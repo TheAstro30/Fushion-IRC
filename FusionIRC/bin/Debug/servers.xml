@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<servers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <networks>
+    <network name="Abc" last="0">
+      <server address="irc.abc.net.au" portRange="6667" />
+      <server address="irc.dont.com" portRange="6667" description="Random server" />
+      <server address="irc.format.com" portRange="6667" />
+      <server address="irc.formatme.com" portRange="6667" />
+    </network>
+    <network name="Test" last="0">
+      <server address="irc.abc.com" portRange="6667-6669,+7000" password="yourmom" description="Random server" />
+    </network>
+  </networks>
+</servers>

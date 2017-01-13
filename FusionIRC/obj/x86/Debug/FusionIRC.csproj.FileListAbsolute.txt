@@ -1,0 +1,13 @@
+E:\CSharp\FusionIRC\FusionIRC\FusionIRC\bin\Debug\FusionIRC.exe
+E:\CSharp\FusionIRC\FusionIRC\FusionIRC\bin\Debug\FusionIRC.pdb
+E:\CSharp\FusionIRC\FusionIRC\FusionIRC\bin\Debug\ircClient.dll
+E:\CSharp\FusionIRC\FusionIRC\FusionIRC\bin\Debug\ircCore.dll
+E:\CSharp\FusionIRC\FusionIRC\FusionIRC\bin\Debug\ircClient.pdb
+E:\CSharp\FusionIRC\FusionIRC\FusionIRC\bin\Debug\ircCore.pdb
+E:\CSharp\FusionIRC\FusionIRC\FusionIRC\obj\x86\Debug\FusionIRC.csprojResolveAssemblyReference.cache
+E:\CSharp\FusionIRC\FusionIRC\FusionIRC\obj\x86\Debug\FusionIRC.Forms.FrmClientWindow.resources
+E:\CSharp\FusionIRC\FusionIRC\FusionIRC\obj\x86\Debug\FusionIRC.Forms.FrmTest.resources
+E:\CSharp\FusionIRC\FusionIRC\FusionIRC\obj\x86\Debug\FusionIRC.Properties.Resources.resources
+E:\CSharp\FusionIRC\FusionIRC\FusionIRC\obj\x86\Debug\FusionIRC.csproj.GenerateResource.Cache
+E:\CSharp\FusionIRC\FusionIRC\FusionIRC\obj\x86\Debug\FusionIRC.exe
+E:\CSharp\FusionIRC\FusionIRC\FusionIRC\obj\x86\Debug\FusionIRC.pdb

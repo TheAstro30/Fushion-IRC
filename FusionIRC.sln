@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FusionIRC", "FusionIRC\FusionIRC.csproj", "{609713B4-9C5E-4572-9CEA-264BFF253268}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ircClient", "ircClient\ircClient\ircClient.csproj", "{883E7B5A-3260-4A3D-A5F9-DF69B08CAF7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ircCore", "ircCore\ircCore.csproj", "{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{609713B4-9C5E-4572-9CEA-264BFF253268}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{609713B4-9C5E-4572-9CEA-264BFF253268}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{609713B4-9C5E-4572-9CEA-264BFF253268}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{609713B4-9C5E-4572-9CEA-264BFF253268}.Debug|x86.ActiveCfg = Debug|x86
+		{609713B4-9C5E-4572-9CEA-264BFF253268}.Debug|x86.Build.0 = Debug|x86
+		{609713B4-9C5E-4572-9CEA-264BFF253268}.Release|Any CPU.ActiveCfg = Release|x86
+		{609713B4-9C5E-4572-9CEA-264BFF253268}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{609713B4-9C5E-4572-9CEA-264BFF253268}.Release|Mixed Platforms.Build.0 = Release|x86
+		{609713B4-9C5E-4572-9CEA-264BFF253268}.Release|x86.ActiveCfg = Release|x86
+		{609713B4-9C5E-4572-9CEA-264BFF253268}.Release|x86.Build.0 = Release|x86
+		{883E7B5A-3260-4A3D-A5F9-DF69B08CAF7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{883E7B5A-3260-4A3D-A5F9-DF69B08CAF7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{883E7B5A-3260-4A3D-A5F9-DF69B08CAF7F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{883E7B5A-3260-4A3D-A5F9-DF69B08CAF7F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{883E7B5A-3260-4A3D-A5F9-DF69B08CAF7F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{883E7B5A-3260-4A3D-A5F9-DF69B08CAF7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{883E7B5A-3260-4A3D-A5F9-DF69B08CAF7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{883E7B5A-3260-4A3D-A5F9-DF69B08CAF7F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{883E7B5A-3260-4A3D-A5F9-DF69B08CAF7F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{883E7B5A-3260-4A3D-A5F9-DF69B08CAF7F}.Release|x86.ActiveCfg = Release|Any CPU
+		{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

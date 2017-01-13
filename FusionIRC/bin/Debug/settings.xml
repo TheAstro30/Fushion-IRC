@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <windows>
+    <window name="application" size="969,593" position="55,55" maximized="false" />
+  </windows>
+  <themes currentTheme="0">
+    <theme name="Default" path="default.thm" />
+  </themes>
+</settings>
