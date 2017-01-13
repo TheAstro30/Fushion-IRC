@@ -1,7 +1,0 @@
-E:\CSharp\FusionIRC\FusionIRC\ircClient\ircClient\bin\Debug\ircClient.dll
-E:\CSharp\FusionIRC\FusionIRC\ircClient\ircClient\bin\Debug\ircClient.pdb
-E:\CSharp\FusionIRC\FusionIRC\ircClient\ircClient\bin\Debug\ircCore.dll
-E:\CSharp\FusionIRC\FusionIRC\ircClient\ircClient\bin\Debug\ircCore.pdb
-E:\CSharp\FusionIRC\FusionIRC\ircClient\ircClient\obj\Debug\ircClient.csprojResolveAssemblyReference.cache
-E:\CSharp\FusionIRC\FusionIRC\ircClient\ircClient\obj\Debug\ircClient.dll
-E:\CSharp\FusionIRC\FusionIRC\ircClient\ircClient\obj\Debug\ircClient.pdb
