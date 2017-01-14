@@ -6,7 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using ircCore.Controls.ChildWindows.IrcWindow.Helpers;
+using ircCore.Controls.ChildWindows.OutputDisplay.Helpers;
 
 namespace ircCore.Settings.Theming
 {   

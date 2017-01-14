@@ -1,6 +1,6 @@
-﻿namespace FusionIRC.Forms
+﻿namespace ircCore.Dialogs
 {
-    partial class FrmClientWindow
+    partial class FrmOptions
     {
         /// <summary>
         /// Required designer variable.
@@ -28,26 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmClientWindow));
             this.SuspendLayout();
             // 
-            // FrmClientWindow
+            // FrmOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(953, 554);
+            this.ClientSize = new System.Drawing.Size(720, 440);
             this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.IsMdiContainer = true;
-            this.Name = "FrmClientWindow";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "FusionIRC";
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "FrmOptions";
+            this.Text = "Settings";
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
     }
 }
-

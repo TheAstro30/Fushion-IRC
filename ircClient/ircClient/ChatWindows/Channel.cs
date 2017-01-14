@@ -4,8 +4,8 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System.Windows.Forms;
-using ircCore.Controls.ChildWindows.IrcWindow;
 using ircCore.Controls.ChildWindows.Nicklist;
+using ircCore.Controls.ChildWindows.OutputDisplay;
 
 namespace ircClient.ChatWindows
 {

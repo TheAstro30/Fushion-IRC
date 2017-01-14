@@ -42,21 +42,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\ChildWindows\IrcWindow\Helpers\Character.cs" />
-    <Compile Include="Controls\ChildWindows\IrcWindow\Helpers\InternalClipboard.cs" />
-    <Compile Include="Controls\ChildWindows\IrcWindow\Helpers\Functions.cs" />
-    <Compile Include="Controls\ChildWindows\IrcWindow\Helpers\OutputRenderer.cs">
+    <Compile Include="Controls\ChildWindows\Helpers\ControlByte.cs" />
+    <Compile Include="Controls\ChildWindows\Input\InputWindow.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\ChildWindows\IrcWindow\Helpers\TextMeasurement.cs" />
-    <Compile Include="Controls\ChildWindows\IrcWindow\Helpers\Wrapping.cs" />
-    <Compile Include="Controls\ChildWindows\IrcWindow\OutputWindow.cs">
+    <Compile Include="Controls\ChildWindows\OutputDisplay\Helpers\Functions.cs" />
+    <Compile Include="Controls\ChildWindows\OutputDisplay\Helpers\Character.cs" />
+    <Compile Include="Controls\ChildWindows\Helpers\InternalClipboard.cs" />
+    <Compile Include="Controls\ChildWindows\OutputDisplay\Helpers\OutputRenderer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\ChildWindows\IrcWindow\Structures\ControlByteData.cs" />
-    <Compile Include="Controls\ChildWindows\IrcWindow\Structures\MarkingData.cs" />
-    <Compile Include="Controls\ChildWindows\IrcWindow\Structures\TextData.cs" />
-    <Compile Include="Controls\ChildWindows\IrcWindow\Structures\WrapData.cs" />
+    <Compile Include="Controls\ChildWindows\OutputDisplay\Helpers\TextMeasurement.cs" />
+    <Compile Include="Controls\ChildWindows\OutputDisplay\Helpers\Wrapping.cs" />
+    <Compile Include="Controls\ChildWindows\OutputDisplay\OutputWindow.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ChildWindows\OutputDisplay\Structures\ControlByteData.cs" />
+    <Compile Include="Controls\ChildWindows\OutputDisplay\Structures\MarkingData.cs" />
+    <Compile Include="Controls\ChildWindows\OutputDisplay\Structures\TextData.cs" />
+    <Compile Include="Controls\ChildWindows\OutputDisplay\Structures\WrapData.cs" />
     <Compile Include="Controls\ChildWindows\Nicklist\Helpers\NickComparer.cs" />
     <Compile Include="Controls\ChildWindows\Nicklist\Helpers\NickComparerHelper.cs" />
     <Compile Include="Controls\ChildWindows\Nicklist\Helpers\NicklistStyler.cs">
@@ -66,17 +70,26 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\ChildWindows\Nicklist\Structures\NickData.cs" />
-    <Compile Include="Controls\SwitchTreeView\Base\TreeNodeEx.cs" />
-    <Compile Include="Controls\SwitchTreeView\Base\TreeViewEx.cs">
+    <Compile Include="Controls\ChildWindows\Input\ColorBox\ColorSelectionBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\SwitchTreeView\IrcSwitchTreeView.cs">
+    <Compile Include="Controls\ChildWindows\Input\ColorBox\ColorTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Dialog\FrmOptions.cs">
+    <Compile Include="Dialogs\FrmColorIndex.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialog\FrmOptions.Designer.cs">
+    <Compile Include="Controls\SwitchView\Base\TreeNodeEx.cs" />
+    <Compile Include="Controls\SwitchView\Base\TreeViewEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\SwitchView\WindowTreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Dialogs\FrmOptions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\FrmOptions.Designer.cs">
       <DependentUpon>FrmOptions.cs</DependentUpon>
     </Compile>
     <Compile Include="Settings\Networks\ServerManager.cs" />
@@ -95,7 +108,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <EmbeddedResource Include="Dialog\FrmOptions.resx">
+    <EmbeddedResource Include="Dialogs\FrmOptions.resx">
       <DependentUpon>FrmOptions.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>

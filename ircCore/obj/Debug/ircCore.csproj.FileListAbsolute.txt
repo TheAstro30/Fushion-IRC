@@ -1,6 +1,0 @@
-E:\CSharp\FusionIRC\FusionIRC\ircCore\bin\Debug\ircCore.dll
-E:\CSharp\FusionIRC\FusionIRC\ircCore\bin\Debug\ircCore.pdb
-E:\CSharp\FusionIRC\FusionIRC\ircCore\obj\Debug\ircCore.Dialog.FrmOptions.resources
-E:\CSharp\FusionIRC\FusionIRC\ircCore\obj\Debug\ircCore.csproj.GenerateResource.Cache
-E:\CSharp\FusionIRC\FusionIRC\ircCore\obj\Debug\ircCore.dll
-E:\CSharp\FusionIRC\FusionIRC\ircCore\obj\Debug\ircCore.pdb

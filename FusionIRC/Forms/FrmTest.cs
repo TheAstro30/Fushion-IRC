@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using ircCore.Controls.ChildWindows.IrcWindow.Helpers;
+using ircCore.Controls.ChildWindows.OutputDisplay.Helpers;
 using ircCore.Settings.Theming;
 
 namespace FusionIRC.Forms
@@ -11,7 +11,7 @@ namespace FusionIRC.Forms
     {
         public FrmTest()
         {
-            InitializeComponent();            
+            InitializeComponent();
             //WHEN I DELETE THIS FORM THE FOLLOWING SETTINGS BELOW NEED TO BE IMPLEMENTED ON THE CHILD WINDOW
             outputWindow1.BackColor = ThemeManager.GetColor(ThemeColor.WindowBackColor);
             outputWindow1.ForeColor = ThemeManager.GetColor(ThemeColor.WindowForeColor);
@@ -63,10 +63,14 @@ namespace FusionIRC.Forms
             //outputWindow1.SaveBuffer("test.buf");
             //outputWindow1.LoadBuffer("test.buf");
             //outputWindow1.AddLine(1, true, string.Format("[{0:00}:{1:00}] {2}", now.Hour, now.Minute, "<DonaldTrump> 4,1W15e 4n15eed 4t15o 4b15uild 4a w15all!"));
-            //outputWindow1.Clear();                      
+            //outputWindow1.Clear();                     
         }
 
-
+        protected override void OnLoad(EventArgs e)
+        {
+            FrmTest_Resize(this, new EventArgs());
+            base.OnLoad(e);
+        }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
@@ -87,6 +91,14 @@ namespace FusionIRC.Forms
         private void outputWindow1_OnWindowRightClicked()
         {
             MessageBox.Show(@"Window was right-clicked");
+        }
+
+        private void FrmTest_Resize(object sender, EventArgs e)
+        {
+            outputWindow1.SetBounds(0, 0, ClientRectangle.Width,
+                                    ClientRectangle.Height - inputBox1.ClientRectangle.Height - 1);
+            inputBox1.SetBounds(0, ClientRectangle.Height - inputBox1.ClientRectangle.Height, ClientRectangle.Width,
+                                inputBox1.ClientRectangle.Height);
         }
     }
 }
