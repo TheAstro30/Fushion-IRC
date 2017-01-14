@@ -29,7 +29,7 @@ namespace ircCore.Controls.ChildWindows.Input.ColorBox
         public void SetBoxColor(int index, Color c)
         {
             _boxColor[index] = c;
-            Refresh();
+            Invalidate();
         }
 
         public bool ShowFocusRectangle
@@ -44,7 +44,7 @@ namespace ircCore.Controls.ChildWindows.Input.ColorBox
             set
             {
                 _selected = value;
-                Refresh();
+                Invalidate();
             }
         }
 
@@ -79,7 +79,7 @@ namespace ircCore.Controls.ChildWindows.Input.ColorBox
                         }
                     }
                 }
-                Refresh();
+                Invalidate();
             }
             base.OnMouseDown(e);
         }

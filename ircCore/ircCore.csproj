@@ -103,6 +103,7 @@
     <Compile Include="Settings\Theming\Theme.cs" />
     <Compile Include="Settings\Theming\ThemeManager.cs" />
     <Compile Include="Utils\TimeFunctions.cs" />
+    <Compile Include="Utils\Utf8.cs" />
     <Compile Include="Utils\XmlFormatting.cs" />
     <Compile Include="Utils\Serialization\XmlSerialize.cs" />
   </ItemGroup>
