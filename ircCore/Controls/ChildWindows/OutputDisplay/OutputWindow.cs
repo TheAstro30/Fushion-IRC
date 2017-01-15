@@ -37,13 +37,15 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         private int _maximumLines;
         private int _averageCharacterWidth;
         private int _windowWidth;
-        private int _largeChange;
         private int _scrollValue;
         private bool _scrolledToBottom;
 
         private string _url;
 
         private readonly Timer _wrapUpdate;
+        private readonly Timer _update;
+        private bool _incomingText;
+
         private readonly bool _initialized;
 
         /* Public events */
@@ -76,8 +78,11 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             _vScroll.Scroll += VerticalScrollUpdate;
             Controls.Add(_vScroll);
             /* Wrap update timer */
-            _wrapUpdate = new Timer {Interval = 10};
+            _wrapUpdate = new Timer {Interval = 5};
             _wrapUpdate.Tick += TimerReWrap;
+            /* Addline wait to finish adding timer */
+            _update = new Timer {Interval = 5};
+            _update.Tick += TimerUpdate;
             _initialized = true;
         }
 
@@ -486,6 +491,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 return; /* Nothing to do */
             }         
             /* Add the raw text to our structure first; this may or may not be used as the control develops */
+            _incomingText = true;
             var lines = TextData.WrappedLinesCount - 1;
             var currentLines = lines > 0 ? lines : 0;
             var t = new TextData.Text
@@ -509,13 +515,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             {
                 TrimBuffer();
             }
-            /* Update the vertical scroll bar's max, current value, etc */
-            if (TextHeight > 0)
-            {
-                _largeChange = ClientRectangle.Height / TextHeight;
-                _vScroll.LargeChange = _largeChange;
-                _vScroll.Maximum = (TextData.WrappedLinesCount - 1) + _largeChange;
-            }               
+            /* Set scrolled to bottom value */              
             if (_scrollValue == currentLines)
             {
                 _scrolledToBottom = true;
@@ -524,14 +524,17 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             else
             {
                 _scrolledToBottom = false;
-            }
-            UpdateScrollBar();
+            }            
             if (OnLineAdded != null)
             {
                 OnLineAdded(text); /* This can be used to output to a log file */
             }
-            /* Now refresh the hDC and draw out our newly added line ;) */
-            Invalidate();            
+            /* Now refresh the hDC and draw out our newly added line ;) */        
+            if (_update.Enabled)
+            {
+                return;
+            }
+            _update.Enabled = true;
         }
 
         public void LoadBuffer(string file)
@@ -672,6 +675,20 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             }
             UpdateScrollBar();
             Invalidate();
+        }
+
+        private void TimerUpdate(object sender, EventArgs e)
+        {
+            if (!_incomingText)
+            {
+                _update.Enabled = false;
+                UpdateScrollBar();
+                Invalidate();
+            }
+            else
+            {
+                _incomingText = false;
+            }
         }
     }
 }

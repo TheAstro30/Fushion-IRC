@@ -33,7 +33,7 @@ namespace FusionIRC.Forms
         {
             this.components = new System.ComponentModel.Container();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.outputWindow1 = new OutputWindow();
+            this.outputWindow1 = new ircCore.Controls.ChildWindows.OutputDisplay.OutputWindow();
             this.inputBox1 = new ircCore.Controls.ChildWindows.Input.InputWindow();
             this.SuspendLayout();
             // 
@@ -48,11 +48,11 @@ namespace FusionIRC.Forms
             this.outputWindow1.AutoScrollMinSize = new System.Drawing.Size(0, 1);
             this.outputWindow1.BackColor = System.Drawing.SystemColors.Window;
             this.outputWindow1.BackgroundImage = null;
-            this.outputWindow1.BackgroundImageLayout = BackgroundImageLayoutStyles.Tile;
+            this.outputWindow1.BackgroundImageLayout = ircCore.Controls.ChildWindows.OutputDisplay.Helpers.BackgroundImageLayoutStyles.Tile;
             this.outputWindow1.ForeColor = System.Drawing.SystemColors.WindowText;
             this.outputWindow1.IndentWidth = 16;
             this.outputWindow1.LineMarkerColor = System.Drawing.Color.Red;
-            this.outputWindow1.LineSpacingStyle = LineSpacingStyle.Single;
+            this.outputWindow1.LineSpacingStyle = ircCore.Controls.ChildWindows.OutputDisplay.Helpers.LineSpacingStyle.Single;
             this.outputWindow1.Location = new System.Drawing.Point(0, 0);
             this.outputWindow1.MaximumLines = 500;
             this.outputWindow1.Name = "outputWindow1";
@@ -78,7 +78,7 @@ namespace FusionIRC.Forms
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.ClientSize = new System.Drawing.Size(651, 346);
+            this.ClientSize = new System.Drawing.Size(653, 350);
             this.Controls.Add(this.inputBox1);
             this.Controls.Add(this.outputWindow1);
             this.MinimumSize = new System.Drawing.Size(100, 100);

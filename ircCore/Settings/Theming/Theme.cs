@@ -42,9 +42,9 @@ namespace ircCore.Settings.Theming
 
         public Dictionary<ThemeColor, int> ThemeColors = new Dictionary<ThemeColor, int>();
 
-        public Dictionary<ThemeWindow, Font> ThemeFonts = new Dictionary<ThemeWindow, Font>();
+        public Dictionary<ChildWindowType, Font> ThemeFonts = new Dictionary<ChildWindowType, Font>();
 
-        public Dictionary<ThemeWindow, ThemeBackgroundData> ThemeBackgrounds = new Dictionary<ThemeWindow, ThemeBackgroundData>();
+        public Dictionary<ChildWindowType, ThemeBackgroundData> ThemeBackgrounds = new Dictionary<ChildWindowType, ThemeBackgroundData>();
 
         public Dictionary<ThemeMessage, ThemeMessageData> Messages = new Dictionary<ThemeMessage, ThemeMessageData>();
         
@@ -72,14 +72,14 @@ namespace ircCore.Settings.Theming
             /* Default time stamp */
             TimeStampFormat = "[h:nnt]";
             /* Default fonts */
-            ThemeFonts.Add(ThemeWindow.Console, new Font("Lucida Console", 10));
-            ThemeFonts.Add(ThemeWindow.Channel, new Font("Lucida Console", 10));
-            ThemeFonts.Add(ThemeWindow.Private, new Font("Lucida Console", 10));
+            ThemeFonts.Add(ChildWindowType.Console, new Font("Lucida Console", 10));
+            ThemeFonts.Add(ChildWindowType.Channel, new Font("Lucida Console", 10));
+            ThemeFonts.Add(ChildWindowType.Private, new Font("Lucida Console", 10));
             /* Default messages */
             Messages.Add(ThemeMessage.ChannelTopic, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Topic is: '$text'" });
             Messages.Add(ThemeMessage.ChannelTopicSet, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Topic set by: $nick $text" });
             Messages.Add(ThemeMessage.ChannelTopicChange, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * $nick changes $target topic to '$text'" });
-            Messages.Add(ThemeMessage.ChannelText, new ThemeMessageData {DefaultColor = 1, MessageFormat = "$ts <$nick ($address)> $text"});
+            Messages.Add(ThemeMessage.ChannelText, new ThemeMessageData {DefaultColor = 1, MessageFormat = "$ts <$nick> $text"});
             Messages.Add(ThemeMessage.ChannelSelfText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts <$me> $text" });
             Messages.Add(ThemeMessage.ChannelActionText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * $nick $text" });
             Messages.Add(ThemeMessage.ChannelSelfActionText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * $me $text" });
@@ -92,9 +92,10 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.ModeChannelText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $nick sets mode: $text" });
             Messages.Add(ThemeMessage.ModeUserText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $nick sets mode: $text $target" });
             Messages.Add(ThemeMessage.ModeSelfText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $me sets mode: $text" });
+            Messages.Add(ThemeMessage.NickChange, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $nick is now known as: $newnick" });
             //delete this
             var bgd = new ThemeBackgroundData {Path = "c.jpg", LayoutStyle = BackgroundImageLayoutStyles.Photo};
-            ThemeBackgrounds.Add(ThemeWindow.Channel, bgd);
+            ThemeBackgrounds.Add(ChildWindowType.Channel, bgd);
             /* Set this flag to true to ensure it will be saved if it doesn't exist (ie: load fails) */
             ThemeChanged = true;
         }        

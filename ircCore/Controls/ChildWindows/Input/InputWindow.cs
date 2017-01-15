@@ -135,49 +135,49 @@ namespace ircCore.Controls.ChildWindows.Input
         {
             _mnuContext.Items.Clear();
             var m = new ToolStripMenuItem("Undo", null, ContextMenuOnClick)
-            {
-                ShortcutKeys = Keys.Control | Keys.Z,
-                Enabled = _txtOut.CanUndo,
-                Tag = "UNDO"
-            };
+                        {
+                            ShortcutKeys = Keys.Control | Keys.Z,
+                            Enabled = _txtOut.CanUndo,
+                            Tag = "UNDO"
+                        };
             _mnuContext.Items.Add(m);
             var s = new ToolStripSeparator();
             _mnuContext.Items.Add(s);
             m = new ToolStripMenuItem("Cut", null, ContextMenuOnClick)
-            {
-                ShortcutKeys = Keys.Control | Keys.X,
-                Enabled = _txtOut.SelectedText.Length > 0,
-                Tag = "CUT"
-            };
+                    {
+                        ShortcutKeys = Keys.Control | Keys.X,
+                        Enabled = _txtOut.SelectedText.Length > 0,
+                        Tag = "CUT"
+                    };
             _mnuContext.Items.Add(m);
             m = new ToolStripMenuItem("Copy", null, ContextMenuOnClick)
-            {
-                ShortcutKeys = Keys.Control | Keys.C,
-                Enabled = _txtOut.SelectedText.Length > 0,
-                Tag = "COPY"
-            };
+                    {
+                        ShortcutKeys = Keys.Control | Keys.C,
+                        Enabled = _txtOut.SelectedText.Length > 0,
+                        Tag = "COPY"
+                    };
             _mnuContext.Items.Add(m);
             m = new ToolStripMenuItem("Paste", null, ContextMenuOnClick)
-            {
-                ShortcutKeys = Keys.Control | Keys.V,
-                Enabled = Clipboard.GetText().Length > 0,
-                Tag = "PASTE"
-            };
+                    {
+                        ShortcutKeys = Keys.Control | Keys.V,
+                        Enabled = Clipboard.GetText().Length > 0,
+                        Tag = "PASTE"
+                    };
             _mnuContext.Items.Add(m);
             m = new ToolStripMenuItem("Delete", null, ContextMenuOnClick)
-            {
-                Enabled = _txtOut.SelectedText.Length > 0,
-                Tag = "DELETE"
-            };
+                    {
+                        Enabled = _txtOut.SelectedText.Length > 0,
+                        Tag = "DELETE"
+                    };
             _mnuContext.Items.Add(m);
             s = new ToolStripSeparator();
             _mnuContext.Items.Add(s);
             m = new ToolStripMenuItem("Select ALL", null, ContextMenuOnClick)
-            {
-                ShortcutKeys = Keys.Control | Keys.A,
-                Enabled = !string.IsNullOrEmpty(_txtOut.Text),
-                Tag = "ALL"
-            };
+                    {
+                        ShortcutKeys = Keys.Control | Keys.A,
+                        Enabled = !string.IsNullOrEmpty(_txtOut.Text),
+                        Tag = "ALL"
+                    };
             _mnuContext.Items.Add(m);
         }
 
@@ -190,15 +190,19 @@ namespace ircCore.Controls.ChildWindows.Input
                 case "UNDO":
                     _txtOut.Undo();
                     break;
+
                 case "CUT":
                     _txtOut.Cut();
                     break;
+
                 case "COPY":
                     _txtOut.Copy();
                     break;
+
                 case "PASTE":
                     _txtOut.Paste();
                     break;
+
                 case "DELETE":
                     /* Copy contents of clipboard */
                     var strTemp = Clipboard.GetText();
@@ -208,6 +212,7 @@ namespace ircCore.Controls.ChildWindows.Input
                     if (!string.IsNullOrEmpty(strTemp)) { Clipboard.SetText(strTemp); }
                     else { Clipboard.Clear(); }
                     break;
+
                 case "ALL":
                     _txtOut.SelectAll();
                     break;
@@ -228,7 +233,12 @@ namespace ircCore.Controls.ChildWindows.Input
                         if (_history.Count > 100) { _history.RemoveAt(0); }
                         _historyPoint = _history.Count;
                     }
+                    else
+                    {
+                        SystemSounds.Beep.Play();
+                    }
                     break;
+
                 case 38:
                     /* Up arrow */
                     _historyPoint -= 1;
@@ -246,6 +256,7 @@ namespace ircCore.Controls.ChildWindows.Input
                         }
                     }
                     break;
+
                 case 40:
                     /* Down arrow */
                     _historyPoint += 1;
@@ -278,6 +289,7 @@ namespace ircCore.Controls.ChildWindows.Input
                     if (TabKeyPress != null) { TabKeyPress(this); }
                     e.Handled = true;
                     break;
+
                 case (char)13:
                     e.Handled = true;
                     break;

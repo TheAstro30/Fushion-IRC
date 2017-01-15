@@ -4,93 +4,158 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
-using System.Runtime.InteropServices;
+using System.Drawing;
+using System.Media;
 using System.Windows.Forms;
+using FusionIRC.Helpers;
+using FusionIRC.Properties;
+using ircClient;
+using ircCore.Controls;
 using ircCore.Controls.ChildWindows.Input;
 using ircCore.Controls.ChildWindows.Nicklist;
 using ircCore.Controls.ChildWindows.OutputDisplay;
+using ircCore.Controls.ChildWindows.OutputDisplay.Helpers;
+using ircCore.Settings;
+using ircCore.Settings.Theming;
+using ircCore.Utils;
 
 namespace FusionIRC.Forms
 {
     /* This class is our "main" chat window for console, channel, query and DCC chats - one class for all */
-    public enum ChildWindowType
-    {
-        Console = 0,
-        Channel = 1,
-        Private = 2,
-        DccChat = 3
-    }
-
-    public class FrmChildWindow : Form
+    public sealed class FrmChildWindow : ChildWindow
     {        
-        /* Win32 API */
-        [DllImport("user32.dll", EntryPoint = "SendMessageA", CharSet = CharSet.Auto)]
-        private static extern IntPtr SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr GetTopWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern bool BringWindowToTop(IntPtr hWnd);
-
-        protected const int UmsgDonothide = 0x404;
-        protected const int UmsgOkhide = 0x405;
-        protected const int ScMinimize = 0xf020;
-        protected const int WmSyscommand = 0x112;
-        protected const int WmMdirestore = 0x223;
-        protected const int WmMdinext = 0x224;
-        protected const int WmNcactivate = 0x86;
-
         /* Public properties */
-        public bool NoDeactivate { get; set; }
-
         public ChildWindowType WindowType { get; private set; }
+        public ClientConnection Client { get; private set; }
         public OutputWindow Output { get; set; }
         public InputWindow Input { get; set; }
         public Nicklist Nicklist { get; set; }
 
         /* Constructor */
-        public FrmChildWindow(ChildWindowType type)
+        public FrmChildWindow(ClientConnection client, ChildWindowType type, Form owner)
         {
             /* Constructor where we pass what type of window this is - then we know what controls to create ;) */
-            WindowType = type;
-            Output = new OutputWindow(); //make sure to set proper properties and things here
-            Input = new InputWindow(); //make sure to set proper properties and things here
-        }
+            Client = client;
+            WindowType = type;            
+            /* Controls */
+            Input = new InputWindow
+                        {
+                            BackColor = ThemeManager.GetColor(ThemeColor.WindowBackColor),//change to its own
+                            ForeColor = ThemeManager.GetColor(ThemeColor.WindowForeColor),//change to its own
+                            Font = ThemeManager.CurrentTheme.ThemeFonts[type]
+                        };
 
-        /* Public activation mehtods */
-        public void ShowWithoutActive()
-        {
-            var topWindow = GetTopWindow(Parent.Handle);
-            SendMessage(topWindow, UmsgDonothide, IntPtr.Zero, IntPtr.Zero);
-            Show();
-            SendMessage(topWindow, UmsgOkhide, IntPtr.Zero, IntPtr.Zero);
-            var f = (FrmChildWindow)FromHandle(topWindow);
-            if (f == null) { return; }
-            //if (IrcMain.Settings.WinMaximized)
-            //{
-            //    f.WindowState = FormWindowState.Maximized;
-            //}
-            f.BringToFront();
-            f.MyActivate();
-        }
+            Output = new OutputWindow
+                         {                             
+                             BackColor = ThemeManager.GetColor(ThemeColor.WindowBackColor),
+                             ForeColor = ThemeManager.GetColor(ThemeColor.WindowForeColor),
+                             Font = ThemeManager.CurrentTheme.ThemeFonts[type],
+                             LineSpacingStyle = LineSpacingStyle.Paragraph
+                         };
 
-        public void MyActivate()
-        {
-            /* This method raises the original forms Activated event if you
-               want other controls to be focused when the form regains focus */
-            OnActivated(new EventArgs());
-        }
+            if (type == ChildWindowType.Channel)
+            {
+                Nicklist = new Nicklist
+                               {
+                                   BackColor = ThemeManager.GetColor(ThemeColor.WindowBackColor),//change to its own
+                                   ForeColor = ThemeManager.GetColor(ThemeColor.WindowForeColor),//change to its own
+                                   Font = ThemeManager.CurrentTheme.ThemeFonts[type]
+                               };
+            }
+            /* Add controls */                        
+            Controls.AddRange(new Control[] {Input, Output});
+            if (Nicklist != null)
+            {
+                Controls.Add(Nicklist);
+            }
+            /* Callbacks */
+            Input.TabKeyPress += InputTabKeyPress;
+            Input.KeyDown += InputKeyDown;
+            /* Window properties */
+            BackColor = Color.FromArgb(190, 190, 190);            
+            ShowInTaskbar = false;
+            MdiParent = owner;
+            MinimumSize = new Size(480, 280);
+            /* Set window icon */
+            switch (type)
+            {
+                case ChildWindowType.Console:
+                    Icon = Resources.status;
+                    break;
 
-        public void Restore()
-        {
-            SendMessage(Parent.Handle, WmMdirestore, Handle, IntPtr.Zero);
-        }
+                case ChildWindowType.Channel:
+                    Icon = Resources.channel;
+                    break;
 
+                case ChildWindowType.Private:
+                    Icon = Resources.query;
+                    break;
+
+                case ChildWindowType.DccChat:
+                    Icon = Resources.dcc_chat;
+                    break;
+            }
+            /* Set client size */
+            ClientSize = new Size(540, 400);            
+        }
+        
         /* Overrides */
+        protected override void OnActivated(EventArgs e)
+        {
+            Input.Focus();
+            base.OnActivated(e);
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            OnResize(new EventArgs());
+            base.OnLoad(e);
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            /* Update window position in settings ... */
+            switch (e.CloseReason)
+            {
+                case CloseReason.ApplicationExitCall:
+                case CloseReason.WindowsShutDown:
+                case CloseReason.MdiFormClosing:
+                    return;
+            }            
+            if (WindowType == ChildWindowType.Console)                
+            {
+                if (WindowManager.Windows.Count == 1)
+                {
+                    /* Make sure we're not trying to close the only open console!! */
+                    e.Cancel = true;
+                    SystemSounds.Beep.Play();
+                    return;
+                }
+                /* Before removing the window, it would be a good idea to 1) send the quit message & 2) close all windows associated with this console */
+                Client.Send(string.Format("QUIT :Leaving."));
+                WindowManager.RemoveAllWindowsOfConsole(Client);
+            }            
+            if (WindowType == ChildWindowType.Channel && Client.IsConnected)
+            {
+                /* Part channel if closing it */
+                Client.Send(string.Format("PART {0}", Tag));
+            }
+            WindowManager.RemoveWindow(Client, this);
+            base.OnFormClosing(e);
+
+        }
+
         protected override void OnResize(EventArgs e)
         {
             /* Adjust our controls based on window type */
+            var right = WindowType == ChildWindowType.Channel ? 120 : 0;
+            var height = ClientRectangle.Height - Input.ClientRectangle.Height - 1;
+            Output.SetBounds(0, 0, ClientRectangle.Width - right, height);
+            Input.SetBounds(0, Output.ClientRectangle.Height + 1, ClientRectangle.Width, Input.ClientRectangle.Height);
+            if (Nicklist != null)
+            {
+                Nicklist.SetBounds(ClientRectangle.Width - right, 0, right, height);
+            }
             base.OnResize(e);
         }
 
@@ -108,34 +173,72 @@ namespace FusionIRC.Forms
             base.Dispose(disposing);
         }
 
-        protected override void WndProc(ref Message m)
+        /* Control callbacks */
+        private void InputTabKeyPress(InputWindow e)
         {
-            if (NoDeactivate && m.Msg == WmNcactivate && m.WParam == IntPtr.Zero)
+            //lstNicklist.TabNextNick(txtOut, IrcTokens.Gettok(Text, 1, 1, (char)32));
+        }
+
+        private void InputKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
             {
-                m.WParam = (IntPtr)1;
-                BringWindowToTop(m.HWnd);
-                base.WndProc(ref m);
-                m.Result = IntPtr.Zero;
-            }
-            else switch (m.Msg)
-                {
-                    case UmsgOkhide:
-                        NoDeactivate = false;
-                        break;
-
-                    case UmsgDonothide:
-                        NoDeactivate = true;
-                        break;
-
-                    default:
-                        if (m.Msg == WmSyscommand && m.WParam.ToInt32() == ScMinimize)
+                case Keys.Return:
+                    var s = Utf8.ConvertToUtf8(Input.Text, true);
+                    Input.Text = null;                    
+                    /* Send text to server */
+                    if (WindowType != ChildWindowType.Console)
+                    {
+                        if (s[0] == '/')
                         {
-                            /* Detects if a form is minimized and stops the MDI client from restoring down all child windows */
-                            SendMessage(Parent.Handle, WmMdinext, IntPtr.Zero, IntPtr.Zero);
-                        }                        
-                        base.WndProc(ref m);
-                        break;
-                }
-        }        
+                            CommandProcessor.Parse(Client, this, s);
+                            return;
+                        }
+                        if (!Client.IsConnected)
+                        {
+                            return;
+                        }
+                        var tmd = new IncomingMessageData
+                                      {
+                                          Message = WindowType == ChildWindowType.Channel ? ThemeMessage.ChannelSelfText : ThemeMessage.ChannelText,
+                                          TimeStamp = DateTime.Now,
+                                          Nick = Client.UserInfo.Nick,                                          
+                                          Text = s
+                                      };
+                        var pmd = ThemeManager.ParseMessage(tmd);
+                        Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+                        Client.Send(string.Format("PRIVMSG {0} :{1}", Tag, Utf8.ConvertFromUtf8(s, true)));
+                        return;
+                    }
+                    /* Console window */
+                    if (s[0] == '/')
+                    {
+                        CommandProcessor.Parse(Client, this, s);
+                        return;
+                    }
+                    if (!Client.IsConnected)
+                    {
+                        return;
+                    }
+                    /* Console window - send data as raw */
+                    Client.Send(Utf8.ConvertFromUtf8(s, true));
+                    break;
+
+                case Keys.Back:
+                case Keys.Delete:
+                case Keys.Up:
+                case Keys.Right:
+                case Keys.Left:
+                case Keys.Down:
+                case Keys.Space:
+                    /* Nicklist clear tab search completion */
+                    break;
+            }
+        }
+
+        private void InputMouseWheel(object sender, MouseEventArgs e)
+        {
+            //txtIn.MouseWheelScroll(sender, e); not implemented on control yet
+        }
     }
 }

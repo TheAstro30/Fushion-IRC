@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace ircCore.Utils
 {
-    public sealed class IrcUtf8
+    public sealed class Utf8
     {
         /* UTF8/IRC encoder/decoder module
            Original Author: MichKa

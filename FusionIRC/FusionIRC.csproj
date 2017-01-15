@@ -64,6 +64,9 @@
     <Compile Include="Forms\FrmTest.designer.cs">
       <DependentUpon>FrmTest.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\CommandProcessor.cs" />
+    <Compile Include="Helpers\ConnectionCallbackManager.cs" />
+    <Compile Include="Helpers\WindowManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\FrmClientWindow.resx">
@@ -97,7 +100,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ircClient\ircClient\ircClient.csproj">
+    <ProjectReference Include="..\ircClient\ircClient.csproj">
       <Project>{883E7B5A-3260-4A3D-A5F9-DF69B08CAF7F}</Project>
       <Name>ircClient</Name>
     </ProjectReference>
@@ -112,7 +115,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes\" />
-    <Folder Include="Helpers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -11,17 +11,18 @@ using ircCore.Utils.Serialization;
 
 namespace ircCore.Settings.Theming
 {
+    public enum ChildWindowType
+    {
+        Console = 0,
+        Channel = 1,
+        Private = 2,
+        DccChat = 3
+    }
+
     public enum ThemeColor
     {
         WindowBackColor = 0,
         WindowForeColor = 1
-    }
-
-    public enum ThemeWindow
-    {
-        Console = 0,
-        Channel = 1,
-        Private = 2
     }
 
     public enum ThemeMessage
@@ -44,7 +45,8 @@ namespace ircCore.Settings.Theming
         ModeSelfText = 15,
         QuitText = 16,
         ChannelKickText = 17,
-        ChannelSelfKickText = 18
+        ChannelSelfKickText = 18,
+        NickChange = 19
     }
 
     public class IncomingMessageData
@@ -98,12 +100,12 @@ namespace ircCore.Settings.Theming
         }
 
         /* Accessible theme properties */
-        public static Font GetFont(ThemeWindow window)
+        public static Font GetFont(ChildWindowType window)
         {
             return !CurrentTheme.ThemeFonts.ContainsKey(window) ? new Font("Lucida Console", 10) : CurrentTheme.ThemeFonts[window];
         }
 
-        public static Theme.ThemeBackgroundData GetBackground(ThemeWindow window)
+        public static Theme.ThemeBackgroundData GetBackground(ChildWindowType window)
         {
             return !CurrentTheme.ThemeBackgrounds.ContainsKey(window) ? null : CurrentTheme.ThemeBackgrounds[window];
         }

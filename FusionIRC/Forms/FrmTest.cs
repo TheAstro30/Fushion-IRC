@@ -16,8 +16,8 @@ namespace FusionIRC.Forms
             outputWindow1.BackColor = ThemeManager.GetColor(ThemeColor.WindowBackColor);
             outputWindow1.ForeColor = ThemeManager.GetColor(ThemeColor.WindowForeColor);
 
-            outputWindow1.Font = ThemeManager.CurrentTheme.ThemeFonts[ThemeWindow.Channel];
-            var bd = ThemeManager.GetBackground(ThemeWindow.Channel);
+            outputWindow1.Font = ThemeManager.CurrentTheme.ThemeFonts[ircCore.Settings.Theming.ChildWindowType.Channel];
+            var bd = ThemeManager.GetBackground(ircCore.Settings.Theming.ChildWindowType.Channel);
             if (bd != null && File.Exists(bd.Path))
             {
                 outputWindow1.BackgroundImage = (Bitmap)Image.FromFile(bd.Path);

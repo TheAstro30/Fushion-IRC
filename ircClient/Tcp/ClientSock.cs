@@ -4,6 +4,8 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Linq;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Net;
@@ -66,17 +68,20 @@ namespace ircClient.Tcp
         public virtual event Action<ClientSock, string> OnDebugOut;
         public virtual event Action<ClientSock, X509Certificate> OnSslInvalidCertificate;
 
-        public ClientSock() : this(80)
+        public ClientSock()
+            : this(80)
         {
             /* Empty */
         }
 
-        public ClientSock(int port) : this("127.0.0.1", port)
+        public ClientSock(int port)
+            : this("127.0.0.1", port)
         {
             /* Empty */
         }
 
-        public ClientSock(string ip) : this(ip, 80)
+        public ClientSock(string ip)
+            : this(ip, 80)
         {
             /* Empty */
         }
@@ -97,17 +102,20 @@ namespace ircClient.Tcp
             {
                 if (_syncObject == null & DesignMode)
                 {
-                    var designer = (IDesignerHost)GetService(typeof(IDesignerHost));
+                    var designer = (IDesignerHost) GetService(typeof (IDesignerHost));
                     if (designer != null)
                     {
-                        _syncObject = (ISynchronizeInvoke)designer.RootComponent;
+                        _syncObject = (ISynchronizeInvoke) designer.RootComponent;
                     }
                 }
                 return _syncObject;
             }
             set
             {
-                if (DesignMode) { return; }
+                if (DesignMode)
+                {
+                    return;
+                }
                 if (_syncObject != null && !ReferenceEquals(_syncObject, value))
                 {
                     throw new Exception("Property can not be set at run-time");
@@ -124,7 +132,10 @@ namespace ircClient.Tcp
             get { return _localPort; }
             set
             {
-                if (GetState == WinsockStates.Closed) { _localPort = value; }
+                if (GetState == WinsockStates.Closed)
+                {
+                    _localPort = value;
+                }
             }
         }
 
@@ -134,7 +145,10 @@ namespace ircClient.Tcp
             get { return _remotePort; }
             set
             {
-                if (GetState != WinsockStates.Connected) { _remotePort = value; }
+                if (GetState != WinsockStates.Connected)
+                {
+                    _remotePort = value;
+                }
             }
         }
 
@@ -144,7 +158,10 @@ namespace ircClient.Tcp
             get { return _remoteIp; }
             set
             {
-                if (GetState == WinsockStates.Closed) { _remoteIp = value; }
+                if (GetState == WinsockStates.Closed)
+                {
+                    _remoteIp = value;
+                }
             }
         }
 
@@ -154,10 +171,59 @@ namespace ircClient.Tcp
             {
                 try
                 {
-                    var iEp = (IPEndPoint)_clientSocket.RemoteEndPoint;
+                    var iEp = (IPEndPoint) _clientSocket.RemoteEndPoint;
                     return (iEp != null) ? iEp.Address.ToString() : null;
                 }
-                catch { return null; }
+                catch
+                {
+                    return string.Empty;
+                }
+            }
+        }
+
+        public string LocalIp
+        {
+            get
+            {
+                UnicastIPAddressInformation ip = null;
+                try
+                {
+                    var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+                    foreach (var address in from network in networkInterfaces
+                                            where network.OperationalStatus == OperationalStatus.Up
+                                            select network.GetIPProperties()
+                                            into properties
+                                            where properties.GatewayAddresses.Count != 0
+                                            from address in properties.UnicastAddresses
+                                            where address.Address.AddressFamily == AddressFamily.InterNetwork
+                                            where !IPAddress.IsLoopback(address.Address)
+                                            select address)
+                    {
+                        if (!address.IsDnsEligible)
+                        {
+                            if (ip == null)
+                            {
+                                ip = address;
+                            }
+                            continue;
+                        }
+                        /* The best IP is the IP got from DHCP server */
+                        if (address.PrefixOrigin != PrefixOrigin.Dhcp)
+                        {
+                            if (ip == null || !ip.IsDnsEligible)
+                            {
+                                ip = address;
+                            }
+                            continue;
+                        }
+                        return address.Address.ToString();
+                    }
+                    return ip != null ? ip.Address.ToString() : string.Empty;
+                }
+                catch
+                {
+                    return string.Empty;
+                }
             }
         }
 
@@ -189,7 +255,10 @@ namespace ircClient.Tcp
                     {
                         _listenSocket.Stop();
                     }
-                    catch { return; }
+                    catch
+                    {
+                        return;
+                    }
                     break;
                 case WinsockStates.Connected:
                 case WinsockStates.Connecting:
@@ -202,10 +271,19 @@ namespace ircClient.Tcp
                     {
                         _clientSocket.Shutdown(SocketShutdown.Both);
                         _clientSocket.Close();
-                        if (_networkStream != null) { _networkStream.Close(); }
-                        if (_sslStream != null) { _sslStream.Close(); }
+                        if (_networkStream != null)
+                        {
+                            _networkStream.Close();
+                        }
+                        if (_sslStream != null)
+                        {
+                            _sslStream.Close();
+                        }
                     }
-                    catch { return; }
+                    catch
+                    {
+                        return;
+                    }
                     break;
                 case WinsockStates.Error:
                     ChangeState(WinsockStates.Closed);
@@ -221,19 +299,28 @@ namespace ircClient.Tcp
         {
             try
             {
-                if (GetState != WinsockStates.Listening) { return; }
+                if (GetState != WinsockStates.Listening)
+                {
+                    return;
+                }
                 /* Only accept if listening */
                 ChangeState(WinsockStates.ConnectionPending);
                 _clientSocket = requestId;
                 if (OnConnected != null)
                 {
-                    _syncObject.Invoke(OnConnected, new object[] { this });
+                    _syncObject.Invoke(OnConnected, new object[] {this});
                 }
                 ChangeState(WinsockStates.Connected);
                 _clientSocket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnClientRead, null);
             }
-            catch (SocketException ex) { SocketErrorHandler(ex); }
-            catch { System.Diagnostics.Debug.Assert(true); }
+            catch (SocketException ex)
+            {
+                SocketErrorHandler(ex);
+            }
+            catch
+            {
+                System.Diagnostics.Debug.Assert(true);
+            }
         }
 
         public void Connect(string address, int port)
@@ -252,21 +339,30 @@ namespace ircClient.Tcp
                 ChangeState(WinsockStates.Connecting);
                 _clientSocket.BeginConnect(address, port, OnClientConnected, null);
             }
-            catch (SocketException ex) { SocketErrorHandler(ex); }
-            catch { System.Diagnostics.Debug.Assert(true); }
+            catch (SocketException ex)
+            {
+                SocketErrorHandler(ex);
+            }
+            catch
+            {
+                System.Diagnostics.Debug.Assert(true);
+            }
         }
 
         public void SendData(string data)
         {
             try
             {
-                SendData(IrcUtf8.StringToByteArray(data));
+                SendData(Utf8.StringToByteArray(data));
                 if (OnDebugOut != null)
                 {
-                    _syncObject.Invoke(OnDebugOut, new object[] { this, data });
+                    _syncObject.Invoke(OnDebugOut, new object[] {this, data});
                 }
             }
-            catch { System.Diagnostics.Debug.Assert(true); }
+            catch
+            {
+                System.Diagnostics.Debug.Assert(true);
+            }
         }
 
         public void SendData(byte[] data)
@@ -313,27 +409,43 @@ namespace ircClient.Tcp
                         Close();
                         SocketErrorHandler(ex);
                     }
-                    catch { System.Diagnostics.Debug.Assert(true); }
+                    catch
+                    {
+                        System.Diagnostics.Debug.Assert(true);
+                    }
                     break;
             }
         }
 
         public void GetData(ref string data)
-        {            
-            byte[] byt = { };
+        {
+            if (!string.IsNullOrEmpty(data))
+            {
+                return;
+            }
+            byte[] byt = {};
             var s = new StringBuilder();
-            GetData(ref byt);            
+            GetData(ref byt);
             for (var i = 0; i <= byt.Length - 1; i++)
             {
-                if (byt[i] == 10) { s.Append((char)10); }
-                else { s.Append(IrcUtf8.AsciiChr(byt[i])); }
+                if (byt[i] == 10)
+                {
+                    s.Append((char) 10);
+                }
+                else
+                {
+                    s.Append(Utf8.AsciiChr(byt[i]));
+                }
             }
             data = s.ToString();
         }
 
         public void GetData(ref byte[] bytes)
         {
-            if (_byteData.Count == 0) { return; }
+            if (_byteData.Count == 0)
+            {
+                return;
+            }
             var byt = _byteData[0];
             _byteData.RemoveAt(0);
             bytes = new byte[byt.Length];
@@ -347,11 +459,15 @@ namespace ircClient.Tcp
         }
 
         /* Socket callback events */
+
         private void OnClientConnected(IAsyncResult ar)
         {
             try
             {
-                if (GetState == WinsockStates.Closed) { return; }
+                if (GetState == WinsockStates.Closed)
+                {
+                    return;
+                }
                 _clientSocket.EndConnect(ar);
                 if (IsSsl)
                 {
@@ -395,18 +511,32 @@ namespace ircClient.Tcp
                     }
                     else
                     {
-                        _clientSocket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnClientRead, _clientSocket);
+                        _clientSocket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnClientRead,
+                                                   _clientSocket);
                     }
-                    if (OnConnected != null) { _syncObject.Invoke(OnConnected, new object[] { this }); }
+                    if (OnConnected != null)
+                    {
+                        _syncObject.Invoke(OnConnected, new object[] {this});
+                    }
                 }
             }
-            catch (SocketException ex) { SocketErrorHandler(ex); }
-            catch { System.Diagnostics.Debug.Assert(true); }
+            catch (SocketException ex)
+            {
+                SocketErrorHandler(ex);
+            }
+            catch
+            {
+                System.Diagnostics.Debug.Assert(true);
+            }
         }
 
-        private bool OnRemoteCertificateValidation(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        private bool OnRemoteCertificateValidation(object sender, X509Certificate certificate, X509Chain chain,
+                                                   SslPolicyErrors sslPolicyErrors)
         {
-            if (!EnableSslAuthentication) { return false; }
+            if (!EnableSslAuthentication)
+            {
+                return false;
+            }
             switch (sslPolicyErrors)
             {
                 case SslPolicyErrors.None:
@@ -414,13 +544,19 @@ namespace ircClient.Tcp
                 case SslPolicyErrors.RemoteCertificateNameMismatch:
                 case SslPolicyErrors.RemoteCertificateNameMismatch | SslPolicyErrors.RemoteCertificateChainErrors:
                     /* Certificate error */
-                    if (SslAutoAccept) { return true; }
+                    if (SslAutoAccept)
+                    {
+                        return true;
+                    }
                     if (OnSslInvalidCertificate != null)
                     {
                         _sslWaitingAccept = true;
-                        _syncObject.Invoke(OnSslInvalidCertificate, new object[] { this, certificate });
+                        _syncObject.Invoke(OnSslInvalidCertificate, new object[] {this, certificate});
                     }
-                    else { return false; }
+                    else
+                    {
+                        return false;
+                    }
                     while (_sslWaitingAccept)
                     {
                         /* Basic block operation */
@@ -438,7 +574,10 @@ namespace ircClient.Tcp
                 if (GetState == WinsockStates.Listening)
                 {
                     var tmpSock = _listenSocket.EndAcceptSocket(ar);
-                    if (OnConnectionRequest != null) { _syncObject.Invoke(OnConnectionRequest, new object[] { this, tmpSock }); }
+                    if (OnConnectionRequest != null)
+                    {
+                        _syncObject.Invoke(OnConnectionRequest, new object[] {this, tmpSock});
+                    }
                     /* Stop listening as we no longer need it */
                     _listenSocket.Stop();
                 }
@@ -448,11 +587,14 @@ namespace ircClient.Tcp
                     ChangeState(WinsockStates.Error);
                     if (OnError != null)
                     {
-                        _syncObject.Invoke(OnError, new object[] { this, "Unknown error" });
+                        _syncObject.Invoke(OnError, new object[] {this, "Unknown error"});
                     }
                 }
             }
-            catch { System.Diagnostics.Debug.Assert(true); }
+            catch
+            {
+                System.Diagnostics.Debug.Assert(true);
+            }
         }
 
         private void OnClientRead(IAsyncResult ar)
@@ -494,28 +636,35 @@ namespace ircClient.Tcp
                             }
                         }
                     }
-                    catch { return; }
+                    catch
+                    {
+                        return;
+                    }
                     if (intCount < 1)
                     {
                         Close();
                         _buffer = new byte[BufferSize];
                         if (OnDisconnected != null)
                         {
-                            _syncObject.Invoke(OnDisconnected, new object[] { this });
+                            _syncObject.Invoke(OnDisconnected, new object[] {this});
                         }
                         return;
-                    }                    
-                    Array.Resize(ref _buffer, intCount);
-                    _byteData.Add(_buffer);
-                    if (OnDataArrival != null) { _syncObject.Invoke(OnDataArrival, new object[] { this, _buffer.Length }); }
-                    _buffer = new byte[BufferSize];
+                    }
+                    var buffer = _buffer;
+                    Array.Resize(ref buffer, intCount);
+                    _byteData.Add(buffer);
+                    if (OnDataArrival != null)
+                    {
+                        _syncObject.Invoke(OnDataArrival, new object[] {this, buffer.Length});
+                    }
+                    buffer = new byte[BufferSize];
                     if (IsSsl)
                     {
                         try
                         {
                             if (_sslStream != null && _sslStream.CanRead)
                             {
-                                _sslStream.BeginRead(_buffer, 0, _buffer.Length, OnClientRead, _sslStream);
+                                _sslStream.BeginRead(buffer, 0, _buffer.Length, OnClientRead, _sslStream);
                             }
                             else
                             {
@@ -531,7 +680,7 @@ namespace ircClient.Tcp
                     }
                     else
                     {
-                        _clientSocket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnClientRead, null);
+                        _clientSocket.BeginReceive(_buffer, 0, buffer.Length, SocketFlags.None, OnClientRead, null);
                     }
                 }
             }
@@ -541,9 +690,15 @@ namespace ircClient.Tcp
                 _buffer = new byte[BufferSize];
                 try
                 {
-                    if (OnDisconnected != null) { _syncObject.Invoke(OnDisconnected, new object[] { this }); }
+                    if (OnDisconnected != null)
+                    {
+                        _syncObject.Invoke(OnDisconnected, new object[] {this});
+                    }
                 }
-                catch { System.Diagnostics.Debug.Assert(true); }
+                catch
+                {
+                    System.Diagnostics.Debug.Assert(true);
+                }
             }
         }
 
@@ -556,14 +711,23 @@ namespace ircClient.Tcp
                     _syncObject.Invoke(
                         OnError,
                         ex != null
-                            ? new object[] { this, ErrorHandling.GetErrorDescription(ex.ErrorCode) }
-                            : new object[] { this, ErrorHandling.GetErrorDescription(-1) });
+                            ? new object[] {this, ErrorHandling.GetErrorDescription(ex.ErrorCode)}
+                            : new object[] {this, ErrorHandling.GetErrorDescription(-1)});
                 }
                 ChangeState(WinsockStates.Error);
-                if (_sslStream != null) { _sslStream.Close(); }
-                if (_networkStream != null) { _networkStream.Close(); }
+                if (_sslStream != null)
+                {
+                    _sslStream.Close();
+                }
+                if (_networkStream != null)
+                {
+                    _networkStream.Close();
+                }
             }
-            catch { System.Diagnostics.Debug.Assert(true); }
+            catch
+            {
+                System.Diagnostics.Debug.Assert(true);
+            }
         }
 
         private void ChangeState(WinsockStates newState)
@@ -573,10 +737,13 @@ namespace ircClient.Tcp
                 GetState = newState;
                 if (OnStateChanged != null)
                 {
-                    _syncObject.Invoke(OnStateChanged, new object[] { this, GetState });
+                    _syncObject.Invoke(OnStateChanged, new object[] {this, GetState});
                 }
             }
-            catch { System.Diagnostics.Debug.Assert(true); }
+            catch
+            {
+                System.Diagnostics.Debug.Assert(true);
+            }
         }
 
         private void BeginListen()
@@ -604,7 +771,10 @@ namespace ircClient.Tcp
                 Close();
                 SocketErrorHandler(ex);
             }
-            catch { System.Diagnostics.Debug.Assert(true); }
+            catch
+            {
+                System.Diagnostics.Debug.Assert(true);
+            }
         }
     }
 }

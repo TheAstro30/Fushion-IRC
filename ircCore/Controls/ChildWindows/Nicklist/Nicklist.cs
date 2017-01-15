@@ -159,6 +159,22 @@ namespace ircCore.Controls.ChildWindows.Nicklist
             EndListUpdate("");
         }
 
+        public void AddNick(string nick, string address)
+        {
+            var nd = new NickData
+                         {
+                             Nick = nick, Address = address
+                         };
+            /* Double check the nick isn't already in the list */
+            if (_list.FirstOrDefault(o => o.Nick == nd.Nick) == null)
+            {
+                _list.Add(nd);
+            }
+            BeginListUpdate();
+            _list.Sort(_nickComparer);
+            EndListUpdate("");
+        }
+
         public void RemoveNick(string nick)
         {
             var n = _list.FirstOrDefault(o => o.Nick == nick);
@@ -169,6 +185,19 @@ namespace ircCore.Controls.ChildWindows.Nicklist
             BeginListUpdate();
             _list.Remove(n);
             EndListUpdate(nick);
+        }
+
+        public void RenameNick(string nick, string newNick)
+        {
+            var nd = _list.FirstOrDefault(o => o.Nick.ToLower() == nick.ToLower());
+            if (nd == null)
+            {
+                return;
+            }
+            nd.Nick = newNick;
+            BeginListUpdate();
+            _list.Sort(_nickComparer);
+            EndListUpdate("");
         }
 
         public void AddUserMode(string nick, string modeChar)

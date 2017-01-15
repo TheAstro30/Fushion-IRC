@@ -12,6 +12,9 @@ namespace ircCore.Settings
     [Serializable, XmlRoot("settings")]
     public class Settings
     {        
+        [XmlElement("userInfo")]
+        public SettingsUserInfo UserInfo = new SettingsUserInfo();
+
         [XmlElement("windows")]
         public SettingsWindow SettingsWindows = new SettingsWindow();        
 
@@ -24,7 +27,7 @@ namespace ircCore.Settings
             var w = new WindowData { Name = "application", Size = new Size(969, 593), Position = new Point(55, 55) };
             SettingsWindows.Window.Add(w);
             /* Create a blank theme */
-            Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = "default.thm"});            
+            Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = "default.thm"});
         }
     }
 }
