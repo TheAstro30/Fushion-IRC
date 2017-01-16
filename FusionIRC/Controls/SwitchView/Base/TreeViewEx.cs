@@ -7,7 +7,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace ircCore.Controls.SwitchView.Base
+namespace FusionIRC.Controls.SwitchView.Base
 {
     public class TreeViewEx : TreeView
     {

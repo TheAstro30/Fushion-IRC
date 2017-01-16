@@ -29,13 +29,13 @@ namespace ircCore.Controls.ChildWindows.Nicklist.Structures
 
         public bool AddUserMode(string modeChar)
         {
-            /* Add a @ or + etc. as "o" or "v" */
+            /* Add a @ or + etc. as "o" or "v" */            
             if (_userModes.FirstOrDefault(o => o == modeChar) != null)
-            {
+            {                
                 return false;
             }
             _userModes.Add(modeChar);
-            _userModes.Sort(_comparer);
+            _userModes.Sort(_comparer);            
             return true;
         }
 

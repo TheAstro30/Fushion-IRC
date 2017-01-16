@@ -73,7 +73,21 @@ namespace FusionIRC.Helpers
                 {
                     win.ShowWithoutActive();
                 }
-            }
+                /* Add to tree view as well */
+                ((FrmClientWindow)mdiOwner).switchTree.AddWindow(win);
+                if (win.DisplayNodeRoot != null)
+                {
+                    /* Update the window type count */
+                    var count = GetChildWindowCount(win);
+                    win.DisplayNodeRoot.Text = win.WindowType == ChildWindowType.Channel
+                                                     ? string.Format("Channels ({0})", count)
+                                                     : win.WindowType == ChildWindowType.Private
+                                                           ? string.Format("Queries ({0})", count)
+                                                           : win.WindowType == ChildWindowType.DccChat
+                                                                 ? string.Format("Chats ({0})", count)
+                                                                 : win.DisplayNodeRoot.Text;
+                }
+            }           
             return win;
         }
 
@@ -81,8 +95,7 @@ namespace FusionIRC.Helpers
         {
             /* Romoves a window from the dictionary object */
             if (!Windows.ContainsKey(client))
-            {
-                System.Diagnostics.Debug.Print("Remove Failed");
+            {                
                 return;
             }
             if (window.WindowType == ChildWindowType.Console)
@@ -90,19 +103,31 @@ namespace FusionIRC.Helpers
                 RemoveConnectionHandlers(client);
                 /* We should send disconnect command ... */
                 Windows.Remove(client);
-                System.Diagnostics.Debug.Print("Removed console window");
+                ((FrmClientWindow)window.MdiParent).switchTree.RemoveWindow(window);             
                 return;
             }
             /* Else, we remove the child window from this current console connection */
             Windows[client].Remove(window);
-            System.Diagnostics.Debug.Print("Removed child window");
+            /* Update treeview */
+            ((FrmClientWindow)window.MdiParent).switchTree.RemoveWindow(window);
+            if (window.DisplayNodeRoot != null)
+            {
+                /* Update the window type count */
+                var count = GetChildWindowCount(window);
+                window.DisplayNodeRoot.Text = window.WindowType == ChildWindowType.Channel
+                                                    ? string.Format("Channels ({0})", count)
+                                                    : window.WindowType == ChildWindowType.Private
+                                                          ? string.Format("Queries ({0})", count)
+                                                          : window.WindowType == ChildWindowType.DccChat
+                                                                ? string.Format("Chats ({0})", count)
+                                                                : window.DisplayNodeRoot.Text;
+            }            
         }
 
         public static void RemoveAllWindowsOfConsole(ClientConnection client)
         {
             if (!Windows.ContainsKey(client))
-            {
-                System.Diagnostics.Debug.Print("Remove Failed");
+            {                
                 return;
             }
             /* The first window is always the console - list must remain UNSORTED at all times */
@@ -121,17 +146,28 @@ namespace FusionIRC.Helpers
         public static FrmChildWindow GetConsoleWindow(ClientConnection client)
         {
             var c = Windows.ContainsKey(client) ? Windows[client] : null;
-            if (c == null)
-            {
-                return null;
-            }
-            return c.FirstOrDefault(o => o.Tag.ToString().ToLower() == "console");
+            return c == null ? null : c.FirstOrDefault(o => o.Tag.ToString().ToLower() == "console");
         }
 
         public static ClientConnection GetActiveConnection(Form owner)
         {
             var win = (FrmChildWindow)owner.ActiveMdiChild;
             return win != null ? win.Client : null;
+        }
+
+        public static int GetChildWindowCount(FrmChildWindow child)
+        {
+            /* Get's the number of child windows that are of the same type */
+            var c = Windows.ContainsKey(child.Client) ? Windows[child.Client] : null;
+            return c == null ? 0 : c.Count(o => o.WindowType == child.WindowType);
+        }
+
+        public static void SetWindowEvent(FrmChildWindow child, Form owner, WindowEvent windowEvent)
+        {
+            if (child != null && child != owner.ActiveMdiChild)
+            {
+                child.CurrentWindowEvent = windowEvent;
+            }
         }
 
         /* Theme loaded callback */
@@ -149,10 +185,19 @@ namespace FusionIRC.Helpers
             client.Parser.OnJoinUser += ConnectionCallbackManager.OnJoinUser;
             client.Parser.OnJoinSelf += ConnectionCallbackManager.OnJoinSelf;
             client.Parser.OnPartUser += ConnectionCallbackManager.OnPartUser;
+            client.Parser.OnPartSelf += ConnectionCallbackManager.OnPartSelf;
             client.Parser.OnNames += ConnectionCallbackManager.OnNames;
+            client.Parser.OnWho += ConnectionCallbackManager.OnWho;
             client.Parser.OnTextChannel += ConnectionCallbackManager.OnTextChannel;
+            client.Parser.OnTextSelf += ConnectionCallbackManager.OnTextSelf;
             client.Parser.OnActionChannel += ConnectionCallbackManager.OnActionChannel;
+            client.Parser.OnActionSelf += ConnectionCallbackManager.OnActionSelf;
             client.Parser.OnNick += ConnectionCallbackManager.OnNick;
+            client.Parser.OnQuit += ConnectionCallbackManager.OnQuit;
+            client.Parser.OnKickSelf += ConnectionCallbackManager.OnKickSelf;
+            client.Parser.OnKickUser += ConnectionCallbackManager.OnKickUser;
+            client.Parser.OnModeSelf += ConnectionCallbackManager.OnModeSelf;
+            client.Parser.OnModeChannel += ConnectionCallbackManager.OnModeChannel;
         }
 
         private static void RemoveConnectionHandlers(ClientConnection client)
@@ -162,10 +207,19 @@ namespace FusionIRC.Helpers
             client.Parser.OnJoinUser -= ConnectionCallbackManager.OnJoinUser;
             client.Parser.OnJoinSelf -= ConnectionCallbackManager.OnJoinSelf;
             client.Parser.OnPartUser -= ConnectionCallbackManager.OnPartUser;
+            client.Parser.OnPartSelf -= ConnectionCallbackManager.OnPartSelf;
             client.Parser.OnNames -= ConnectionCallbackManager.OnNames;
+            client.Parser.OnWho -= ConnectionCallbackManager.OnWho;
             client.Parser.OnTextChannel -= ConnectionCallbackManager.OnTextChannel;
+            client.Parser.OnTextSelf -= ConnectionCallbackManager.OnTextSelf;
             client.Parser.OnActionChannel -= ConnectionCallbackManager.OnActionChannel;
+            client.Parser.OnActionSelf -= ConnectionCallbackManager.OnActionSelf;
             client.Parser.OnNick -= ConnectionCallbackManager.OnNick;
+            client.Parser.OnQuit -= ConnectionCallbackManager.OnQuit;
+            client.Parser.OnKickSelf -= ConnectionCallbackManager.OnKickSelf;
+            client.Parser.OnKickUser -= ConnectionCallbackManager.OnKickUser;
+            client.Parser.OnModeSelf -= ConnectionCallbackManager.OnModeSelf;
+            client.Parser.OnModeChannel -= ConnectionCallbackManager.OnModeChannel;
         }
     }
 }

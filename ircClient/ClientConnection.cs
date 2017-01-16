@@ -42,11 +42,10 @@ namespace ircClient
             _sock.OnConnected += OnConnected;
             _sock.OnDisconnected += OnDisconnected;
             _sock.OnError += OnError;
-            _sock.OnDataArrival += OnDataArrival;
-            System.Diagnostics.Debug.Print("IP " + _sock.LocalIp);
+            _sock.OnDataArrival += OnDataArrival;            
             Parser = new Parser(this);
 
-            UserInfo = userInfo;
+            UserInfo = new SettingsUserInfo(userInfo);
         }
 
         public void Connect(string address, int port)

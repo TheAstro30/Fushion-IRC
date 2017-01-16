@@ -16,11 +16,13 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -81,13 +83,6 @@
     </Compile>
     <Compile Include="Dialogs\FrmColorIndex.cs">
       <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\SwitchView\Base\TreeNodeEx.cs" />
-    <Compile Include="Controls\SwitchView\Base\TreeViewEx.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\SwitchView\WindowTreeView.cs">
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Dialogs\FrmOptions.cs">
       <SubType>Form</SubType>

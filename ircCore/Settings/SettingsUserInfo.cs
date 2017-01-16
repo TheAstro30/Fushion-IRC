@@ -22,5 +22,23 @@ namespace ircCore.Settings
 
         [XmlAttribute("realname")]
         public string RealName { get; set; }
+
+        [XmlIgnore]
+        public bool AlternativeUsed { get; set; } /* On an IRC server during connect "nick in use", switch nick and alternative */
+
+        /* Constructors */
+        public SettingsUserInfo()
+        {
+            /* Empty constructor */
+        }
+
+        public SettingsUserInfo(SettingsUserInfo userInfo)
+        {
+            /* Copy constructor */
+            Nick = userInfo.Nick;
+            Alternative = userInfo.Alternative;
+            Ident = userInfo.Ident;
+            RealName = userInfo.RealName;
+        }
     }
 }

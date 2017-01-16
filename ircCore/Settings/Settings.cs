@@ -23,7 +23,19 @@ namespace ircCore.Settings
 
         public Settings()
         {
+            /* User info */
+            var rand = new Random();
+            var info = new SettingsUserInfo
+                           {
+                               Nick = string.Format("Fusion-{0}", rand.Next(1999, 9999)),
+                               Alternative = string.Format("Fusion_{0}", rand.Next(1999, 9999)),
+                               Ident = "FusionIRC",
+                               RealName = "Fusion IRC Client"
+                           };
+            UserInfo = info;
             /* Set up basic settings */
+            SettingsWindows.SwitchTreeWidth = 110;
+            SettingsWindows.NicklistWidth = 112;
             var w = new WindowData { Name = "application", Size = new Size(969, 593), Position = new Point(55, 55) };
             SettingsWindows.Window.Add(w);
             /* Create a blank theme */

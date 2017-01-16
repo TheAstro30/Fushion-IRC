@@ -14,8 +14,17 @@ namespace ircCore.Settings
     [Serializable]
     public class SettingsWindow
     {
+        [XmlAttribute("childrenMaximized")]
+        public bool ChildrenMaximized { get; set; }
+
+        [XmlAttribute("switchTreeWidth")]
+        public int SwitchTreeWidth { get; set; }
+
+        [XmlAttribute("nicklistWidth")]
+        public int NicklistWidth { get; set; }
+
         [XmlElement("window")]
-        public List<WindowData> Window = new List<WindowData>();             
+        public List<WindowData> Window = new List<WindowData>();
     }
 
     [Serializable]

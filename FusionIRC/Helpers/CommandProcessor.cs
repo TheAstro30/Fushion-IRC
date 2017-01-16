@@ -13,20 +13,25 @@ namespace FusionIRC.Helpers
     public static class CommandProcessor
     {
         public static void Parse(ClientConnection client, FrmChildWindow child, string data)
-        {
+        {            
             var i = data.IndexOf(' ');
-            if (i == -1)
+            string com;
+            var args = string.Empty;
+            if (i != -1)
             {
-                return;
+                com = data.Substring(0, i).Trim().ToUpper().Replace("/", "");
+                args = data.Substring(i).Trim();
             }
-            var com = data.Substring(0, i).Trim().ToUpper().Replace("/", "");
-            var args = data.Substring(i).Trim();
+            else
+            {
+                com = data.ToUpper().Replace("/", "");
+            }            
             ParseCommand(client, child, com, args);
         }
 
         /* Private parsing methods */
         private static void ParseCommand(ClientConnection client, FrmChildWindow child, string command, string args)
-        {
+        {            
             switch (command)
             {
                 case "SERVER":
@@ -40,8 +45,16 @@ namespace FusionIRC.Helpers
                     ParseAction(client, child, args);
                     break;
 
+                case "PART":
+                    ParsePart(client, child, args);
+                    break;
+
                 case "NICK":
                     ParseNick(client, args);
+                    break;
+
+                case "NAMES":
+                    ParseNames(client, args);
                     break;
 
                 default:
@@ -50,7 +63,7 @@ namespace FusionIRC.Helpers
                     {
                         return;
                     }
-                    client.Send(string.Format("{0} :{1}", command, args));
+                    client.Send(string.Format("{0} {1}", command, args));
                     break;
             }
         }
@@ -116,13 +129,18 @@ namespace FusionIRC.Helpers
                 return;
             }
             var c = WindowManager.GetWindow(client, child.Tag.ToString());
-            if (c == null || c.WindowType != ChildWindowType.Channel)
+            if (c == null || c.WindowType == ChildWindowType.Console)
             {
                 return;
             }
             var tmd = new IncomingMessageData
                           {
-                              Message = ThemeMessage.ChannelSelfActionText,
+                              Message =
+                                  child.WindowType == ChildWindowType.Channel
+                                      ? ThemeMessage.ChannelSelfActionText
+                                      : child.WindowType == ChildWindowType.Private
+                                            ? ThemeMessage.PrivateSelfActionText
+                                            : ThemeMessage.ChannelSelfActionText,
                               TimeStamp = DateTime.Now,
                               Nick = client.UserInfo.Nick,
                               Text = args
@@ -131,6 +149,23 @@ namespace FusionIRC.Helpers
             c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
             var action = string.Format("PRIVMSG {0} :{1}ACTION {2}{3}", child.Tag, (char)1, args, (char)1);
             client.Send(action);
+        }
+
+        private static void ParseNames(ClientConnection client, string args)
+        {
+            if (!client.IsConnected || string.IsNullOrEmpty(args))
+            {
+                return;
+            }
+            var i = args.IndexOf(' ');
+            var channel = i == -1 ? args : args.Substring(0, i).Trim();
+            var c = WindowManager.GetWindow(client, channel);
+            if (c == null || c.WindowType != ChildWindowType.Channel)
+            {
+                return;
+            }
+            c.Nicklist.Clear();
+            client.Send(string.Format("NAMES {0}\r\nWHO {0}", channel));
         }
 
         private static void ParseNick(ClientConnection client, string args)
@@ -143,6 +178,27 @@ namespace FusionIRC.Helpers
                 client.UserInfo.Nick = nick;
             }
             client.Send(string.Format("NICK {0}", nick));
+        }
+
+        private static void ParsePart(ClientConnection client, FrmChildWindow child, string args)
+        {            
+            string channel;
+            if (string.IsNullOrEmpty(args))
+            {
+                if (child.WindowType != ChildWindowType.Channel)
+                {         
+                    /* Cannot part a console, query or DCC chat! */
+                    return;
+                }
+                /* Part the active window */
+                channel = child.Tag.ToString();
+            }
+            else
+            {
+                var c = args.Split(' ');
+                channel = c[0];
+            }            
+            client.Send(string.Format("PART {0}", channel));
         }
     }
 }

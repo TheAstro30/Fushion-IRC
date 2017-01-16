@@ -34,19 +34,22 @@ namespace ircCore.Settings.Theming
         ChannelSelfText = 4,
         ChannelActionText = 5,
         ChannelSelfActionText = 6,
-        NoticeServerText = 7,
-        NoticeText = 8,
-        NoticeSelfText = 9,
-        ChannelJoinText = 10,
-        ChannelSelfJoinText = 11,
-        ChannelPartText = 12,
-        ModeChannelText = 13,
-        ModeUserText = 14,
-        ModeSelfText = 15,
-        QuitText = 16,
-        ChannelKickText = 17,
-        ChannelSelfKickText = 18,
-        NickChange = 19
+        PrivateText = 7,
+        PrivateSelfText = 8,
+        PrivateActionText = 9,
+        PrivateSelfActionText = 10,
+        NoticeServerText = 11,
+        NoticeText = 12,
+        NoticeSelfText = 13,
+        ChannelJoinText = 14,
+        ChannelSelfJoinText = 15,
+        ChannelPartText = 16,
+        ModeChannelText = 17,        
+        ModeSelfText = 18,
+        QuitText = 19,
+        ChannelKickText = 20,
+        ChannelSelfKickText = 21,
+        NickChange = 22
     }
 
     public class IncomingMessageData
@@ -93,8 +96,7 @@ namespace ircCore.Settings.Theming
             if (!CurrentTheme.ThemeChanged)
             {
                 return;
-            }
-            System.Diagnostics.Debug.Print("Save");
+            }            
             CurrentTheme.ThemeChanged = false;
             BinarySerialize<Theme>.Save(themeFile, CurrentTheme);
         }

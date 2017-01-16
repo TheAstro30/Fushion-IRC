@@ -18,11 +18,12 @@
     <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -34,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>main.ico</ApplicationIcon>
+    <ApplicationIcon>mainicon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -49,6 +50,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\SplitContainerEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\SwitchView\Base\TreeNodeEx.cs" />
+    <Compile Include="Controls\SwitchView\Base\TreeViewEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\SwitchView\WindowTreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Forms\FrmChildWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -58,22 +69,14 @@
     <Compile Include="Forms\FrmClientWindow.Designer.cs">
       <DependentUpon>FrmClientWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FrmTest.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\FrmTest.designer.cs">
-      <DependentUpon>FrmTest.cs</DependentUpon>
-    </Compile>
     <Compile Include="Helpers\CommandProcessor.cs" />
     <Compile Include="Helpers\ConnectionCallbackManager.cs" />
+    <Compile Include="Helpers\MdiHelper.cs" />
     <Compile Include="Helpers\WindowManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\FrmClientWindow.resx">
       <DependentUpon>FrmClientWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FrmTest.resx">
-      <DependentUpon>FrmTest.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -110,8 +113,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Icons\main.ico" />
-    <Content Include="main.ico" />
+    <Content Include="mainicon.ico" />
+    <None Include="Resources\short_circuit_fisher_stevens.jpeg" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes\" />

@@ -5,8 +5,10 @@
  */
 using System;
 using System.Drawing;
+using System.IO;
 using System.Media;
 using System.Windows.Forms;
+using FusionIRC.Controls;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
 using ircClient;
@@ -22,8 +24,18 @@ using ircCore.Utils;
 namespace FusionIRC.Forms
 {
     /* This class is our "main" chat window for console, channel, query and DCC chats - one class for all */
+    public enum WindowEvent
+    {
+        None = 0,
+        EventReceived = 1,
+        MessageReceived = 2
+    }
+
     public sealed class FrmChildWindow : ChildWindow
     {        
+        private readonly Timer _focus;
+        private WindowEvent _event;
+
         /* Public properties */
         public ChildWindowType WindowType { get; private set; }
         public ClientConnection Client { get; private set; }
@@ -31,6 +43,46 @@ namespace FusionIRC.Forms
         public InputWindow Input { get; set; }
         public Nicklist Nicklist { get; set; }
 
+        public SplitContainer Splitter { get; set; }
+
+        /* Nodes used by the switch treeview - much easier to keep track of/update from here */
+        public TreeNode DisplayNodeRoot { get; set; }
+        public TreeNode DisplayNode { get; set; }
+        
+        public bool AutoClose { get; set; }
+
+        public WindowEvent CurrentWindowEvent
+        {
+            get
+            {
+                return _event;
+            }
+            set
+            {
+                /* We can adjust our node color based on the event :) */                
+                switch (value)
+                {
+                    case WindowEvent.None:
+                        DisplayNode.ForeColor = Color.Black;
+                        break;
+
+                    case WindowEvent.EventReceived:
+                        if (_event == WindowEvent.MessageReceived)
+                        {
+                            /* Messages take ownership */
+                            return;
+                        }
+                        DisplayNode.ForeColor = Color.ForestGreen;
+                        break;
+
+                    case WindowEvent.MessageReceived:
+                        DisplayNode.ForeColor = Color.Red;
+                        break;
+                }
+                _event = value;
+            }
+        }
+        
         /* Constructor */
         public FrmChildWindow(ClientConnection client, ChildWindowType type, Form owner)
         {
@@ -54,19 +106,41 @@ namespace FusionIRC.Forms
                          };
 
             if (type == ChildWindowType.Channel)
-            {
+            {                
                 Nicklist = new Nicklist
                                {
                                    BackColor = ThemeManager.GetColor(ThemeColor.WindowBackColor),//change to its own
                                    ForeColor = ThemeManager.GetColor(ThemeColor.WindowForeColor),//change to its own
-                                   Font = ThemeManager.CurrentTheme.ThemeFonts[type]
+                                   Font = ThemeManager.CurrentTheme.ThemeFonts[type],
+                                   UserModes = Client.Parser.UserModes,
+                                   UserModeCharacters = Client.Parser.UserModeCharacters,
+                                   Dock = DockStyle.Fill
                                };
+                Splitter = new SplitContainer
+                               {
+                                   FixedPanel = FixedPanel.Panel2,
+                                   Location = new Point(0, 0),
+                                   Panel1MinSize = 250,                                   
+                                   SplitterWidth = 1
+                               };
+                Splitter.Panel1.Controls.Add(Output);
+                Splitter.Panel2MinSize = 80;
+                Splitter.Panel2.Controls.Add(Nicklist);                
+                Splitter.SplitterMoving += SplitterMoving;
+
+                Output.Dock = DockStyle.Fill;
+                Controls.AddRange(new Control[] {Input, Splitter});
             }
-            /* Add controls */                        
-            Controls.AddRange(new Control[] {Input, Output});
-            if (Nicklist != null)
+            else
             {
-                Controls.Add(Nicklist);
+                Controls.AddRange(new Control[] { Input, Output });
+            }
+            /* Set up window background */
+            var bd = ThemeManager.GetBackground(type);
+            if (bd != null && File.Exists(bd.Path))
+            {
+                Output.BackgroundImage = (Bitmap)Image.FromFile(bd.Path);
+                Output.BackgroundImageLayout = bd.LayoutStyle;
             }
             /* Callbacks */
             Input.TabKeyPress += InputTabKeyPress;
@@ -96,13 +170,16 @@ namespace FusionIRC.Forms
                     break;
             }
             /* Set client size */
-            ClientSize = new Size(540, 400);            
+            ClientSize = new Size(540, 400);
+            /* Focus activation timer */
+            _focus = new Timer {Interval = 10};
+            _focus.Tick += TimerFocus;
         }
         
         /* Overrides */
         protected override void OnActivated(EventArgs e)
-        {
-            Input.Focus();
+        {            
+            _focus.Enabled = true;
             base.OnActivated(e);
         }
 
@@ -135,27 +212,35 @@ namespace FusionIRC.Forms
                 Client.Send(string.Format("QUIT :Leaving."));
                 WindowManager.RemoveAllWindowsOfConsole(Client);
             }            
-            if (WindowType == ChildWindowType.Channel && Client.IsConnected)
+            if (WindowType == ChildWindowType.Channel && Client.IsConnected && !AutoClose)
             {
                 /* Part channel if closing it */
                 Client.Send(string.Format("PART {0}", Tag));
             }
             WindowManager.RemoveWindow(Client, this);
             base.OnFormClosing(e);
-
         }
 
         protected override void OnResize(EventArgs e)
         {
-            /* Adjust our controls based on window type */
-            var right = WindowType == ChildWindowType.Channel ? 120 : 0;
+            /* Adjust our controls based on window type */            
             var height = ClientRectangle.Height - Input.ClientRectangle.Height - 1;
-            Output.SetBounds(0, 0, ClientRectangle.Width - right, height);
-            Input.SetBounds(0, Output.ClientRectangle.Height + 1, ClientRectangle.Width, Input.ClientRectangle.Height);
-            if (Nicklist != null)
+            if (WindowType == ChildWindowType.Channel)
             {
-                Nicklist.SetBounds(ClientRectangle.Width - right, 0, right, height);
+                /* Set up our splitter */
+                Splitter.SetBounds(0, 0, ClientRectangle.Width, height);
+                Input.SetBounds(0, Splitter.ClientRectangle.Height + 1, ClientRectangle.Width, Input.ClientRectangle.Height);
+                if (WindowState == FormWindowState.Normal)
+                {
+                    Splitter.SplitterDistance = ClientRectangle.Width - SettingsManager.Settings.SettingsWindows.NicklistWidth;
+                }
             }
+            else
+            {
+                /* Normal window, no nicklist/splitter */
+                Output.SetBounds(0, 0, ClientRectangle.Width, height);
+                Input.SetBounds(0, Output.ClientRectangle.Height + 1, ClientRectangle.Width, Input.ClientRectangle.Height);
+            }            
             base.OnResize(e);
         }
 
@@ -171,6 +256,12 @@ namespace FusionIRC.Forms
                 }
             }
             base.Dispose(disposing);
+        }
+
+        public override string ToString()
+        {
+            /* Return readable text for the tree nodes of the "switch view" */
+            return Tag.ToString();
         }
 
         /* Control callbacks */
@@ -200,9 +291,14 @@ namespace FusionIRC.Forms
                         }
                         var tmd = new IncomingMessageData
                                       {
-                                          Message = WindowType == ChildWindowType.Channel ? ThemeMessage.ChannelSelfText : ThemeMessage.ChannelText,
+                                          Message =
+                                              WindowType == ChildWindowType.Channel
+                                                  ? ThemeMessage.ChannelSelfText
+                                                  : WindowType == ChildWindowType.Private
+                                                        ? ThemeMessage.PrivateSelfText
+                                                        : ThemeMessage.ChannelSelfText,
                                           TimeStamp = DateTime.Now,
-                                          Nick = Client.UserInfo.Nick,                                          
+                                          Nick = Client.UserInfo.Nick,
                                           Text = s
                                       };
                         var pmd = ThemeManager.ParseMessage(tmd);
@@ -236,9 +332,23 @@ namespace FusionIRC.Forms
             }
         }
 
+        private void SplitterMoving(object sender, SplitterCancelEventArgs e)
+        {
+            /* Save the nicklist width */
+            SettingsManager.Settings.SettingsWindows.NicklistWidth = ClientRectangle.Width - e.SplitX;
+        }
+
         private void InputMouseWheel(object sender, MouseEventArgs e)
         {
             //txtIn.MouseWheelScroll(sender, e); not implemented on control yet
+        }
+
+        private void TimerFocus(object sender, EventArgs e)
+        {
+            _focus.Enabled = false;
+            CurrentWindowEvent = WindowEvent.None;
+            ((FrmClientWindow)MdiParent).switchTree.SelectedNode = DisplayNode;
+            Input.Focus();
         }
     }
 }

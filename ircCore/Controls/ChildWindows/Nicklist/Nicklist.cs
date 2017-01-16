@@ -17,7 +17,7 @@ namespace ircCore.Controls.ChildWindows.Nicklist
     /* IRC Nicklist control sorted by user mode */
     public class Nicklist : UserControl
     {
-        private readonly List<NickData> _list = new List<NickData>();
+        private List<NickData> _list = new List<NickData>();
         private readonly NicklistStyler _baseList;
         private readonly NickComparer _nickComparer = new NickComparer();
         private readonly BindingSource _dataSource = new BindingSource();
@@ -84,9 +84,9 @@ namespace ircCore.Controls.ChildWindows.Nicklist
             {
                 _userModeCharacters = value;
                 _userModeCharacter = new List<string>();
-                if (string.IsNullOrEmpty(_userModes))
+                if (string.IsNullOrEmpty(_userModeCharacters))
                 {
-                    _userModes = "@+";
+                    _userModeCharacters = "ov";
                 }
                 for (var i = 0; i <= _userModeCharacters.Length - 1; i++)
                 {
@@ -175,6 +175,15 @@ namespace ircCore.Controls.ChildWindows.Nicklist
             EndListUpdate("");
         }
 
+        public void UpdateNickAddress(string nick, string address)
+        {
+            var nd = _list.FirstOrDefault(o => o.Nick.ToLower() == nick.ToLower());
+            if (nd != null)
+            {
+                nd.Address = address;                
+            }
+        }
+
         public void RemoveNick(string nick)
         {
             var n = _list.FirstOrDefault(o => o.Nick == nick);
@@ -206,13 +215,13 @@ namespace ircCore.Controls.ChildWindows.Nicklist
             if (n == null) { return; }
             var mode = _userMode.FindIndex(o => o == modeChar);
             if (mode == -1 || mode > _userModeCharacter.Count - 1)
-            {
+            {                
                 return;
             }            
             if (!n.AddUserMode(_userModeCharacter[mode]))
-            {
+            {             
                 return;
-            }
+            }            
             BeginListUpdate();
             _list.Sort(_nickComparer);
             EndListUpdate(nick);
@@ -234,6 +243,12 @@ namespace ircCore.Controls.ChildWindows.Nicklist
             BeginListUpdate();
             _list.Sort(_nickComparer);
             EndListUpdate(nick);
+        }
+
+        public void Clear()
+        {            
+            _list.Clear();
+            EndListUpdate("");            
         }
 
         /* List binding updating */

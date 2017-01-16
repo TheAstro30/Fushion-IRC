@@ -87,12 +87,15 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.ChannelSelfJoinText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Now talking in: $target" });
             Messages.Add(ThemeMessage.ChannelPartText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * $nick ($address) has left: $target" });
             Messages.Add(ThemeMessage.QuitText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts * $nick ($address) has quit IRC ($text)" });
-            Messages.Add(ThemeMessage.ChannelKickText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts * $knick was kicked from $target by $nick '$text')" });
-            Messages.Add(ThemeMessage.ChannelSelfKickText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts * You were kicked from $target by $nick '$text')" });
-            Messages.Add(ThemeMessage.ModeChannelText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $nick sets mode: $text" });
-            Messages.Add(ThemeMessage.ModeUserText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $nick sets mode: $text $target" });
+            Messages.Add(ThemeMessage.ChannelKickText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts * $knick was kicked from $target by $nick '$text'" });
+            Messages.Add(ThemeMessage.ChannelSelfKickText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts * You were kicked from $target by $nick '$text'" });
+            Messages.Add(ThemeMessage.ModeChannelText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $nick sets mode: $text" });            
             Messages.Add(ThemeMessage.ModeSelfText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $me sets mode: $text" });
             Messages.Add(ThemeMessage.NickChange, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $nick is now known as: $newnick" });
+            Messages.Add(ThemeMessage.PrivateText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts <$nick> $text" });
+            Messages.Add(ThemeMessage.PrivateSelfText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts <$me> $text" });
+            Messages.Add(ThemeMessage.PrivateActionText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * $nick $text" });
+            Messages.Add(ThemeMessage.PrivateSelfActionText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * $me $text" });
             //delete this
             var bgd = new ThemeBackgroundData {Path = "c.jpg", LayoutStyle = BackgroundImageLayoutStyles.Photo};
             ThemeBackgrounds.Add(ChildWindowType.Channel, bgd);
