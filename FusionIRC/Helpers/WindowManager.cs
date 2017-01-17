@@ -74,7 +74,7 @@ namespace FusionIRC.Helpers
                     win.ShowWithoutActive();
                 }
                 /* Add to tree view as well */
-                ((FrmClientWindow)mdiOwner).switchTree.AddWindow(win);
+                ((FrmClientWindow)mdiOwner).SwitchView.AddWindow(win);
                 if (win.DisplayNodeRoot != null)
                 {
                     /* Update the window type count */
@@ -103,13 +103,13 @@ namespace FusionIRC.Helpers
                 RemoveConnectionHandlers(client);
                 /* We should send disconnect command ... */
                 Windows.Remove(client);
-                ((FrmClientWindow)window.MdiParent).switchTree.RemoveWindow(window);             
+                ((FrmClientWindow)window.MdiParent).SwitchView.RemoveWindow(window);             
                 return;
             }
             /* Else, we remove the child window from this current console connection */
             Windows[client].Remove(window);
             /* Update treeview */
-            ((FrmClientWindow)window.MdiParent).switchTree.RemoveWindow(window);
+            ((FrmClientWindow)window.MdiParent).SwitchView.RemoveWindow(window);
             if (window.DisplayNodeRoot != null)
             {
                 /* Update the window type count */
@@ -182,6 +182,13 @@ namespace FusionIRC.Helpers
         {
             /* Add the callback handlers to ConnectionCallbackManager */
             client.OnDebugOut += ConnectionCallbackManager.OnDebugOut;
+            client.OnClientBeginConnect += ConnectionCallbackManager.OnClientBeginConnect;
+            client.OnClientCancelConnection += ConnectionCallbackManager.OnClientCancelConnection;
+            client.OnClientConnected += ConnectionCallbackManager.OnClientConnected;
+            client.OnClientDisconnected += ConnectionCallbackManager.OnClientDisconnected;
+            client.OnClientConnectionError += ConnectionCallbackManager.OnClientConnectionError;
+            client.OnClientConnectionClosed += CommandProcessor.OnClientWaitToReconnect;
+            client.Parser.OnServerPingPong += ConnectionCallbackManager.OnServerPingPong;
             client.Parser.OnJoinUser += ConnectionCallbackManager.OnJoinUser;
             client.Parser.OnJoinSelf += ConnectionCallbackManager.OnJoinSelf;
             client.Parser.OnPartUser += ConnectionCallbackManager.OnPartUser;
@@ -204,6 +211,13 @@ namespace FusionIRC.Helpers
         {
             /* Add the callback handlers to ConnectionCallbackManager */
             client.OnDebugOut -= ConnectionCallbackManager.OnDebugOut;
+            client.OnClientBeginConnect -= ConnectionCallbackManager.OnClientBeginConnect;
+            client.OnClientCancelConnection -= ConnectionCallbackManager.OnClientCancelConnection;
+            client.OnClientConnected -= ConnectionCallbackManager.OnClientConnected;
+            client.OnClientDisconnected -= ConnectionCallbackManager.OnClientDisconnected;
+            client.OnClientConnectionError -= ConnectionCallbackManager.OnClientConnectionError;
+            client.OnClientConnectionClosed -= CommandProcessor.OnClientWaitToReconnect;
+            client.Parser.OnServerPingPong -= ConnectionCallbackManager.OnServerPingPong;
             client.Parser.OnJoinUser -= ConnectionCallbackManager.OnJoinUser;
             client.Parser.OnJoinSelf -= ConnectionCallbackManager.OnJoinSelf;
             client.Parser.OnPartUser -= ConnectionCallbackManager.OnPartUser;

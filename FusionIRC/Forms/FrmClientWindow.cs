@@ -3,11 +3,12 @@
  * Copyright (C) 2016 - 2017
  * Provided AS-IS with no warranty expressed or implied
  */
-
 using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using FusionIRC.Classes;
+using FusionIRC.Controls.SwitchView;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
 using ircCore.Settings;
@@ -16,22 +17,21 @@ using ircCore.Settings.Theming;
 
 namespace FusionIRC.Forms
 {
-    public partial class FrmClientWindow : Form
+    public sealed class FrmClientWindow : Form
     {
         private readonly bool _initialize;
-        private ImageList _images;
+        private readonly ImageList _images;
+        private readonly MdiHelper _mdi;
+        private readonly Splitter _switchViewSplitter;
 
-        private MdiHelper _mdi;
+        public WindowTreeView SwitchView;        
+        public ToolbarControl ToolBar { get; private set; }
+        public MenubarControl MenuBar { get; private set; }
 
         /* Constructor */
         public FrmClientWindow()
         {
             _initialize = true;
-            InitializeComponent();
-            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-            /* MDI helper class */
-            _mdi = new MdiHelper(this);            
-            ConnectionCallbackManager.MainForm = this;
             /* Load client settings */
             SettingsManager.Load();
             /* Load servers */
@@ -39,13 +39,29 @@ namespace FusionIRC.Forms
             /* Load client current theme */
             ThemeManager.ThemeLoaded += WindowManager.OnThemeLoaded;
             ThemeManager.Load(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path);
-            /* Set window position and size */
-            var w = SettingsManager.GetWindowByName("application");
-            Size = w.Size;
-            Location = w.Position;
-            WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
+            /* Main form initialization */
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            Text = @"FusionIRC";
+            ClientSize = new Size(953, 554);
+            Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            IsMdiContainer = true;
+            StartPosition = FormStartPosition.Manual;            
+            /* Treeview */
+            SwitchView = new WindowTreeView
+                             {
+                                 BorderStyle = BorderStyle.FixedSingle,
+                                 Dock = DockStyle.Left,
+                                 DrawMode = TreeViewDrawMode.OwnerDrawText,
+                                 Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0),
+                                 HideSelection = false,
+                                 Location = new Point(0, 0),
+                                 ShowPlusMinus = false,
+                                 ShowRootLines = false,
+                                 Size = new Size(160, 554),
+                                 TabIndex = 0
+                             };
             /* Treeview icons */
-            _images = new ImageList {ImageSize = new Size(16, 16), ColorDepth = ColorDepth.Depth32Bit};
+            _images = new ImageList { ImageSize = new Size(16, 16), ColorDepth = ColorDepth.Depth32Bit };
             _images.Images.AddRange(new[]
                                         {
                                             Resources.status.ToBitmap(),
@@ -53,17 +69,37 @@ namespace FusionIRC.Forms
                                             Resources.query.ToBitmap(),
                                             Resources.dcc_chat.ToBitmap()
                                         });
-            switchTree.ImageList = _images;
-            switchTree.AfterSelect += SwitchTreeAfterSelect;
-            SwitchViewSplitter.SplitPosition = SettingsManager.Settings.SettingsWindows.SwitchTreeWidth;
-            SwitchViewSplitter.SplitterMoving += SplitterMoving;            
-            _initialize = false;
-            //remove
-            //var f = new FrmTest
-            //            {
-            //                MdiParent = this
-            //            };
-            //f.Show();
+            SwitchView.ImageList = _images;
+            SwitchView.AfterSelect += SwitchViewAfterSelect;
+            /* Splitter */
+            _switchViewSplitter = new Splitter
+                                     {
+                                         Location = new Point(160, 0),
+                                         MinExtra = 60,
+                                         MinSize = 80,
+                                         Size = new Size(1, 554),
+                                         TabIndex = 4,
+                                         TabStop = false                                         
+                                     };
+            _switchViewSplitter.SplitterMoving += SwitchViewSplitterMoving;            
+            /* Add controls */
+            Controls.AddRange(new Control[] {_switchViewSplitter, SwitchView});
+            /* Adjust splitter */
+            _switchViewSplitter.SplitPosition = SettingsManager.Settings.SettingsWindows.SwitchTreeWidth;
+            /* Setup toolbar */
+            ToolBar = new ToolbarControl(this);
+            /* Setup menubar */
+            MenuBar = new MenubarControl(this);
+            ToolBar.MenuBar = MenuBar;
+            /* MDI helper class */
+            _mdi = new MdiHelper(this);            
+            ConnectionCallbackManager.MainForm = this;            
+            /* Set window position and size */
+            var w = SettingsManager.GetWindowByName("application");
+            Size = w.Size;
+            Location = w.Position;
+            WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
+            _initialize = false;            
         }
 
         /* Overrides */
@@ -74,7 +110,7 @@ namespace FusionIRC.Forms
             base.OnLoad(e);
         }
 
-        protected override void OnMove(System.EventArgs e)
+        protected override void OnMove(EventArgs e)
         {
             if (!_initialize)
             {
@@ -87,7 +123,7 @@ namespace FusionIRC.Forms
             base.OnMove(e);
         }
 
-        protected override void OnResize(System.EventArgs e)
+        protected override void OnResize(EventArgs e)
         {
             if (!_initialize)
             {
@@ -125,21 +161,25 @@ namespace FusionIRC.Forms
             base.OnFormClosing(e);
         }
 
-        private static void SplitterMoving(object sender, SplitterEventArgs e)
+        private void SwitchViewSplitterMoving(object sender, SplitterEventArgs e)
         {
+            if (_initialize)
+            {
+                return;
+            }
             /* Save the switch window "size" */
             SettingsManager.Settings.SettingsWindows.SwitchTreeWidth = e.SplitX;
         }
 
         /* Treeview selection */
-        private void SwitchTreeAfterSelect(object sender, TreeViewEventArgs e)
+        private void SwitchViewAfterSelect(object sender, TreeViewEventArgs e)
         {
             /* Flicker-free form activation */
             if (e.Action != TreeViewAction.ByMouse)
             {
                 return;
             }
-            var t = switchTree.SelectedNode;                                   
+            var t = SwitchView.SelectedNode;                                   
             var win = (FrmChildWindow)t.Tag;
             if (win == null)
             {               

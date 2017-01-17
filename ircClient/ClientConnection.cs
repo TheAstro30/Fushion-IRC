@@ -25,12 +25,26 @@ namespace ircClient
         
         private StringBuilder _buffer = new StringBuilder();
         private readonly List<string> _sockData = new List<string>();
+
         private Timer _tmrParse;
+        private Timer _tmrWaitToReconnect;
 
         public bool IsConnecting { get; internal set; }
         public bool IsConnected { get; internal set; }
 
+        public bool IsWaitingToReconnect { get; set; }
+
+        public string Server { get; set; }
+        public int Port { get; set; }
+
         public event Action<ClientConnection, string> OnDebugOut;
+        public event Action<ClientConnection> OnClientBeginConnect;
+        public event Action<ClientConnection> OnClientConnected;
+        public event Action<ClientConnection> OnClientDisconnected;
+        public event Action<ClientConnection> OnClientCancelConnection;
+        public event Action<ClientConnection, string> OnClientConnectionError;
+
+        public event Action<ClientConnection> OnClientConnectionClosed;
 
         /* Constructor */
         public ClientConnection(ISynchronizeInvoke syncObjcet, SettingsUserInfo userInfo)
@@ -42,32 +56,75 @@ namespace ircClient
             _sock.OnConnected += OnConnected;
             _sock.OnDisconnected += OnDisconnected;
             _sock.OnError += OnError;
-            _sock.OnDataArrival += OnDataArrival;            
+            _sock.OnDataArrival += OnDataArrival;
+            _sock.OnStateChanged += OnStateChanged;
             Parser = new Parser(this);
 
             UserInfo = new SettingsUserInfo(userInfo);
+
+            _tmrWaitToReconnect = new Timer
+                                      {
+                                          Interval = 2000
+                                      };
+            _tmrWaitToReconnect.Tick += TimerWaitToReconnect;
+        }
+
+        /* Connect overloads */
+        public void Connect()
+        {
+            if (string.IsNullOrEmpty(Server))
+            {
+                return;
+            }
+            Connect(Server, Port > 0 ? Port : 6667);
         }
 
         public void Connect(string address, int port)
         {
+            Server = address;
+            Port = port;
             IsConnecting = true;
             _sock.Connect(address, port);
+            if (OnClientBeginConnect != null)
+            {
+                OnClientBeginConnect(this);
+            }
         }
 
+        /* Disconnection */
         public void Disconnect()
         {
+            if (IsConnected)
+            {
+                Send("QUIT :Leaving");
+            }
+            else
+            {
+                _sock.Close();
+            }
             IsConnecting = false;
             IsConnected = false;
-            _sock.Close();
         }
 
         public void CancelConnection()
         {
+            if (IsConnected)
+            {
+                Send("QUIT :Leaving.");
+            }
+            else
+            {
+                _sock.Close();
+            }
             IsConnecting = false;
             IsConnected = false;
-            _sock.Close();
+            if (OnClientCancelConnection != null)
+            {
+                OnClientCancelConnection(this);
+            }
         }
 
+        /* Sockwrite */
         public void Send(string data)
         {
             _sock.SendData(string.Format("{0}\r\n", data));
@@ -76,19 +133,30 @@ namespace ircClient
         /* Socket callbacks */
         private void OnConnected(ClientSock sock)
         {
-            System.Diagnostics.Debug.Print("connected " + _sock.LocalIp + " " + _sock.RemoteHostIp);            
+            if (OnClientConnected != null)
+            {
+                OnClientConnected(this);
+            }
             Send(string.Format("NICK {0}", UserInfo.Nick));
             Send(string.Format("USER {0} {1} {2} :{3}", UserInfo.Ident, _sock.LocalIp, _sock.RemoteHostIp, UserInfo.RealName));
         }
 
         private void OnDisconnected(ClientSock sock)
         {
+            if (OnClientDisconnected != null)
+            {
+                OnClientDisconnected(this);
+            }
             IsConnecting = false;
             IsConnected = false;
         }
 
         private void OnError(ClientSock sock, string error)
         {
+            if (OnClientConnectionError != null)
+            {
+                OnClientConnectionError(this, error);
+            }
             IsConnecting = false;
             IsConnected = false;
         }
@@ -115,7 +183,20 @@ namespace ircClient
             _tmrParse.Tick += TmrParseTick;
         }
 
-        /* Timer callback */
+        private void OnStateChanged(ClientSock sock, WinsockStates state)
+        {
+            switch (state)
+            {
+                case WinsockStates.Closed:
+                    System.Diagnostics.Debug.Print("Closed");
+                    IsConnecting = false;
+                    IsConnected = false;
+                    _tmrWaitToReconnect.Enabled = true;
+                    break;
+            }
+        }
+
+        /* Timer callbacks */
         private void TmrParseTick(object sender, EventArgs e)
         {
             if (_sockData.Count == 0)
@@ -191,6 +272,21 @@ namespace ircClient
             }            
             /* Now we send the data to the main parser */            
             Parser.Parse(first, second, third, fourth);
+        }
+
+        private void TimerWaitToReconnect(object sender, EventArgs e)
+        {
+            /* Gives a small delay before raising the "closed" event */
+            _tmrWaitToReconnect.Enabled = false;
+            if (!IsWaitingToReconnect)
+            {
+                return;
+            }
+            IsWaitingToReconnect = false;
+            if (OnClientConnectionClosed != null)
+            {
+                OnClientConnectionClosed(this);
+            }
         }
     }
 }

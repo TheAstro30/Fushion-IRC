@@ -76,6 +76,12 @@ namespace ircCore.Settings.Theming
             ThemeFonts.Add(ChildWindowType.Channel, new Font("Lucida Console", 10));
             ThemeFonts.Add(ChildWindowType.Private, new Font("Lucida Console", 10));
             /* Default messages */
+            Messages.Add(ThemeMessage.ConnectingText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * Connecting to: $server [$port]" });
+            Messages.Add(ThemeMessage.ConnectedText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * Connected! Waiting for welcome message..." });
+            Messages.Add(ThemeMessage.ConnectionCancelledText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * Connection cancelled" });
+            Messages.Add(ThemeMessage.DisconnectedText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * Disconnected" });
+            Messages.Add(ThemeMessage.ConnectionErrorText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * Error connecting to: $server ($text)" });
+            Messages.Add(ThemeMessage.ServerPingPongText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Server request PING; client response PONG!" });
             Messages.Add(ThemeMessage.ChannelTopic, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Topic is: '$text'" });
             Messages.Add(ThemeMessage.ChannelTopicSet, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Topic set by: $nick $text" });
             Messages.Add(ThemeMessage.ChannelTopicChange, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * $nick changes $target topic to '$text'" });
@@ -91,7 +97,7 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.ChannelSelfKickText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts * You were kicked from $target by $nick '$text'" });
             Messages.Add(ThemeMessage.ModeChannelText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $nick sets mode: $text" });            
             Messages.Add(ThemeMessage.ModeSelfText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $me sets mode: $text" });
-            Messages.Add(ThemeMessage.NickChange, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $nick is now known as: $newnick" });
+            Messages.Add(ThemeMessage.NickChangeText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $nick is now known as: $newnick" });
             Messages.Add(ThemeMessage.PrivateText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts <$nick> $text" });
             Messages.Add(ThemeMessage.PrivateSelfText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts <$me> $text" });
             Messages.Add(ThemeMessage.PrivateActionText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * $nick $text" });

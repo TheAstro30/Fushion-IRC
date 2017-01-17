@@ -16,6 +16,8 @@ namespace ircClient.Classes
         private readonly ClientConnection _client;
 
         /* Public events */
+        public event Action<ClientConnection> OnServerPingPong;
+
         public event Action<ClientConnection, string, string, string> OnJoinUser;
         public event Action<ClientConnection, string> OnJoinSelf;
         public event Action<ClientConnection, string, string, string> OnPartUser;
@@ -53,6 +55,10 @@ namespace ircClient.Classes
             {
                 case "PING":
                     _client.Send(string.Format("PONG {0}", first));
+                    if (OnServerPingPong != null)
+                    {
+                        OnServerPingPong(_client);
+                    }
                     break;
 
                 case "JOIN":

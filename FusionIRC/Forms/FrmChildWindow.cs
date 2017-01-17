@@ -8,7 +8,6 @@ using System.Drawing;
 using System.IO;
 using System.Media;
 using System.Windows.Forms;
-using FusionIRC.Controls;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
 using ircClient;
@@ -35,15 +34,14 @@ namespace FusionIRC.Forms
     {        
         private readonly Timer _focus;
         private WindowEvent _event;
+        private readonly SplitContainer _splitter;
 
         /* Public properties */
         public ChildWindowType WindowType { get; private set; }
         public ClientConnection Client { get; private set; }
         public OutputWindow Output { get; set; }
         public InputWindow Input { get; set; }
-        public Nicklist Nicklist { get; set; }
-
-        public SplitContainer Splitter { get; set; }
+        public Nicklist Nicklist { get; set; }        
 
         /* Nodes used by the switch treeview - much easier to keep track of/update from here */
         public TreeNode DisplayNodeRoot { get; set; }
@@ -116,20 +114,21 @@ namespace FusionIRC.Forms
                                    UserModeCharacters = Client.Parser.UserModeCharacters,
                                    Dock = DockStyle.Fill
                                };
-                Splitter = new SplitContainer
+                /* Split control for nicklist */
+                _splitter = new SplitContainer
                                {
                                    FixedPanel = FixedPanel.Panel2,
                                    Location = new Point(0, 0),
                                    Panel1MinSize = 250,                                   
                                    SplitterWidth = 1
                                };
-                Splitter.Panel1.Controls.Add(Output);
-                Splitter.Panel2MinSize = 80;
-                Splitter.Panel2.Controls.Add(Nicklist);                
-                Splitter.SplitterMoving += SplitterMoving;
-
+                _splitter.Panel1.Controls.Add(Output);
+                _splitter.Panel2MinSize = 80;
+                _splitter.Panel2.Controls.Add(Nicklist);                
+                _splitter.SplitterMoving += SplitterMoving;
+                /* Only add splitter to controls, not the output window */
                 Output.Dock = DockStyle.Fill;
-                Controls.AddRange(new Control[] {Input, Splitter});
+                Controls.AddRange(new Control[] {Input, _splitter});
             }
             else
             {
@@ -228,11 +227,11 @@ namespace FusionIRC.Forms
             if (WindowType == ChildWindowType.Channel)
             {
                 /* Set up our splitter */
-                Splitter.SetBounds(0, 0, ClientRectangle.Width, height);
-                Input.SetBounds(0, Splitter.ClientRectangle.Height + 1, ClientRectangle.Width, Input.ClientRectangle.Height);
+                _splitter.SetBounds(0, 0, ClientRectangle.Width, height);
+                Input.SetBounds(0, _splitter.ClientRectangle.Height + 1, ClientRectangle.Width, Input.ClientRectangle.Height);
                 if (WindowState == FormWindowState.Normal)
                 {
-                    Splitter.SplitterDistance = ClientRectangle.Width - SettingsManager.Settings.SettingsWindows.NicklistWidth;
+                    _splitter.SplitterDistance = ClientRectangle.Width - SettingsManager.Settings.SettingsWindows.NicklistWidth;
                 }
             }
             else
@@ -347,7 +346,7 @@ namespace FusionIRC.Forms
         {
             _focus.Enabled = false;
             CurrentWindowEvent = WindowEvent.None;
-            ((FrmClientWindow)MdiParent).switchTree.SelectedNode = DisplayNode;
+            ((FrmClientWindow)MdiParent).SwitchView.SelectedNode = DisplayNode;
             Input.Focus();
         }
     }

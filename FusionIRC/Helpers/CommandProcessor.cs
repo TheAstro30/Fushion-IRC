@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Windows.Forms;
 using FusionIRC.Forms;
 using ircClient;
 using ircCore.Settings.Theming;
@@ -12,6 +13,31 @@ namespace FusionIRC.Helpers
 {
     public static class CommandProcessor
     {
+        private static Timer _tmrWaitToReconnectTimeOut;
+
+        /* Constructor */
+        static CommandProcessor()
+        {
+            System.Diagnostics.Debug.Print("Constructor");
+            /* Wait at least N number of seconds for socket to disconenct when issuing a new /server connection on a connected socket */
+            _tmrWaitToReconnectTimeOut = new Timer
+                                             {
+                                                 Interval = 4000
+                                             };
+            _tmrWaitToReconnectTimeOut.Tick += TimerWaitToReconnectTimeOut;
+        }
+
+        public static void OnClientWaitToReconnect(ClientConnection client)
+        {
+            /* This is called when the server command is issued on a currently connected server */
+            if (_tmrWaitToReconnectTimeOut.Enabled)
+            {
+                /* Event raised by connection class before time out timer fired */
+                _tmrWaitToReconnectTimeOut.Enabled = false;
+            }
+            ParseServerConnection(client, string.Format("{0}:{1}", client.Server, client.Port));
+        }
+
         public static void Parse(ClientConnection client, FrmChildWindow child, string data)
         {            
             var i = data.IndexOf(' ');
@@ -36,6 +62,10 @@ namespace FusionIRC.Helpers
             {
                 case "SERVER":
                     ParseServerConnection(client, args);
+                    break;
+
+                case "DISCONNECT":
+                    ParseServerDisconnection(client);
                     break;
 
                 case "ME":
@@ -68,10 +98,11 @@ namespace FusionIRC.Helpers
             }
         }
 
+        /* Connection events */
         private static void ParseServerConnection(ClientConnection client, string args)
         {
             var s = args.Split(' ');
-            string[] address = null;
+            string[] address;
             var port = 6667;
             var c = WindowManager.GetConsoleWindow(client);
             if (c == null || s.Length == 0)
@@ -103,13 +134,13 @@ namespace FusionIRC.Helpers
                     }
                     else
                     {
-                        address = s[0].Split(':');
+                        address = s[0].Split(':');                        
                     }
                     c.Client.Parser.JoinChannelsOnConnect = s.Length > 2 && s[1].ToLower() == "-j"
                                                                 ? s[2]
                                                                 : s.Length > 3 && s[2].ToLower() == "-j"
                                                                       ? s[3]
-                                                                      : string.Empty;
+                                                                      : string.Empty;                    
                     break;
             }
             if (address.Length == 2)
@@ -119,9 +150,45 @@ namespace FusionIRC.Helpers
                     port = 6667;
                 }
             }
+            /* If currently connected, we should send quit message */
+            if (c.Client.IsConnecting)
+            {
+                c.Client.CancelConnection();
+            }
+            else if (c.Client.IsConnected)
+            {
+                c.Client.IsWaitingToReconnect = true;
+                c.Client.Disconnect();
+                c.Client.Server = address[0];
+                c.Client.Port = port;
+                _tmrWaitToReconnectTimeOut.Tag = c.Client;
+                _tmrWaitToReconnectTimeOut.Enabled = true;
+                return;
+            }
             c.Client.Connect(address[0], port);
         }
 
+        private static void ParseServerDisconnection(ClientConnection client)
+        {
+            System.Diagnostics.Debug.Print("Disconnect");
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
+            {
+                System.Diagnostics.Debug.Print("window is null");
+                return;
+            }
+            if (client.IsConnecting)
+            {
+                /* Cancel current connection */
+                System.Diagnostics.Debug.Print("Cancel");
+                client.CancelConnection();
+                return;
+            }
+            System.Diagnostics.Debug.Print("Disconnect");
+            client.Disconnect();
+        }
+
+        /* Text events */
         private static void ParseAction(ClientConnection client, FrmChildWindow child, string args)
         {
             if (child.WindowType == ChildWindowType.Console)
@@ -199,6 +266,13 @@ namespace FusionIRC.Helpers
                 channel = c[0];
             }            
             client.Send(string.Format("PART {0}", channel));
+        }
+
+        /* Timer callback */
+        private static void TimerWaitToReconnectTimeOut(object sender, EventArgs e)
+        {
+            _tmrWaitToReconnectTimeOut.Enabled = false;
+            OnClientWaitToReconnect((ClientConnection)_tmrWaitToReconnectTimeOut.Tag);
         }
     }
 }

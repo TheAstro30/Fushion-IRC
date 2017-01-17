@@ -19,14 +19,121 @@ namespace FusionIRC.Helpers
 
         public static void OnDebugOut(ClientConnection client, string data)
         {
+            System.Diagnostics.Debug.Print(data);
+            //var c = WindowManager.GetConsoleWindow(client);
+            //if (c == null || c.WindowType != ChildWindowType.Console)
+            //{
+            //    return;
+            //}
+            //c.Output.AddLine(1, data);
+            ///* Update treenode color */
+            //WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
+        }
+
+        /* Connection events */
+        public static void OnClientBeginConnect(ClientConnection client)
+        {
             var c = WindowManager.GetConsoleWindow(client);
             if (c == null || c.WindowType != ChildWindowType.Console)
             {
                 return;
             }
-            c.Output.AddLine(1, data);
-            /* Update treenode color */
-            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.ConnectingText,
+                              TimeStamp = DateTime.Now,
+                              Server = client.Server,
+                              Port = client.Port
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);            
+        }
+
+        public static void OnClientConnected(ClientConnection client)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || c.WindowType != ChildWindowType.Console)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.ConnectedText,
+                              TimeStamp = DateTime.Now
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+        }
+
+        public static void OnClientCancelConnection(ClientConnection client)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || c.WindowType != ChildWindowType.Console)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.ConnectionCancelledText,
+                              TimeStamp = DateTime.Now
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+        }
+
+        public static void OnClientDisconnected(ClientConnection client)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || c.WindowType != ChildWindowType.Console)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.DisconnectedText,
+                              TimeStamp = DateTime.Now
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            /* Iterate all open channels and clear nick list */
+            foreach (var win in WindowManager.Windows[client].Where(win => win.WindowType == ChildWindowType.Channel))
+            {
+                win.Nicklist.Clear();
+            }
+        }
+
+        public static void OnClientConnectionError(ClientConnection client, string error)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || c.WindowType != ChildWindowType.Console)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.ConnectionErrorText,
+                              TimeStamp = DateTime.Now,
+                              Text = error,
+                              Server = client.Server
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+        }
+
+        public static void OnServerPingPong(ClientConnection client)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || c.WindowType != ChildWindowType.Console)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.ServerPingPongText,
+                              TimeStamp = DateTime.Now,
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
         }
 
         /* Text messages */
@@ -221,7 +328,7 @@ namespace FusionIRC.Helpers
                     c.Nicklist.RenameNick(nick, newNick);
                     var tmd = new IncomingMessageData
                                   {
-                                      Message = ThemeMessage.NickChange,
+                                      Message = ThemeMessage.NickChangeText,
                                       TimeStamp = DateTime.Now,
                                       Nick = nick,
                                       NewNick = newNick

@@ -27,29 +27,35 @@ namespace ircCore.Settings.Theming
 
     public enum ThemeMessage
     {
-        ChannelTopic = 0,
-        ChannelTopicSet = 1,
-        ChannelTopicChange = 2,
-        ChannelText = 3,
-        ChannelSelfText = 4,
-        ChannelActionText = 5,
-        ChannelSelfActionText = 6,
-        PrivateText = 7,
-        PrivateSelfText = 8,
-        PrivateActionText = 9,
-        PrivateSelfActionText = 10,
-        NoticeServerText = 11,
-        NoticeText = 12,
-        NoticeSelfText = 13,
-        ChannelJoinText = 14,
-        ChannelSelfJoinText = 15,
-        ChannelPartText = 16,
-        ModeChannelText = 17,        
-        ModeSelfText = 18,
-        QuitText = 19,
-        ChannelKickText = 20,
-        ChannelSelfKickText = 21,
-        NickChange = 22
+        ConnectingText = 0,
+        ConnectedText = 1,
+        DisconnectedText = 2,
+        ConnectionCancelledText = 3,
+        ConnectionErrorText = 4,
+        ServerPingPongText = 5,
+        ChannelTopic = 100,
+        ChannelTopicSet = 101,
+        ChannelTopicChange = 102,
+        ChannelText = 103,
+        ChannelSelfText = 104,
+        ChannelActionText = 105,
+        ChannelSelfActionText = 106,
+        PrivateText = 107,
+        PrivateSelfText = 108,
+        PrivateActionText = 109,
+        PrivateSelfActionText = 110,
+        NoticeServerText = 111,
+        NoticeText = 112,
+        NoticeSelfText = 113,
+        ChannelJoinText = 114,
+        ChannelSelfJoinText = 115,
+        ChannelPartText = 116,
+        ModeChannelText = 117,        
+        ModeSelfText = 118,
+        QuitText = 119,
+        ChannelKickText = 120,
+        ChannelSelfKickText = 121,
+        NickChangeText = 122
     }
 
     public class IncomingMessageData
@@ -63,7 +69,11 @@ namespace ircCore.Settings.Theming
         public string Target { get; set; }
         public string Text { get; set; }
         public string NewNick { get; set; }
-        public string KickedNick { get; set; }        
+        public string KickedNick { get; set; } 
+
+        /* Server related properties */
+        public string Server { get; set; }
+        public int Port { get; set; }
     }
 
     public class ParsedMessageData
@@ -139,6 +149,8 @@ namespace ircCore.Settings.Theming
             sb.Replace("$knick", messageData.KickedNick);
             sb.Replace("$text", messageData.Text);
             sb.Replace("$target", messageData.Target);
+            sb.Replace("$server", messageData.Server);
+            sb.Replace("$port", messageData.Port.ToString());
             pmd.DefaultColor = CurrentTheme.Messages[messageData.Message].DefaultColor;
             pmd.Message = sb.ToString();
             return pmd;

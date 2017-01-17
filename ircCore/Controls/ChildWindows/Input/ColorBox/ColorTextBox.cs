@@ -8,7 +8,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using ircCore.Controls.ChildWindows.Helpers;
-using ircCore.Dialogs;
+using ircCore.Forms;
 
 namespace ircCore.Controls.ChildWindows.Input.ColorBox
 {

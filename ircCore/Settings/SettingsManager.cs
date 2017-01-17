@@ -31,7 +31,7 @@ namespace ircCore.Settings
         {
             var w = Settings.SettingsWindows.Window.FirstOrDefault(o => o.Name.ToLower() == name.ToLower());
             if (w == null)
-            {
+            {                
                 w = new WindowData {Name = name.ToLower()};
                 Settings.SettingsWindows.Window.Add(w);
             }
