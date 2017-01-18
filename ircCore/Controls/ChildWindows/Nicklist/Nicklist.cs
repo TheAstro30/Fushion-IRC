@@ -17,7 +17,7 @@ namespace ircCore.Controls.ChildWindows.Nicklist
     /* IRC Nicklist control sorted by user mode */
     public class Nicklist : UserControl
     {
-        private List<NickData> _list = new List<NickData>();
+        private readonly List<NickData> _list = new List<NickData>();
         private readonly NicklistStyler _baseList;
         private readonly NickComparer _nickComparer = new NickComparer();
         private readonly BindingSource _dataSource = new BindingSource();
@@ -110,7 +110,13 @@ namespace ircCore.Controls.ChildWindows.Nicklist
             {
                 nick = nick.Replace(n.Value, "");
             }
-            return _list.FirstOrDefault(o => o.Nick == nick) != null;
+            return _list.FirstOrDefault(o => o.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase)) != null;
+        }
+
+        public string GetNickPrefix(string nick)
+        {
+            var n = _list.FirstOrDefault(o => o.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase));
+            return n != null ? n.GetUserMode() : string.Empty;
         }
 
         /* Overrides */
@@ -177,7 +183,7 @@ namespace ircCore.Controls.ChildWindows.Nicklist
 
         public void UpdateNickAddress(string nick, string address)
         {
-            var nd = _list.FirstOrDefault(o => o.Nick.ToLower() == nick.ToLower());
+            var nd = _list.FirstOrDefault(o => o.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase));
             if (nd != null)
             {
                 nd.Address = address;                
@@ -198,7 +204,7 @@ namespace ircCore.Controls.ChildWindows.Nicklist
 
         public void RenameNick(string nick, string newNick)
         {
-            var nd = _list.FirstOrDefault(o => o.Nick.ToLower() == nick.ToLower());
+            var nd = _list.FirstOrDefault(o => o.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase));
             if (nd == null)
             {
                 return;

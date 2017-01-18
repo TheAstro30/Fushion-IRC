@@ -3,6 +3,9 @@
  * Copyright (C) 2016 - 2017
  * Provided AS-IS with no warranty expressed or implied
  */
+
+using System;
+using System.Drawing;
 using System.Linq;
 using ircCore.Utils.Serialization;
 
@@ -29,10 +32,10 @@ namespace ircCore.Settings
 
         public static WindowData GetWindowByName(string name)
         {
-            var w = Settings.SettingsWindows.Window.FirstOrDefault(o => o.Name.ToLower() == name.ToLower());
+            var w = Settings.SettingsWindows.Window.FirstOrDefault(o => o.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
             if (w == null)
             {                
-                w = new WindowData {Name = name.ToLower()};
+                w = new WindowData {Name = name.ToLower(), Position = new Point(-1, -1)}; /* -1 means default position */
                 Settings.SettingsWindows.Window.Add(w);
             }
             return w;

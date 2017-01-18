@@ -46,7 +46,9 @@ namespace FusionIRC.Helpers
                               Port = client.Port
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);            
+            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
 
         public static void OnClientConnected(ClientConnection client)
@@ -63,6 +65,8 @@ namespace FusionIRC.Helpers
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
 
         public static void OnClientCancelConnection(ClientConnection client)
@@ -79,6 +83,8 @@ namespace FusionIRC.Helpers
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
 
         public static void OnClientDisconnected(ClientConnection client)
@@ -95,6 +101,8 @@ namespace FusionIRC.Helpers
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
             /* Iterate all open channels and clear nick list */
             foreach (var win in WindowManager.Windows[client].Where(win => win.WindowType == ChildWindowType.Channel))
             {
@@ -118,6 +126,8 @@ namespace FusionIRC.Helpers
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
 
         public static void OnServerPingPong(ClientConnection client)
@@ -134,6 +144,8 @@ namespace FusionIRC.Helpers
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
 
         /* Text messages */
@@ -150,6 +162,7 @@ namespace FusionIRC.Helpers
                               Message = ThemeMessage.ChannelText,
                               TimeStamp = DateTime.Now,
                               Nick = nick,
+                              Prefix = c.Nicklist.GetNickPrefix(nick),
                               Address = address,
                               Text = text
                           };
@@ -190,6 +203,7 @@ namespace FusionIRC.Helpers
                               Message = ThemeMessage.ChannelActionText,
                               TimeStamp = DateTime.Now,
                               Nick = nick,
+                              Prefix = c.Nicklist.GetNickPrefix(nick),
                               Address = address,
                               Text = text
                           };
@@ -217,7 +231,125 @@ namespace FusionIRC.Helpers
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
         }
 
+        public static void OnNotice(ClientConnection client, string nick, string address, string text)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.NoticeText,
+                              TimeStamp = DateTime.Now,
+                              Nick = nick,
+                              Address = address,
+                              Text = text
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
+        }
+
         /* Events */
+        public static void OnWelcome(ClientConnection client, string text)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.WelcomeText,
+                              TimeStamp = DateTime.Now,
+                              Text = text
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
+        }
+
+        public static void OnMotd(ClientConnection client, string text)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.MotdText,
+                              TimeStamp = DateTime.Now,
+                              Text = text
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
+        }
+
+        public static void OnTopicIs(ClientConnection client, string channel, string text)
+        {
+            var c = WindowManager.GetWindow(client, channel);
+            if (c == null || c.WindowType != ChildWindowType.Channel)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.ChannelTopic,
+                              TimeStamp = DateTime.Now,
+                              Text = text
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+        }
+
+        public static void OnTopicSetBy(ClientConnection client, string channel, string text)
+        {
+            var c = WindowManager.GetWindow(client, channel);
+            if (c == null || c.WindowType != ChildWindowType.Channel)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.ChannelTopicSet,
+                              TimeStamp = DateTime.Now,
+                              Text = text
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+        }
+
+        public static void OnTopicChanged(ClientConnection client, string nick, string channel, string text)
+        {
+            var c = WindowManager.GetWindow(client, channel);
+            if (c == null || c.WindowType != ChildWindowType.Channel)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.ChannelTopicChange,
+                              TimeStamp = DateTime.Now,
+                              Nick = nick,
+                              Prefix = c.Nicklist.GetNickPrefix(nick),
+                              Text = text
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+        }
+
         public static void OnJoinUser(ClientConnection client, string nick, string address, string channel)
         {
             var c = WindowManager.GetWindow(client, channel);
@@ -277,16 +409,17 @@ namespace FusionIRC.Helpers
             if (c == null || c.WindowType != ChildWindowType.Channel)
             {
                 return;
-            }
-            c.Nicklist.RemoveNick(nick);
+            }            
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.ChannelPartText,
                               TimeStamp = DateTime.Now,
                               Nick = nick,
+                              Prefix = c.Nicklist.GetNickPrefix(nick),
                               Address = address,
                               Target = channel
                           };
+            c.Nicklist.RemoveNick(nick);
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
@@ -316,29 +449,45 @@ namespace FusionIRC.Helpers
         public static void OnNick(ClientConnection client, string nick, string newNick)
         {
             /* If the nick is me, update client user info data */
-            if (nick.ToLower() == client.UserInfo.Nick.ToLower())
+            if (nick.Equals(client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
             {
                 client.UserInfo.Nick = newNick;
+                var console = WindowManager.GetConsoleWindow(client);
+                if (console == null)
+                {                    
+                    return;
+                }
+                var tmd = new IncomingMessageData
+                              {
+                                  Message = ThemeMessage.NickChangeSelfText,
+                                  TimeStamp = DateTime.Now,
+                                  NewNick = nick
+                              };
+                var pmd = ThemeManager.ParseMessage(tmd);
+                console.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+                /* Update treenode color */
+                WindowManager.SetWindowEvent(console, MainForm, WindowEvent.EventReceived);
             }
             /* This is harder as we have to go through all channels and rename the nick in the nicklist */
             foreach (var c in WindowManager.Windows[client].Where(c => c.WindowType != ChildWindowType.Console))
             {
-                if (c.WindowType == ChildWindowType.Channel)
-                {
-                    c.Nicklist.RenameNick(nick, newNick);
+                if (c.WindowType == ChildWindowType.Channel && c.Nicklist.ContainsNick(nick))
+                {                    
                     var tmd = new IncomingMessageData
                                   {
-                                      Message = ThemeMessage.NickChangeText,
+                                      Message = ThemeMessage.NickChangeUserText,
                                       TimeStamp = DateTime.Now,
                                       Nick = nick,
+                                      Prefix = c.Nicklist.GetNickPrefix(nick),
                                       NewNick = newNick
                                   };
+                    c.Nicklist.RenameNick(nick, newNick);
                     var pmd = ThemeManager.ParseMessage(tmd);
                     c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
                     /* Update treenode color */
                     WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
                 }
-                else
+                else if (c.WindowType == ChildWindowType.Private && c.Tag.ToString().Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                 {
                     /* Rename any open query windows to keep track of it */
                     c.Text = newNick;
@@ -351,24 +500,22 @@ namespace FusionIRC.Helpers
         public static void OnQuit(ClientConnection client, string nick, string address, string msg)
         {
             /* This is basically the same as OnNick - remove the nick from the nicklist and display the message in channels */
-            foreach (var c in WindowManager.Windows[client].Where(c => c.WindowType != ChildWindowType.Console))
-            {
-                if (c.WindowType == ChildWindowType.Channel)
-                {
-                    c.Nicklist.RemoveNick(nick);
-                    var tmd = new IncomingMessageData
-                                  {
-                                      Message = ThemeMessage.QuitText,
-                                      TimeStamp = DateTime.Now,
-                                      Nick = nick,
-                                      Address = address,
-                                      Text = msg
-                                  };
-                    var pmd = ThemeManager.ParseMessage(tmd);
-                    c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
-                    /* Update treenode color */
-                    WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
-                }
+            foreach (var c in WindowManager.Windows[client].Where(c => c.WindowType == ChildWindowType.Channel && c.Nicklist.ContainsNick(nick)))
+            {                
+                var tmd = new IncomingMessageData
+                              {
+                                  Message = ThemeMessage.QuitText,
+                                  TimeStamp = DateTime.Now,
+                                  Nick = nick,
+                                  Prefix = c.Nicklist.GetNickPrefix(nick),
+                                  Address = address,
+                                  Text = msg
+                              };
+                c.Nicklist.RemoveNick(nick);
+                var pmd = ThemeManager.ParseMessage(tmd);
+                c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+                /* Update treenode color */
+                WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
             }
         }
 
@@ -392,6 +539,7 @@ namespace FusionIRC.Helpers
                               TimeStamp = DateTime.Now,
                               Target = channel,
                               Nick = nick,
+                              Prefix = c.Nicklist.GetNickPrefix(nick),
                               Text = msg
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
@@ -414,6 +562,7 @@ namespace FusionIRC.Helpers
                               TimeStamp = DateTime.Now,
                               Target = channel,
                               Nick = nick,
+                              Prefix = c.Nicklist.GetNickPrefix(nick),
                               KickedNick = knick,
                               Text = msg
                           };
@@ -443,8 +592,7 @@ namespace FusionIRC.Helpers
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
 
-        public static void OnModeChannel(ClientConnection client, string nick, string channel, string modes,
-                                         string modeData)
+        public static void OnModeChannel(ClientConnection client, string nick, string channel, string modes, string modeData)
         {
             var c = WindowManager.GetWindow(client, channel);
             if (c == null || c.WindowType != ChildWindowType.Channel)
@@ -456,6 +604,7 @@ namespace FusionIRC.Helpers
                               Message = ThemeMessage.ModeChannelText,
                               TimeStamp = DateTime.Now,
                               Nick = nick,
+                              Prefix = c.Nicklist.GetNickPrefix(nick),
                               Text = string.Format("{0} {1}", modes, modeData)
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
@@ -505,6 +654,25 @@ namespace FusionIRC.Helpers
                         break;
                 }
             }
+        }
+
+        public static void OnRaw(ClientConnection client, string message)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.RawText,
+                              TimeStamp = DateTime.Now,
+                              Text = message
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
     }
 }

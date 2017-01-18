@@ -36,6 +36,10 @@ namespace FusionIRC.Forms
         private WindowEvent _event;
         private readonly SplitContainer _splitter;
 
+        private readonly bool _initialize;
+
+        private string _windowChildName;
+
         /* Public properties */
         public ChildWindowType WindowType { get; private set; }
         public ClientConnection Client { get; private set; }
@@ -84,9 +88,16 @@ namespace FusionIRC.Forms
         /* Constructor */
         public FrmChildWindow(ClientConnection client, ChildWindowType type, Form owner)
         {
+            _initialize = true;
             /* Constructor where we pass what type of window this is - then we know what controls to create ;) */
             Client = client;
-            WindowType = type;            
+            WindowType = type;
+            /* Next line is used for getting/setting window size/position */
+            _windowChildName = type == ChildWindowType.Console
+                                   ? "console"
+                                   : type == ChildWindowType.Channel
+                                         ? "channel"
+                                         : type == ChildWindowType.Private ? "private" : "chat";
             /* Controls */
             Input = new InputWindow
                         {
@@ -148,7 +159,7 @@ namespace FusionIRC.Forms
             BackColor = Color.FromArgb(190, 190, 190);            
             ShowInTaskbar = false;
             MdiParent = owner;
-            MinimumSize = new Size(480, 280);
+            MinimumSize = new Size(480, 180);
             /* Set window icon */
             switch (type)
             {
@@ -173,6 +184,18 @@ namespace FusionIRC.Forms
             /* Focus activation timer */
             _focus = new Timer {Interval = 10};
             _focus.Tick += TimerFocus;
+            /* Set window position and size - note: if a window is specified by it's "tag" (ie: #test), that takes priority */
+            var w = SettingsManager.GetWindowByName(_windowChildName);
+            if (w.Size.Width != 0 && w.Size.Height != 0)
+            {
+                Size = w.Size;
+            }
+            if (w.Position.X != -1 && w.Position.Y != -1)
+            {
+                Location = w.Position;
+            }
+            //WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
+            _initialize = false;
         }
         
         /* Overrides */
@@ -209,7 +232,7 @@ namespace FusionIRC.Forms
                 }
                 /* Before removing the window, it would be a good idea to 1) send the quit message & 2) close all windows associated with this console */
                 Client.Send(string.Format("QUIT :Leaving."));
-                WindowManager.RemoveAllWindowsOfConsole(Client);
+                WindowManager.RemoveAllWindowsOfConsole(Client);                
             }            
             if (WindowType == ChildWindowType.Channel && Client.IsConnected && !AutoClose)
             {
@@ -217,7 +240,21 @@ namespace FusionIRC.Forms
                 Client.Send(string.Format("PART {0}", Tag));
             }
             WindowManager.RemoveWindow(Client, this);
+            _focus.Enabled = false;
             base.OnFormClosing(e);
+        }
+
+        protected override void OnMove(EventArgs e)
+        {
+            if (!_initialize)
+            {
+                var w = SettingsManager.GetWindowByName(_windowChildName);
+                if (WindowState != FormWindowState.Maximized)
+                {
+                    //w.Position = Location;
+                }
+            }
+            base.OnMove(e);
         }
 
         protected override void OnResize(EventArgs e)
@@ -239,22 +276,19 @@ namespace FusionIRC.Forms
                 /* Normal window, no nicklist/splitter */
                 Output.SetBounds(0, 0, ClientRectangle.Width, height);
                 Input.SetBounds(0, Output.ClientRectangle.Height + 1, ClientRectangle.Width, Input.ClientRectangle.Height);
-            }            
-            base.OnResize(e);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
+            }
+            /* Update settings */
+            if (!_initialize)
             {
-                Output.Dispose();
-                Input.Dispose();
-                if (Nicklist != null)
+                var w = SettingsManager.GetWindowByName(_windowChildName);
+                if (WindowState != FormWindowState.Maximized)
                 {
-                    Nicklist.Dispose();
+                    /* For now, we're only interested in position */
+                    w.Size = Size;
+                    //w.Position = Location;
                 }
             }
-            base.Dispose(disposing);
+            base.OnResize(e);
         }
 
         public override string ToString()
@@ -274,6 +308,11 @@ namespace FusionIRC.Forms
             switch (e.KeyCode)
             {
                 case Keys.Return:
+                    if (string.IsNullOrEmpty(Input.Text))
+                    {
+                        SystemSounds.Beep.Play();
+                        return;
+                    }
                     var s = Utf8.ConvertToUtf8(Input.Text, true);
                     Input.Text = null;                    
                     /* Send text to server */
@@ -311,12 +350,6 @@ namespace FusionIRC.Forms
                         CommandProcessor.Parse(Client, this, s);
                         return;
                     }
-                    if (!Client.IsConnected)
-                    {
-                        return;
-                    }
-                    /* Console window - send data as raw */
-                    Client.Send(Utf8.ConvertFromUtf8(s, true));
                     break;
 
                 case Keys.Back:
@@ -346,7 +379,10 @@ namespace FusionIRC.Forms
         {
             _focus.Enabled = false;
             CurrentWindowEvent = WindowEvent.None;
-            ((FrmClientWindow)MdiParent).SwitchView.SelectedNode = DisplayNode;
+            if (DisplayNode != null)
+            {
+                ((FrmClientWindow) MdiParent).SwitchView.SelectedNode = DisplayNode;
+            }
             Input.Focus();
         }
     }

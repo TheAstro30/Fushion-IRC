@@ -52,12 +52,18 @@
   <ItemGroup>
     <Compile Include="Classes\MenubarControl.cs" />
     <Compile Include="Classes\ToolbarControl.cs" />
+    <Compile Include="Controls\FormEx.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Controls\SwitchView\Base\TreeNodeEx.cs" />
     <Compile Include="Controls\SwitchView\Base\TreeViewEx.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\SwitchView\WindowTreeView.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\FrmChatFind.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\FrmChildWindow.cs">
       <SubType>Form</SubType>

@@ -33,6 +33,7 @@ namespace ircCore.Settings.Theming
         ConnectionCancelledText = 3,
         ConnectionErrorText = 4,
         ServerPingPongText = 5,
+        WelcomeText = 6,
         ChannelTopic = 100,
         ChannelTopicSet = 101,
         ChannelTopicChange = 102,
@@ -43,19 +44,22 @@ namespace ircCore.Settings.Theming
         PrivateText = 107,
         PrivateSelfText = 108,
         PrivateActionText = 109,
-        PrivateSelfActionText = 110,
-        NoticeServerText = 111,
-        NoticeText = 112,
-        NoticeSelfText = 113,
-        ChannelJoinText = 114,
-        ChannelSelfJoinText = 115,
-        ChannelPartText = 116,
-        ModeChannelText = 117,        
-        ModeSelfText = 118,
-        QuitText = 119,
-        ChannelKickText = 120,
-        ChannelSelfKickText = 121,
-        NickChangeText = 122
+        PrivateSelfActionText = 110,        
+        NoticeText = 111,
+        NoticeSelfText = 112,
+        ChannelJoinText = 113,
+        ChannelSelfJoinText = 114,
+        ChannelPartText = 115,
+        ModeChannelText = 116,        
+        ModeSelfText = 117,
+        QuitText = 118,
+        ChannelKickText = 119,
+        ChannelSelfKickText = 120,
+        NickChangeUserText = 121,
+        NickChangeSelfText = 122,
+        MessageTargetText = 123,
+        MotdText = 124,
+        RawText = 125
     }
 
     public class IncomingMessageData
@@ -65,6 +69,7 @@ namespace ircCore.Settings.Theming
         public DateTime TimeStamp { get; set; }
 
         public string Nick { get; set; }
+        public string Prefix { get; set; }
         public string Address { get; set; }
         public string Target { get; set; }
         public string Text { get; set; }
@@ -143,6 +148,7 @@ namespace ircCore.Settings.Theming
             var sb = new StringBuilder(CurrentTheme.Messages[messageData.Message].MessageFormat);
             sb.Replace("$ts", TimeFunctions.FormatTimeStamp(messageData.TimeStamp, CurrentTheme.TimeStampFormat));
             sb.Replace("$nick", messageData.Nick);
+            sb.Replace("$prefix", messageData.Prefix);
             sb.Replace("$address", messageData.Address);
             sb.Replace("$me", messageData.Nick);
             sb.Replace("$newnick", messageData.NewNick);

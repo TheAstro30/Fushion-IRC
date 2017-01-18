@@ -18,6 +18,7 @@ namespace FusionIRC.Classes
         private readonly MenuStrip _menuBar;
 
         private readonly ToolStripMenuItem _mnuFile;
+        private readonly ToolStripMenuItem _mnuWindow;
 
         public MenubarControl(Form owner)
         {
@@ -42,7 +43,15 @@ namespace FusionIRC.Classes
                                                     new ToolStripMenuItem("Disconnect", null, OnMenuFileClick),                                                    
                                                     new ToolStripSeparator(), new ToolStripMenuItem("Exit",null,OnMenuFileClick, Keys.Alt | Keys.F4), 
                                                 });
-            _menuBar.Items.Add(_mnuFile);
+            _mnuWindow = new ToolStripMenuItem
+                             {
+                                 Text = @"&Window"
+                             };
+            _mnuWindow.DropDownItems.AddRange(new ToolStripItem[]
+                                                  {
+                                                      new ToolStripMenuItem("Find Text...", null, OnMenuWindowClick, Keys.Control | Keys.F)
+                                                  });
+            _menuBar.Items.AddRange(new[] {_mnuFile, _mnuWindow});
         }
 
         public void ConnectionUpdate(bool connected)
@@ -88,6 +97,25 @@ namespace FusionIRC.Classes
 
                 case "EXIT":
                     Application.Exit();
+                    break;
+            }
+        }
+
+        private void OnMenuWindowClick(object sender, EventArgs e)
+        {
+            var item = (ToolStripMenuItem)sender;
+            var c = WindowManager.GetActiveWindow(_owner);
+            if (c == null || item == null)
+            {
+                return;
+            }
+            switch (item.Text.ToUpper())
+            {
+                case "FIND TEXT...":
+                    using (var f = new FrmChatFind(c))
+                    {                                              
+                        f.ShowDialog(_owner);
+                    }
                     break;
             }
         }

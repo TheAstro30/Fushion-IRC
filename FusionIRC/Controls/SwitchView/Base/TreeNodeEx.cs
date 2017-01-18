@@ -30,7 +30,7 @@ namespace FusionIRC.Controls.SwitchView.Base
             TreeNodeEx t;
             for (var i = 0; i < Nodes.Count; i++)
             {
-                if (String.Compare(Nodes[i].Text, text, StringComparison.OrdinalIgnoreCase) <= 0)
+                if (Nodes[i].Text.Equals(text, StringComparison.InvariantCultureIgnoreCase))
                 {
                     continue;
                 }

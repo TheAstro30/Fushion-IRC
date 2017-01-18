@@ -83,12 +83,12 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.ConnectionErrorText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * Error connecting to: $server ($text)" });
             Messages.Add(ThemeMessage.ServerPingPongText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Server request PING; client response PONG!" });
             Messages.Add(ThemeMessage.ChannelTopic, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Topic is: '$text'" });
-            Messages.Add(ThemeMessage.ChannelTopicSet, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Topic set by: $nick $text" });
+            Messages.Add(ThemeMessage.ChannelTopicSet, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Topic set by: $text" });
             Messages.Add(ThemeMessage.ChannelTopicChange, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * $nick changes $target topic to '$text'" });
-            Messages.Add(ThemeMessage.ChannelText, new ThemeMessageData {DefaultColor = 1, MessageFormat = "$ts <$nick> $text"});
-            Messages.Add(ThemeMessage.ChannelSelfText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts <$me> $text" });
-            Messages.Add(ThemeMessage.ChannelActionText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * $nick $text" });
-            Messages.Add(ThemeMessage.ChannelSelfActionText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * $me $text" });
+            Messages.Add(ThemeMessage.ChannelText, new ThemeMessageData {DefaultColor = 1, MessageFormat = "$ts <$prefix$nick> $text"});
+            Messages.Add(ThemeMessage.ChannelSelfText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts <$prefix$me> $text" });
+            Messages.Add(ThemeMessage.ChannelActionText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * $prefix$nick $text" });
+            Messages.Add(ThemeMessage.ChannelSelfActionText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * $prefix$me $text" });
             Messages.Add(ThemeMessage.ChannelJoinText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * $nick ($address) has joined: $target" });
             Messages.Add(ThemeMessage.ChannelSelfJoinText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Now talking in: $target" });
             Messages.Add(ThemeMessage.ChannelPartText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * $nick ($address) has left: $target" });
@@ -97,11 +97,18 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.ChannelSelfKickText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts * You were kicked from $target by $nick '$text'" });
             Messages.Add(ThemeMessage.ModeChannelText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $nick sets mode: $text" });            
             Messages.Add(ThemeMessage.ModeSelfText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $me sets mode: $text" });
-            Messages.Add(ThemeMessage.NickChangeText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $nick is now known as: $newnick" });
+            Messages.Add(ThemeMessage.NickChangeUserText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $nick is now known as: $newnick" });
+            Messages.Add(ThemeMessage.NickChangeSelfText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * You are now known as: $newnick" });
             Messages.Add(ThemeMessage.PrivateText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts <$nick> $text" });
             Messages.Add(ThemeMessage.PrivateSelfText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts <$me> $text" });
             Messages.Add(ThemeMessage.PrivateActionText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * $nick $text" });
             Messages.Add(ThemeMessage.PrivateSelfActionText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * $me $text" });
+            Messages.Add(ThemeMessage.MessageTargetText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts -> *$target* $text" });            
+            Messages.Add(ThemeMessage.NoticeText, new ThemeMessageData { DefaultColor = 5, MessageFormat = "$ts -$nick- $text" });
+            Messages.Add(ThemeMessage.NoticeSelfText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts -> -$target- $text" });
+            Messages.Add(ThemeMessage.MotdText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts $text" });
+            Messages.Add(ThemeMessage.WelcomeText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts $text" });
+            Messages.Add(ThemeMessage.RawText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts $text" });
             //delete this
             var bgd = new ThemeBackgroundData {Path = "c.jpg", LayoutStyle = BackgroundImageLayoutStyles.Photo};
             ThemeBackgrounds.Add(ChildWindowType.Channel, bgd);

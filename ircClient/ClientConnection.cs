@@ -27,7 +27,7 @@ namespace ircClient
         private readonly List<string> _sockData = new List<string>();
 
         private Timer _tmrParse;
-        private Timer _tmrWaitToReconnect;
+        private readonly Timer _tmrWaitToReconnect;
 
         public bool IsConnecting { get; internal set; }
         public bool IsConnected { get; internal set; }

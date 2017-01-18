@@ -3,6 +3,8 @@
  * Copyright (C) 2016 - 2017
  * Provided AS-IS with no warranty expressed or implied
  */
+
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Linq;
@@ -48,7 +50,7 @@ namespace FusionIRC.Helpers
                 if (c != null)
                 {
                     /* Check the window isn't all ready in the list */
-                    win = c.FirstOrDefault(o => o.Tag.ToString().ToLower() == tag.ToLower());
+                    win = c.FirstOrDefault(o => o.Tag.ToString().Equals(tag, StringComparison.InvariantCultureIgnoreCase));
                     if (win != null)
                     {
                         return win;
@@ -140,18 +142,23 @@ namespace FusionIRC.Helpers
         public static FrmChildWindow GetWindow(ClientConnection client, string tag)
         {
             var c = Windows.ContainsKey(client) ? Windows[client] : null;
-            return c != null ? c.FirstOrDefault(o => o.Tag.ToString().ToLower() == tag.ToLower()) : null;
+            return c != null ? c.FirstOrDefault(o => o.Tag.ToString().Equals(tag, StringComparison.InvariantCultureIgnoreCase)) : null;
+        }
+
+        public static FrmChildWindow GetActiveWindow(Form owner)
+        {
+            return (FrmChildWindow) owner.ActiveMdiChild;
         }
 
         public static FrmChildWindow GetConsoleWindow(ClientConnection client)
         {
             var c = Windows.ContainsKey(client) ? Windows[client] : null;
-            return c == null ? null : c.FirstOrDefault(o => o.Tag.ToString().ToLower() == "console");
+            return c == null ? null : c.FirstOrDefault(o => o.Tag.ToString().Equals("console", StringComparison.InvariantCultureIgnoreCase));
         }
 
         public static ClientConnection GetActiveConnection(Form owner)
         {
-            var win = (FrmChildWindow)owner.ActiveMdiChild;
+            var win = (FrmChildWindow) owner.ActiveMdiChild;
             return win != null ? win.Client : null;
         }
 
@@ -189,6 +196,11 @@ namespace FusionIRC.Helpers
             client.OnClientConnectionError += ConnectionCallbackManager.OnClientConnectionError;
             client.OnClientConnectionClosed += CommandProcessor.OnClientWaitToReconnect;
             client.Parser.OnServerPingPong += ConnectionCallbackManager.OnServerPingPong;
+            client.Parser.OnMotd += ConnectionCallbackManager.OnMotd;
+            client.Parser.OnWelcome += ConnectionCallbackManager.OnWelcome;
+            client.Parser.OnTopicIs += ConnectionCallbackManager.OnTopicIs;
+            client.Parser.OnTopicSetBy += ConnectionCallbackManager.OnTopicSetBy;
+            client.Parser.OnTopicChanged += ConnectionCallbackManager.OnTopicChanged;
             client.Parser.OnJoinUser += ConnectionCallbackManager.OnJoinUser;
             client.Parser.OnJoinSelf += ConnectionCallbackManager.OnJoinSelf;
             client.Parser.OnPartUser += ConnectionCallbackManager.OnPartUser;
@@ -198,13 +210,15 @@ namespace FusionIRC.Helpers
             client.Parser.OnTextChannel += ConnectionCallbackManager.OnTextChannel;
             client.Parser.OnTextSelf += ConnectionCallbackManager.OnTextSelf;
             client.Parser.OnActionChannel += ConnectionCallbackManager.OnActionChannel;
-            client.Parser.OnActionSelf += ConnectionCallbackManager.OnActionSelf;
+            client.Parser.OnActionSelf += ConnectionCallbackManager.OnActionSelf;            
+            client.Parser.OnNotice += ConnectionCallbackManager.OnNotice;
             client.Parser.OnNick += ConnectionCallbackManager.OnNick;
             client.Parser.OnQuit += ConnectionCallbackManager.OnQuit;
             client.Parser.OnKickSelf += ConnectionCallbackManager.OnKickSelf;
             client.Parser.OnKickUser += ConnectionCallbackManager.OnKickUser;
             client.Parser.OnModeSelf += ConnectionCallbackManager.OnModeSelf;
             client.Parser.OnModeChannel += ConnectionCallbackManager.OnModeChannel;
+            client.Parser.OnRaw += ConnectionCallbackManager.OnRaw;
         }
 
         private static void RemoveConnectionHandlers(ClientConnection client)
@@ -218,6 +232,10 @@ namespace FusionIRC.Helpers
             client.OnClientConnectionError -= ConnectionCallbackManager.OnClientConnectionError;
             client.OnClientConnectionClosed -= CommandProcessor.OnClientWaitToReconnect;
             client.Parser.OnServerPingPong -= ConnectionCallbackManager.OnServerPingPong;
+            client.Parser.OnMotd -= ConnectionCallbackManager.OnMotd;
+            client.Parser.OnWelcome -= ConnectionCallbackManager.OnWelcome;
+            client.Parser.OnTopicIs -= ConnectionCallbackManager.OnTopicIs;
+            client.Parser.OnTopicSetBy -= ConnectionCallbackManager.OnTopicSetBy;
             client.Parser.OnJoinUser -= ConnectionCallbackManager.OnJoinUser;
             client.Parser.OnJoinSelf -= ConnectionCallbackManager.OnJoinSelf;
             client.Parser.OnPartUser -= ConnectionCallbackManager.OnPartUser;
@@ -227,13 +245,15 @@ namespace FusionIRC.Helpers
             client.Parser.OnTextChannel -= ConnectionCallbackManager.OnTextChannel;
             client.Parser.OnTextSelf -= ConnectionCallbackManager.OnTextSelf;
             client.Parser.OnActionChannel -= ConnectionCallbackManager.OnActionChannel;
-            client.Parser.OnActionSelf -= ConnectionCallbackManager.OnActionSelf;
+            client.Parser.OnActionSelf -= ConnectionCallbackManager.OnActionSelf;            
+            client.Parser.OnNotice -= ConnectionCallbackManager.OnNotice;
             client.Parser.OnNick -= ConnectionCallbackManager.OnNick;
             client.Parser.OnQuit -= ConnectionCallbackManager.OnQuit;
             client.Parser.OnKickSelf -= ConnectionCallbackManager.OnKickSelf;
             client.Parser.OnKickUser -= ConnectionCallbackManager.OnKickUser;
             client.Parser.OnModeSelf -= ConnectionCallbackManager.OnModeSelf;
             client.Parser.OnModeChannel -= ConnectionCallbackManager.OnModeChannel;
+            client.Parser.OnRaw -= ConnectionCallbackManager.OnRaw;
         }
     }
 }

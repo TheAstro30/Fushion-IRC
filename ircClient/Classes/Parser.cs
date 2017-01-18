@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ircClient.Tcp;
+using ircCore.Utils;
 
 namespace ircClient.Classes
 {
@@ -26,7 +27,8 @@ namespace ircClient.Classes
         public event Action<ClientConnection, string, string, string, string> OnTextChannel;
         public event Action<ClientConnection, string, string, string> OnTextSelf;
         public event Action<ClientConnection, string, string, string, string> OnActionChannel;
-        public event Action<ClientConnection, string, string, string> OnActionSelf;
+        public event Action<ClientConnection, string, string, string> OnActionSelf;        
+        public event Action<ClientConnection, string, string, string> OnNotice;
 
         public event Action<ClientConnection, string, string> OnNick;
         public event Action<ClientConnection, string, string, string> OnQuit;
@@ -39,16 +41,28 @@ namespace ircClient.Classes
         public event Action<ClientConnection, string, string> OnNames;
         public event Action<ClientConnection, string, string, string> OnWho;
 
+        public event Action<ClientConnection, string> OnMotd;
+        public event Action<ClientConnection, string> OnWelcome;
+
+        public event Action<ClientConnection, string, string> OnTopicIs;
+        public event Action<ClientConnection, string, string> OnTopicSetBy;
+        public event Action<ClientConnection, string, string, string> OnTopicChanged;
+
+        public event Action<ClientConnection, string> OnRaw;
+
+        /* Public properties */
         public string JoinChannelsOnConnect { get; set; }
 
         public string UserModeCharacters { get; set; }
         public string UserModes { get; set; }
 
+        /* Constructor */
         public Parser(ClientConnection client)
         {
             _client = client;
         }
 
+        /* Main parsing entry point */
         public void Parse(string first, string second, string third, string fourth)
         {
             switch (second.ToUpper())
@@ -74,6 +88,14 @@ namespace ircClient.Classes
                     ParsePrivateMesasage(first, third, fourth);
                     break;
 
+                case "NOTICE":
+                    ParseNotice(first, fourth);
+                    break;
+
+                case "TOPIC":
+                    ParseTopicChanged(first, third, fourth);
+                    break;
+
                 case "NICK":
                     ParseNick(first, third);
                     break;
@@ -94,15 +116,51 @@ namespace ircClient.Classes
                     /* Welcome message */
                     _client.IsConnected = true;
                     _client.IsConnecting = false;
+                    if (OnWelcome != null)
+                    {
+                        OnWelcome(_client, RemoveColon(fourth));
+                    }
+                    break;
+
+                case "002":
+                case "003":
+                case "004":
+                    if (OnWelcome != null)
+                    {
+                        OnWelcome(_client, RemoveColon(fourth));
+                    }
                     break;
 
                 case "005":
                     ParseProtocols(fourth);
+                    if (OnWelcome != null)
+                    {
+                        OnWelcome(_client, RemoveColon(fourth.Replace(":are", "are")));
+                    }
+                    break;
+
+                case "332":
+                    /* Topic is */
+                    ParseTopicIs(fourth);
+                    break;
+
+                case "333":
+                    /* Topic set by */
+                    ParseTopicSetBy(fourth);
                     break;
 
                 case "352":
                     /* Who list */
                     ParseWho(third, fourth);
+                    break;
+
+                case "372":
+                case "375":
+                    /* Motd Text */
+                    if (OnMotd != null)
+                    {
+                        OnMotd(_client, RemoveColon(fourth));
+                    }
                     break;
 
                 case "376":
@@ -112,6 +170,18 @@ namespace ircClient.Classes
                     {
                         _client.Send(string.Format("JOIN {0}", JoinChannelsOnConnect));
                         JoinChannelsOnConnect = string.Empty;
+                    }
+                    if (OnMotd != null)
+                    {
+                        OnMotd(_client, RemoveColon(fourth));
+                    }
+                    break;
+
+                case "421":
+                case "433":
+                    if (OnRaw != null)
+                    {
+                        OnRaw(_client, string.Format("* {0}", fourth.Replace(":", "")));
                     }
                     break;
 
@@ -130,7 +200,7 @@ namespace ircClient.Classes
             {
                 return; /*This should never happen */
             }
-            if (n[0].ToLower() == _client.UserInfo.Nick.ToLower())
+            if (n[0].Equals(_client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
             {
                 /* Self join */
                 if (OnJoinSelf != null)
@@ -154,7 +224,7 @@ namespace ircClient.Classes
             {
                 return; /*This should never happen */
             }            
-            if (n[0].ToLower() == _client.UserInfo.Nick.ToLower())
+            if (n[0].Equals(_client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
             {             
                 /* Yourself */
                 if (OnPartSelf != null)
@@ -169,6 +239,53 @@ namespace ircClient.Classes
             }
         }
 
+        private void ParseTopicIs(string data)
+        {
+            var i = data.IndexOf(' ');
+            if (i == -1)
+            {
+                return;
+            }
+            /* First token is channel */
+            var channel = data.Substring(0, i).Trim();
+            data = data.Substring(i).Trim();
+            if (OnTopicIs != null)
+            {
+                OnTopicIs(_client, channel, data);
+            }
+        }
+
+        private void ParseTopicSetBy(string data)
+        {
+            /* We treat this a little differently, we need to change the last token from a long format to a date format */
+            var i = data.Split(' ');
+            if (i.Length == 0)
+            {
+                return;
+            }
+            /* First token is channel */
+            var channel = i[0];
+            i[0] = string.Empty; /* Null it */
+            i[i.Length - 1] = TimeFunctions.FormatAsciiTime(i[i.Length - 1], null);
+            if (OnTopicSetBy != null)
+            {
+                OnTopicSetBy(_client, channel, string.Join(" ", i).Trim());
+            }
+        }
+
+        private void ParseTopicChanged(string nick, string channel, string data)
+        {
+            var n = RemoveColon(nick).Split('!');
+            if (n.Length == 0)
+            {
+                return; /*This should never happen */
+            }
+            if (OnTopicChanged != null)
+            {
+                OnTopicChanged(_client, n[0], channel, RemoveColon(data));
+            }
+        }
+
         private void ParsePrivateMesasage(string nick, string target, string text)
         {
             var n = RemoveColon(nick).Split('!');
@@ -178,7 +295,7 @@ namespace ircClient.Classes
             }
             var s = RemoveColon(text);
             int i;
-            if (target.ToLower() == _client.UserInfo.Nick.ToLower())
+            if (target.Equals(_client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
             {
                 /* You were messaged */
                 if (s[0] == '\x01')
@@ -224,6 +341,35 @@ namespace ircClient.Classes
             }
         }
 
+        private void ParseNotice(string nick, string msg)
+        {
+            /* Both server and normal notices raises similar events, so we just have one */
+            var n = RemoveColon(nick).Split('!');
+            if (n.Length == 0)
+            {
+                return; /*This should never happen */
+            }
+            var i = msg.IndexOf(' ');
+            if (i > -1)
+            {
+                /* :Saphira.US.DragonIRC.com NOTICE AUTH :*** Looking up your hostname... */
+                var tmp = msg.Substring(0, i).Trim();
+                if (!string.IsNullOrEmpty(tmp) && tmp.Equals("auth", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    if (OnNotice != null)
+                    {
+                        OnNotice(_client, n[0], n.Length > 1 ? n[1] : "", RemoveColon(msg.Substring(i).Trim()));
+                    }
+                    return;
+                }
+            }
+            /* Either a server notice or user notice - its kind of difficult to differentiate between the two */
+            if (OnNotice != null)
+            {
+                OnNotice(_client, n[0], n.Length > 1 ? n[1] : "", RemoveColon(msg));
+            }
+        }
+
         private void ParseNick(string nick, string newNick)
         {
             var n = RemoveColon(nick).Split('!');
@@ -264,7 +410,7 @@ namespace ircClient.Classes
             }
             var knick = msg.Substring(0, i).Trim();
             msg = RemoveColon(msg.Substring(i).Trim());
-            if (knick.ToLower() == _client.UserInfo.Nick.ToLower() && OnKickSelf != null)
+            if (knick.Equals(_client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase) && OnKickSelf != null)
             {
                 OnKickSelf(_client, n[0], channel, msg);
             }
@@ -281,7 +427,7 @@ namespace ircClient.Classes
             {
                 return; /*This should never happen */
             }
-            if (target.ToLower() == _client.UserInfo.Nick.ToLower())
+            if (target.Equals(_client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
             {           
                 if (OnModeSelf != null)
                 {

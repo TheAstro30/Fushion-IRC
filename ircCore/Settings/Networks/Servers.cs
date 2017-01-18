@@ -41,7 +41,7 @@ namespace ircCore.Settings.Networks
         /* Comparator */
         public int CompareTo(object obj)
         {
-            return string.Compare(NetworkName, ((NetworkData) obj).NetworkName, StringComparison.OrdinalIgnoreCase);
+            return string.Compare(NetworkName, ((NetworkData) obj).NetworkName, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 
@@ -118,7 +118,7 @@ namespace ircCore.Settings.Networks
         /* Comparator */
         public int CompareTo(object obj)
         {
-            return string.Compare(Address, ((ServerData)obj).Address, StringComparison.OrdinalIgnoreCase);
+            return string.Compare(Address, ((ServerData)obj).Address, StringComparison.InvariantCultureIgnoreCase);
         }
     }
 

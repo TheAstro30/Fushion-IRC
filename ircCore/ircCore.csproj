@@ -87,6 +87,7 @@
     <Compile Include="Settings\Networks\ServerManager.cs" />
     <Compile Include="Settings\Networks\Servers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings\SettingsFind.cs" />
     <Compile Include="Settings\SettingsUserInfo.cs" />
     <Compile Include="Utils\Serialization\BinarySerialize.cs" />
     <Compile Include="Settings\Settings.cs" />

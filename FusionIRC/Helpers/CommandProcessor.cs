@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Forms;
 using ircClient;
@@ -13,31 +14,33 @@ namespace FusionIRC.Helpers
 {
     public static class CommandProcessor
     {
-        private static Timer _tmrWaitToReconnectTimeOut;
+        private static readonly Timer TmrWaitToReconnectTimeOut;
 
         /* Constructor */
         static CommandProcessor()
         {
             System.Diagnostics.Debug.Print("Constructor");
             /* Wait at least N number of seconds for socket to disconenct when issuing a new /server connection on a connected socket */
-            _tmrWaitToReconnectTimeOut = new Timer
+            TmrWaitToReconnectTimeOut = new Timer
                                              {
                                                  Interval = 4000
                                              };
-            _tmrWaitToReconnectTimeOut.Tick += TimerWaitToReconnectTimeOut;
+            TmrWaitToReconnectTimeOut.Tick += TimerWaitToReconnectTimeOut;
         }
 
+        /* Client waiting to reconnect after a disconnect */
         public static void OnClientWaitToReconnect(ClientConnection client)
         {
             /* This is called when the server command is issued on a currently connected server */
-            if (_tmrWaitToReconnectTimeOut.Enabled)
+            if (TmrWaitToReconnectTimeOut.Enabled)
             {
                 /* Event raised by connection class before time out timer fired */
-                _tmrWaitToReconnectTimeOut.Enabled = false;
+                TmrWaitToReconnectTimeOut.Enabled = false;
             }
             ParseServerConnection(client, string.Format("{0}:{1}", client.Server, client.Port));
         }
 
+        /* Main parsing entry point */
         public static void Parse(ClientConnection client, FrmChildWindow child, string data)
         {            
             var i = data.IndexOf(' ');
@@ -73,6 +76,22 @@ namespace FusionIRC.Helpers
                 case "DESCRIBE":
                     /* Action */
                     ParseAction(client, child, args);
+                    break;
+
+                case "AME":
+                    ParseAme(client, args);
+                    break;
+
+                case "AMSG":
+                    ParseAmsg(client, args);
+                    break;
+
+                case "MSG":
+                    ParseMsg(client, child, args);
+                    break;
+
+                case "NOTICE":
+                    ParseNotice(client, child, args);
                     break;
 
                 case "PART":
@@ -112,7 +131,7 @@ namespace FusionIRC.Helpers
             switch (s.Length)
             {
                 case 1:
-                    if (s[0].ToLower() == "-m")
+                    if (s[0].Equals("-m", StringComparison.InvariantCultureIgnoreCase))
                     {
                         return;
                     }
@@ -121,11 +140,11 @@ namespace FusionIRC.Helpers
 
                 default:
                     /* /server -m server[:port]  or /server -m server[:port] -j #chan */
-                    if (s[0].ToLower() == "-m")
+                    if (s[0].Equals("-m", StringComparison.InvariantCultureIgnoreCase))
                     {
                         /* Create new connection */
                         c = WindowManager.AddWindow(null, ChildWindowType.Console, ConnectionCallbackManager.MainForm,
-                                                        "Console", "Console", true);
+                                                    "Console", "Console", true);
                         if (c == null)
                         {
                             return;
@@ -134,13 +153,15 @@ namespace FusionIRC.Helpers
                     }
                     else
                     {
-                        address = s[0].Split(':');                        
+                        address = s[0].Split(':');
                     }
-                    c.Client.Parser.JoinChannelsOnConnect = s.Length > 2 && s[1].ToLower() == "-j"
+                    c.Client.Parser.JoinChannelsOnConnect = s.Length > 2 &&
+                                                            s[1].Equals("-j", StringComparison.InvariantCultureIgnoreCase)
                                                                 ? s[2]
-                                                                : s.Length > 3 && s[2].ToLower() == "-j"
+                                                                : s.Length > 3 &&
+                                                                  s[2].Equals("-j", StringComparison.InvariantCultureIgnoreCase)
                                                                       ? s[3]
-                                                                      : string.Empty;                    
+                                                                      : string.Empty;
                     break;
             }
             if (address.Length == 2)
@@ -161,8 +182,8 @@ namespace FusionIRC.Helpers
                 c.Client.Disconnect();
                 c.Client.Server = address[0];
                 c.Client.Port = port;
-                _tmrWaitToReconnectTimeOut.Tag = c.Client;
-                _tmrWaitToReconnectTimeOut.Enabled = true;
+                TmrWaitToReconnectTimeOut.Tag = c.Client;
+                TmrWaitToReconnectTimeOut.Enabled = true;
                 return;
             }
             c.Client.Connect(address[0], port);
@@ -191,12 +212,7 @@ namespace FusionIRC.Helpers
         /* Text events */
         private static void ParseAction(ClientConnection client, FrmChildWindow child, string args)
         {
-            if (child.WindowType == ChildWindowType.Console)
-            {
-                return;
-            }
-            var c = WindowManager.GetWindow(client, child.Tag.ToString());
-            if (c == null || c.WindowType == ChildWindowType.Console)
+            if (child.WindowType == ChildWindowType.Console || !client.IsConnected)
             {
                 return;
             }
@@ -210,12 +226,135 @@ namespace FusionIRC.Helpers
                                             : ThemeMessage.ChannelSelfActionText,
                               TimeStamp = DateTime.Now,
                               Nick = client.UserInfo.Nick,
+                              Prefix = child.WindowType == ChildWindowType.Channel ? child.Nicklist.GetNickPrefix(client.UserInfo.Nick) : string.Empty,
                               Text = args
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            child.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(child, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
             var action = string.Format("PRIVMSG {0} :{1}ACTION {2}{3}", child.Tag, (char)1, args, (char)1);
             client.Send(action);
+        }
+
+        private static void ParseAme(ClientConnection client, string args)
+        {
+            if (!client.IsConnected)
+            {
+                return;
+            }
+            foreach (var c in WindowManager.Windows[client].Where(c => c.WindowType == ChildWindowType.Channel))
+            {
+                ParseAction(client, c, args);
+            }
+        }
+
+        private static void ParseMsg(ClientConnection client, FrmChildWindow child, string args)
+        {
+            /* /msg <target> <text> */
+            var i = args.IndexOf(' ');
+            if (i == -1 || !client.IsConnected)
+            {
+                return;
+            }
+            IncomingMessageData tmd;
+            ParsedMessageData pmd;
+            var target = args.Substring(0, i).Trim();
+            args = args.Substring(i).Trim();
+            /* Now we need to find the "target" window, if it exists send text to there, if not we display an "echo" in the acitve window */
+            var c = WindowManager.GetWindow(client, target);
+            if (c == null)
+            {
+                /* Echo the message to the active window */                
+                if (child != null)
+                {
+                    tmd = new IncomingMessageData
+                              {
+                                  Message = ThemeMessage.MessageTargetText,
+                                  TimeStamp = DateTime.Now,
+                                  Target = target,
+                                  Text = args
+                              };
+                    pmd = ThemeManager.ParseMessage(tmd);
+                    child.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+                    /* Update treenode color */
+                    WindowManager.SetWindowEvent(child, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
+                    child.Client.Send(string.Format("PRIVMSG {0} :{1}", target, args));                    
+                }
+                return;
+            }
+            /* Target exists */
+            tmd = new IncomingMessageData
+                      {
+                          Message =
+                              c.WindowType == ChildWindowType.Channel
+                                  ? ThemeMessage.ChannelSelfText
+                                  : c.WindowType == ChildWindowType.Private
+                                        ? ThemeMessage.PrivateSelfText
+                                        : ThemeMessage.ChannelSelfText,
+                          TimeStamp = DateTime.Now,
+                          Nick =
+                              c.WindowType == ChildWindowType.Channel
+                                  ? c.Client.UserInfo.Nick
+                                  : c.WindowType == ChildWindowType.Private ? c.Tag.ToString() : target,
+                          Text = args
+                      };
+            pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
+            c.Client.Send(string.Format("PRIVMSG {0} :{1}", target, args));
+        }
+
+        private static void ParseAmsg(ClientConnection client, string args)
+        {
+            if (!client.IsConnected)
+            {
+                return;
+            }
+            foreach (var c in WindowManager.Windows[client].Where(c => c.WindowType == ChildWindowType.Channel))
+            {
+                var tmd = new IncomingMessageData
+                              {
+                                  Message = ThemeMessage.ChannelSelfText,
+                                  TimeStamp = DateTime.Now,
+                                  Nick = client.UserInfo.Nick,
+                                  Prefix = c.Nicklist.GetNickPrefix(client.UserInfo.Nick),
+                                  Text = args
+                              };
+                var pmd = ThemeManager.ParseMessage(tmd);
+                c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+                /* Update treenode color */
+                WindowManager.SetWindowEvent(c, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
+                client.Send(string.Format("PRIVMSG {0} :{1}", c.Tag, args));
+            }
+        }
+
+        private static void ParseNotice(ClientConnection client, FrmChildWindow child, string args)
+        {
+            if (!client.IsConnected || string.IsNullOrEmpty(args))
+            {
+                return;
+            }
+            var i = args.IndexOf(' ');
+            if (i == -1)
+            {
+                return;
+            }
+            var target = args.Substring(0, i).Trim();
+            args = args.Substring(i).Trim();
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.NoticeSelfText,
+                              TimeStamp = DateTime.Now,
+                              Target = target,
+                              Text = args
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            child.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(child, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
+            client.Send(string.Format("NOTICE {0} :{1}", target, args));
         }
 
         private static void ParseNames(ClientConnection client, string args)
@@ -239,16 +378,44 @@ namespace FusionIRC.Helpers
         {
             var i = args.IndexOf(' ');
             var nick = i > -1 ? args.Substring(i).Trim() : args;
-            if (client.IsConnecting)
+            if (nick.Equals(client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return;
+            }
+            if (client.IsConnecting && !client.IsConnected)
             {
                 /* Client is in the middle of connecting - but not fully connected, update credentials */               
                 client.UserInfo.Nick = nick;
             }
             client.Send(string.Format("NICK {0}", nick));
+            if (client.IsConnected || client.IsConnecting)
+            {
+                return;
+            }
+            client.UserInfo.Nick = nick;
+            var console = WindowManager.GetConsoleWindow(client);
+            if (console == null)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.NickChangeSelfText,
+                              TimeStamp = DateTime.Now,
+                              NewNick = nick
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            console.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(console, ConnectionCallbackManager.MainForm, WindowEvent.EventReceived);
         }
 
         private static void ParsePart(ClientConnection client, FrmChildWindow child, string args)
-        {            
+        {
+            if (!client.IsConnected)
+            {
+                return;
+            }
             string channel;
             if (string.IsNullOrEmpty(args))
             {
@@ -271,8 +438,8 @@ namespace FusionIRC.Helpers
         /* Timer callback */
         private static void TimerWaitToReconnectTimeOut(object sender, EventArgs e)
         {
-            _tmrWaitToReconnectTimeOut.Enabled = false;
-            OnClientWaitToReconnect((ClientConnection)_tmrWaitToReconnectTimeOut.Tag);
+            TmrWaitToReconnectTimeOut.Enabled = false;
+            OnClientWaitToReconnect((ClientConnection)TmrWaitToReconnectTimeOut.Tag);
         }
     }
 }

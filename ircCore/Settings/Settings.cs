@@ -21,6 +21,9 @@ namespace ircCore.Settings
         [XmlElement("themes")]
         public SettingsTheme Themes = new SettingsTheme();
 
+        [XmlElement("search")]
+        public SettingsFind Search = new SettingsFind();
+
         public Settings()
         {
             /* User info */
@@ -36,7 +39,7 @@ namespace ircCore.Settings
             /* Set up basic settings */
             SettingsWindows.SwitchTreeWidth = 110;
             SettingsWindows.NicklistWidth = 112;
-            var w = new WindowData { Name = "application", Size = new Size(969, 593), Position = new Point(55, 55) };
+            var w = new WindowData { Name = "application", Size = new Size(1100, 750), Position = new Point(55, 55) };
             SettingsWindows.Window.Add(w);
             /* Create a blank theme */
             Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = "default.thm"});

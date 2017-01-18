@@ -3,6 +3,8 @@
  * Copyright (C) 2016 - 2017
  * Provided AS-IS with no warranty expressed or implied
  */
+
+using System;
 using System.Linq;
 using ircCore.Utils.Serialization;
 
@@ -51,7 +53,7 @@ namespace ircCore.Settings.Networks
         {            
             /* Find or create a network object */
             var newNetwork = false;
-            var n = Servers.Networks.Network.FirstOrDefault(o => o.NetworkName.ToLower() == network.ToLower());
+            var n = Servers.Networks.Network.FirstOrDefault(o => o.NetworkName.Equals(network, StringComparison.InvariantCultureIgnoreCase));
             if (n == null)
             {
                 newNetwork = true;
@@ -110,7 +112,7 @@ namespace ircCore.Settings.Networks
         /* Private methods */
         private static NetworkData GetNetwork(string network)
         {
-            return Servers.Networks.Network.FirstOrDefault(o => o.NetworkName.ToLower() == network.ToLower());
+            return Servers.Networks.Network.FirstOrDefault(o => o.NetworkName.Equals(network, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

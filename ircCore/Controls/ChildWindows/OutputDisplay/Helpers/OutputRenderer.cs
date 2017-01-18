@@ -40,7 +40,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
         private float _bgAspect;
 
         /* Properties */
-        internal TextData TextData { get; set; }
+        public TextData TextData { get; set; }
 
         public new Bitmap BackgroundImage
         {

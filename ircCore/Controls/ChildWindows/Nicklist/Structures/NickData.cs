@@ -50,6 +50,11 @@ namespace ircCore.Controls.ChildWindows.Nicklist.Structures
             return false;
         }
 
+        public string GetUserMode()
+        {
+            return _userModes.Count > 0 ? _userModes[0] : string.Empty;
+        }
+
         public override string ToString()
         {
             return string.Format("{0}{1}", _userModes.Count > 0 ? _userModes[0] : "", Nick);

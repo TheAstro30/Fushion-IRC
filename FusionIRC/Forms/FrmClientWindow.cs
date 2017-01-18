@@ -99,7 +99,7 @@ namespace FusionIRC.Forms
             Size = w.Size;
             Location = w.Position;
             WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
-            _initialize = false;            
+            _initialize = false;
         }
 
         /* Overrides */

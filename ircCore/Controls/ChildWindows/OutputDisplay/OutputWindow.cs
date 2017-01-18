@@ -10,6 +10,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
+using System.Media;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -102,6 +103,34 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         {
             get { return _maximumLines; }
             set { _maximumLines = value > 0 ? value : 1; }
+        }
+
+        public int ScrollTo
+        {
+            get
+            {
+                return _scrollValue;
+            }
+            set
+            {
+                if (TextData.Lines.Count - 1 == -1)
+                {
+                    return;
+                }
+                _scrollValue = value;
+                _vScroll.Value = _scrollValue;
+                if (_scrollValue == TextData.WrappedLinesCount - 1)
+                {
+                    _scrolledToBottom = true;
+                    //_isScrolled = false;
+                }
+                else
+                {
+                    _scrolledToBottom = false;
+                    //_isScrolled = true;
+                }
+                Invalidate();
+            }
         }
 
         /* Control overrides */
@@ -524,10 +553,16 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             else
             {
                 _scrolledToBottom = false;
+                SystemSounds.Beep.Play();
             }            
             if (OnLineAdded != null)
             {
                 OnLineAdded(text); /* This can be used to output to a log file */
+            }
+            if (MarkingData != null)
+            {
+                /* Do not refresh the screen as marking is in progress */
+                return;
             }
             /* Now refresh the hDC and draw out our newly added line ;) */        
             if (_update.Enabled)
