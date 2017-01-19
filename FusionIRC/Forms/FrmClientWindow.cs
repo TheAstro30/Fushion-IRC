@@ -85,7 +85,7 @@ namespace FusionIRC.Forms
             /* Add controls */
             Controls.AddRange(new Control[] {_switchViewSplitter, SwitchView});
             /* Adjust splitter */
-            _switchViewSplitter.SplitPosition = SettingsManager.Settings.SettingsWindows.SwitchTreeWidth;
+            _switchViewSplitter.SplitPosition = SettingsManager.Settings.Windows.SwitchTreeWidth;
             /* Setup toolbar */
             ToolBar = new ToolbarControl(this);
             /* Setup menubar */
@@ -108,6 +108,17 @@ namespace FusionIRC.Forms
             /* Create our first connection */
             WindowManager.AddWindow(null, ChildWindowType.Console, this, "Console", "Console", true);
             base.OnLoad(e);
+        }
+
+        protected override void OnActivated(EventArgs e)
+        {            
+            /* Activate the child window that's currently to front */
+            var win = WindowManager.GetActiveWindow(this);
+            if (win != null)
+            {
+                win.MyActivate();
+            }
+            base.OnActivated(e);
         }
 
         protected override void OnMove(EventArgs e)
@@ -168,7 +179,7 @@ namespace FusionIRC.Forms
                 return;
             }
             /* Save the switch window "size" */
-            SettingsManager.Settings.SettingsWindows.SwitchTreeWidth = e.SplitX;
+            SettingsManager.Settings.Windows.SwitchTreeWidth = e.SplitX;
         }
 
         /* Treeview selection */

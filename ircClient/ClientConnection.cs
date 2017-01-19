@@ -36,8 +36,7 @@ namespace ircClient
 
         public string Server { get; set; }
         public int Port { get; set; }
-
-        public event Action<ClientConnection, string> OnDebugOut;
+        
         public event Action<ClientConnection> OnClientBeginConnect;
         public event Action<ClientConnection> OnClientConnected;
         public event Action<ClientConnection> OnClientDisconnected;
@@ -215,11 +214,6 @@ namespace ircClient
             if (string.IsNullOrEmpty(s))
             {
                 return;
-            }
-            /* Output to debug event */
-            if (OnDebugOut != null)
-            {
-                OnDebugOut(this, s);
             }
             /* Now we can parse the elements we need */
             var i = s.IndexOf(' ');

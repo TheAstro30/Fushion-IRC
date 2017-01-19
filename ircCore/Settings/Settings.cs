@@ -16,13 +16,16 @@ namespace ircCore.Settings
         public SettingsUserInfo UserInfo = new SettingsUserInfo();
 
         [XmlElement("windows")]
-        public SettingsWindow SettingsWindows = new SettingsWindow();        
+        public SettingsWindow Windows = new SettingsWindow();        
 
         [XmlElement("themes")]
         public SettingsTheme Themes = new SettingsTheme();
 
         [XmlElement("search")]
         public SettingsFind Search = new SettingsFind();
+
+        [XmlElement("caching")]
+        public SettingsCaching Caching = new SettingsCaching();
 
         public Settings()
         {
@@ -37,12 +40,16 @@ namespace ircCore.Settings
                            };
             UserInfo = info;
             /* Set up basic settings */
-            SettingsWindows.SwitchTreeWidth = 110;
-            SettingsWindows.NicklistWidth = 112;
+            Windows.SwitchTreeWidth = 110;
+            Windows.NicklistWidth = 112;
             var w = new WindowData { Name = "application", Size = new Size(1100, 750), Position = new Point(55, 55) };
-            SettingsWindows.Window.Add(w);
+            Windows.Window.Add(w);
             /* Create a blank theme */
             Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = "default.thm"});
+            /* Caching defaults */
+            Caching.Output = 500;
+            Caching.Input = 50;
+            Caching.ChatSearch = 25;
         }
     }
 }

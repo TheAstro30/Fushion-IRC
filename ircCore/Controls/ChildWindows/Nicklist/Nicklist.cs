@@ -7,8 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Media;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using ircCore.Controls.ChildWindows.Input;
 using ircCore.Controls.ChildWindows.Nicklist.Helpers;
 using ircCore.Controls.ChildWindows.Nicklist.Structures;
 
@@ -32,6 +34,14 @@ namespace ircCore.Controls.ChildWindows.Nicklist
         private List<string> _userModeCharacter = new List<string>();
 
         private List<object> _selectedItems = new List<object>();
+
+        /* Nick tab completetion */
+        private bool _keySearch;
+        private int _keyPoint;
+        private int _selPoint;
+        private int _nickMatches;
+        private string _keyWord;
+        private string _rest;
 
         public event Action OnNicklistRightClick;
         public event Action OnNicklistDoubleClick;
@@ -117,6 +127,103 @@ namespace ircCore.Controls.ChildWindows.Nicklist
         {
             var n = _list.FirstOrDefault(o => o.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase));
             return n != null ? n.GetUserMode() : string.Empty;
+        }
+
+        public string GetAddress(string nick)
+        {
+            var n = _list.FirstOrDefault(o => o.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase));
+            return n != null ? string.Format("{0}!{1}", n.Nick, n.Address) : string.Empty;
+        }
+
+        /* Tab completion */
+        public string TabNextNick(string inputText, string childWindowCaption, int selectionStart, ref string restOfString)
+        {
+            /* This works just like mIRC's type a letter, press TAB, complete nick .. successive
+               TAB presses returns the next nick beginning with that letter, etc */
+            if (!string.IsNullOrEmpty(inputText))
+            {             
+                int i;
+                if (_keySearch == false)
+                {
+                    /* Search for a space */
+                    _selPoint = selectionStart;
+                    /* Are we in the middle of the line? */
+                    i = inputText.LastIndexOf(' ', _selPoint - 1);
+                    _keyWord = i != -1 ? inputText.Substring(i + 1).Trim() : inputText.Trim();
+                    i = _keyWord.IndexOf(' ');
+                    if (i != -1)
+                    {
+                        _rest = _keyWord.Substring(i + 1).Trim();
+                        _keyWord = _keyWord.Substring(0, i).Trim();
+                    }
+                    _keySearch = true;
+                }
+                restOfString = _rest;
+                if (childWindowCaption.Length >= _keyWord.Length)
+                {
+                    if (!_keyWord.Equals(childWindowCaption.Substring(0, _keyWord.Length), StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        /* Nicklist (match) */
+                        if (_keyPoint > _list.Count - 1)
+                        {
+                            _keyPoint = 1;
+                            _nickMatches = 0;
+                        }
+                        /* NickSearch: */
+                        for (i = _keyPoint; i <= _list.Count - 1; i++)
+                        {
+                            var nick = _list[i].Nick;                            
+                            if (nick.Length < _keyWord.Length || !_keyWord.Equals(nick.Substring(0, _keyWord.Length), StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                continue;
+                            }
+                            /* We found a match */
+                            _keyPoint = i + 1;
+                            _nickMatches += 1;
+                            /* Now replace the text */                            
+                            return string.Format("{0}{1}", _selPoint > 1 ? inputText.Substring(0, _selPoint - _keyWord.Length) : "", nick);
+                        }
+                    }
+                    else if (_keyWord.Length > 0)
+                    {
+                        /* Channel name match */
+                        if (_keyWord.Equals(childWindowCaption.Substring(0, _keyWord.Length), StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            /* It matches */                            
+                            return string.Format("{0}{1}", _selPoint > 1 ? inputText.Substring(0, _selPoint - _keyWord.Length) : "", childWindowCaption);
+                        }
+                    }
+                    else
+                    {
+                        ClearTabNick();
+                    }
+                }
+                else
+                {
+                    ClearTabNick();
+                }
+                /* Loop back to nick search if matches is greater than 1 */
+                if (_nickMatches > 1)
+                {
+                    _keyPoint = 0;
+                    _nickMatches = 0;                    
+                    return TabNextNick(inputText, childWindowCaption, selectionStart, ref restOfString);                    
+                }
+            }
+            /* Else nothing matches */
+            ClearTabNick();
+            SystemSounds.Beep.Play();
+            return inputText;
+        }
+
+        public void ClearTabNick()
+        {
+            _keySearch = false;
+            _keyPoint = 0;
+            _selPoint = 0;
+            _nickMatches = 0;
+            _keyWord = string.Empty;
+            _rest = string.Empty;
         }
 
         /* Overrides */

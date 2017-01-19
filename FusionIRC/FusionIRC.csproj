@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Classes\MenubarControl.cs" />
     <Compile Include="Classes\ToolbarControl.cs" />
+    <Compile Include="Classes\WildcardMatch.cs" />
     <Compile Include="Controls\FormEx.cs">
       <SubType>Form</SubType>
     </Compile>

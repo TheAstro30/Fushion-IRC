@@ -17,17 +17,9 @@ namespace FusionIRC.Helpers
         /* All events raised by the client connection class are handled here, rather than on the main form */
         public static Form MainForm { get; set; }
 
-        public static void OnDebugOut(ClientConnection client, string data)
+        public static void OnOther(ClientConnection client, string data)
         {
             System.Diagnostics.Debug.Print(data);
-            //var c = WindowManager.GetConsoleWindow(client);
-            //if (c == null || c.WindowType != ChildWindowType.Console)
-            //{
-            //    return;
-            //}
-            //c.Output.AddLine(1, data);
-            ///* Update treenode color */
-            //WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
         }
 
         /* Connection events */
@@ -252,6 +244,27 @@ namespace FusionIRC.Helpers
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
         }
 
+        public static void OnWallops(ClientConnection client, string nick, string address, string text)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.WallopsText,
+                              TimeStamp = DateTime.Now,
+                              Nick = nick,
+                              Address = address,
+                              Text = text
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
+        }
+
         /* Events */
         public static void OnWelcome(ClientConnection client, string text)
         {
@@ -442,7 +455,7 @@ namespace FusionIRC.Helpers
             if (c == null || c.WindowType != ChildWindowType.Channel)
             {
                 return;
-            }
+            }            
             c.Nicklist.UpdateNickAddress(nick, address);
         }
 

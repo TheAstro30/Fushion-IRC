@@ -109,9 +109,7 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.MotdText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts $text" });
             Messages.Add(ThemeMessage.WelcomeText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts $text" });
             Messages.Add(ThemeMessage.RawText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts $text" });
-            //delete this
-            var bgd = new ThemeBackgroundData {Path = "c.jpg", LayoutStyle = BackgroundImageLayoutStyles.Photo};
-            ThemeBackgrounds.Add(ChildWindowType.Channel, bgd);
+            Messages.Add(ThemeMessage.WallopsText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts !$nick! $text" });            
             /* Set this flag to true to ensure it will be saved if it doesn't exist (ie: load fails) */
             ThemeChanged = true;
         }        

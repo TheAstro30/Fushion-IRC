@@ -37,8 +37,7 @@ namespace FusionIRC.Forms
         private readonly SplitContainer _splitter;
 
         private readonly bool _initialize;
-
-        private string _windowChildName;
+        private readonly string _windowChildName;
 
         /* Public properties */
         public ChildWindowType WindowType { get; private set; }
@@ -87,8 +86,8 @@ namespace FusionIRC.Forms
         
         /* Constructor */
         public FrmChildWindow(ClientConnection client, ChildWindowType type, Form owner)
-        {
-            _initialize = true;
+        {            
+            _initialize = true;            
             /* Constructor where we pass what type of window this is - then we know what controls to create ;) */
             Client = client;
             WindowType = type;
@@ -103,7 +102,8 @@ namespace FusionIRC.Forms
                         {
                             BackColor = ThemeManager.GetColor(ThemeColor.WindowBackColor),//change to its own
                             ForeColor = ThemeManager.GetColor(ThemeColor.WindowForeColor),//change to its own
-                            Font = ThemeManager.CurrentTheme.ThemeFonts[type]
+                            Font = ThemeManager.CurrentTheme.ThemeFonts[type],
+                            MaximumHistoryCache = SettingsManager.Settings.Caching.Input
                         };
 
             Output = new OutputWindow
@@ -111,7 +111,8 @@ namespace FusionIRC.Forms
                              BackColor = ThemeManager.GetColor(ThemeColor.WindowBackColor),
                              ForeColor = ThemeManager.GetColor(ThemeColor.WindowForeColor),
                              Font = ThemeManager.CurrentTheme.ThemeFonts[type],
-                             LineSpacingStyle = LineSpacingStyle.Paragraph
+                             LineSpacingStyle = LineSpacingStyle.Paragraph,
+                             MaximumLines = SettingsManager.Settings.Caching.Output
                          };
 
             if (type == ChildWindowType.Channel)
@@ -125,6 +126,7 @@ namespace FusionIRC.Forms
                                    UserModeCharacters = Client.Parser.UserModeCharacters,
                                    Dock = DockStyle.Fill
                                };
+                Nicklist.OnNicklistDoubleClick += NicklistDoubleClickNick;
                 /* Split control for nicklist */
                 _splitter = new SplitContainer
                                {
@@ -155,12 +157,13 @@ namespace FusionIRC.Forms
             /* Callbacks */
             Input.TabKeyPress += InputTabKeyPress;
             Input.KeyDown += InputKeyDown;
+            Input.MouseWheel += InputMouseWheel;
             /* Window properties */
             BackColor = Color.FromArgb(190, 190, 190);            
             ShowInTaskbar = false;
             MdiParent = owner;
             MinimumSize = new Size(480, 180);
-            /* Set window icon */
+            /* Set window icon */            
             switch (type)
             {
                 case ChildWindowType.Console:
@@ -207,7 +210,7 @@ namespace FusionIRC.Forms
 
         protected override void OnLoad(EventArgs e)
         {
-            OnResize(new EventArgs());
+            OnResize(new EventArgs());            
             base.OnLoad(e);
         }
 
@@ -268,7 +271,7 @@ namespace FusionIRC.Forms
                 Input.SetBounds(0, _splitter.ClientRectangle.Height + 1, ClientRectangle.Width, Input.ClientRectangle.Height);
                 if (WindowState == FormWindowState.Normal)
                 {
-                    _splitter.SplitterDistance = ClientRectangle.Width - SettingsManager.Settings.SettingsWindows.NicklistWidth;
+                    _splitter.SplitterDistance = ClientRectangle.Width - SettingsManager.Settings.Windows.NicklistWidth;
                 }
             }
             else
@@ -298,11 +301,6 @@ namespace FusionIRC.Forms
         }
 
         /* Control callbacks */
-        private void InputTabKeyPress(InputWindow e)
-        {
-            //lstNicklist.TabNextNick(txtOut, IrcTokens.Gettok(Text, 1, 1, (char)32));
-        }
-
         private void InputKeyDown(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
@@ -314,7 +312,7 @@ namespace FusionIRC.Forms
                         return;
                     }
                     var s = Utf8.ConvertToUtf8(Input.Text, true);
-                    Input.Text = null;                    
+                    Input.Text = string.Empty;                    
                     /* Send text to server */
                     if (WindowType != ChildWindowType.Console)
                     {
@@ -360,19 +358,55 @@ namespace FusionIRC.Forms
                 case Keys.Down:
                 case Keys.Space:
                     /* Nicklist clear tab search completion */
+                    if (Nicklist != null)
+                    {
+                        Nicklist.ClearTabNick();
+                    }
                     break;
             }
+        }
+
+        private void InputTabKeyPress(InputWindow e)
+        {
+            /* Tab completion */
+            var text = Text.Split(' ');
+            if (text.Length < 1 || Nicklist == null)
+            {
+                return;
+            }
+            var rest = string.Empty;
+            var s = Nicklist.TabNextNick(Input.Text, text[0], Input.SelectionStart, ref rest);            
+            var i = 0;
+            if (!string.IsNullOrEmpty(s))
+            {
+                i = s.Length;
+            }
+            Input.Text = !string.IsNullOrEmpty(rest) ? string.Format("{0} {1}", s, rest) : string.Format("{0}", s);
+            Input.SelectionStart = i;
+        }
+
+        private void InputMouseWheel(object sender, MouseEventArgs e)
+        {
+            Output.MouseWheelScroll(e);
+        }
+
+        /* Nick list callbacks */
+        private void NicklistDoubleClickNick()
+        {
+            if (Nicklist.SelectedNicks.Count == 0)
+            {
+                return;
+            }
+            var nick = Nicklist.SelectedNicks[0];
+            /* Open a query window with the nick (default action) */
+            var win = WindowManager.GetWindow(Client, nick) ?? WindowManager.AddWindow(Client, ChildWindowType.Private, MdiParent, nick, nick, true);
+            win.BringToFront();
         }
 
         private void SplitterMoving(object sender, SplitterCancelEventArgs e)
         {
             /* Save the nicklist width */
-            SettingsManager.Settings.SettingsWindows.NicklistWidth = ClientRectangle.Width - e.SplitX;
-        }
-
-        private void InputMouseWheel(object sender, MouseEventArgs e)
-        {
-            //txtIn.MouseWheelScroll(sender, e); not implemented on control yet
+            SettingsManager.Settings.Windows.NicklistWidth = ClientRectangle.Width - e.SplitX;
         }
 
         private void TimerFocus(object sender, EventArgs e)

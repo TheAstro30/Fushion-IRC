@@ -4,10 +4,6 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ircClient.Tcp;
 using ircCore.Utils;
 
 namespace ircClient.Classes
@@ -44,11 +40,15 @@ namespace ircClient.Classes
         public event Action<ClientConnection, string> OnMotd;
         public event Action<ClientConnection, string> OnWelcome;
 
+        public event Action<ClientConnection, string, string, string> OnWallops;
+
         public event Action<ClientConnection, string, string> OnTopicIs;
         public event Action<ClientConnection, string, string> OnTopicSetBy;
         public event Action<ClientConnection, string, string, string> OnTopicChanged;
 
         public event Action<ClientConnection, string> OnRaw;
+
+        public event Action<ClientConnection, string> OnOther;
 
         /* Public properties */
         public string JoinChannelsOnConnect { get; set; }
@@ -112,6 +112,10 @@ namespace ircClient.Classes
                     ParseMode(first, third, fourth);
                     break;
 
+                case "WALLOPS":                    
+                    ParseWallops(first, string.Format("{0} {1}", third, fourth));
+                    break;
+
                 case "001":
                     /* Welcome message */
                     _client.IsConnected = true;
@@ -150,8 +154,8 @@ namespace ircClient.Classes
                     break;
 
                 case "352":
-                    /* Who list */
-                    ParseWho(third, fourth);
+                    /* Who list - #temp ~TheAstro3 Manager.DragonIRC.com Saphira.US.DragonIRC.com DragonsBlood H* :0 TheAstro30 */
+                    ParseWho(fourth);
                     break;
 
                 case "372":
@@ -177,8 +181,15 @@ namespace ircClient.Classes
                     }
                     break;
 
+                case "331":
+                case "381":
+                case "401":
                 case "421":
                 case "433":
+                case "464":
+                case "481":
+                case "491":
+                    /* Other raws */
                     if (OnRaw != null)
                     {
                         OnRaw(_client, string.Format("* {0}", fourth.Replace(":", "")));
@@ -186,8 +197,15 @@ namespace ircClient.Classes
                     break;
 
                 case "353":
-                    /* Channel names :server yournick := channel :names */
+                    /* Channel names :server yournick := #channel :names */
                     ParseNames(fourth);
+                    break;
+
+                default:
+                    if (OnOther != null)
+                    {
+                        OnOther(_client, string.Format("Unknown - {0} {1} {2} {3}", first, second, third, fourth));
+                    }
                     break;
             }
         }
@@ -248,7 +266,7 @@ namespace ircClient.Classes
             }
             /* First token is channel */
             var channel = data.Substring(0, i).Trim();
-            data = data.Substring(i).Trim();
+            data = RemoveColon(data.Substring(i).Trim());
             if (OnTopicIs != null)
             {
                 OnTopicIs(_client, channel, data);
@@ -367,6 +385,20 @@ namespace ircClient.Classes
             if (OnNotice != null)
             {
                 OnNotice(_client, n[0], n.Length > 1 ? n[1] : "", RemoveColon(msg));
+            }
+        }
+
+        private void ParseWallops(string nick, string data)
+        {
+            var n = RemoveColon(nick).Split('!');
+            if (n.Length == 0)
+            {
+                return; /*This should never happen */
+            }
+            System.Diagnostics.Debug.Print(data);
+            if (OnWallops != null)
+            {
+                OnWallops(_client, n[0], n.Length > 1 ? n[1] : "", RemoveColon(data));
             }
         }
 
@@ -506,7 +538,7 @@ namespace ircClient.Classes
             }
         }
 
-        private void ParseWho(string nick, string data)
+        private void ParseWho(string data)
         {            
             var s = data.Split(' ');
             if (s.Length < 4)
@@ -515,7 +547,7 @@ namespace ircClient.Classes
             }
             if (OnWho != null)
             {
-                OnWho(_client, nick, s[0], string.Format("{0}@{1}", s[1], s[2]));
+                OnWho(_client, s[4], s[0], string.Format("{0}@{1}", s[1], s[2]));
             }
         }
 

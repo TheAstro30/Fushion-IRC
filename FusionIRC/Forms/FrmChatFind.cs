@@ -217,7 +217,13 @@ namespace FusionIRC.Forms
                         {
                             _cmbSearch.Text = search;
                             _cmbSearch.SelectionStart = search.Length;
-                        }                                 
+                        }
+                        /* Adjust the size of the list */
+                        if (_cmbSearch.Items.Count > SettingsManager.Settings.Caching.ChatSearch)
+                        {
+                            /* Remove last item */
+                            _cmbSearch.Items.RemoveAt(_cmbSearch.Items.Count - 1);
+                        }
                         FindWord(_cmbSearch.Text, _rbDown.Checked, _chkCase.Checked);
                     }
                     break;
@@ -251,8 +257,8 @@ namespace FusionIRC.Forms
                 }
             }
             var regXMatch = !matchCase
-                                ? new Regex(Regex.Escape(matchString), RegexOptions.IgnoreCase | RegexOptions.Compiled)
-                                : new Regex(Regex.Escape(matchString), RegexOptions.Compiled);
+                                ? new Regex(Regex.Escape(matchString.Replace("*", null)), RegexOptions.IgnoreCase)
+                                : new Regex(Regex.Escape(matchString.Replace("*", null)));
             int x;
             int y;
             var pointer = 0;            

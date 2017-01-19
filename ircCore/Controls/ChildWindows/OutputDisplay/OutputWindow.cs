@@ -539,16 +539,17 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             {                
                 return; /* It's unlikely ... */
             }            
-            TextData.Wrapped.Add(w);
-            if (TextData.Lines.Count > _maximumLines)
-            {
-                TrimBuffer();
-            }
+            TextData.Wrapped.Add(w);            
             /* Set scrolled to bottom value */              
             if (_scrollValue == currentLines)
             {
                 _scrolledToBottom = true;
                 _scrollValue = TextData.WrappedLinesCount - 1;
+                if (TextData.Lines.Count > _maximumLines)
+                {
+                    /* Only trim the buffer if the window isn't scrolled above bottom - or else lines appear to move up */
+                    TrimBuffer();
+                }
             }
             else
             {
@@ -616,6 +617,11 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             _vScroll.Maximum = 0;
             _vScroll.LargeChange = 1;
             Invalidate();
+        }
+
+        public void MouseWheelScroll(MouseEventArgs e)
+        {
+            OnMouseWheel(e);
         }
 
         /* Private methods */

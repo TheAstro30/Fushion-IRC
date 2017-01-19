@@ -106,6 +106,10 @@ namespace FusionIRC.Helpers
                     ParseNames(client, args);
                     break;
 
+                case "TOPIC":
+                    ParseTopic(client, args);
+                    break;
+
                 default:
                     /* Send command to server */
                     if (!client.IsConnected)
@@ -372,6 +376,24 @@ namespace FusionIRC.Helpers
             }
             c.Nicklist.Clear();
             client.Send(string.Format("NAMES {0}\r\nWHO {0}", channel));
+        }
+
+        private static void ParseTopic(ClientConnection client, string args)
+        {
+            if (string.IsNullOrEmpty(args) || !client.IsConnected)
+            {
+                return;
+            }
+            var i = args.IndexOf(' ');
+            if (i == -1)
+            {
+                /* Most likely /topic #chan */
+                client.Send(string.Format("TOPIC {0}", args));
+                return;
+            }
+            var channel = args.Substring(0, i).Trim();
+            args = args.Substring(i).Trim();
+            client.Send(string.Format("TOPIC {0} :{1}", channel, args));
         }
 
         private static void ParseNick(ClientConnection client, string args)

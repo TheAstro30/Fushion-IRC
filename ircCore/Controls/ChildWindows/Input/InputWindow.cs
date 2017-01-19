@@ -25,35 +25,8 @@ namespace ircCore.Controls.ChildWindows.Input
         private int _historyPoint;
         private readonly List<string> _history = new List<string>();
 
-        public InputWindow()
-        {
-            _mnuContext = new ContextMenuStrip();
-            _mnuContext.Opening += MnuContextOpening;
-
-            _txtOut = new ColorTextBox
-                          {
-                              AcceptsTab = true,
-                              BorderStyle = BorderStyle.None,
-                              ContextMenuStrip = _mnuContext,
-                              Font = new Font("Lucida Console", 10),
-                              IsMultiLinePaste = false,
-                              IsNormalTextbox = false,
-                              Location = new Point(1, 1),
-                              Multiline = true,
-                              ProcessCodes = true,
-                              Size = new Size(298, 20),
-                              TabIndex = 0,
-                              WordWrap = false,
-                              AllowMultiLinePaste = true
-                          };
-            _txtOut.KeyDown += TxtOutKeyDown;
-            _txtOut.KeyPress += TxtOutKeyPress;
-            _txtOut.MouseWheel += TxtOutMouseWheel;
-            Controls.Add(_txtOut);
-
-            BuildContextMenu();
-        }
-
+        /* Properties */
+        public int MaximumHistoryCache { get; set; }
         public event Action<InputWindow> TabKeyPress;
 
         public new Color BackColor
@@ -118,13 +91,43 @@ namespace ircCore.Controls.ChildWindows.Input
             get { return _txtOut.IsMultiLinePaste; }
         }
 
+        public InputWindow()
+        {            
+            _mnuContext = new ContextMenuStrip();
+            _mnuContext.Opening += MnuContextOpening;
+
+            _txtOut = new ColorTextBox
+                          {
+                              AcceptsTab = true,
+                              BorderStyle = BorderStyle.None,
+                              ContextMenuStrip = _mnuContext,
+                              Font = new Font("Lucida Console", 10),
+                              IsMultiLinePaste = false,
+                              IsNormalTextbox = false,
+                              Location = new Point(1, 1),
+                              Multiline = true,
+                              ProcessCodes = true,
+                              Size = new Size(298, 20),
+                              TabIndex = 0,
+                              WordWrap = false,
+                              AllowMultiLinePaste = true
+                          };
+            _txtOut.KeyDown += TxtOutKeyDown;
+            _txtOut.KeyPress += TxtOutKeyPress;
+            _txtOut.MouseWheel += TxtOutMouseWheel;
+            Controls.Add(_txtOut);
+
+            BuildContextMenu();
+        }
+
         protected override void OnResize(EventArgs e)
         {
-            Height = GetTextHeight() + 4;
-            _txtOut.SetBounds(0, 2, Width - 4, _txtOut.Height);
+            Height = GetTextHeight() + 6; /* Extra padding at top and bottom */
+            _txtOut.SetBounds(0, 4, Width - 4, _txtOut.Height);
             base.OnResize(e);
         }
 
+        /* Private methods */
         private void MnuContextOpening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             _txtOut.Focus();
@@ -219,6 +222,7 @@ namespace ircCore.Controls.ChildWindows.Input
             }
         }
 
+        /* Callback events */
         protected void TxtOutKeyDown(object sender, KeyEventArgs e)
         {
             switch (e.KeyValue)
@@ -230,7 +234,10 @@ namespace ircCore.Controls.ChildWindows.Input
                         IsInCache(_txtOut.Text);
                         _history.Add(_txtOut.Text);
                         /* First in, first out */
-                        if (_history.Count > 100) { _history.RemoveAt(0); }
+                        if (_history.Count > MaximumHistoryCache)
+                        {
+                            _history.RemoveAt(0);
+                        }
                         _historyPoint = _history.Count;
                     }
                     else

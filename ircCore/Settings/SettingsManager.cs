@@ -32,11 +32,11 @@ namespace ircCore.Settings
 
         public static WindowData GetWindowByName(string name)
         {
-            var w = Settings.SettingsWindows.Window.FirstOrDefault(o => o.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            var w = Settings.Windows.Window.FirstOrDefault(o => o.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
             if (w == null)
             {                
                 w = new WindowData {Name = name.ToLower(), Position = new Point(-1, -1)}; /* -1 means default position */
-                Settings.SettingsWindows.Window.Add(w);
+                Settings.Windows.Window.Add(w);
             }
             return w;
         }

@@ -59,7 +59,8 @@ namespace ircCore.Settings.Theming
         NickChangeSelfText = 122,
         MessageTargetText = 123,
         MotdText = 124,
-        RawText = 125
+        RawText = 125,
+        WallopsText = 126
     }
 
     public class IncomingMessageData
