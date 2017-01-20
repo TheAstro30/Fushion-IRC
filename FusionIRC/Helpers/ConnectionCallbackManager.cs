@@ -5,6 +5,7 @@
  */
 using System;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using FusionIRC.Forms;
 using ircClient;
@@ -34,8 +35,8 @@ namespace FusionIRC.Helpers
                           {
                               Message = ThemeMessage.ConnectingText,
                               TimeStamp = DateTime.Now,
-                              Server = client.Server,
-                              Port = client.Port
+                              Server = client.Server.Address,
+                              Port = client.Server.Port
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
@@ -114,12 +115,38 @@ namespace FusionIRC.Helpers
                               Message = ThemeMessage.ConnectionErrorText,
                               TimeStamp = DateTime.Now,
                               Text = error,
-                              Server = client.Server
+                              Server = client.Server.Address
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+        }
+
+        public static void OnClientSslInvalidCertificate(ClientConnection client, X509Certificate certificate)
+        {
+            var store = new X509Store("FusionIRC", StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadWrite);
+            if (store.Certificates.Cast<X509Certificate2>().Any(cert => cert.Subject == certificate.Subject))
+            {
+                client.SslAcceptCertificate(true);
+                store.Close();
+                return;
+            }
+            using (var ssl = new FrmSslError())
+            {
+                ssl.Server = client.Server.Address;
+                ssl.CertificateStore = store;
+                ssl.Certificate = certificate;
+                if (ssl.ShowDialog(MainForm) == DialogResult.Cancel)
+                {
+                    client.SslAcceptCertificate(false);
+                    store.Close();
+                    return;
+                }
+            }
+            store.Close();
+            client.SslAcceptCertificate(true);
         }
 
         public static void OnServerPingPong(ClientConnection client)
@@ -141,8 +168,7 @@ namespace FusionIRC.Helpers
         }
 
         /* Text messages */
-        public static void OnTextChannel(ClientConnection client, string nick, string address, string channel,
-                                         string text)
+        public static void OnTextChannel(ClientConnection client, string nick, string address, string channel, string text)
         {
             var c = WindowManager.GetWindow(client, channel);
             if (c == null || c.WindowType != ChildWindowType.Channel)
@@ -182,8 +208,7 @@ namespace FusionIRC.Helpers
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
         }
 
-        public static void OnActionChannel(ClientConnection client, string nick, string address, string channel,
-                                           string text)
+        public static void OnActionChannel(ClientConnection client, string nick, string address, string channel, string text)
         {
             var c = WindowManager.GetWindow(client, channel);
             if (c == null || c.WindowType != ChildWindowType.Channel)
@@ -295,6 +320,25 @@ namespace FusionIRC.Helpers
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.MotdText,
+                              TimeStamp = DateTime.Now,
+                              Text = text
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
+        }
+
+        public static void OnLUsers(ClientConnection client, string text)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.LUsersText,
                               TimeStamp = DateTime.Now,
                               Text = text
                           };

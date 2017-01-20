@@ -7,6 +7,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using FusionIRC.Forms;
+using FusionIRC.Forms.Settings;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
 
@@ -22,6 +23,9 @@ namespace FusionIRC.Classes
         private readonly ToolStrip _toolBar;
 
         private readonly ToolStripButton _btnConnect;
+        private readonly ToolStripButton _btnConnectToLocation;
+        private readonly ToolStripButton _btnSettings;
+        private readonly ToolStripButton _btnTheme;
 
         private readonly Timer _tmrCheck;
 
@@ -41,7 +45,7 @@ namespace FusionIRC.Classes
                                ShowItemToolTips = true
                            };
             owner.Controls.Add(_toolBar);
-
+            /* Connect button */
             _btnConnect = new ToolStripButton
                               {
                                   Image = Resources.connect.ToBitmap(),
@@ -51,7 +55,38 @@ namespace FusionIRC.Classes
                                   ToolTipText = @"Connect"
                               };
             _btnConnect.Click += ToolbarButtonClick;
-            _toolBar.Items.Add(_btnConnect);
+            /* Connect to location button */
+            _btnConnectToLocation = new ToolStripButton
+                                        {
+                                            Image = Resources.connect_to_location.ToBitmap(),
+                                            ImageScaling = ToolStripItemImageScaling.None,
+                                            Size = new Size(32, 32),
+                                            Tag = "CONNECTTO",
+                                            ToolTipText = @"Connect to location"
+                                        };
+            _btnConnectToLocation.Click += ToolbarButtonClick;
+            /* Settings button */
+            _btnSettings = new ToolStripButton
+                               {
+                                   Image = Resources.settings.ToBitmap(),
+                                   ImageScaling = ToolStripItemImageScaling.None,
+                                   Size = new Size(32, 32),
+                                   Tag = "SETTINGS",
+                                   ToolTipText = @"Settings"
+                               };
+            _btnSettings.Click += ToolbarButtonClick;
+            /* Theme button */
+            _btnTheme = new ToolStripButton
+                            {
+                                Image = Resources.theme.ToBitmap(),
+                                ImageScaling = ToolStripItemImageScaling.None,
+                                Size = new Size(32, 32),
+                                Tag = "THEME",
+                                ToolTipText = @"Theme manager"
+                            };
+            _btnTheme.Click += ToolbarButtonClick;
+            /* Add the buttons to the toolbar */
+            _toolBar.Items.AddRange(new ToolStripItem[] { _btnConnect, _btnConnectToLocation, new ToolStripSeparator(), _btnSettings, _btnTheme });
 
             _tmrCheck = new Timer
                             {
@@ -74,17 +109,22 @@ namespace FusionIRC.Classes
             switch (btn.Tag.ToString())
             {
                 case "CONNECT":                    
-                    if (string.IsNullOrEmpty(c.Server))
+                    if (string.IsNullOrEmpty(c.Server.Address))
                     {
-                        c.Server = "irc.dragonirc.com"; //change this
-                        c.Port = 6667;
+                        c.Server.Address = "irc.dragonirc.com"; //change this
+                        c.Server.Port = 6667;
+                        c.Server.IsSsl = false;
                     }
                     console = WindowManager.GetConsoleWindow(c);
                     if (console == null)
                     {
                         return;
                     }
-                    CommandProcessor.Parse(c, console, string.Format("SERVER {0}:{1}", c.Server, c.Port));
+                    CommandProcessor.Parse(c, console,
+                                           string.Format("SERVER {0}:{1}", c.Server.Address,
+                                                         c.Server.IsSsl
+                                                             ? string.Format("+{0}", c.Server.Port.ToString())
+                                                             : c.Server.Port.ToString()));
                     break;
 
                 case "DISCONNECT":                    
@@ -94,6 +134,27 @@ namespace FusionIRC.Classes
                         return;
                     }
                     CommandProcessor.Parse(c, console, "DISCONNECT");
+                    break;
+
+                case "CONNECTTO":
+                    using (var connect = new FrmConnectTo(_owner))
+                    {
+                        connect.ShowDialog(_owner);
+                    }
+                    break;
+
+                case "SETTINGS":
+                    using (var settings = new FrmSettings())
+                    {
+                        settings.ShowDialog(_owner);
+                    }
+                    break;
+
+                case "THEME":
+                    using (var theme = new FrmTheme())
+                    {
+                        theme.ShowDialog(_owner);
+                    }
                     break;
             }
         }
@@ -124,7 +185,7 @@ namespace FusionIRC.Classes
             else
             {
                 if (_connect)
-                {
+                {                    
                     return;
                 }
                 _btnConnect.Tag = "CONNECT";

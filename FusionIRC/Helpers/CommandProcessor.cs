@@ -37,7 +37,11 @@ namespace FusionIRC.Helpers
                 /* Event raised by connection class before time out timer fired */
                 TmrWaitToReconnectTimeOut.Enabled = false;
             }
-            ParseServerConnection(client, string.Format("{0}:{1}", client.Server, client.Port));
+            ParseServerConnection(client,
+                                  string.Format("{0}:{1}", client.Server.Address,
+                                                client.Server.IsSsl
+                                                    ? string.Format("+{0}", client.Server.Port.ToString())
+                                                    : client.Server.Port.ToString()));
         }
 
         /* Main parsing entry point */
@@ -127,6 +131,7 @@ namespace FusionIRC.Helpers
             var s = args.Split(' ');
             string[] address;
             var port = 6667;
+            bool ssl = false;
             var c = WindowManager.GetConsoleWindow(client);
             if (c == null || s.Length == 0)
             {
@@ -170,6 +175,12 @@ namespace FusionIRC.Helpers
             }
             if (address.Length == 2)
             {
+                /* Look for a '+' to determine SSL */
+                if (address[1][0] == '+')
+                {
+                    ssl = true;
+                    address[1] = address[1].Substring(1);
+                }
                 if (!int.TryParse(address[1], out port))
                 {
                     port = 6667;
@@ -184,13 +195,14 @@ namespace FusionIRC.Helpers
             {
                 c.Client.IsWaitingToReconnect = true;
                 c.Client.Disconnect();
-                c.Client.Server = address[0];
-                c.Client.Port = port;
+                c.Client.Server.Address = address[0];
+                c.Client.Server.Port = port;
+                c.Client.Server.IsSsl = ssl;
                 TmrWaitToReconnectTimeOut.Tag = c.Client;
                 TmrWaitToReconnectTimeOut.Enabled = true;
                 return;
             }
-            c.Client.Connect(address[0], port);
+            c.Client.Connect(address[0], port, ssl);
         }
 
         private static void ParseServerDisconnection(ClientConnection client)

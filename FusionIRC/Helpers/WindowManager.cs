@@ -196,7 +196,9 @@ namespace FusionIRC.Helpers
             client.OnClientConnectionError += ConnectionCallbackManager.OnClientConnectionError;
             client.OnClientConnectionClosed += CommandProcessor.OnClientWaitToReconnect;
             client.Parser.OnServerPingPong += ConnectionCallbackManager.OnServerPingPong;
+            client.OnClientSslInvalidCertificate += ConnectionCallbackManager.OnClientSslInvalidCertificate;
             client.Parser.OnMotd += ConnectionCallbackManager.OnMotd;
+            client.Parser.OnLUsers += ConnectionCallbackManager.OnLUsers;
             client.Parser.OnWelcome += ConnectionCallbackManager.OnWelcome;
             client.Parser.OnTopicIs += ConnectionCallbackManager.OnTopicIs;
             client.Parser.OnTopicSetBy += ConnectionCallbackManager.OnTopicSetBy;
@@ -232,8 +234,10 @@ namespace FusionIRC.Helpers
             client.OnClientDisconnected -= ConnectionCallbackManager.OnClientDisconnected;
             client.OnClientConnectionError -= ConnectionCallbackManager.OnClientConnectionError;
             client.OnClientConnectionClosed -= CommandProcessor.OnClientWaitToReconnect;
+            client.OnClientSslInvalidCertificate -= ConnectionCallbackManager.OnClientSslInvalidCertificate;
             client.Parser.OnServerPingPong -= ConnectionCallbackManager.OnServerPingPong;
             client.Parser.OnMotd -= ConnectionCallbackManager.OnMotd;
+            client.Parser.OnLUsers -= ConnectionCallbackManager.OnLUsers;
             client.Parser.OnWelcome -= ConnectionCallbackManager.OnWelcome;
             client.Parser.OnTopicIs -= ConnectionCallbackManager.OnTopicIs;
             client.Parser.OnTopicSetBy -= ConnectionCallbackManager.OnTopicSetBy;

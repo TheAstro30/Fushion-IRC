@@ -530,8 +530,7 @@ namespace ircClient.Tcp
             }
         }
 
-        private bool OnRemoteCertificateValidation(object sender, X509Certificate certificate, X509Chain chain,
-                                                   SslPolicyErrors sslPolicyErrors)
+        private bool OnRemoteCertificateValidation(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             if (!EnableSslAuthentication)
             {
@@ -539,13 +538,14 @@ namespace ircClient.Tcp
             }
             switch (sslPolicyErrors)
             {
-                case SslPolicyErrors.None:
+                case SslPolicyErrors.None:                    
                     return true;
+
                 case SslPolicyErrors.RemoteCertificateNameMismatch:
                 case SslPolicyErrors.RemoteCertificateNameMismatch | SslPolicyErrors.RemoteCertificateChainErrors:
                     /* Certificate error */
                     if (SslAutoAccept)
-                    {
+                    {                        
                         return true;
                     }
                     if (OnSslInvalidCertificate != null)
@@ -650,21 +650,20 @@ namespace ircClient.Tcp
                         }
                         return;
                     }
-                    var buffer = _buffer;
-                    Array.Resize(ref buffer, intCount);
-                    _byteData.Add(buffer);
+                    Array.Resize(ref _buffer, intCount);
+                    _byteData.Add(_buffer);
                     if (OnDataArrival != null)
                     {
-                        _syncObject.Invoke(OnDataArrival, new object[] {this, buffer.Length});
+                        _syncObject.Invoke(OnDataArrival, new object[] {this, _buffer.Length});
                     }
-                    buffer = new byte[BufferSize];
+                    _buffer = new byte[BufferSize];
                     if (IsSsl)
                     {
                         try
                         {
                             if (_sslStream != null && _sslStream.CanRead)
                             {
-                                _sslStream.BeginRead(buffer, 0, _buffer.Length, OnClientRead, _sslStream);
+                                _sslStream.BeginRead(_buffer, 0, _buffer.Length, OnClientRead, _sslStream);
                             }
                             else
                             {
@@ -680,7 +679,7 @@ namespace ircClient.Tcp
                     }
                     else
                     {
-                        _clientSocket.BeginReceive(_buffer, 0, buffer.Length, SocketFlags.None, OnClientRead, null);
+                        _clientSocket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnClientRead, null);
                     }
                 }
             }

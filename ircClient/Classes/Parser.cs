@@ -38,6 +38,7 @@ namespace ircClient.Classes
         public event Action<ClientConnection, string, string, string> OnWho;
 
         public event Action<ClientConnection, string> OnMotd;
+        public event Action<ClientConnection, string> OnLUsers;
         public event Action<ClientConnection, string> OnWelcome;
 
         public event Action<ClientConnection, string, string, string> OnWallops;
@@ -143,6 +144,21 @@ namespace ircClient.Classes
                     }
                     break;
 
+                case "250":
+                case "251":
+                case "252":
+                case "253":
+                case "254":
+                case "255":
+                case "265":
+                case "266":
+                    /* LUsers */
+                    if (OnLUsers != null)
+                    {
+                        OnLUsers(_client, fourth.Replace(":", ""));
+                    }
+                    break;
+
                 case "332":
                     /* Topic is */
                     ParseTopicIs(fourth);
@@ -181,18 +197,39 @@ namespace ircClient.Classes
                     }
                     break;
 
+                case "404":
+                case "421":
+                case "471":
+                case "473":
+                case "474":
+                case "475":
+                    /* These raws we take the first token and put it at the end */
+                    var i = fourth.IndexOf(' ');
+                    if (i != -1)
+                    {
+                        var s = fourth.Substring(0, i).Trim();
+                        fourth = fourth.Substring(i).Trim();
+                        if (OnRaw != null)
+                        {
+                            OnRaw(_client, string.Format("{0}: {1}", RemoveColon(fourth), s));
+                        }
+                    }
+                    break;
+
                 case "331":
                 case "381":
-                case "401":
-                case "421":
+                case "401":                
                 case "433":
+                case "437":
                 case "464":
+                case "472":
                 case "481":
                 case "491":
+                case "501":
                     /* Other raws */
                     if (OnRaw != null)
                     {
-                        OnRaw(_client, string.Format("* {0}", fourth.Replace(":", "")));
+                        OnRaw(_client, string.Format("{0}", fourth.Replace(":", "")));
                     }
                     break;
 

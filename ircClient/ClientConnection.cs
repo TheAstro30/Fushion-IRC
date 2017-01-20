@@ -6,11 +6,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Windows.Forms;
 using ircClient.Classes;
 using ircClient.Tcp;
 using ircCore.Settings;
+using ircCore.Settings.Networks;
 using ircCore.Utils;
 
 namespace ircClient
@@ -34,29 +36,31 @@ namespace ircClient
 
         public bool IsWaitingToReconnect { get; set; }
 
-        public string Server { get; set; }
-        public int Port { get; set; }
-        
+        public Server Server = new Server();
+
         public event Action<ClientConnection> OnClientBeginConnect;
         public event Action<ClientConnection> OnClientConnected;
         public event Action<ClientConnection> OnClientDisconnected;
         public event Action<ClientConnection> OnClientCancelConnection;
         public event Action<ClientConnection, string> OnClientConnectionError;
-
         public event Action<ClientConnection> OnClientConnectionClosed;
+        public event Action<ClientConnection, X509Certificate> OnClientSslInvalidCertificate;
 
         /* Constructor */
         public ClientConnection(ISynchronizeInvoke syncObjcet, SettingsUserInfo userInfo)
         {
             _sock = new ClientSock
                         {
-                            SynchronizingObject = syncObjcet
+                            SynchronizingObject = syncObjcet,
+                            EnableSslAuthentication = true
                         };
             _sock.OnConnected += OnConnected;
             _sock.OnDisconnected += OnDisconnected;
             _sock.OnError += OnError;
             _sock.OnDataArrival += OnDataArrival;
             _sock.OnStateChanged += OnStateChanged;
+            _sock.OnSslInvalidCertificate += OnSslInvalidCertificate;
+            
             Parser = new Parser(this);
 
             UserInfo = new SettingsUserInfo(userInfo);
@@ -71,19 +75,21 @@ namespace ircClient
         /* Connect overloads */
         public void Connect()
         {
-            if (string.IsNullOrEmpty(Server))
+            if (string.IsNullOrEmpty(Server.Address))
             {
                 return;
             }
-            Connect(Server, Port > 0 ? Port : 6667);
+            Connect(Server.Address, Server.Port > 0 ? Server.Port : 6667, Server.IsSsl);
         }
 
-        public void Connect(string address, int port)
+        public void Connect(string address, int port, bool ssl)
         {
-            Server = address;
-            Port = port;
+            Server.Address = address;
+            Server.Port = port;
+            Server.IsSsl = ssl;
             IsConnecting = true;
-            _sock.Connect(address, port);
+            _sock.IsSsl = ssl;
+            _sock.Connect(address, port);            
             if (OnClientBeginConnect != null)
             {
                 OnClientBeginConnect(this);
@@ -121,6 +127,11 @@ namespace ircClient
             {
                 OnClientCancelConnection(this);
             }
+        }
+
+        public void SslAcceptCertificate(bool accept)
+        {
+            _sock.SslAcceptCertificate(accept);
         }
 
         /* Sockwrite */
@@ -192,6 +203,14 @@ namespace ircClient
                     IsConnected = false;
                     _tmrWaitToReconnect.Enabled = true;
                     break;
+            }
+        }
+
+        private void OnSslInvalidCertificate(ClientSock sock, X509Certificate certificate)
+        {
+            if (OnClientSslInvalidCertificate != null)
+            {
+                OnClientSslInvalidCertificate(this, certificate);
             }
         }
 

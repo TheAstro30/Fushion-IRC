@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using FusionIRC.Forms;
 using FusionIRC.Helpers;
+using ircCore.Settings.Theming;
 
 namespace FusionIRC.Classes
 {    
@@ -39,9 +40,14 @@ namespace FusionIRC.Classes
                            };
             _mnuFile.DropDownItems.AddRange(new ToolStripItem[]
                                                 {
-                                                    new ToolStripMenuItem("Connect", null, OnMenuFileClick),
-                                                    new ToolStripMenuItem("Disconnect", null, OnMenuFileClick),                                                    
-                                                    new ToolStripSeparator(), new ToolStripMenuItem("Exit",null,OnMenuFileClick, Keys.Alt | Keys.F4), 
+                                                    new ToolStripMenuItem("New window", null, OnMenuFileClick, Keys.Control | Keys.M),
+                                                    new ToolStripSeparator(),
+                                                    new ToolStripMenuItem("Connect to location...", null, OnMenuFileClick, Keys.F2),
+                                                    new ToolStripSeparator(), 
+                                                    new ToolStripMenuItem("Connect", null, OnMenuFileClick, Keys.F3),
+                                                    new ToolStripMenuItem("Disconnect", null, OnMenuFileClick, Keys.F4),                                                    
+                                                    new ToolStripSeparator(),
+                                                    new ToolStripMenuItem("Exit", null, OnMenuFileClick, Keys.Alt | Keys.F4), 
                                                 });
             _mnuWindow = new ToolStripMenuItem
                              {
@@ -55,9 +61,9 @@ namespace FusionIRC.Classes
         }
 
         public void ConnectionUpdate(bool connected)
-        {
-            _mnuFile.DropDownItems[0].Enabled = !connected;
-            _mnuFile.DropDownItems[1].Enabled = connected;
+        {            
+            _mnuFile.DropDownItems[4].Enabled = !connected;
+            _mnuFile.DropDownItems[5].Enabled = connected;
         }
 
         /* Menu callbacks */
@@ -72,18 +78,34 @@ namespace FusionIRC.Classes
             FrmChildWindow console;            
             switch (item.Text.ToUpper())
             {
-                case "CONNECT":
-                    if (string.IsNullOrEmpty(c.Server))
+                case "NEW WINDOW":
+                    WindowManager.AddWindow(null, ChildWindowType.Console, _owner, "Console", "Console", true);
+                    break;
+
+                case "CONNECT TO LOCATION...":
+                    using (var connect = new FrmConnectTo(_owner))
                     {
-                        c.Server = "irc.dragonirc.com"; //change this
-                        c.Port = 6667;
+                        connect.ShowDialog(_owner);
+                    }
+                    break;    
+
+                case "CONNECT":
+                    if (string.IsNullOrEmpty(c.Server.Address))
+                    {
+                        c.Server.Address = "irc.dragonirc.com"; //change this
+                        c.Server.Port = 6667;
+                        c.Server.IsSsl = false;
                     }
                     console = WindowManager.GetConsoleWindow(c);
                     if (console == null)
                     {
                         return;
                     }
-                    CommandProcessor.Parse(c, console, string.Format("SERVER {0}:{1}", c.Server, c.Port));
+                    CommandProcessor.Parse(c, console,
+                                           string.Format("SERVER {0}:{1}", c.Server.Address,
+                                                         c.Server.IsSsl
+                                                             ? string.Format("+{0}", c.Server.Port.ToString())
+                                                             : c.Server.Port.ToString()));
                     break;
 
                 case "DISCONNECT":

@@ -14,6 +14,9 @@ namespace ircCore.Settings
     {        
         [XmlElement("userInfo")]
         public SettingsUserInfo UserInfo = new SettingsUserInfo();
+    
+        [XmlElement("connection")]
+        public SettingsConnection Connection = new SettingsConnection();
 
         [XmlElement("windows")]
         public SettingsWindow Windows = new SettingsWindow();        
@@ -40,9 +43,11 @@ namespace ircCore.Settings
                            };
             UserInfo = info;
             /* Set up basic settings */
-            Windows.SwitchTreeWidth = 110;
+            Windows.SwitchTreeWidth = 160;
             Windows.NicklistWidth = 112;
             var w = new WindowData { Name = "application", Size = new Size(1100, 750), Position = new Point(55, 55) };
+            Windows.Window.Add(w);
+            w = new WindowData {Name = "console", Size = new Size(731, 255), Position = new Point(-1, -1)};
             Windows.Window.Add(w);
             /* Create a blank theme */
             Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = "default.thm"});
