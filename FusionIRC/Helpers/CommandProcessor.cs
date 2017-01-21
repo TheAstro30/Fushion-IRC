@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Forms;
 using ircClient;
+using ircClient.Classes;
 using ircCore.Settings.Theming;
 
 namespace FusionIRC.Helpers
@@ -112,6 +113,20 @@ namespace FusionIRC.Helpers
 
                 case "TOPIC":
                     ParseTopic(client, args);
+                    break;
+
+                case "WHOIS":
+                    if (!client.IsConnected || string.IsNullOrEmpty(args))
+                    {
+                        return;
+                    }
+                    client.Parser.Whois = new WhoisInfo();
+                    var n = args.Split(' ');
+                    if (n.Length == 0)
+                    {
+                        return;
+                    }
+                    client.Send(string.Format("WHOIS {0}", n[0]));
                     break;
 
                 default:

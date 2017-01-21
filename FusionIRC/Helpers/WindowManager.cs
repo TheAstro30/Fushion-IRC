@@ -222,6 +222,7 @@ namespace FusionIRC.Helpers
             client.Parser.OnModeChannel += ConnectionCallbackManager.OnModeChannel;
             client.Parser.OnRaw += ConnectionCallbackManager.OnRaw;
             client.Parser.OnWallops += ConnectionCallbackManager.OnWallops;
+            client.Parser.OnWhois += ConnectionCallbackManager.OnWhois;
         }
 
         private static void RemoveConnectionHandlers(ClientConnection client)
@@ -260,6 +261,7 @@ namespace FusionIRC.Helpers
             client.Parser.OnModeChannel -= ConnectionCallbackManager.OnModeChannel;
             client.Parser.OnRaw -= ConnectionCallbackManager.OnRaw;
             client.Parser.OnWallops -= ConnectionCallbackManager.OnWallops;
+            client.Parser.OnWhois -= ConnectionCallbackManager.OnWhois;
         }
     }
 }

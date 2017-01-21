@@ -36,6 +36,27 @@ namespace ircCore.Utils
             return sb.ToString();
         }
 
+        public static string GetDuration(int durationSecs, bool digitalTime)
+        {
+            var ts = new TimeSpan(0, 0, 0, durationSecs);
+            if (!digitalTime)
+            {
+                var wks = ts.Days / 7;
+                var days = ts.Days - (wks * 7);
+                if (durationSecs > 0)
+                {
+                    return (wks > 0 ? string.Format(wks > 1 ? "{0:#}wks" : "{0:#}wk", wks) + " " : null) +
+                           (days > 0 ? string.Format(days > 1 ? "{0:#}days" : "{0:#}day", days) + " " : null) +
+                           (ts.Hours > 0 ? string.Format(ts.Hours > 1 ? "{0:#}hrs" : "{0:#}hr", ts.Hours) + " " : null) +
+                           (ts.Minutes > 0 ? string.Format(ts.Minutes > 1 ? "{0:#}mins" : "{0:#}min", ts.Minutes) + " " : null) +
+                           (ts.Seconds > 0 ? string.Format(ts.Seconds > 1 ? "{0:#}secs" : "{0:#}sec", ts.Seconds) : null);
+                }
+                return "0secs";
+            }
+            var hrs = (ts.Days * 24) + ts.Hours;
+            return string.Format((hrs > 0 ? hrs < 99 ? "{0:00}:" : "{0:000}:" : null) + "{1:00}:{2:00}", hrs, ts.Minutes, ts.Seconds);
+        }
+
         /* Private methods */
         private static int StrToInt(string value)
         {

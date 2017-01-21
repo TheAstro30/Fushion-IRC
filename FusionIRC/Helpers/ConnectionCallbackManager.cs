@@ -731,5 +731,13 @@ namespace FusionIRC.Helpers
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
+
+        public static void OnWhois(ClientConnection client)
+        {            
+            using (var whois = new FrmWhoisInfo(client.Parser.Whois))
+            {
+                whois.ShowDialog(MainForm);
+            }
+        }
     }
 }

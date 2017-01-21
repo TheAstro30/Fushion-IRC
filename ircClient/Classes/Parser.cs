@@ -4,6 +4,8 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Reflection;
+using System.Windows.Forms;
 using ircCore.Utils;
 
 namespace ircClient.Classes
@@ -47,15 +49,19 @@ namespace ircClient.Classes
         public event Action<ClientConnection, string, string> OnTopicSetBy;
         public event Action<ClientConnection, string, string, string> OnTopicChanged;
 
+        public event Action<ClientConnection, string, string, string> OnCtcp;
+        public event Action<ClientConnection> OnWhois;
         public event Action<ClientConnection, string> OnRaw;
 
-        public event Action<ClientConnection, string> OnOther;
-
+        public event Action<ClientConnection, string> OnOther; //probably deleting this
+       
         /* Public properties */
         public string JoinChannelsOnConnect { get; set; }
 
         public string UserModeCharacters { get; set; }
         public string UserModes { get; set; }
+
+        public WhoisInfo Whois = new WhoisInfo();
 
         /* Constructor */
         public Parser(ClientConnection client)
@@ -66,6 +72,8 @@ namespace ircClient.Classes
         /* Main parsing entry point */
         public void Parse(string first, string second, string third, string fourth)
         {
+            int i;
+            string[] n;
             switch (second.ToUpper())
             {
                 case "PING":
@@ -85,7 +93,7 @@ namespace ircClient.Classes
                     ParsePart(first, third);
                     break;
 
-                case "PRIVMSG":
+                case "PRIVMSG":                    
                     ParsePrivateMesasage(first, third, fourth);
                     break;
 
@@ -197,14 +205,92 @@ namespace ircClient.Classes
                     }
                     break;
 
+                case "301":
+                    /* Whois replies */
+                    i = fourth.IndexOf(' ');
+                    if (i > -1)
+                    {
+                        Whois.AwayMessage = RemoveColon(fourth.Substring(i).Trim());
+                    }
+                    break;
+
+                case "307":
+                case "308":
+                case "309":
+                case "310":
+                case "313":
+                case "316":
+                case "378":
+                case "379":
+                    /* Whois replies */
+                    Whois.OtherInfo.Add(fourth.Replace(":", ""));
+                    break;
+
+                case "317":
+                    /* Idle/signon */
+                    n = fourth.Split(' ');
+                    if (n.Length > 2)
+                    {
+                        int idle;
+                        int.TryParse(n[1], out idle);
+                        Whois.OtherInfo.Add(string.Format("{0} has been idle {1}, signed on: {2}", n[0],
+                                                          TimeFunctions.GetDuration(idle, false),
+                                                          TimeFunctions.FormatAsciiTime(n[2], null)));
+                    }
+                    break;
+
+                case "311":
+                    /* Whois user <nick> <user> <host> * :<real_name> */
+                    var colon = fourth.IndexOf(':');                    
+                    if (colon > -1)
+                    {
+                        var nick = fourth.Substring(0, colon).Trim();
+                        var name = fourth.Substring(colon).Trim();
+                        n = nick.Split(' ');
+                        if (n.Length > 2)
+                        {
+                            Whois.Nick = n[0];
+                            Whois.Address = string.Format("{0}@{1}", n[1], n[2]);
+                        }
+                        Whois.Realname = RemoveColon(name);
+                    }                    
+                    break;
+
+                case "312":
+                    /* Whois Server */
+                    i = fourth.IndexOf(' ');
+                    if (i > -1)
+                    {
+                        Whois.Server = string.Format("{0})", fourth.Substring(i).Trim().Replace(":", "("));
+                    }
+                    break;
+
+                case "318":
+                    /* End of WHOIS */
+                    if (OnWhois != null)
+                    {
+                        OnWhois(_client);
+                    }
+                    break;
+
+                case "319":
+                    /* Whois channels */
+                    i = fourth.IndexOf(' ');
+                    if (i > -1)
+                    {
+                        Whois.Channels = RemoveColon(fourth.Substring(i).Trim()).Replace(" ", ", ");
+                    }
+                    break;
+
                 case "404":
                 case "421":
+                case "432":
                 case "471":
                 case "473":
                 case "474":
                 case "475":
                     /* These raws we take the first token and put it at the end */
-                    var i = fourth.IndexOf(' ');
+                    i = fourth.IndexOf(' ');
                     if (i != -1)
                     {
                         var s = fourth.Substring(0, i).Trim();
@@ -352,19 +438,57 @@ namespace ircClient.Classes
             int i;
             if (target.Equals(_client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
             {
+                System.Diagnostics.Debug.Print(text);
                 /* You were messaged */
                 if (s[0] == '\x01')
                 {
-                    /* Action - \x01ACTION text\x01 */
+                    /* Either a CTCP or ACTION */
+                    s = RemoveColon(s.Substring(1, s.Length - 2));
+                    switch (s)
+                    {
+                        case "VERSION":
+                            var version = Assembly.GetExecutingAssembly().GetName().Version;
+                            _client.Send(string.Format("NOTICE {0} :{1}VERSION FusionIRC v{2}.{3} by Jason James Newland{4}", n[0], (char) 1, version.Major, version.Minor, (char) 1));
+                            break;
+
+                        case "TIME":
+                            _client.Send(string.Format("NOTICE {0} :{1}TIME {2}{3}", n[0], (char) 1, string.Format("{0:ddd dd MMM yyyy, H:mm:ss tt}", DateTime.Now), (char) 1));
+                            break;
+                    }
                     i = s.IndexOf(' ');
                     if (i == -1)
                     {
+                        if (OnCtcp != null)
+                        {
+                            OnCtcp(_client, n[0], n.Length > 1 ? n[1] : string.Empty, s);
+                        }
+                        /* Ignore it */
                         return;
                     }
-                    if (OnActionSelf != null)
+                    var ctcp = s.Substring(0, i).Trim();
+                    var t = s.Substring(i, s.Length - i).Trim();
+                    switch (ctcp)
                     {
-                        OnActionSelf(_client, n[0], n.Length > 1 ? n[1] : "", s.Substring(i, s.Length - i - 1).Trim());
-                    }
+                        case "PING":
+                            _client.Send(string.Format("NOTICE {0} :{1}PING {2}{3}", n[0], (char) 1, t, (char) 1));
+                            if (OnCtcp != null)
+                            {
+                                OnCtcp(_client, n[0], n.Length > 1 ? n[1] : string.Empty, ctcp);
+                            }
+                            break;
+
+                        case "DCC":
+                            /* Place holder */
+                            System.Diagnostics.Debug.Print("DCC " + t);
+                            break;
+
+                        case "ACTION":
+                            if (OnActionSelf != null)
+                            {
+                                OnActionSelf(_client, n[0], n.Length > 1 ? n[1] : "", t);
+                            }
+                            break;
+                    }                    
                     return;
                 }
                 if (OnTextSelf != null)
