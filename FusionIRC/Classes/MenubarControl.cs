@@ -5,9 +5,11 @@
  */
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Forms;
 using FusionIRC.Helpers;
+using ircCore.Settings.Networks;
 using ircCore.Settings.Theming;
 
 namespace FusionIRC.Classes
@@ -41,6 +43,7 @@ namespace FusionIRC.Classes
             _mnuFile.DropDownItems.AddRange(new ToolStripItem[]
                                                 {
                                                     new ToolStripMenuItem("New window", null, OnMenuFileClick, Keys.Control | Keys.M),
+                                                    new ToolStripMenuItem("Recent"), 
                                                     new ToolStripSeparator(),
                                                     new ToolStripMenuItem("Connect to location...", null, OnMenuFileClick, Keys.F2),
                                                     new ToolStripSeparator(), 
@@ -49,6 +52,7 @@ namespace FusionIRC.Classes
                                                     new ToolStripSeparator(),
                                                     new ToolStripMenuItem("Exit", null, OnMenuFileClick, Keys.Alt | Keys.F4), 
                                                 });
+            _mnuFile.DropDownOpening += OnMenuFileDropDownOpening;            
             _mnuWindow = new ToolStripMenuItem
                              {
                                  Text = @"&Window"
@@ -62,11 +66,37 @@ namespace FusionIRC.Classes
 
         public void ConnectionUpdate(bool connected)
         {            
-            _mnuFile.DropDownItems[4].Enabled = !connected;
-            _mnuFile.DropDownItems[5].Enabled = connected;
+            _mnuFile.DropDownItems[5].Enabled = !connected;
+            _mnuFile.DropDownItems[6].Enabled = connected;
         }
 
         /* Menu callbacks */
+        private void OnMenuFileDropDownOpening(object sender, EventArgs e)
+        {
+            if (ServerManager.Servers.Recent.Server.Count == 0)
+            {
+                _mnuFile.DropDownItems[1].Visible = false;
+                return;
+            }
+            /* Populate the recent list */
+            _mnuFile.DropDownItems[1].Visible = true;
+            var itm = (ToolStripMenuItem)_mnuFile.DropDownItems[1];
+            if (itm == null)
+            {
+                return;
+            }
+            itm.DropDownItems.Clear();
+            foreach (var s in ServerManager.Servers.Recent.Server)
+            {                
+                itm.DropDownItems.Add(s.ToString(), null, OnMenuRecentServerClick);
+            }
+            itm.DropDownItems.AddRange(new ToolStripItem[]
+                                           {
+                                               new ToolStripSeparator(),
+                                               new ToolStripMenuItem("Clear", null, OnMenuRecentServerClick)
+                                           });
+        }
+
         private void OnMenuFileClick(object sender, EventArgs e)
         {
             var item = (ToolStripMenuItem) sender;
@@ -90,22 +120,23 @@ namespace FusionIRC.Classes
                     break;    
 
                 case "CONNECT":
-                    if (string.IsNullOrEmpty(c.Server.Address))
-                    {
-                        c.Server.Address = "irc.dragonirc.com"; //change this
-                        c.Server.Port = 6667;
-                        c.Server.IsSsl = false;
-                    }
+                    var server = ServerManager.Servers.Recent.Server.Count > 0
+                                     ? ServerManager.Servers.Recent.Server[0]
+                                     : new Server
+                                           {
+                                               Address = "irc.dragonirc.com",
+                                               Port = 6667
+                                           };
                     console = WindowManager.GetConsoleWindow(c);
                     if (console == null)
                     {
                         return;
                     }
                     CommandProcessor.Parse(c, console,
-                                           string.Format("SERVER {0}:{1}", c.Server.Address,
-                                                         c.Server.IsSsl
-                                                             ? string.Format("+{0}", c.Server.Port.ToString())
-                                                             : c.Server.Port.ToString()));
+                                           string.Format("SERVER {0}:{1}", server.Address,
+                                                         server.IsSsl
+                                                             ? string.Format("+{0}", server.Port)
+                                                             : server.Port.ToString()));
                     break;
 
                 case "DISCONNECT":
@@ -121,6 +152,41 @@ namespace FusionIRC.Classes
                     Application.Exit();
                     break;
             }
+        }
+
+        private void OnMenuRecentServerClick(object sender, EventArgs e)
+        {
+            var item = (ToolStripMenuItem) sender;
+            var c = WindowManager.GetActiveConnection(_owner);
+            if (c == null || item == null)
+            {
+                return;
+            }
+            if (item.Text.ToUpper() == "CLEAR")
+            {
+                ServerManager.Servers.Recent.Server.Clear();
+                return;
+            }
+            var address = item.Text.Split(':');
+            if (address.Length == 0)
+            {
+                return;
+            }
+            var server = ServerManager.Servers.Recent.Server.FirstOrDefault(s => s.Address.Equals(address[0], StringComparison.InvariantCultureIgnoreCase));
+            if (server == null)
+            {
+                return;
+            }
+            var console = WindowManager.GetConsoleWindow(c);
+            if (console == null)
+            {
+                return;
+            }
+            CommandProcessor.Parse(c, console,
+                                   string.Format("SERVER {0}:{1}", server.Address,
+                                                 server.IsSsl
+                                                     ? string.Format("+{0}", server.Port)
+                                                     : server.Port.ToString()));
         }
 
         private void OnMenuWindowClick(object sender, EventArgs e)

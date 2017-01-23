@@ -111,6 +111,10 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.RawText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $text" });
             Messages.Add(ThemeMessage.WallopsText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts !$nick! $text" });
             Messages.Add(ThemeMessage.LUsersText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * $text" });
+            Messages.Add(ThemeMessage.InviteText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * $nick has invited you to join $chan" });
+            Messages.Add(ThemeMessage.CtcpText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts [$nick ($address)] $ctcp" });
+            Messages.Add(ThemeMessage.CtcpSelfText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts -> [$nick] $ctcp" });
+            Messages.Add(ThemeMessage.CtcpReplyText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts [$nick ($address) $ctcp reply]: $text" });
             /* Set this flag to true to ensure it will be saved if it doesn't exist (ie: load fails) */
             ThemeChanged = true;
         }        

@@ -9,14 +9,30 @@ using System.Xml.Serialization;
 
 namespace ircCore.Settings.Networks
 {
+    [Serializable]
     public class Server
     {
         /* This class is returned via ServerManager's GetNextServer method */
+        [XmlAttribute("address")]
         public string Address { get; set; }
 
+        [XmlAttribute("port")]
         public int Port { get; set; }
 
+        [XmlAttribute("ssl")]
         public bool IsSsl { get; set; }
+
+        public Server()
+        {
+            /* Empty */
+        }
+
+        public Server(Server server)
+        {
+            Address = server.Address;
+            Port = server.Port;
+            IsSsl = server.IsSsl;
+        }
 
         /* ToString() method "server.address:port" */
         public override string ToString()
@@ -132,6 +148,12 @@ namespace ircCore.Settings.Networks
             public List<NetworkData> Network = new List<NetworkData>();
         }
 
+        public class RecentList
+        {
+            [XmlElement("server")]
+            public List<Server> Server = new List<Server>(); 
+        }
+
         /* The reason I put this as a class is because I wanted the formatted XML to look like the following:
          * <networks>
          *    <network name="Name">
@@ -141,5 +163,8 @@ namespace ircCore.Settings.Networks
          * much nicer looking formatted like this ;) */
         [XmlElement("networks")]
         public NetworkList Networks = new NetworkList();
+
+        [XmlElement("recent")]
+        public RecentList Recent = new RecentList();
     }
 }

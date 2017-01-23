@@ -39,9 +39,10 @@ namespace ircClient.Classes
         public event Action<ClientConnection, string, string> OnNames;
         public event Action<ClientConnection, string, string, string> OnWho;
 
-        public event Action<ClientConnection, string> OnMotd;
+        public event Action<ClientConnection, string, bool> OnMotd;
         public event Action<ClientConnection, string> OnLUsers;
         public event Action<ClientConnection, string> OnWelcome;
+        public event Action<ClientConnection, string, string, string> OnInvite;
 
         public event Action<ClientConnection, string, string, string> OnWallops;
 
@@ -50,6 +51,7 @@ namespace ircClient.Classes
         public event Action<ClientConnection, string, string, string> OnTopicChanged;
 
         public event Action<ClientConnection, string, string, string> OnCtcp;
+        public event Action<ClientConnection, string, string, string, string> OnCtcpReply;
         public event Action<ClientConnection> OnWhois;
         public event Action<ClientConnection, string> OnRaw;
 
@@ -71,7 +73,23 @@ namespace ircClient.Classes
 
         /* Main parsing entry point */
         public void Parse(string first, string second, string third, string fourth)
-        {
+        {            
+            if (!string.IsNullOrEmpty(first))
+            {
+                switch (first.ToUpper())
+                {
+                    case "NOTICE":
+                        /* Undernet crap */
+                        if (second.Equals("auth", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            if (OnNotice != null)
+                            {
+                                OnNotice(_client, _client.Server.Address, "", RemoveColon(string.Format("{0} {1}", third, fourth)));
+                            }
+                        }
+                        break;
+                }
+            }
             int i;
             string[] n;
             switch (second.ToUpper())
@@ -123,6 +141,10 @@ namespace ircClient.Classes
 
                 case "WALLOPS":                    
                     ParseWallops(first, string.Format("{0} {1}", third, fourth));
+                    break;
+
+                case "INVITE":
+                    ParseInvite(first, fourth);
                     break;
 
                 case "001":
@@ -187,7 +209,7 @@ namespace ircClient.Classes
                     /* Motd Text */
                     if (OnMotd != null)
                     {
-                        OnMotd(_client, RemoveColon(fourth));
+                        OnMotd(_client, RemoveColon(fourth), false);
                     }
                     break;
 
@@ -201,7 +223,7 @@ namespace ircClient.Classes
                     }
                     if (OnMotd != null)
                     {
-                        OnMotd(_client, RemoveColon(fourth));
+                        OnMotd(_client, RemoveColon(fourth), true);
                     }
                     break;
 
@@ -308,6 +330,7 @@ namespace ircClient.Classes
                 case "433":
                 case "437":
                 case "464":
+                case "468":
                 case "472":
                 case "481":
                 case "491":
@@ -427,6 +450,19 @@ namespace ircClient.Classes
             }
         }
 
+        private void ParseInvite(string nick, string channel)
+        {
+            var n = RemoveColon(nick).Split('!');
+            if (n.Length == 0)
+            {
+                return; /*This should never happen */
+            }
+            if (OnInvite != null)
+            {
+                OnInvite(_client, n[0], n.Length > 2 ? n[1] : "", RemoveColon(channel));
+            }
+        }
+
         private void ParsePrivateMesasage(string nick, string target, string text)
         {
             var n = RemoveColon(nick).Split('!');
@@ -437,8 +473,7 @@ namespace ircClient.Classes
             var s = RemoveColon(text);
             int i;
             if (target.Equals(_client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
-            {
-                System.Diagnostics.Debug.Print(text);
+            {                
                 /* You were messaged */
                 if (s[0] == '\x01')
                 {
@@ -528,7 +563,24 @@ namespace ircClient.Classes
             {
                 return; /*This should never happen */
             }
-            var i = msg.IndexOf(' ');
+            /* Determine if it's a notice or a CTCP reply */
+            var s = RemoveColon(msg);
+            int i;
+            if (s[0] == '\x01')
+            {
+                /* Most likely a CTCP */
+                s = s.Substring(1, s.Length - 2);                
+                i = s.IndexOf(' ');
+                if (i > -1)
+                {
+                    if (OnCtcpReply != null)
+                    {                        
+                        OnCtcpReply(_client, n[0], n.Length > 1 ? n[1] : "", s.Substring(0, i).Trim(), s.Substring(i).Trim());
+                    }
+                }
+                return;
+            }
+            i = s.IndexOf(' ');
             if (i > -1)
             {
                 /* :Saphira.US.DragonIRC.com NOTICE AUTH :*** Looking up your hostname... */
@@ -537,7 +589,7 @@ namespace ircClient.Classes
                 {
                     if (OnNotice != null)
                     {
-                        OnNotice(_client, n[0], n.Length > 1 ? n[1] : "", RemoveColon(msg.Substring(i).Trim()));
+                        OnNotice(_client, n[0], n.Length > 1 ? n[1] : "", s.Substring(i).Trim());
                     }
                     return;
                 }
@@ -545,7 +597,7 @@ namespace ircClient.Classes
             /* Either a server notice or user notice - its kind of difficult to differentiate between the two */
             if (OnNotice != null)
             {
-                OnNotice(_client, n[0], n.Length > 1 ? n[1] : "", RemoveColon(msg));
+                OnNotice(_client, n[0], n.Length > 1 ? n[1] : "", s);
             }
         }
 
@@ -555,8 +607,7 @@ namespace ircClient.Classes
             if (n.Length == 0)
             {
                 return; /*This should never happen */
-            }
-            System.Diagnostics.Debug.Print(data);
+            }            
             if (OnWallops != null)
             {
                 OnWallops(_client, n[0], n.Length > 1 ? n[1] : "", RemoveColon(data));

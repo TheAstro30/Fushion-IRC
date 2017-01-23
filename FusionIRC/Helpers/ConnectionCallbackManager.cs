@@ -9,7 +9,9 @@ using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using FusionIRC.Forms;
 using ircClient;
+using ircCore.Settings.Networks;
 using ircCore.Settings.Theming;
+using ircCore.Utils;
 
 namespace FusionIRC.Helpers
 {
@@ -310,7 +312,7 @@ namespace FusionIRC.Helpers
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
         }
 
-        public static void OnMotd(ClientConnection client, string text)
+        public static void OnMotd(ClientConnection client, string text, bool isEnd)
         {
             var c = WindowManager.GetConsoleWindow(client);
             if (c == null)
@@ -327,6 +329,24 @@ namespace FusionIRC.Helpers
             c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
+            if (!isEnd)
+            {
+                return;
+            }
+            /* Update recent servers list */
+            foreach (var s in ServerManager.Servers.Recent.Server.Where(s => s.Address.Equals(client.Server.Address, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                /* Remove it from it's current position */
+                ServerManager.Servers.Recent.Server.Remove(s);
+                break;
+            }
+            /* Insert current server at the top of the recent list */
+            ServerManager.Servers.Recent.Server.Insert(0, client.Server);
+            /* Keep the list length down */
+            if (ServerManager.Servers.Recent.Server.Count > 25)
+            {
+                ServerManager.Servers.Recent.Server.RemoveAt(ServerManager.Servers.Recent.Server.Count - 1);
+            }
         }
 
         public static void OnLUsers(ClientConnection client, string text)
@@ -738,6 +758,84 @@ namespace FusionIRC.Helpers
             {
                 whois.ShowDialog(MainForm);
             }
+        }
+
+        public static void OnInvite(ClientConnection client, string nick, string address, string channel)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.InviteText,
+                              TimeStamp = DateTime.Now,
+                              Nick = nick,
+                              Address = address,
+                              Target = channel
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+        }
+
+        public static void OnCtcp(ClientConnection client, string nick, string address, string ctcp)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.CtcpText,
+                              TimeStamp = DateTime.Now,
+                              Nick = nick,
+                              Address = address,
+                              Target = ctcp
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+        }
+
+        public static void OnCtcpReply(ClientConnection client, string nick, string address, string ctcp, string text)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
+            {
+                return;
+            }
+            string s;            
+            if (ctcp == "PING")
+            {
+                /* We need to convert the "text" field to a time (current ctime - sent ctime) */
+                long time;
+                long.TryParse(text, out time);
+                long currentTime;
+                long.TryParse(TimeFunctions.CTime(), out currentTime);
+                s = TimeFunctions.GetDuration((int) (currentTime - time), false);
+            }
+            else
+            {
+                s = text;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.CtcpReplyText,
+                              TimeStamp = DateTime.Now,
+                              Nick = nick,
+                              Address = address,
+                              Target = ctcp,
+                              Text = s
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
     }
 }

@@ -207,8 +207,12 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                             var bold = wrapData.IsBold;
                             var underLine = wrapData.IsUnderline;
                             var italic = wrapData.IsItalic;
+                            //Character.ReturnChar(gSrc, wrapData, e.X,
+                            //                     TextData.Lines[lineIndex].IsIndented && wrapIndex > 0, IndentWidth,
+                            //                     _font,
+                            //                     out position, out startX, ref bold, ref underLine, ref italic);
                             Character.ReturnChar(gSrc, wrapData, e.X,
-                                                 TextData.Lines[lineIndex].IsIndented && wrapIndex > 0, IndentWidth,
+                                                 wrapIndex > 0, IndentWidth,
                                                  _font,
                                                  out position, out startX, ref bold, ref underLine, ref italic);
 
@@ -366,8 +370,12 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                     if (!MarkingData.MarkReverse)
                     {
                         /* Currently going forwards */
+                        //Character.ReturnChar(g, wrapData, e.X,
+                        //                     TextData.Lines[lineIndex].IsIndented && wrapIndex > 0, IndentWidth,
+                        //                     _font,
+                        //                     out position, out startX, ref bold, ref underLine, ref italic);
                         Character.ReturnChar(g, wrapData, e.X,
-                                             TextData.Lines[lineIndex].IsIndented && wrapIndex > 0, IndentWidth,
+                                             wrapIndex > 0, IndentWidth,
                                              _font,
                                              out position, out startX, ref bold, ref underLine, ref italic);
                         if (MarkingData.MarkStartCharPos == -1 & position == 0)
@@ -399,8 +407,13 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                     else
                     {
                         /* Currently going backwards */
+                        //Character.ReturnChar(g, wrapData, e.X,
+                        //                     TextData.Lines[lineIndex].IsIndented && wrapIndex > 0, IndentWidth,
+                        //                     _font,
+                        //                     out position, out startX, ref MarkingData.IsBold,
+                        //                     ref MarkingData.IsUnderline, ref MarkingData.IsItalic);
                         Character.ReturnChar(g, wrapData, e.X,
-                                             TextData.Lines[lineIndex].IsIndented && wrapIndex > 0, IndentWidth,
+                                             wrapIndex > 0, IndentWidth,
                                              _font,
                                              out position, out startX, ref MarkingData.IsBold,
                                              ref MarkingData.IsUnderline, ref MarkingData.IsItalic);
@@ -433,8 +446,12 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 else
                 {
                     /* Get current word under mouse */
+                    //var c = Character.ReturnChar(g, wrapData, e.X,
+                    //                             TextData.Lines[lineIndex].IsIndented && wrapIndex > 0, IndentWidth,
+                    //                             _font,
+                    //                             out position, out startX, ref bold, ref underLine, ref italic);
                     var c = Character.ReturnChar(g, wrapData, e.X,
-                                                 TextData.Lines[lineIndex].IsIndented && wrapIndex > 0, IndentWidth,
+                                                 wrapIndex > 0, IndentWidth,
                                                  _font,
                                                  out position, out startX, ref bold, ref underLine, ref italic);
                     var wordUnderMouse = c != (char)0
@@ -526,7 +543,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             var t = new TextData.Text
                         {
                             DefaultColor = ThemeManager.CurrentTheme.Colors[defaultColor % 15],
-                            IsIndented = indented,
+                            //IsIndented = indented,
                             Line = text
                         };
             TextData.Lines.Add(t);
@@ -694,7 +711,8 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 foreach (var l in TextData.Lines)
                 {
                     WrapData w;
-                    Wrapping.WordWrap(g, l.DefaultColor, BackColor, l.IsIndented, IndentWidth, l.Line, _windowWidth, _font, out w);
+                    //Wrapping.WordWrap(g, l.DefaultColor, BackColor, l.IsIndented, IndentWidth, l.Line, _windowWidth, _font, out w);
+                    Wrapping.WordWrap(g, l.DefaultColor, BackColor, true, IndentWidth, l.Line, _windowWidth, _font, out w);
                     if (w.Lines.Count == 0)
                     {
                         return;

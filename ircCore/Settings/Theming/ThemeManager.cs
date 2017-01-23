@@ -61,7 +61,11 @@ namespace ircCore.Settings.Theming
         MotdText = 124,
         RawText = 125,
         WallopsText = 126,
-        LUsersText = 127
+        LUsersText = 127,
+        InviteText = 128,
+        CtcpText = 129,
+        CtcpSelfText = 130,
+        CtcpReplyText = 131
     }
 
     public class IncomingMessageData
@@ -156,6 +160,8 @@ namespace ircCore.Settings.Theming
             sb.Replace("$newnick", messageData.NewNick);
             sb.Replace("$knick", messageData.KickedNick);
             sb.Replace("$text", messageData.Text);
+            sb.Replace("$chan", messageData.Target);
+            sb.Replace("$ctcp", messageData.Target);
             sb.Replace("$target", messageData.Target);
             sb.Replace("$server", messageData.Server);
             sb.Replace("$port", messageData.Port.ToString());

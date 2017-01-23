@@ -10,6 +10,7 @@ using FusionIRC.Forms;
 using ircClient;
 using ircClient.Classes;
 using ircCore.Settings.Theming;
+using ircCore.Utils;
 
 namespace FusionIRC.Helpers
 {
@@ -127,6 +128,10 @@ namespace FusionIRC.Helpers
                         return;
                     }
                     client.Send(string.Format("WHOIS {0}", n[0]));
+                    break;
+
+                case "CTCP":
+                    ParseCtcp(client, args);
                     break;
 
                 default:
@@ -386,6 +391,36 @@ namespace FusionIRC.Helpers
             /* Update treenode color */
             WindowManager.SetWindowEvent(child, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
             client.Send(string.Format("NOTICE {0} :{1}", target, args));
+        }
+
+        private static void ParseCtcp(ClientConnection client, string args)
+        {
+            if (!client.IsConnected || string.IsNullOrEmpty(args))
+            {
+                return;
+            }
+            var ctcp = args.Split(' ');
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || ctcp.Length < 2)
+            {
+                return;
+            }
+            var ct = ctcp[1].ToUpper();
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.CtcpSelfText,
+                              TimeStamp = DateTime.Now,
+                              Target = ct,
+                              Nick = ctcp[0],
+                              Text = args
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
+            client.Send(ct == "PING"
+                            ? string.Format("PRIVMSG {0} :{1}{2} {3}{4}", ctcp[0], (char) 1, ct, TimeFunctions.CTime(), (char) 1)
+                            : string.Format("PRIVMSG {0} :{1}{2}{3}", ctcp[0], (char) 1, ct, (char) 1));
         }
 
         private static void ParseNames(ClientConnection client, string args)

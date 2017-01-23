@@ -260,7 +260,8 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
                         }
                         break;
                     }  
-                    var indented = currentLine > 0 && TextData.Lines[linePosition].IsIndented;
+                    //var indented = currentLine > 0 && TextData.Lines[linePosition].IsIndented;
+                    var indented = currentLine > 0;
                     /* Make sure the rectangle is set to the correct positions */
                     rect.X = indented ? IndentWidth : 0;                    
                     rect.Y = rectBottom + (TextHeight*currentLine);                    
@@ -391,12 +392,14 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
                 int markCharStart;
                 if (i == 0)
                 {
-                    markStart = TextData.Lines[id.ActualLineNumber].IsIndented && id.WrappedLineNumber > 0 && MarkingData.MarkStartCharPos == 0 ? IndentWidth : MarkingData.MarkStartXPos;
+                    //markStart = TextData.Lines[id.ActualLineNumber].IsIndented && id.WrappedLineNumber > 0 && MarkingData.MarkStartCharPos == 0 ? IndentWidth : MarkingData.MarkStartXPos;
+                    markStart = id.WrappedLineNumber > 0 && MarkingData.MarkStartCharPos == 0 ? IndentWidth : MarkingData.MarkStartXPos;
                     markCharStart = MarkingData.MarkStartCharPos;
                 }
                 else
                 {
-                    markStart = TextData.Lines[id.ActualLineNumber].IsIndented && id.WrappedLineNumber > 0 ? IndentWidth : 0;
+                    //markStart = TextData.Lines[id.ActualLineNumber].IsIndented && id.WrappedLineNumber > 0 ? IndentWidth : 0;
+                    markStart = id.WrappedLineNumber > 0 ? IndentWidth : 0;
                     markCharStart = 0;
                 }
                 if (i < lines)

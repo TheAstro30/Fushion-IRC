@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Globalization;
 using System.Text;
 
 namespace ircCore.Utils
@@ -15,6 +16,18 @@ namespace ircCore.Utils
             /* Returns the time from a long (tick value) time */
             var dt = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(StrToInt(time)).ToLocalTime();
             return !string.IsNullOrEmpty(format) ? FormatTimeStamp(dt, format) : string.Format("{0:ddd MMM dd hh:mm:ss yyyy}", dt);
+        }
+
+        public static string CTime()
+        {
+            return Epoch(DateTime.Now).ToString(CultureInfo.InvariantCulture);
+        }
+
+        private static uint Epoch(DateTime fromDate)
+        {
+            var baseDate = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            var span = fromDate.ToUniversalTime() - baseDate;
+            return (uint)span.TotalSeconds;
         }
 
         public static string FormatTimeStamp(DateTime date, string timeStamp)

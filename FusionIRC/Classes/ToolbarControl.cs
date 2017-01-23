@@ -10,6 +10,7 @@ using FusionIRC.Forms;
 using FusionIRC.Forms.Settings;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
+using ircCore.Settings.Networks;
 
 namespace FusionIRC.Classes
 {
@@ -108,23 +109,24 @@ namespace FusionIRC.Classes
             FrmChildWindow console;
             switch (btn.Tag.ToString())
             {
-                case "CONNECT":                    
-                    if (string.IsNullOrEmpty(c.Server.Address))
-                    {
-                        c.Server.Address = "irc.dragonirc.com"; //change this
-                        c.Server.Port = 6667;
-                        c.Server.IsSsl = false;
-                    }
+                case "CONNECT":
+                    var server = ServerManager.Servers.Recent.Server.Count > 0
+                                     ? ServerManager.Servers.Recent.Server[0]
+                                     : new Server
+                                           {
+                                               Address = "irc.dragonirc.com",
+                                               Port = 6667
+                                           };
                     console = WindowManager.GetConsoleWindow(c);
                     if (console == null)
                     {
                         return;
                     }
                     CommandProcessor.Parse(c, console,
-                                           string.Format("SERVER {0}:{1}", c.Server.Address,
-                                                         c.Server.IsSsl
-                                                             ? string.Format("+{0}", c.Server.Port.ToString())
-                                                             : c.Server.Port.ToString()));
+                                           string.Format("SERVER {0}:{1}", server.Address,
+                                                         server.IsSsl
+                                                             ? string.Format("+{0}", server.Port)
+                                                             : server.Port.ToString()));
                     break;
 
                 case "DISCONNECT":                    
