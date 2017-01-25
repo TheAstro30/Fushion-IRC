@@ -53,9 +53,6 @@
     <Compile Include="Classes\MenubarControl.cs" />
     <Compile Include="Classes\ToolbarControl.cs" />
     <Compile Include="Classes\WildcardMatch.cs" />
-    <Compile Include="Controls\FormEx.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Controls\SwitchView\Base\TreeNodeEx.cs" />
     <Compile Include="Controls\SwitchView\Base\TreeViewEx.cs">
       <SubType>Component</SubType>
@@ -90,12 +87,6 @@
     <Compile Include="Forms\Settings\FrmSettings.Designer.cs">
       <DependentUpon>FrmSettings.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Settings\FrmTheme.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Settings\FrmTheme.Designer.cs">
-      <DependentUpon>FrmTheme.cs</DependentUpon>
-    </Compile>
     <Compile Include="Helpers\CommandProcessor.cs" />
     <Compile Include="Helpers\ConnectionCallbackManager.cs" />
     <Compile Include="Helpers\MdiHelper.cs" />
@@ -107,9 +98,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\FrmSettings.resx">
       <DependentUpon>FrmSettings.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Settings\FrmTheme.resx">
-      <DependentUpon>FrmTheme.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

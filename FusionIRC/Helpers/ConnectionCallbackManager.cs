@@ -41,7 +41,7 @@ namespace FusionIRC.Helpers
                               Port = client.Server.Port
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -59,7 +59,7 @@ namespace FusionIRC.Helpers
                               TimeStamp = DateTime.Now
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -77,7 +77,7 @@ namespace FusionIRC.Helpers
                               TimeStamp = DateTime.Now
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -95,7 +95,7 @@ namespace FusionIRC.Helpers
                               TimeStamp = DateTime.Now
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
             /* Iterate all open channels and clear nick list */
@@ -120,7 +120,7 @@ namespace FusionIRC.Helpers
                               Server = client.Server.Address
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -164,7 +164,7 @@ namespace FusionIRC.Helpers
                               TimeStamp = DateTime.Now,
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -187,7 +187,7 @@ namespace FusionIRC.Helpers
                               Text = text
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
         }
@@ -205,7 +205,7 @@ namespace FusionIRC.Helpers
                               Text = text
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
         }
@@ -227,7 +227,7 @@ namespace FusionIRC.Helpers
                               Text = text
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
         }
@@ -245,7 +245,7 @@ namespace FusionIRC.Helpers
                               Text = text
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
         }
@@ -266,7 +266,7 @@ namespace FusionIRC.Helpers
                               Text = text
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
         }
@@ -287,7 +287,7 @@ namespace FusionIRC.Helpers
                               Text = text
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
         }
@@ -307,7 +307,7 @@ namespace FusionIRC.Helpers
                               Text = text
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
         }
@@ -326,7 +326,7 @@ namespace FusionIRC.Helpers
                               Text = text
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
             if (!isEnd)
@@ -363,7 +363,7 @@ namespace FusionIRC.Helpers
                               Text = text
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
         }
@@ -541,7 +541,7 @@ namespace FusionIRC.Helpers
                                   NewNick = nick
                               };
                 var pmd = ThemeManager.ParseMessage(tmd);
-                console.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+                console.Output.AddLine(pmd.DefaultColor, pmd.Message);
                 /* Update treenode color */
                 WindowManager.SetWindowEvent(console, MainForm, WindowEvent.EventReceived);
             }
@@ -560,7 +560,7 @@ namespace FusionIRC.Helpers
                                   };
                     c.Nicklist.RenameNick(nick, newNick);
                     var pmd = ThemeManager.ParseMessage(tmd);
-                    c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+                    c.Output.AddLine(pmd.DefaultColor, pmd.Message);
                     /* Update treenode color */
                     WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
                 }
@@ -590,7 +590,7 @@ namespace FusionIRC.Helpers
                               };
                 c.Nicklist.RemoveNick(nick);
                 var pmd = ThemeManager.ParseMessage(tmd);
-                c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+                c.Output.AddLine(pmd.DefaultColor, pmd.Message);
                 /* Update treenode color */
                 WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
             }
@@ -620,7 +620,7 @@ namespace FusionIRC.Helpers
                               Text = msg
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -644,7 +644,7 @@ namespace FusionIRC.Helpers
                               Text = msg
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -664,7 +664,7 @@ namespace FusionIRC.Helpers
                               Text = modes
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -685,7 +685,7 @@ namespace FusionIRC.Helpers
                               Text = string.Format("{0} {1}", modes, modeData)
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
             /* We need to parse the mode data */
@@ -747,7 +747,7 @@ namespace FusionIRC.Helpers
                               Text = message
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -776,7 +776,7 @@ namespace FusionIRC.Helpers
                               Target = channel
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -797,7 +797,7 @@ namespace FusionIRC.Helpers
                               Target = ctcp
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -833,7 +833,7 @@ namespace FusionIRC.Helpers
                               Text = s
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }

@@ -22,9 +22,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Structures
         [Serializable]
         public class Text
         {
-            public Color DefaultColor { get; set; }
-
-            //public bool IsIndented { get; set; }
+            public Color DefaultColor { get; set; }            
 
             public string Line { get; set; } /* The original unmodified line */
         }

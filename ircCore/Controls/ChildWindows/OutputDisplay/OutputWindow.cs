@@ -23,18 +23,23 @@ using ircCore.Utils.Serialization;
 namespace ircCore.Controls.ChildWindows.OutputDisplay
 {
     /* Main output window control */
+
     public sealed class OutputWindow : OutputRenderer
     {
         private readonly bool _isDesignMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
 
-        private const string UrlRegex = "((www\\.|www\\d\\.|(https?|shttp|ftp|irc):((//)|(\\\\\\\\)))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
+        private const string UrlRegex =
+            "((www\\.|www\\d\\.|(https?|shttp|ftp|irc):((//)|(\\\\\\\\)))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
+
         private readonly Regex _regExUrl = new Regex(UrlRegex, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        private static readonly Regex RegExNick = new Regex(@"[^A-Za-z0-9_-|#|\[\]\\\/`\^{}]", RegexOptions.Compiled); /* Non alpha-numeric check */
+        private static readonly Regex RegExNick = new Regex(@"[^A-Za-z0-9_-|#|\[\]\\\/`\^{}]", RegexOptions.Compiled);
+                                      /* Non alpha-numeric check */
 
         private readonly VScrollBar _vScroll;
         private Font _font;
 
+        private bool _showScrollBar;
         private int _maximumLines;
         private int _averageCharacterWidth;
         private int _windowWidth;
@@ -57,10 +62,12 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         public event Action OnWindowRightClicked;
 
         /* Constructor */
+
         public OutputWindow()
-        {            
+        {
             /* Double buffering */
-            SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint, true);
+            SetStyle(
+                ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint, true);
             /* Initial fore/back colors */
             ForeColor = SystemColors.WindowText;
             BackColor = SystemColors.Window;
@@ -69,12 +76,20 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             TextData = new TextData();
             LineSpacingStyle = LineSpacingStyle.Single;
             ShowLineMarker = true;
-            LineMarkerColor = Color.Red;            
+            LineMarkerColor = Color.Red;
             MaximumLines = 500;
+            ShowScrollBar = true;
+            WordWrap = true;
+            AllowCopySelection = true;
             /* Create scroll bar */
             _vScroll = new VScrollBar
                            {
-                               Width = 18, Dock = DockStyle.Right, Minimum = 0, Maximum = 0, LargeChange = 1
+                               Width = 18,
+                               Dock = DockStyle.Right,
+                               Minimum = 0,
+                               Maximum = 0,
+                               LargeChange = 1,
+                               Visible = _showScrollBar
                            };
             _vScroll.Scroll += VerticalScrollUpdate;
             Controls.Add(_vScroll);
@@ -98,11 +113,33 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             }
         }
 
-        
+        public bool ShowScrollBar
+        {
+            get { return _showScrollBar; }
+            set
+            {
+                _showScrollBar = value;
+                if (_vScroll != null)
+                {
+                    _vScroll.Visible = _showScrollBar;
+                    AdjustWidth(true);
+                }
+            }
+        }
+
+        public bool WordWrap { get; set; }
+        public bool AllowCopySelection { get; set; }
+
         public int MaximumLines
         {
-            get { return _maximumLines; }
-            set { _maximumLines = value > 0 ? value : 1; }
+            get
+            {
+                return _maximumLines;
+            }
+            set
+            {
+                _maximumLines = value > 0 ? value : 1;
+            }
         }
 
         public int ScrollTo
@@ -119,16 +156,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 }
                 _scrollValue = value;
                 _vScroll.Value = _scrollValue;
-                if (_scrollValue == TextData.WrappedLinesCount - 1)
-                {
-                    _scrolledToBottom = true;
-                    //_isScrolled = false;
-                }
-                else
-                {
-                    _scrolledToBottom = false;
-                    //_isScrolled = true;
-                }
+                _scrolledToBottom = _scrollValue == TextData.WrappedLinesCount - 1;
                 Invalidate();
             }
         }
@@ -149,7 +177,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         protected override void OnPaint(PaintEventArgs e)
         {
             /* Where the magic happens ;) - simplified to a separate class */
-            if (_isDesignMode || TextData.Lines.Count == 0)
+            if (!Visible || _isDesignMode || TextData.Lines.Count == 0)
             {
                 return;
             }
@@ -171,6 +199,10 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             switch (e.Button)
             {
                 case MouseButtons.Left:
+                    if (!AllowCopySelection)
+                    {
+                        return;
+                    }
                     int lineIndex;
                     int wrapIndex;
                     int startY;
@@ -181,11 +213,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                     if (lineIndex == -1)
                     {
                         return; /* Nothing to mark */
-                    }
-                    //if (string.IsNullOrEmpty(_url))
-                    //{
-                    //    Cursor = Cursors.IBeam;
-                    //}
+                    }                    
                     var bmp = new Bitmap(ClientRectangle.Width - _vScroll.Width, ClientRectangle.Height,
                                          PixelFormat.Format24bppRgb);
                     using (var gSrc = CreateGraphics())
@@ -206,15 +234,9 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                             int startX;
                             var bold = wrapData.IsBold;
                             var underLine = wrapData.IsUnderline;
-                            var italic = wrapData.IsItalic;
-                            //Character.ReturnChar(gSrc, wrapData, e.X,
-                            //                     TextData.Lines[lineIndex].IsIndented && wrapIndex > 0, IndentWidth,
-                            //                     _font,
-                            //                     out position, out startX, ref bold, ref underLine, ref italic);
-                            Character.ReturnChar(gSrc, wrapData, e.X,
-                                                 wrapIndex > 0, IndentWidth,
-                                                 _font,
-                                                 out position, out startX, ref bold, ref underLine, ref italic);
+                            var italic = wrapData.IsItalic;                            
+                            Character.ReturnChar(gSrc, wrapData, e.X, wrapIndex > 0, IndentWidth, _font, out position,
+                                                 out startX, ref bold, ref underLine, ref italic);
 
                             MarkingData = new MarkingData
                                               {
@@ -363,21 +385,14 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 var italic = false;                
                 if (MarkingData != null)
                 {                    
-                    /* Selection marking */                                                                
-                    //Cursor = Cursors.IBeam;
+                    /* Selection marking */                                                                                    
                     MarkingData.MouseStartedMoving = true;
                     int i;
                     if (!MarkingData.MarkReverse)
                     {
-                        /* Currently going forwards */
-                        //Character.ReturnChar(g, wrapData, e.X,
-                        //                     TextData.Lines[lineIndex].IsIndented && wrapIndex > 0, IndentWidth,
-                        //                     _font,
-                        //                     out position, out startX, ref bold, ref underLine, ref italic);
-                        Character.ReturnChar(g, wrapData, e.X,
-                                             wrapIndex > 0, IndentWidth,
-                                             _font,
-                                             out position, out startX, ref bold, ref underLine, ref italic);
+                        /* Currently going forwards */                        
+                        Character.ReturnChar(g, wrapData, e.X, wrapIndex > 0, IndentWidth, _font, out position,
+                                             out startX, ref bold, ref underLine, ref italic);
                         if (MarkingData.MarkStartCharPos == -1 & position == 0)
                         {
                             MarkingData.MarkStartCharPos = 0;
@@ -406,17 +421,10 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                     }
                     else
                     {
-                        /* Currently going backwards */
-                        //Character.ReturnChar(g, wrapData, e.X,
-                        //                     TextData.Lines[lineIndex].IsIndented && wrapIndex > 0, IndentWidth,
-                        //                     _font,
-                        //                     out position, out startX, ref MarkingData.IsBold,
-                        //                     ref MarkingData.IsUnderline, ref MarkingData.IsItalic);
-                        Character.ReturnChar(g, wrapData, e.X,
-                                             wrapIndex > 0, IndentWidth,
-                                             _font,
-                                             out position, out startX, ref MarkingData.IsBold,
-                                             ref MarkingData.IsUnderline, ref MarkingData.IsItalic);
+                        /* Currently going backwards */                        
+                        Character.ReturnChar(g, wrapData, e.X, wrapIndex > 0, IndentWidth, _font, out position,
+                                             out startX, ref MarkingData.IsBold, ref MarkingData.IsUnderline,
+                                             ref MarkingData.IsItalic);
                         MarkingData.MarkStartLine = currentLine;
                         MarkingData.MarkStartCharPos = position;
                         MarkingData.MarkStartXPos = startX;
@@ -446,14 +454,8 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 else
                 {
                     /* Get current word under mouse */
-                    //var c = Character.ReturnChar(g, wrapData, e.X,
-                    //                             TextData.Lines[lineIndex].IsIndented && wrapIndex > 0, IndentWidth,
-                    //                             _font,
-                    //                             out position, out startX, ref bold, ref underLine, ref italic);
-                    var c = Character.ReturnChar(g, wrapData, e.X,
-                                                 wrapIndex > 0, IndentWidth,
-                                                 _font,
-                                                 out position, out startX, ref bold, ref underLine, ref italic);
+                    var c = Character.ReturnChar(g, wrapData, e.X, wrapIndex > 0, IndentWidth, _font, out position,
+                                                 out startX, ref bold, ref underLine, ref italic);
                     var wordUnderMouse = c != (char)0
                                                 ? Character.ReturnWord(g, TextData.Wrapped[lineIndex], wrapIndex, position)
                                                 : string.Empty;
@@ -527,11 +529,6 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         /* Methods */
         public void AddLine(int defaultColor, string text)
         {
-            AddLine(defaultColor, false, text);
-        }
-
-        public void AddLine(int defaultColor, bool indented, string text)
-        {
             if (string.IsNullOrEmpty(text))
             {                
                 return; /* Nothing to do */
@@ -550,7 +547,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             WrapData w;
             using (var g = CreateGraphics())
             {
-                Wrapping.WordWrap(g, t.DefaultColor, BackColor, indented, IndentWidth, text, _windowWidth, _font, out w);    
+                Wrapping.WordWrap(g, t.DefaultColor, BackColor, WordWrap, IndentWidth, text, _windowWidth, _font, out w);    
             }            
             if (w.Lines.Count == 0)
             {                
@@ -625,6 +622,17 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             BinarySerialize<TextData>.Save(file, TextData);
         }
 
+        public void ModifyLine(int line, string newText)
+        {
+            /* Really only used for the theme line data modification (single line anyway) */
+            if (line > TextData.Lines.Count - 1 || TextData.Lines.Count == 0)
+            {
+                return;
+            }
+            TextData.Lines[line].Line = newText;
+            _wrapUpdate.Enabled = true;
+        }
+
         public void Clear()
         {
             TextData = new TextData();
@@ -661,7 +669,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             }
             TextHeight = _font.Height*LineSpacing;
             if (!adjustClientWidth) { return; }
-            var i = ClientRectangle.Width - (_vScroll.Width + _averageCharacterWidth) - 2;                   
+            var i = ClientRectangle.Width - (_showScrollBar ? _vScroll.Width + _averageCharacterWidth : _averageCharacterWidth) - 2;                   
             if (i == _windowWidth)
             {
                 return;
@@ -710,9 +718,8 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             {
                 foreach (var l in TextData.Lines)
                 {
-                    WrapData w;
-                    //Wrapping.WordWrap(g, l.DefaultColor, BackColor, l.IsIndented, IndentWidth, l.Line, _windowWidth, _font, out w);
-                    Wrapping.WordWrap(g, l.DefaultColor, BackColor, true, IndentWidth, l.Line, _windowWidth, _font, out w);
+                    WrapData w;                    
+                    Wrapping.WordWrap(g, l.DefaultColor, BackColor, WordWrap, IndentWidth, l.Line, _windowWidth, _font, out w);
                     if (w.Lines.Count == 0)
                     {
                         return;

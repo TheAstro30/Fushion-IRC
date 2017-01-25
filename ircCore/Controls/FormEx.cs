@@ -6,7 +6,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace FusionIRC.Controls
+namespace ircCore.Controls
 {
     public class FormEx : Form
     {

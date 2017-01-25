@@ -91,6 +91,19 @@
     <Compile Include="Settings\SettingsConnection.cs" />
     <Compile Include="Settings\SettingsFind.cs" />
     <Compile Include="Settings\SettingsUserInfo.cs" />
+    <Compile Include="Settings\Theming\Forms\Controls\ThemePreview.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Settings\Theming\Forms\FrmNew.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Settings\Theming\Forms\FrmTheme.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\FormEx.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Utils\Functions.cs" />
     <Compile Include="Utils\Serialization\BinarySerialize.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Settings\SettingsManager.cs" />
@@ -103,7 +116,6 @@
     <Compile Include="Utils\XmlFormatting.cs" />
     <Compile Include="Utils\Serialization\XmlSerialize.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

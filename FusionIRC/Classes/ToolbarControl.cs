@@ -11,6 +11,7 @@ using FusionIRC.Forms.Settings;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
 using ircCore.Settings.Networks;
+using ircCore.Settings.Theming.Forms;
 
 namespace FusionIRC.Classes
 {

@@ -3,7 +3,6 @@
  * Copyright (C) 2016 - 2017
  * Provided AS-IS with no warranty expressed or implied
  */
-
 using System.Drawing;
 using System.Windows.Forms;
 using ircCore.Controls.ChildWindows.Helpers;
@@ -259,11 +258,9 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
                                                    (rect.Y + (font.Height/2)) - LinePadding);
                         }
                         break;
-                    }  
-                    //var indented = currentLine > 0 && TextData.Lines[linePosition].IsIndented;
-                    var indented = currentLine > 0;
+                    }                    
                     /* Make sure the rectangle is set to the correct positions */
-                    rect.X = indented ? IndentWidth : 0;                    
+                    rect.X = currentLine > 0 ? IndentWidth : 0;                    
                     rect.Y = rectBottom + (TextHeight*currentLine);                    
                     var x = 0;                    
                     if (lineData.Lines[currentLine].ControlBytes.Count > 0)
@@ -279,7 +276,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
                                                       font, rect, foreColor, backColor, FormatFlags);
                             }
                             x = controlData.Position;
-                            rect.X = (indented ? IndentWidth : 0) + controlData.CurrentMeasurement;                           
+                            rect.X = (currentLine > 0 ? IndentWidth : 0) + controlData.CurrentMeasurement;                           
                             switch (controlData.ControlByte)
                             {
                                 case ControlByte.Bold:

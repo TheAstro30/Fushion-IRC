@@ -118,5 +118,19 @@ namespace ircCore.Settings.Theming
             /* Set this flag to true to ensure it will be saved if it doesn't exist (ie: load fails) */
             ThemeChanged = true;
         }        
+
+        public Theme(Theme theme)
+        {
+            /* Copy constructor */
+            Colors = new Color[16];
+            for (var i = 0; i <= theme.Colors.Length - 1; i++)
+            {
+                Colors[i] = theme.Colors[i];
+            }
+            ThemeColors = new Dictionary<ThemeColor, int>(theme.ThemeColors);
+            TimeStampFormat = theme.TimeStampFormat;
+            ThemeFonts = new Dictionary<ChildWindowType, Font>(theme.ThemeFonts);
+            Messages = new Dictionary<ThemeMessage, ThemeMessageData>(theme.Messages);
+        }
     }
 }

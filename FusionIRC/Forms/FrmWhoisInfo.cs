@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using FusionIRC.Controls;
 using ircClient.Classes;
+using ircCore.Controls;
 
 namespace FusionIRC.Forms
 {

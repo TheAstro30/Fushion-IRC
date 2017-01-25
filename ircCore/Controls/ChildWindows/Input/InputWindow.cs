@@ -28,6 +28,7 @@ namespace ircCore.Controls.ChildWindows.Input
         /* Properties */
         public int MaximumHistoryCache { get; set; }
         public event Action<InputWindow> TabKeyPress;
+        public new event Action<InputWindow> TextChanged;
 
         public new Color BackColor
         {
@@ -115,6 +116,7 @@ namespace ircCore.Controls.ChildWindows.Input
             _txtOut.KeyDown += TxtOutKeyDown;
             _txtOut.KeyPress += TxtOutKeyPress;
             _txtOut.MouseWheel += TxtOutMouseWheel;
+            _txtOut.TextChanged += TxtOutTextChanged;
             Controls.Add(_txtOut);
 
             BuildContextMenu();
@@ -306,6 +308,14 @@ namespace ircCore.Controls.ChildWindows.Input
         private void TxtOutMouseWheel(object sender, MouseEventArgs e)
         {
             OnMouseWheel(e);
+        }
+
+        private void TxtOutTextChanged(object sender, EventArgs e)
+        {
+            if (TextChanged != null)
+            {
+                TextChanged(this);
+            }
         }
 
         private void IsInCache(string text)

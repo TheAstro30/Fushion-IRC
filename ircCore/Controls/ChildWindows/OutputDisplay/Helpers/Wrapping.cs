@@ -12,7 +12,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
     /* The main word wrap function for the window; this will wrap the text to the window width filling in the WrapData structure */
     internal static class Wrapping
     {
-        internal static void WordWrap(Graphics deviceContext, Color defaultColor, Color backColor, bool indented, int indentWidth, string text, int width, Font font, out WrapData data)
+        internal static void WordWrap(Graphics deviceContext, Color defaultColor, Color backColor, bool wordWrap, int indentWidth, string text, int width, Font font, out WrapData data)
         {            
             data = new WrapData();
             /* We have to go via the text character by character, look for control byte codes, calculate the position in the string it starts and
@@ -29,8 +29,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
             var underLine = false;
             var italic = false;
             var reverse = false;
-            var wld = new WrapData.WrapLineData();
-            var indent = indented ? indentWidth : 0;
+            var wld = new WrapData.WrapLineData();            
             var firstLineParsed = false;
             /* This method, all though refactored, is still in no way the best way to accomplish wrapping */
             for (i = 0; i <= length; i++)
@@ -114,12 +113,13 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
                         currentWidth += TextMeasurement.MeasureStringWidth(deviceContext, font, c);
                         break;
                 }
-                if (currentWidth + (firstLineParsed ? indent : 0) <= width)
-                {                    
+                if (!wordWrap || currentWidth + (firstLineParsed ? indentWidth : 0) <= width)
+                {
+                    /* Either word wrapping is false or the current width hasn't exceeded the window width yet */
                     continue;
                 }
                 /* If the current known break position is a little less than the right edge, break by word - otherwise it will cut the word in half */
-                if (breakPos > i - (i / 3))
+                if (breakPos > i - (i/3))
                 {
                     /* Break by word */
                     i = breakPos;
@@ -146,10 +146,10 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
                         var count = wld.ControlBytes.Count - 1;
                         var tmpData = wld.ControlBytes[count];
                         text = string.Format("{0}{1}{2}{3}", text.Substring(0, tmpData.Position),
-                                             (char)tmpData.ControlByte,
+                                             (char) tmpData.ControlByte,
                                              tmpData.ControlByte == ControlByte.Color ? tmpData.OriginalColor : "",
-                                             text.Substring(tmpData.Position));                        
-                        wld.ControlBytes.RemoveAt(count);                        
+                                             text.Substring(tmpData.Position));
+                        wld.ControlBytes.RemoveAt(count);
                     }
                 }
                 wld.Text = text.Substring(0, i);
@@ -164,7 +164,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
                               IsItalic = italic
                           };
                 text = text.Substring(i).TrimStart();
-                length = text.Length - 1;                
+                length = text.Length - 1;
                 breakPos = 0;
                 currentWidth = 0;
                 i = -1;

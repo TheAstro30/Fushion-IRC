@@ -266,7 +266,7 @@ namespace FusionIRC.Helpers
                               Text = args
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            child.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            child.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(child, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
             var action = string.Format("PRIVMSG {0} :{1}ACTION {2}{3}", child.Tag, (char)1, args, (char)1);
@@ -312,7 +312,7 @@ namespace FusionIRC.Helpers
                                   Text = args
                               };
                     pmd = ThemeManager.ParseMessage(tmd);
-                    child.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+                    child.Output.AddLine(pmd.DefaultColor, pmd.Message);
                     /* Update treenode color */
                     WindowManager.SetWindowEvent(child, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
                     child.Client.Send(string.Format("PRIVMSG {0} :{1}", target, args));                    
@@ -336,7 +336,7 @@ namespace FusionIRC.Helpers
                           Text = args
                       };
             pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
             c.Client.Send(string.Format("PRIVMSG {0} :{1}", target, args));
@@ -359,7 +359,7 @@ namespace FusionIRC.Helpers
                                   Text = args
                               };
                 var pmd = ThemeManager.ParseMessage(tmd);
-                c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+                c.Output.AddLine(pmd.DefaultColor, pmd.Message);
                 /* Update treenode color */
                 WindowManager.SetWindowEvent(c, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
                 client.Send(string.Format("PRIVMSG {0} :{1}", c.Tag, args));
@@ -387,7 +387,7 @@ namespace FusionIRC.Helpers
                               Text = args
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            child.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            child.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(child, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
             client.Send(string.Format("NOTICE {0} :{1}", target, args));
@@ -415,7 +415,7 @@ namespace FusionIRC.Helpers
                               Text = args
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
             client.Send(ct == "PING"
@@ -489,7 +489,7 @@ namespace FusionIRC.Helpers
                               NewNick = nick
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            console.Output.AddLine(pmd.DefaultColor, false, pmd.Message);
+            console.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(console, ConnectionCallbackManager.MainForm, WindowEvent.EventReceived);
         }

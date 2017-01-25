@@ -112,7 +112,7 @@ namespace FusionIRC.Forms
                              ForeColor = ThemeManager.GetColor(ThemeColor.WindowForeColor),
                              Font = ThemeManager.CurrentTheme.ThemeFonts[type],
                              LineSpacingStyle = LineSpacingStyle.Paragraph,
-                             MaximumLines = SettingsManager.Settings.Caching.Output
+                             MaximumLines = SettingsManager.Settings.Caching.Output                             
                          };
 
             if (type == ChildWindowType.Channel)
@@ -198,7 +198,7 @@ namespace FusionIRC.Forms
                 Location = w.Position;
             }
             //WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
-            _initialize = false;
+            _initialize = false;            
         }
         
         /* Overrides */
@@ -338,7 +338,7 @@ namespace FusionIRC.Forms
                                           Text = s
                                       };
                         var pmd = ThemeManager.ParseMessage(tmd);
-                        Output.AddLine(pmd.DefaultColor, true, pmd.Message);
+                        Output.AddLine(pmd.DefaultColor, pmd.Message);
                         Client.Send(string.Format("PRIVMSG {0} :{1}", Tag, Utf8.ConvertFromUtf8(s, true)));
                         return;
                     }

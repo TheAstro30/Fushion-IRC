@@ -3,7 +3,6 @@
  * Copyright (C) 2016 - 2017
  * Provided AS-IS with no warranty expressed or implied
  */
-
 using System.Drawing;
 using System.Windows.Forms;
 using ircCore.Controls.ChildWindows.Input.ColorBox;

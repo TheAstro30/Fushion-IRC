@@ -1,7 +1,10 @@
-﻿using System;
+﻿/* FusionIRC IRC Client
+ * Written by Jason James Newland
+ * Copyright (C) 2016 - 2017
+ * Provided AS-IS with no warranty expressed or implied
+ */
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace ircCore.Settings
@@ -17,6 +20,11 @@ namespace ircCore.Settings
 
             [XmlAttribute("path")]
             public string Path { get; set; }
+
+            public override string ToString()
+            {
+                return Name;
+            }
         }
 
         [XmlAttribute("currentTheme")]

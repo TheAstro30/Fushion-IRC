@@ -101,58 +101,88 @@ namespace ircCore.Settings.Theming
         public static Theme CurrentTheme = new Theme();
 
         public static void Load(string themeFile)
+        {            
+            Load(themeFile, ref CurrentTheme, false);
+        }
+
+        public static void Load(string themeFile, ref Theme theme, bool isPreview)
         {
-            if (!BinarySerialize<Theme>.Load(themeFile, ref CurrentTheme))
+            if (!BinarySerialize<Theme>.Load(themeFile, ref theme))
             {
-                CurrentTheme = new Theme();
+                theme = new Theme();
             }
-            if (ThemeLoaded != null)
+            if (!isPreview && ThemeLoaded != null)
             {
                 ThemeLoaded();
             }
         }
 
         public static void Save(string themeFile)
+        {            
+            Save(themeFile, CurrentTheme);
+        }
+
+        public static void Save(string themeFile, Theme theme)
         {
-            if (!CurrentTheme.ThemeChanged)
+            if (!theme.ThemeChanged)
             {
                 return;
-            }            
-            CurrentTheme.ThemeChanged = false;
-            BinarySerialize<Theme>.Save(themeFile, CurrentTheme);
+            }
+            theme.ThemeChanged = false;
+            BinarySerialize<Theme>.Save(themeFile, theme);
         }
 
         /* Accessible theme properties */
         public static Font GetFont(ChildWindowType window)
         {
-            return !CurrentTheme.ThemeFonts.ContainsKey(window) ? new Font("Lucida Console", 10) : CurrentTheme.ThemeFonts[window];
+            return GetFont(window, CurrentTheme);
+        }
+
+        public static Font GetFont(ChildWindowType window, Theme theme)
+        {
+            return !theme.ThemeFonts.ContainsKey(window) ? new Font("Lucida Console", 10) : theme.ThemeFonts[window];
         }
 
         public static Theme.ThemeBackgroundData GetBackground(ChildWindowType window)
         {
-            return !CurrentTheme.ThemeBackgrounds.ContainsKey(window) ? null : CurrentTheme.ThemeBackgrounds[window];
+            return GetBackground(window, CurrentTheme);
+        }
+
+        public static Theme.ThemeBackgroundData GetBackground(ChildWindowType window, Theme theme)
+        {
+            return !theme.ThemeBackgrounds.ContainsKey(window) ? null : theme.ThemeBackgrounds[window];
         }
 
         public static Color GetColor(ThemeColor color)
         {
-            return !CurrentTheme.ThemeColors.ContainsKey(color) ? CurrentTheme.Colors[0] : CurrentTheme.Colors[CurrentTheme.ThemeColors[color]];
+            return GetColor(color, CurrentTheme);
+        }
+
+        public static Color GetColor(ThemeColor color, Theme theme)
+        {
+            return !theme.ThemeColors.ContainsKey(color) ? theme.Colors[0] : theme.Colors[theme.ThemeColors[color]];
         }
 
         /* The main theme message parser */
         public static ParsedMessageData ParseMessage(IncomingMessageData messageData)
+        {
+            return ParseMessage(messageData, CurrentTheme);
+        }
+
+        public static ParsedMessageData ParseMessage(IncomingMessageData messageData, Theme theme)
         {
             var pmd = new ParsedMessageData
                           {
                               DefaultColor = 1,
                               Message = "[Theme file corrupt/missing data]"
                           };
-            if (!CurrentTheme.Messages.ContainsKey(messageData.Message))
+            if (!theme.Messages.ContainsKey(messageData.Message))
             {
                 return pmd;
             }
             /* This code is kind of ugly... */            
-            var sb = new StringBuilder(CurrentTheme.Messages[messageData.Message].MessageFormat);
-            sb.Replace("$ts", TimeFunctions.FormatTimeStamp(messageData.TimeStamp, CurrentTheme.TimeStampFormat));
+            var sb = new StringBuilder(theme.Messages[messageData.Message].MessageFormat);
+            sb.Replace("$ts", TimeFunctions.FormatTimeStamp(messageData.TimeStamp, theme.TimeStampFormat));
             sb.Replace("$nick", messageData.Nick);
             sb.Replace("$prefix", messageData.Prefix);
             sb.Replace("$address", messageData.Address);
@@ -165,7 +195,7 @@ namespace ircCore.Settings.Theming
             sb.Replace("$target", messageData.Target);
             sb.Replace("$server", messageData.Server);
             sb.Replace("$port", messageData.Port.ToString());
-            pmd.DefaultColor = CurrentTheme.Messages[messageData.Message].DefaultColor;
+            pmd.DefaultColor = theme.Messages[messageData.Message].DefaultColor;
             pmd.Message = sb.ToString();
             return pmd;
         }

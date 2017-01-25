@@ -7,6 +7,7 @@ using System;
 using System.Windows.Forms;
 using FusionIRC.Controls;
 using FusionIRC.Helpers;
+using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
 
