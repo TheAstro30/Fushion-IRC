@@ -6,6 +6,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using ircCore.Settings;
 
 namespace ircCore.Controls
 {
@@ -44,10 +45,10 @@ namespace ircCore.Controls
             {                
                 return;
             }
-            //if (IrcMain.Settings.WinMaximized)
-            //{
-            //    f.WindowState = FormWindowState.Maximized;
-            //}
+            if (SettingsManager.Settings.Windows.ChildrenMaximized)
+            {
+                f.WindowState = FormWindowState.Maximized;
+            }
             f.BringToFront();
             f.MyActivate();
         }

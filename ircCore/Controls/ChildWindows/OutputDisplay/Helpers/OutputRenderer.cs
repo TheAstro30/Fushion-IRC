@@ -114,7 +114,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
 
                     case LineSpacingStyle.Paragraph:
                         LineSpacing = 1;
-                        LinePadding = 5;
+                        LinePadding = 3;
                         break;
                 }                
             }

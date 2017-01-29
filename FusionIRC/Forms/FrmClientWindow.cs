@@ -58,6 +58,8 @@ namespace FusionIRC.Forms
                                  ShowPlusMinus = false,
                                  ShowRootLines = false,
                                  Size = new Size(160, 554),
+                                 BackColor = ThemeManager.GetColor(ThemeColor.SwitchTreeBackColor),
+                                 ForeColor = ThemeManager.GetColor(ThemeColor.SwitchTreeForeColor),
                                  TabIndex = 0
                              };
             /* Treeview icons */
@@ -89,7 +91,7 @@ namespace FusionIRC.Forms
             /* Setup toolbar */
             ToolBar = new ToolbarControl(this);
             /* Setup menubar */
-            MenuBar = new MenubarControl(this);
+            MenuBar = new MenubarControl(this);              
             ToolBar.MenuBar = MenuBar;
             /* MDI helper class */
             _mdi = new MdiHelper(this);            
@@ -151,6 +153,11 @@ namespace FusionIRC.Forms
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
+            /* Save child forms window state */            
+            if (MdiChildren.Where(w => w is FrmChildWindow).Any(w => w.WindowState == FormWindowState.Maximized))
+            {
+                SettingsManager.Settings.Windows.ChildrenMaximized = true;
+            }
             /* Disconnect each connection */
             foreach (var client in WindowManager.Windows.Where(client => client.Key.IsConnected))
             {

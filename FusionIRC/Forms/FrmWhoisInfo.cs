@@ -196,6 +196,7 @@ namespace FusionIRC.Forms
             var whoisInfo = new WhoisInfo(info);
             Text = string.Format("Whois Info: {0}", whoisInfo.Nick);
             _txtNick.Text = whoisInfo.Nick;
+            _txtNick.SelectionStart = _txtNick.Text.Length;
             _txtAddress.Text = whoisInfo.Address;
             _txtRealName.Text = whoisInfo.Realname;
             _txtAway.Text = whoisInfo.AwayMessage;

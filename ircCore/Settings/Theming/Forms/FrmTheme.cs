@@ -16,6 +16,7 @@ namespace ircCore.Settings.Theming.Forms
         private readonly Theme _theme = new Theme();
 
         private readonly ThemePreview _themePreview;
+        private readonly ThemeColors _themeColors;
 
         private readonly TabControl _tab;
         private readonly TabPage _tabTheme;
@@ -48,6 +49,15 @@ namespace ircCore.Settings.Theming.Forms
                                     Size = new Size(571, 408)
                                 };
 
+            _themeColors = new ThemeColors(_theme)
+                                {
+                                    BackColor = Color.Transparent,
+                                    Dock = DockStyle.Fill,
+                                    Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0),
+                                    Location = new Point(3, 3),
+                                    Size = new Size(571, 408)
+                                };
+
             _tab = new TabControl {Location = new Point(12, 12), SelectedIndex = 0, Size = new Size(585, 442)};
 
             _tabTheme = new TabPage
@@ -71,6 +81,8 @@ namespace ircCore.Settings.Theming.Forms
                                  Text = "Theme Colors",
                                  UseVisualStyleBackColor = true
                              };
+
+            _tabColors.Controls.Add(_themeColors);
 
             _tabFonts = new TabPage
                             {

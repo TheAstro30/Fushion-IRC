@@ -91,6 +91,12 @@
     <Compile Include="Settings\SettingsConnection.cs" />
     <Compile Include="Settings\SettingsFind.cs" />
     <Compile Include="Settings\SettingsUserInfo.cs" />
+    <Compile Include="Settings\Theming\Forms\Controls\ThemeColors.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Settings\Theming\Forms\Controls\ThemeColors.Designer.cs">
+      <DependentUpon>ThemeColors.cs</DependentUpon>
+    </Compile>
     <Compile Include="Settings\Theming\Forms\Controls\ThemePreview.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -115,6 +121,11 @@
     <Compile Include="Utils\Utf8.cs" />
     <Compile Include="Utils\XmlFormatting.cs" />
     <Compile Include="Utils\Serialization\XmlSerialize.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Settings\Theming\Forms\Controls\ThemeColors.resx">
+      <DependentUpon>ThemeColors.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

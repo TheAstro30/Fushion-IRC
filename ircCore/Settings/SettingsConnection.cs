@@ -23,7 +23,7 @@ namespace ircCore.Settings
         [XmlAttribute("newWindow")]
         public bool NewWindow { get; set; }
 
-        [XmlAttribute]
+        [XmlAttribute("isSsl")]
         public bool IsSsl { get; set; }
     }
 }

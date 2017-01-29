@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Text;
 using ircCore.Utils;
@@ -21,8 +22,29 @@ namespace ircCore.Settings.Theming
 
     public enum ThemeColor
     {
-        WindowBackColor = 0,
-        WindowForeColor = 1
+        [Description("Text Output Backcolor")]
+        OutputWindowBackColor = 0,
+
+        [Description("Text Output Forecolor")]
+        OutputWindowForeColor = 1,
+
+        [Description("Input Box Backcolor")]
+        InputWindowBackColor = 2,
+
+        [Description("Input Box Forecolor")]
+        InputWindowForeColor = 3,
+
+        [Description("Nicklist Backcolor")]
+        NicklistBackColor = 4,
+
+        [Description("Nicklist Forecolor")]
+        NicklistForeColor = 5,
+
+        [Description("Switch Tree Backcolor")]
+        SwitchTreeBackColor = 6,
+
+        [Description("Switch Tree Forecolor")]
+        SwitchTreeForeColor = 7
     }
 
     public enum ThemeMessage
@@ -34,38 +56,38 @@ namespace ircCore.Settings.Theming
         ConnectionErrorText = 4,
         ServerPingPongText = 5,
         WelcomeText = 6,
-        ChannelTopic = 100,
-        ChannelTopicSet = 101,
-        ChannelTopicChange = 102,
-        ChannelText = 103,
-        ChannelSelfText = 104,
-        ChannelActionText = 105,
-        ChannelSelfActionText = 106,
-        PrivateText = 107,
-        PrivateSelfText = 108,
-        PrivateActionText = 109,
-        PrivateSelfActionText = 110,        
-        NoticeText = 111,
-        NoticeSelfText = 112,
-        ChannelJoinText = 113,
-        ChannelSelfJoinText = 114,
-        ChannelPartText = 115,
-        ModeChannelText = 116,        
-        ModeSelfText = 117,
-        QuitText = 118,
-        ChannelKickText = 119,
-        ChannelSelfKickText = 120,
-        NickChangeUserText = 121,
-        NickChangeSelfText = 122,
-        MessageTargetText = 123,
-        MotdText = 124,
-        RawText = 125,
-        WallopsText = 126,
-        LUsersText = 127,
-        InviteText = 128,
-        CtcpText = 129,
-        CtcpSelfText = 130,
-        CtcpReplyText = 131
+        ChannelTopic = 7,
+        ChannelTopicSet = 8,
+        ChannelTopicChange = 9,
+        ChannelText = 10,
+        ChannelSelfText = 11,
+        ChannelActionText = 12,
+        ChannelSelfActionText = 13,
+        PrivateText = 14,
+        PrivateSelfText = 15,
+        PrivateActionText = 16,
+        PrivateSelfActionText = 17,        
+        NoticeText = 18,
+        NoticeSelfText = 19,
+        ChannelJoinText = 20,
+        ChannelSelfJoinText = 21,
+        ChannelPartText = 22,
+        ModeChannelText = 23,        
+        ModeSelfText = 24,
+        QuitText = 25,
+        ChannelKickText = 26,
+        ChannelSelfKickText = 27,
+        NickChangeUserText = 28,
+        NickChangeSelfText = 29,
+        MessageTargetText = 30,
+        MotdText = 31,
+        RawText = 32,
+        WallopsText = 33,
+        LUsersText = 34,
+        InviteText = 35,
+        CtcpText = 36,
+        CtcpSelfText = 37,
+        CtcpReplyText = 38
     }
 
     public class IncomingMessageData

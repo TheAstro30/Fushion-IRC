@@ -200,8 +200,8 @@ namespace ircCore.Settings.Theming.Forms.Controls
             _theme = theme;
             _preview.Clear();
             _preview.Font = new Font(ThemeManager.GetFont(ChildWindowType.Channel).Name, 10); /* We keep the size static so it fits the preview */
-            _preview.BackColor = ThemeManager.GetColor(ThemeColor.WindowBackColor);
-            _preview.ForeColor = ThemeManager.GetColor(ThemeColor.WindowForeColor);
+            _preview.BackColor = ThemeManager.GetColor(ThemeColor.OutputWindowBackColor);
+            _preview.ForeColor = ThemeManager.GetColor(ThemeColor.OutputWindowForeColor);
             /* Set some text data */
             ThemePreviewText(ThemeMessage.ChannelSelfJoinText, "", "", "", "", "", "#themePreview", "");
             ThemePreviewText(ThemeMessage.ChannelTopic, "", "", "", "", "", "", "Preview of the current selected theme");

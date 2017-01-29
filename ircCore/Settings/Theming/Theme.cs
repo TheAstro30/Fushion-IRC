@@ -29,7 +29,7 @@ namespace ircCore.Settings.Theming
         }
 
         private const string Rgb = "#FFFFFF,#000000,#00007F,#009300,#FF0000,#7F0000,#9C009C,#FC7F00,#FFFF00,#00FC00,#009393,#00FFFF,#0000FC,#FF00FF,#7F7F7F,#D2D2D2";
-        private const string DefaultColors = "0,1";
+        private const string DefaultColors = "0,1,0,1,0,1,0,1";
 
         /* Public properties */
         public bool ThemeChanged { get; set; }

@@ -236,12 +236,14 @@ namespace ircClient.Classes
                     }
                     break;
 
+                case "275":
                 case "307":
                 case "308":
                 case "309":
                 case "310":
                 case "313":
                 case "316":
+                case "330":
                 case "378":
                 case "379":
                     /* Whois replies */

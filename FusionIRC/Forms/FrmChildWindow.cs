@@ -100,16 +100,16 @@ namespace FusionIRC.Forms
             /* Controls */
             Input = new InputWindow
                         {
-                            BackColor = ThemeManager.GetColor(ThemeColor.WindowBackColor),//change to its own
-                            ForeColor = ThemeManager.GetColor(ThemeColor.WindowForeColor),//change to its own
+                            BackColor = ThemeManager.GetColor(ThemeColor.InputWindowBackColor),
+                            ForeColor = ThemeManager.GetColor(ThemeColor.InputWindowForeColor),
                             Font = ThemeManager.CurrentTheme.ThemeFonts[type],
                             MaximumHistoryCache = SettingsManager.Settings.Caching.Input
                         };
 
             Output = new OutputWindow
                          {                             
-                             BackColor = ThemeManager.GetColor(ThemeColor.WindowBackColor),
-                             ForeColor = ThemeManager.GetColor(ThemeColor.WindowForeColor),
+                             BackColor = ThemeManager.GetColor(ThemeColor.OutputWindowBackColor),
+                             ForeColor = ThemeManager.GetColor(ThemeColor.OutputWindowForeColor),
                              Font = ThemeManager.CurrentTheme.ThemeFonts[type],
                              LineSpacingStyle = LineSpacingStyle.Paragraph,
                              MaximumLines = SettingsManager.Settings.Caching.Output                             
@@ -119,8 +119,8 @@ namespace FusionIRC.Forms
             {                
                 Nicklist = new Nicklist
                                {
-                                   BackColor = ThemeManager.GetColor(ThemeColor.WindowBackColor),//change to its own
-                                   ForeColor = ThemeManager.GetColor(ThemeColor.WindowForeColor),//change to its own
+                                   BackColor = ThemeManager.GetColor(ThemeColor.NicklistBackColor),
+                                   ForeColor = ThemeManager.GetColor(ThemeColor.NicklistForeColor),
                                    Font = ThemeManager.CurrentTheme.ThemeFonts[type],
                                    UserModes = Client.Parser.UserModes,
                                    UserModeCharacters = Client.Parser.UserModeCharacters,
@@ -163,8 +163,40 @@ namespace FusionIRC.Forms
             ShowInTaskbar = false;
             MdiParent = owner;
             MinimumSize = new Size(480, 180);
-            /* Set window icon */            
-            switch (type)
+            /* Set client size */
+            ClientSize = new Size(540, 400);
+            /* Focus activation timer */
+            _focus = new Timer {Interval = 10};
+            _focus.Tick += TimerFocus;
+            /* Set window position and size - note: if a window is specified by it's "tag" (ie: #test), that takes priority */
+            var w = SettingsManager.GetWindowByName(_windowChildName);
+            if (w.Size.Width != 0 && w.Size.Height != 0)
+            {
+                Size = w.Size;
+            }
+            if (w.Position.X != -1 && w.Position.Y != -1)
+            {
+                Location = w.Position;
+            }
+            //WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
+            if (SettingsManager.Settings.Windows.ChildrenMaximized)
+            {
+                WindowState = FormWindowState.Maximized;
+            }
+            _initialize = false;            
+        }
+        
+        /* Overrides */
+        protected override void OnActivated(EventArgs e)
+        {            
+            _focus.Enabled = true;
+            base.OnActivated(e);
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            /* Set window icon */
+            switch (WindowType)
             {
                 case ChildWindowType.Console:
                     Icon = Resources.status;
@@ -182,34 +214,6 @@ namespace FusionIRC.Forms
                     Icon = Resources.dcc_chat;
                     break;
             }
-            /* Set client size */
-            ClientSize = new Size(540, 400);
-            /* Focus activation timer */
-            _focus = new Timer {Interval = 10};
-            _focus.Tick += TimerFocus;
-            /* Set window position and size - note: if a window is specified by it's "tag" (ie: #test), that takes priority */
-            var w = SettingsManager.GetWindowByName(_windowChildName);
-            if (w.Size.Width != 0 && w.Size.Height != 0)
-            {
-                Size = w.Size;
-            }
-            if (w.Position.X != -1 && w.Position.Y != -1)
-            {
-                Location = w.Position;
-            }
-            //WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
-            _initialize = false;            
-        }
-        
-        /* Overrides */
-        protected override void OnActivated(EventArgs e)
-        {            
-            _focus.Enabled = true;
-            base.OnActivated(e);
-        }
-
-        protected override void OnLoad(EventArgs e)
-        {
             OnResize(new EventArgs());            
             base.OnLoad(e);
         }
@@ -283,12 +287,19 @@ namespace FusionIRC.Forms
             /* Update settings */
             if (!_initialize)
             {
-                var w = SettingsManager.GetWindowByName(_windowChildName);
-                if (WindowState != FormWindowState.Maximized)
+                switch (WindowState)
                 {
-                    /* For now, we're only interested in position */
-                    w.Size = Size;
-                    //w.Position = Location;
+                    case FormWindowState.Normal:
+                        /* For now, we're only interested in size */
+                        var w = SettingsManager.GetWindowByName(_windowChildName);
+                        w.Size = Size;
+                        //w.Position = Location;
+                        SettingsManager.Settings.Windows.ChildrenMaximized = false;
+                        break;
+
+                    case FormWindowState.Maximized:
+                        SettingsManager.Settings.Windows.ChildrenMaximized = true;
+                        break;
                 }
             }
             base.OnResize(e);

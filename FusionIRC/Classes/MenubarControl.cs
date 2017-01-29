@@ -14,7 +14,7 @@ using ircCore.Settings.Theming;
 
 namespace FusionIRC.Classes
 {    
-    public class MenubarControl
+    public sealed class MenubarControl
     {
         private readonly Form _owner;
 
@@ -35,6 +35,7 @@ namespace FusionIRC.Classes
                                Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0)
                            };
             owner.Controls.Add(_menuBar);
+            _owner.MainMenuStrip = _menuBar;
             /* Menus */
             _mnuFile = new ToolStripMenuItem
                            {
@@ -61,7 +62,7 @@ namespace FusionIRC.Classes
                                                   {
                                                       new ToolStripMenuItem("Find Text...", null, OnMenuWindowClick, Keys.Control | Keys.F)
                                                   });
-            _menuBar.Items.AddRange(new[] {_mnuFile, _mnuWindow});
+            _menuBar.Items.AddRange(new[] {_mnuFile, _mnuWindow});            
         }
 
         public void ConnectionUpdate(bool connected)

@@ -72,9 +72,6 @@
     <Compile Include="Forms\FrmConnectTo.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FrmConnectTo.Designer.cs">
-      <DependentUpon>FrmConnectTo.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\FrmSslError.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -93,9 +90,6 @@
     <Compile Include="Helpers\WindowManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Forms\FrmConnectTo.resx">
-      <DependentUpon>FrmConnectTo.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\FrmSettings.resx">
       <DependentUpon>FrmSettings.cs</DependentUpon>
     </EmbeddedResource>
@@ -131,6 +125,10 @@
     <ProjectReference Include="..\ircCore\ircCore.csproj">
       <Project>{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}</Project>
       <Name>ircCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\xsDirectX\xsDirectX.csproj">
+      <Project>{902CC476-5A7A-40E1-876B-8ABF265307AA}</Project>
+      <Name>xsDirectX</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
