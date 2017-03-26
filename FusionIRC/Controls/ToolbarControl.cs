@@ -13,16 +13,14 @@ using FusionIRC.Properties;
 using ircCore.Settings.Networks;
 using ircCore.Settings.Theming.Forms;
 
-namespace FusionIRC.Classes
+namespace FusionIRC.Controls
 {
-    public class ToolbarControl
+    public sealed class ToolbarControl : ToolStrip
     {
         private readonly Form _owner;
 
         private bool _connect;
         private bool _disconnect;
-
-        private readonly ToolStrip _toolBar;
 
         private readonly ToolStripButton _btnConnect;
         private readonly ToolStripButton _btnConnectToLocation;
@@ -30,23 +28,21 @@ namespace FusionIRC.Classes
         private readonly ToolStripButton _btnTheme;
 
         private readonly Timer _tmrCheck;
-
+        
         public MenubarControl MenuBar { private get; set; }
 
         public ToolbarControl(Form owner)
         {
             _owner = owner;
-            _toolBar = new ToolStrip
-                           {
-                               Dock = DockStyle.Top,
-                               AutoSize = false,
-                               ImageScalingSize = new Size(32, 32),
-                               RenderMode = ToolStripRenderMode.Professional,
-                               Size = new Size(953, 38),
-                               GripStyle = ToolStripGripStyle.Visible,
-                               ShowItemToolTips = true
-                           };
-            owner.Controls.Add(_toolBar);
+            Stretch = true;
+            AutoSize = false;
+            ImageScalingSize = new Size(32, 32);
+            RenderMode = ToolStripRenderMode.Professional;            
+            GripStyle = ToolStripGripStyle.Visible;
+            ShowItemToolTips = true;
+            LayoutStyle = ToolStripLayoutStyle.StackWithOverflow;
+            Padding = new Padding(3, 2, 0, 0);
+            Tag = "TOOLBAR";
             /* Connect button */
             _btnConnect = new ToolStripButton
                               {
@@ -87,15 +83,15 @@ namespace FusionIRC.Classes
                                 ToolTipText = @"Theme manager"
                             };
             _btnTheme.Click += ToolbarButtonClick;
-            /* Add the buttons to the toolbar */
-            _toolBar.Items.AddRange(new ToolStripItem[] { _btnConnect, _btnConnectToLocation, new ToolStripSeparator(), _btnSettings, _btnTheme });
+            /* Add the buttons to the toolbar */            
+            Items.AddRange(new ToolStripItem[] { _btnConnect, _btnConnectToLocation, new ToolStripSeparator(), _btnSettings, _btnTheme });
 
             _tmrCheck = new Timer
                             {
                                 Interval = 250,
                                 Enabled = true
                             };
-            _tmrCheck.Tick += TimerCheckConnection;
+            _tmrCheck.Tick += TimerCheckConnection;            
         }
 
         /* Toolbar callback */

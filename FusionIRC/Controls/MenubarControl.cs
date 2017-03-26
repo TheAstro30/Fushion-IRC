@@ -12,13 +12,11 @@ using FusionIRC.Helpers;
 using ircCore.Settings.Networks;
 using ircCore.Settings.Theming;
 
-namespace FusionIRC.Classes
+namespace FusionIRC.Controls
 {    
-    public sealed class MenubarControl
+    public sealed class MenubarControl : MenuStrip
     {
         private readonly Form _owner;
-
-        private readonly MenuStrip _menuBar;
 
         private readonly ToolStripMenuItem _mnuFile;
         private readonly ToolStripMenuItem _mnuWindow;
@@ -26,16 +24,10 @@ namespace FusionIRC.Classes
         public MenubarControl(Form owner)
         {
             _owner = owner;
-            _menuBar = new MenuStrip
-                           {
-                               Dock = DockStyle.Top,
-                               Size = new Size(657, 28),
-                               RenderMode = ToolStripRenderMode.Professional,
-                               GripStyle = ToolStripGripStyle.Hidden,
-                               Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0)
-                           };
-            owner.Controls.Add(_menuBar);
-            _owner.MainMenuStrip = _menuBar;
+            RenderMode = ToolStripRenderMode.Professional;
+            GripStyle = ToolStripGripStyle.Visible;
+            Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            Tag = "MENUBAR";
             /* Menus */
             _mnuFile = new ToolStripMenuItem
                            {
@@ -61,8 +53,8 @@ namespace FusionIRC.Classes
             _mnuWindow.DropDownItems.AddRange(new ToolStripItem[]
                                                   {
                                                       new ToolStripMenuItem("Find Text...", null, OnMenuWindowClick, Keys.Control | Keys.F)
-                                                  });
-            _menuBar.Items.AddRange(new[] {_mnuFile, _mnuWindow});            
+                                                  });            
+            Items.AddRange(new[] { _mnuFile, _mnuWindow });                        
         }
 
         public void ConnectionUpdate(bool connected)

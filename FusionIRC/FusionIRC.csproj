@@ -11,7 +11,8 @@
     <RootNamespace>FusionIRC</RootNamespace>
     <AssemblyName>FusionIRC</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -50,8 +51,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\MenubarControl.cs" />
-    <Compile Include="Classes\ToolbarControl.cs" />
+    <Compile Include="Controls\MenubarControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ToolbarControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Classes\WildcardMatch.cs" />
     <Compile Include="Controls\SwitchView\Base\TreeNodeEx.cs" />
     <Compile Include="Controls\SwitchView\Base\TreeViewEx.cs">
@@ -103,6 +108,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="app.config" />
     <None Include="Icons\ChildWindows\channel.ico" />
     <None Include="Icons\ChildWindows\dcc-chat.ico" />
     <None Include="Icons\ChildWindows\query.ico" />
@@ -125,10 +131,6 @@
     <ProjectReference Include="..\ircCore\ircCore.csproj">
       <Project>{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}</Project>
       <Name>ircCore</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\xsDirectX\xsDirectX.csproj">
-      <Project>{902CC476-5A7A-40E1-876B-8ABF265307AA}</Project>
-      <Name>xsDirectX</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

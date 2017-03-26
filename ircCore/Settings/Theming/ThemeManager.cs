@@ -49,44 +49,121 @@ namespace ircCore.Settings.Theming
 
     public enum ThemeMessage
     {
+        [Description("Connecting")]
         ConnectingText = 0,
+
+        [Description("Connected")]
         ConnectedText = 1,
+
+        [Description("Disconnected")]
         DisconnectedText = 2,
+
+        [Description("Connection Cancelled")]
         ConnectionCancelledText = 3,
+
+        [Description("Connection Error")]
         ConnectionErrorText = 4,
+
+        [Description("Server Ping/Pong")]
         ServerPingPongText = 5,
+
+        [Description("IRC Welcome")]
         WelcomeText = 6,
+
+        [Description("Channel Topic")]
         ChannelTopic = 7,
+
+        [Description("Channel Topic Set By")]
         ChannelTopicSet = 8,
+
+        [Description("Channel Topic Changed")]
         ChannelTopicChange = 9,
+
+        [Description("Channel Message")]
         ChannelText = 10,
+
+        [Description("Channel Message Self")]
         ChannelSelfText = 11,
+
+        [Description("Channel Action")]
         ChannelActionText = 12,
+
+        [Description("Channel Action Self")]
         ChannelSelfActionText = 13,
+
+        [Description("Private Message")]
         PrivateText = 14,
+
+        [Description("Private Message Self")]
         PrivateSelfText = 15,
+
+        [Description("Private Action")]
         PrivateActionText = 16,
-        PrivateSelfActionText = 17,        
+
+        [Description("Private Action Self")]
+        PrivateSelfActionText = 17,
+
+        [Description("Notice Message")]
         NoticeText = 18,
+
+        [Description("Notice Message Self")]
         NoticeSelfText = 19,
+
+        [Description("Channel Join")]
         ChannelJoinText = 20,
+
+        [Description("Channel Join Self")]
         ChannelSelfJoinText = 21,
+
+        [Description("Channel Part")]
         ChannelPartText = 22,
-        ModeChannelText = 23,        
+
+        [Description("Mode Text")]
+        ModeChannelText = 23,
+
+        [Description("Mode Self Text")]
         ModeSelfText = 24,
+
+        [Description("Quit Message")]
         QuitText = 25,
+
+        [Description("Channel Kick Message")]
         ChannelKickText = 26,
+
+        [Description("Channel Kick Message Self")]
         ChannelSelfKickText = 27,
+
+        [Description("Nick Change")]
         NickChangeUserText = 28,
+
+        [Description("Nick Change Self")]
         NickChangeSelfText = 29,
+
+        [Description("Target Message Text")]
         MessageTargetText = 30,
+
+        [Description("MOTD Text")]
         MotdText = 31,
+
+        [Description("RAW Text")]
         RawText = 32,
+
+        [Description("Wallops Text")]
         WallopsText = 33,
+
+        [Description("Local Users Text")]
         LUsersText = 34,
+
+        [Description("Invite Text")]
         InviteText = 35,
+
+        [Description("CTCP Text")]
         CtcpText = 36,
+
+        [Description("CTCP Text Self")]
         CtcpSelfText = 37,
+
+        [Description("CTCP Reply")]
         CtcpReplyText = 38
     }
 

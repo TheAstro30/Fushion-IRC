@@ -3,10 +3,10 @@
  * Copyright (C) 2016 - 2017
  * Provided AS-IS with no warranty expressed or implied
  */
-
 using System;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Forms;
 using ircCore.Utils.Serialization;
 
 namespace ircCore.Settings
@@ -39,6 +39,17 @@ namespace ircCore.Settings
                 Settings.Windows.Window.Add(w);
             }
             return w;
+        }
+
+        public static AppearanceData.ControlBarData.ControlData GetControlStyle(string name)
+        {
+            var d = Settings.Client.Appearance.ControlBars.Control.FirstOrDefault(o => o.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            if (d == null)
+            {
+                d = new AppearanceData.ControlBarData.ControlData { Name = name.ToLower(), Dock = DockStyle.Top, Visible = true };
+                Settings.Client.Appearance.ControlBars.Control.Add(d);
+            }
+            return d;
         }
     }
 }

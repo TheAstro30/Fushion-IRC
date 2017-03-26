@@ -214,7 +214,7 @@ namespace ircCore.Settings.Theming.Forms.Controls
             ThemePreviewText(ThemeMessage.ModeChannelText, "someGuy", "@", "~fusion@fusion.com", "", "", "", "+b *!*@new.com");
             ThemePreviewText(ThemeMessage.ChannelKickText, "someGuy", "@", "~fusion@fusion.com", "", "aNewDude", "#themePreview", "You can leave now");
             ThemePreviewText(ThemeMessage.NickChangeUserText, "someGuy", "@", "~fusion@fusion.com", "NotHere", "", "", "");
-            ThemePreviewText(ThemeMessage.QuitText, "someGuy", "@", "~fusion@fusion.com", "", "", "", "Quit: Leaving.");
+            ThemePreviewText(ThemeMessage.QuitText, "NotHere", "@", "~fusion@fusion.com", "", "", "", "Quit: Leaving.");
         }
 
         private void ThemePreviewText(ThemeMessage message, string nick, string prefix, string address, string newNick, string kickedNick, string target, string text)

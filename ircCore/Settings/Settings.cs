@@ -5,6 +5,7 @@
  */
 using System;
 using System.Drawing;
+using System.Windows.Forms;
 using System.Xml.Serialization;
 
 namespace ircCore.Settings
@@ -19,7 +20,10 @@ namespace ircCore.Settings
         public SettingsConnection Connection = new SettingsConnection();
 
         [XmlElement("windows")]
-        public SettingsWindow Windows = new SettingsWindow();        
+        public SettingsWindow Windows = new SettingsWindow();
+
+        [XmlElement("client")]
+        public SettingsClient Client = new SettingsClient();
 
         [XmlElement("themes")]
         public SettingsTheme Themes = new SettingsTheme();
@@ -49,6 +53,22 @@ namespace ircCore.Settings
             Windows.Window.Add(w);
             w = new WindowData {Name = "console", Size = new Size(731, 255), Position = new Point(-1, -1)};
             Windows.Window.Add(w);
+            /* Create control styles */
+            var d = new AppearanceData.ControlBarData.ControlData
+                        {
+                            Name = "menubar",
+                            Dock = DockStyle.Top,
+                            Visible = true
+                        };
+            Client.Appearance.ControlBars.Control.Add(d);
+            d = new AppearanceData.ControlBarData.ControlData
+                    {
+                        Name = "toolbar",
+                        Dock = DockStyle.Top,
+                        Position = new Point(0, 25),
+                        Visible = true
+                    };
+            Client.Appearance.ControlBars.Control.Add(d);
             /* Create a blank theme */
             Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = "default.thm"});
             /* Caching defaults */
