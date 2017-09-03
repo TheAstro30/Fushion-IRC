@@ -123,6 +123,11 @@ namespace FusionIRC.Helpers
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+            /* Iterate all open channels and clear nick list */
+            foreach (var win in WindowManager.Windows[client].Where(win => win.WindowType == ChildWindowType.Channel))
+            {
+                win.Nicklist.Clear();
+            }
         }
 
         public static void OnClientSslInvalidCertificate(ClientConnection client, X509Certificate certificate)
@@ -336,6 +341,7 @@ namespace FusionIRC.Helpers
             /* Update recent servers list */
             foreach (var s in ServerManager.Servers.Recent.Server.Where(s => s.Address.Equals(client.Server.Address, StringComparison.InvariantCultureIgnoreCase)))
             {
+                System.Diagnostics.Debug.Print("remove " + s.Address);
                 /* Remove it from it's current position */
                 ServerManager.Servers.Recent.Server.Remove(s);
                 break;
@@ -538,7 +544,7 @@ namespace FusionIRC.Helpers
                               {
                                   Message = ThemeMessage.NickChangeSelfText,
                                   TimeStamp = DateTime.Now,
-                                  NewNick = nick
+                                  NewNick = newNick
                               };
                 var pmd = ThemeManager.ParseMessage(tmd);
                 console.Output.AddLine(pmd.DefaultColor, pmd.Message);

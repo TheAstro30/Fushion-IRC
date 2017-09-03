@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<servers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <networks />
+  <recent>
+    <server address="irc.freenode.com" port="6667" ssl="false" />
+    <server address="irc.dragonirc.com" port="6667" ssl="false" />
+    <server address="irc.freenode.com" port="6667" ssl="false" />
+    <server address="irc.freenode.org" port="6697" ssl="true" />
+    <server address="irc.undernet.org" port="6667" ssl="false" />
+  </recent>
+</servers>

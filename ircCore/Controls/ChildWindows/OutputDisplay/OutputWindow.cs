@@ -189,7 +189,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
             /* Set client rectangle */
             var clientRect = new Rectangle(0, 0, ClientRectangle.Width - _vScroll.Width, ClientRectangle.Height);
-            /* Render out drawing data */
+            /* Render out drawing data */            
             Render(e.Graphics, _font, clientRect, _scrollValue);
         }
 
@@ -240,6 +240,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
 
                             MarkingData = new MarkingData
                                               {
+                                                  MarkScrolledToBottom = _scrolledToBottom,
                                                   MarkBitmap = bmp,
                                                   MarkStartLine = currentLine,
                                                   MarkBackwardStart = currentLine,
@@ -274,6 +275,13 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         {
             if (e.Button == MouseButtons.Left && MarkingData != null)
             {
+                /* Reset scrollbar (if scrolled to bottom originally) */
+                if (MarkingData.MarkScrolledToBottom)
+                {
+                    _scrolledToBottom = true;
+                    _scrollValue = TextData.WrappedLinesCount - 1;
+                    UpdateScrollBar();
+                }
                 /* Do the actual copying of data to clipboard */
                 if (MarkingData.MarkStartCharPos > -1 && MarkingData.MouseStartedMoving)
                 {
@@ -387,7 +395,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 {                    
                     /* Selection marking */                                                                                    
                     MarkingData.MouseStartedMoving = true;
-                    int i;
+                    int i;                    
                     if (!MarkingData.MarkReverse)
                     {
                         /* Currently going forwards */                        
@@ -401,10 +409,11 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                         MarkingData.MarkEndCharPos = position;
                         if (MarkingData.MarkEndCharPos < MarkingData.MarkStartCharPos && MarkingData.MarkEndLine == MarkingData.MarkStartLine && MarkingData.MarkBackwardStart == MarkingData.MarkEndLine)
                         {
-                            /* We are now going backwards in the line */                            
-                            i = MarkingData.MarkStartCharPos;                            
-                            MarkingData.MarkStartCharPos = position != wrapData.Text.Length - 1 ? position -1 : position;
+                            /* We are now going backwards in the line */                             
+                            i = MarkingData.MarkStartCharPos;
+                            MarkingData.MarkStartCharPos = position;
                             MarkingData.MarkEndCharPos = i != wrapData.Text.Length - 1 ? i - 1 : i;
+                            MarkingData.MarkStartXPos = startX;
                             MarkingData.MarkReverse = true;                            
                         }
                         else if (MarkingData.MarkEndLine < MarkingData.MarkStartLine && MarkingData.MarkBackwardStart == MarkingData.MarkStartLine)
@@ -412,15 +421,16 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                             /* Shifted up to the next line above */                            
                             i = MarkingData.MarkStartLine;
                             MarkingData.MarkStartLine = MarkingData.MarkEndLine;
-                            MarkingData.MarkEndLine = i;
-                            i = MarkingData.MarkStartCharPos;                                                        
+                            MarkingData.MarkEndLine = i;                            
+                            i = MarkingData.MarkStartCharPos - 1;
                             MarkingData.MarkStartCharPos = MarkingData.MarkEndCharPos;
                             MarkingData.MarkEndCharPos = i;
+                            MarkingData.MarkStartXPos = startX;                            
                             MarkingData.MarkReverse = true;                            
                         }                        
                     }
                     else
-                    {
+                    {              
                         /* Currently going backwards */                        
                         Character.ReturnChar(g, wrapData, e.X, wrapIndex > 0, IndentWidth, _font, out position,
                                              out startX, ref MarkingData.IsBold, ref MarkingData.IsUnderline,
@@ -429,10 +439,10 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                         MarkingData.MarkStartCharPos = position;
                         MarkingData.MarkStartXPos = startX;
                         if (MarkingData.MarkStartCharPos > MarkingData.MarkEndCharPos && MarkingData.MarkStartLine == MarkingData.MarkEndLine && MarkingData.MarkBackwardStart == MarkingData.MarkStartLine)
-                        {
-                            /* Now reversed direction on current line */
-                            i = position +1;                            
-                            MarkingData.MarkStartCharPos = MarkingData.MarkEndCharPos +1;
+                        {                            
+                            /* Now reversed direction on current line */                            
+                            i = position;
+                            MarkingData.MarkStartCharPos = MarkingData.MarkEndCharPos + 1;
                             MarkingData.MarkEndCharPos = i;
                             MarkingData.MarkStartXPos = MarkingData.MarkOriginalXPos;                            
                             MarkingData.MarkReverse = false;                            
@@ -441,14 +451,14 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                         {                            
                             i = MarkingData.MarkStartLine;
                             MarkingData.MarkStartLine = MarkingData.MarkEndLine;
-                            MarkingData.MarkEndLine = i;
-                            i = MarkingData.MarkEndCharPos +1;                            
-                            MarkingData.MarkEndCharPos = MarkingData.MarkStartCharPos +1;
+                            MarkingData.MarkEndLine = i;                            
+                            i = MarkingData.MarkEndCharPos+1;                            
+                            MarkingData.MarkEndCharPos = MarkingData.MarkStartCharPos+1;
                             MarkingData.MarkStartCharPos = i;
                             MarkingData.MarkStartXPos = MarkingData.MarkOriginalXPos;
                             MarkingData.MarkReverse = false;                            
                         }                        
-                    }
+                    }                    
                     Invalidate();
                 }
                 else
@@ -558,12 +568,15 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             if (_scrollValue == currentLines)
             {
                 _scrolledToBottom = true;
-                _scrollValue = TextData.WrappedLinesCount - 1;
-                if (TextData.Lines.Count > _maximumLines)
+                if (MarkingData == null)
                 {
-                    /* Only trim the buffer if the window isn't scrolled above bottom - or else lines appear to move up */
-                    TrimBuffer();
-                }
+                    _scrollValue = TextData.WrappedLinesCount - 1;
+                    if (TextData.Lines.Count > _maximumLines)
+                    {
+                        /* Only trim the buffer if the window isn't scrolled above bottom (or marking) - or else lines appear to move up */
+                        TrimBuffer();
+                    }
+                }                
             }
             else
             {

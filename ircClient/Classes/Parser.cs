@@ -151,6 +151,11 @@ namespace ircClient.Classes
                     /* Welcome message */
                     _client.IsConnected = true;
                     _client.IsConnecting = false;
+                    if (!third.Equals(_client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        /* Nickname from server doesn't match what was sent - possibly truncated */
+                        _client.UserInfo.Nick = third;
+                    }
                     if (OnWelcome != null)
                     {
                         OnWelcome(_client, RemoveColon(fourth));
@@ -160,6 +165,11 @@ namespace ircClient.Classes
                 case "002":
                 case "003":
                 case "004":
+                    if (!third.Equals(_client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        /* Nickname from server doesn't match what was sent - possibly truncated */
+                        _client.UserInfo.Nick = third;
+                    }
                     if (OnWelcome != null)
                     {
                         OnWelcome(_client, RemoveColon(fourth));
@@ -328,6 +338,7 @@ namespace ircClient.Classes
 
                 case "331":
                 case "381":
+                case "396":
                 case "401":                
                 case "433":
                 case "437":
@@ -631,10 +642,10 @@ namespace ircClient.Classes
 
         private void ParseQuit(string nick, string msg)
         {
-            var n = RemoveColon(nick).Split('!');
-            if (n.Length == 0)
+            var n = RemoveColon(nick).Split('!');            
+            if (n.Length == 0 || n[0].Equals(_client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
             {
-                return; /*This should never happen */
+                return; /*This should never happen - however, some servers send QUIT on self-quit */
             }
             if (OnQuit != null)
             {

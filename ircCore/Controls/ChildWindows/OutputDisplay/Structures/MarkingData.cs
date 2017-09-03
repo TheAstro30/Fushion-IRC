@@ -21,6 +21,8 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Structures
 
         public bool MarkReverse { get; set; }
 
+        public bool MarkScrolledToBottom { get; set; }
+
         public int MarkStartLine { get; set; }
         public int MarkEndLine { get; set; }
         public int MarkBackwardStart { get; set; }

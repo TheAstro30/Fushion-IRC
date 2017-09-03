@@ -150,7 +150,7 @@ namespace FusionIRC.Forms
         protected override void OnLoad(EventArgs e)
         {
             /* Create our first connection */
-            WindowManager.AddWindow(null, ChildWindowType.Console, this, "Console", "Console", true);
+            WindowManager.AddWindow(null, ChildWindowType.Console, this, "Console", "Console", true);            
             base.OnLoad(e);
         }
 
@@ -323,7 +323,7 @@ namespace FusionIRC.Forms
                 return;
             }
             win.Restore();
-            _mdi.ActivateChild(win);              
+            _mdi.ActivateChild(win);
             win.MyActivate();
         }
     }

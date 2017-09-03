@@ -103,8 +103,14 @@ namespace FusionIRC.Helpers
             if (_mdiClient == null) { return; }
             var iPos = _mdiClient.Controls.IndexOf(childForm);
             var iLastIdX = _mdiClient.Controls.Count - 1;
-            if (iPos == iLastIdX) { frmTemp = (FrmChildWindow)_mdiClient.Controls[0]; }
-            else { frmTemp = (FrmChildWindow)_mdiClient.Controls[iPos + 1]; }
+            if (iPos == iLastIdX)
+            {
+                frmTemp = (FrmChildWindow) _mdiClient.Controls[0];
+            }
+            else
+            {
+                frmTemp = (FrmChildWindow)_mdiClient.Controls[iPos + 1];
+            }
             SendMessage(_mdiClient.Handle.ToInt32(), WmMdinext, frmTemp.Handle.ToInt32(), ref iRef);
         }
 

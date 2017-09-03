@@ -180,6 +180,7 @@ namespace FusionIRC.Forms
                 Close();
                 return;
             }
+            _isSsl = false;
             _address = address[0];
             string[] port = null;
             if (!string.IsNullOrEmpty(_txtPort.Text))

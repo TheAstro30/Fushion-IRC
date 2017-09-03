@@ -155,6 +155,7 @@ namespace FusionIRC.Forms
                 Output.BackgroundImageLayout = bd.LayoutStyle;
             }
             /* Callbacks */
+            Output.MouseUp += OutputMouseUp;
             Input.TabKeyPress += InputTabKeyPress;
             Input.KeyDown += InputKeyDown;
             Input.MouseWheel += InputMouseWheel;
@@ -312,6 +313,11 @@ namespace FusionIRC.Forms
         }
 
         /* Control callbacks */
+        private void OutputMouseUp(object sender, MouseEventArgs e)
+        {
+            Input.Focus();
+        }
+
         private void InputKeyDown(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)

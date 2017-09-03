@@ -139,11 +139,11 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
         {
             /* Check for marking */
             if (MarkingData != null && MarkingData.MouseStartedMoving)
-            {
+            {                
                 RenderMarkedText(deviceContext, font, clientRect, scrollValue);
             }
             else
-            {
+            {             
                 /* Render normal line data */
                 RenderBackgroundImage(deviceContext, clientRect);
                 RenderLineData(deviceContext, font, clientRect, scrollValue);

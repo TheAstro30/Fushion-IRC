@@ -197,8 +197,7 @@ namespace ircClient
         {
             switch (state)
             {
-                case WinsockStates.Closed:
-                    System.Diagnostics.Debug.Print("Closed");
+                case WinsockStates.Closed:                    
                     IsConnecting = false;
                     IsConnected = false;
                     _tmrWaitToReconnect.Enabled = true;

@@ -20,8 +20,7 @@ namespace FusionIRC.Helpers
 
         /* Constructor */
         static CommandProcessor()
-        {
-            System.Diagnostics.Debug.Print("Constructor");
+        {            
             /* Wait at least N number of seconds for socket to disconenct when issuing a new /server connection on a connected socket */
             TmrWaitToReconnectTimeOut = new Timer
                                              {
@@ -226,22 +225,18 @@ namespace FusionIRC.Helpers
         }
 
         private static void ParseServerDisconnection(ClientConnection client)
-        {
-            System.Diagnostics.Debug.Print("Disconnect");
+        {            
             var c = WindowManager.GetConsoleWindow(client);
             if (c == null)
-            {
-                System.Diagnostics.Debug.Print("window is null");
+            {         
                 return;
             }
             if (client.IsConnecting)
             {
-                /* Cancel current connection */
-                System.Diagnostics.Debug.Print("Cancel");
+                /* Cancel current connection */                
                 client.CancelConnection();
                 return;
-            }
-            System.Diagnostics.Debug.Print("Disconnect");
+            }            
             client.Disconnect();
         }
 
