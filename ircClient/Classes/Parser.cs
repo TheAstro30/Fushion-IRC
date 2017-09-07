@@ -5,7 +5,6 @@
  */
 using System;
 using System.Reflection;
-using System.Windows.Forms;
 using ircCore.Utils;
 
 namespace ircClient.Classes

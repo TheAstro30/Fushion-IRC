@@ -210,7 +210,7 @@ namespace FusionIRC.Forms
             var c = WindowManager.GetActiveConnection(this);
             if (c != null)
             {                
-                SettingsManager.Settings.UserInfo = c.UserInfo;
+                SettingsManager.Settings.UserInfo = new SettingsUserInfo(c.UserInfo);
             }
             /* In order for the client to load the toolbars in the correct order, we need to get their positions within each dock... */
             UpdateDockLayout();

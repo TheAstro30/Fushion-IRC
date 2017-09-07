@@ -338,6 +338,11 @@ namespace FusionIRC.Helpers
             {
                 return;
             }
+            /* Set invisible */
+            if (client.UserInfo.Invisible)
+            {
+                client.Send(string.Format("MODE {0} +i", client.UserInfo.Nick));
+            }
             /* Update recent servers list */
             foreach (var s in ServerManager.Servers.Recent.Server.Where(s => s.Address.Equals(client.Server.Address, StringComparison.InvariantCultureIgnoreCase)))
             {

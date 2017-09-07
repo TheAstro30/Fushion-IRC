@@ -53,7 +53,10 @@ namespace FusionIRC.Helpers
             foreach (Control a in _parentForm.Controls)
             {
                 _mdiClient = a as MdiClient;
-                if (_mdiClient == null) continue;
+                if (_mdiClient == null)
+                {
+                    continue;
+                }
                 ReleaseHandle();
                 AssignHandle(_mdiClient.Handle);
                 break;

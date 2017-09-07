@@ -17,6 +17,12 @@ namespace ircCore.Utils
             return Path.GetInvalidFileNameChars().Aggregate(fileName, (current, c) => current.Replace(c.ToString(), string.Empty));
         }
 
+        public static string GetFirstWord(string input)
+        {
+            var s = input.Trim().Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+            return s.Length > 0 ? s[0] : input;
+        }
+
         public sealed class EnumUtils
         {
             public static string GetDescriptionFromEnumValue(Enum value)

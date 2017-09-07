@@ -10,7 +10,6 @@ using System.Linq;
 using System.Media;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using FusionIRC.Controls;
 using ircCore.Controls;
 using ircCore.Settings;
 

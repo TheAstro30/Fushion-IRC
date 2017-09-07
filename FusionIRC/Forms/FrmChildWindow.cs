@@ -179,7 +179,6 @@ namespace FusionIRC.Forms
             {
                 Location = w.Position;
             }
-            //WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
             if (SettingsManager.Settings.Windows.ChildrenMaximized)
             {
                 WindowState = FormWindowState.Maximized;
@@ -291,7 +290,6 @@ namespace FusionIRC.Forms
                 switch (WindowState)
                 {
                     case FormWindowState.Normal:
-                        /* For now, we're only interested in size */
                         var w = SettingsManager.GetWindowByName(_windowChildName);
                         w.Size = Size;
                         //w.Position = Location;

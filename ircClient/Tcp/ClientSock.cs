@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
@@ -68,20 +69,17 @@ namespace ircClient.Tcp
         public virtual event Action<ClientSock, string> OnDebugOut;
         public virtual event Action<ClientSock, X509Certificate> OnSslInvalidCertificate;
 
-        public ClientSock()
-            : this(80)
+        public ClientSock() : this(80)
         {
             /* Empty */
         }
 
-        public ClientSock(int port)
-            : this("127.0.0.1", port)
+        public ClientSock(int port) : this("127.0.0.1", port)
         {
             /* Empty */
         }
 
-        public ClientSock(string ip)
-            : this(ip, 80)
+        public ClientSock(string ip) : this(ip, 80)
         {
             /* Empty */
         }
@@ -260,6 +258,7 @@ namespace ircClient.Tcp
                         return;
                     }
                     break;
+
                 case WinsockStates.Connected:
                 case WinsockStates.Connecting:
                 case WinsockStates.ConnectionPending:
@@ -285,9 +284,11 @@ namespace ircClient.Tcp
                         return;
                     }
                     break;
+
                 case WinsockStates.Error:
                     ChangeState(WinsockStates.Closed);
                     break;
+
                 case WinsockStates.Closed:
                     /* Do nothing */
                     break;
@@ -319,7 +320,7 @@ namespace ircClient.Tcp
             }
             catch
             {
-                System.Diagnostics.Debug.Assert(true);
+                Debug.Assert(true);
             }
         }
 
@@ -345,7 +346,7 @@ namespace ircClient.Tcp
             }
             catch
             {
-                System.Diagnostics.Debug.Assert(true);
+                Debug.Assert(true);
             }
         }
 
@@ -361,7 +362,7 @@ namespace ircClient.Tcp
             }
             catch
             {
-                System.Diagnostics.Debug.Assert(true);
+                Debug.Assert(true);
             }
         }
 
@@ -372,9 +373,11 @@ namespace ircClient.Tcp
                 case WinsockStates.Closed:
                     /* Can't send - not connected */
                     break;
+
                 case WinsockStates.Listening:
                     /* Listening */
                     break;
+
                 case WinsockStates.Connected:
                     try
                     {
@@ -411,7 +414,7 @@ namespace ircClient.Tcp
                     }
                     catch
                     {
-                        System.Diagnostics.Debug.Assert(true);
+                        Debug.Assert(true);
                     }
                     break;
             }
@@ -459,7 +462,6 @@ namespace ircClient.Tcp
         }
 
         /* Socket callback events */
-
         private void OnClientConnected(IAsyncResult ar)
         {
             try
@@ -526,7 +528,7 @@ namespace ircClient.Tcp
             }
             catch
             {
-                System.Diagnostics.Debug.Assert(true);
+                Debug.Assert(true);
             }
         }
 
@@ -593,7 +595,7 @@ namespace ircClient.Tcp
             }
             catch
             {
-                System.Diagnostics.Debug.Assert(true);
+                Debug.Assert(true);
             }
         }
 
@@ -650,7 +652,9 @@ namespace ircClient.Tcp
                         }
                         return;
                     }
-                    Array.Resize(ref _buffer, intCount);
+                    var buffer = _buffer; /* Marshal-by-reference may cause runtime exception when passed by ref/out as in the next line... */
+                    Array.Resize(ref buffer, intCount);
+                    _buffer = buffer; /* Shouldn't have to re-assign it back, but doesn't work without doing so... */
                     _byteData.Add(_buffer);
                     if (OnDataArrival != null)
                     {
@@ -696,7 +700,7 @@ namespace ircClient.Tcp
                 }
                 catch
                 {
-                    System.Diagnostics.Debug.Assert(true);
+                    Debug.Assert(true);
                 }
             }
         }
@@ -725,7 +729,7 @@ namespace ircClient.Tcp
             }
             catch
             {
-                System.Diagnostics.Debug.Assert(true);
+                Debug.Assert(true);
             }
         }
 
@@ -741,7 +745,7 @@ namespace ircClient.Tcp
             }
             catch
             {
-                System.Diagnostics.Debug.Assert(true);
+                Debug.Assert(true);
             }
         }
 
@@ -772,7 +776,7 @@ namespace ircClient.Tcp
             }
             catch
             {
-                System.Diagnostics.Debug.Assert(true);
+                Debug.Assert(true);
             }
         }
     }

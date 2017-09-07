@@ -6,7 +6,6 @@ using System;
 using System.Drawing;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
-using FusionIRC.Controls;
 using FusionIRC.Properties;
 using ircCore.Controls;
 
@@ -116,7 +115,7 @@ namespace FusionIRC.Forms
             /* Add controls */
             Controls.AddRange(new Control[] {_pnlIcon, _lblServer, _lblInfo, _lblAccept, _chkAutoAccept, _btnAccept, _btnCancel});
             /* Form initialization */
-            AcceptButton = this._btnAccept;
+            AcceptButton = _btnAccept;
             ClientSize = new Size(434, 211);
             Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;

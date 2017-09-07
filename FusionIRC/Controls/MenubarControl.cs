@@ -43,7 +43,7 @@ namespace FusionIRC.Controls
                                                     new ToolStripMenuItem("Connect", null, OnMenuFileClick, Keys.F3),
                                                     new ToolStripMenuItem("Disconnect", null, OnMenuFileClick, Keys.F4),                                                    
                                                     new ToolStripSeparator(),
-                                                    new ToolStripMenuItem("Exit", null, OnMenuFileClick, Keys.Alt | Keys.F4), 
+                                                    new ToolStripMenuItem("Exit", null, OnMenuFileClick, Keys.Alt | Keys.F4)
                                                 });
             _mnuFile.DropDownOpening += OnMenuFileDropDownOpening;            
             _mnuWindow = new ToolStripMenuItem

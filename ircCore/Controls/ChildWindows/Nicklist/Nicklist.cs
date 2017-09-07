@@ -10,7 +10,6 @@ using System.Linq;
 using System.Media;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using ircCore.Controls.ChildWindows.Input;
 using ircCore.Controls.ChildWindows.Nicklist.Helpers;
 using ircCore.Controls.ChildWindows.Nicklist.Structures;
 

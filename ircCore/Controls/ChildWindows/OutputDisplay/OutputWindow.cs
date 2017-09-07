@@ -671,6 +671,10 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 TextData.Wrapped.RemoveAt(0);
                 TextData.Lines.RemoveAt(0);
             }
+            if (_scrolledToBottom)
+            {
+                _scrollValue = TextData.WrappedLinesCount - 1;
+            }
         }
 
         private void AdjustWidth(bool adjustClientWidth)

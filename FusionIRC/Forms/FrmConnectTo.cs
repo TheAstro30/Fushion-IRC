@@ -10,31 +10,47 @@ using FusionIRC.Helpers;
 using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
+using ircCore.Utils;
 
 namespace FusionIRC.Forms
 {
     public sealed class FrmConnectTo : FormEx
     {
-        private readonly Label _lblHeader;
+        private readonly GroupBox _gbCredentials;
+        private readonly Label _lblUserInfo;
+        private readonly Label _lblNick;
+        private readonly TextBox _txtNick;
+        private readonly Label _lblAlternative;
+        private readonly TextBox _txtAlternate;
+        private readonly Label _lblIdent;
+        private readonly TextBox _txtIdent;
+        private readonly Label _lblRealName;
+        private readonly TextBox _txtRealName;
+        private readonly CheckBox _chkInvisible;                                                                      
+
+        private readonly GroupBox _gbServer;
+        private readonly Label _lblServerInfo;
         private readonly Label _lblAddress;
         private readonly TextBox _txtAddress;
-        private readonly Label _lblPort;        
+        private readonly Label _lblPort;
         private readonly TextBox _txtPort;
         private readonly Label _lblChannels;
         private readonly TextBox _txtChannels;
         private readonly CheckBox _chkNewWindow;
+
         private readonly Button _btnConnect;
         private readonly Button _btnClose;
-
-        private readonly Form _owner;
-        private bool _isSsl;
+        
+        private FrmChildWindow _console;
 
         private string _address;
-        private int _port;        
+        private int _port;
+        private readonly Form _owner;        
+        private bool _isSsl;
 
         public FrmConnectTo(Form owner)
         {
-            ClientSize = new Size(411, 215);
+            ClientSize = new Size(436, 414);
             Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
             MaximizeBox = false;
@@ -44,80 +60,199 @@ namespace FusionIRC.Forms
             StartPosition = FormStartPosition.CenterParent;
             Text = @"Connect To Location";
 
-            _lblHeader = new Label
-                             {
-                                 BackColor = Color.Transparent,
-                                 Location = new Point(12, 9),
-                                 Size = new Size(387, 35),
-                                 Text = @"You can specify an IRC server to connect to directly here. Use '+' before the port to specify the server is SSL"
-                             };
+            _gbCredentials = new GroupBox
+                                 {
+                                     BackColor = Color.Transparent,
+                                     Location = new Point(12, 12),
+                                     Size = new Size(412, 164),
+                                     TabIndex = 2,
+                                     TabStop = false,
+                                     Text = @"User information:"
+                                 };
+
+            _lblUserInfo = new Label
+                               {
+                                   AutoSize = true,
+                                   Location = new Point(6, 19),
+                                   Size = new Size(262, 15),
+                                   TabIndex = 3,
+                                   Text = @"The following fields identify you to an IRC server"
+                               };
+
+
+            _lblNick = new Label
+                           {
+                               AutoSize = true,
+                               Location = new Point(6, 48),
+                               Size = new Size(64, 15),
+                               TabIndex = 4,
+                               Text = @"Nickname:"
+                           };
+
+            _txtNick = new TextBox
+                           {
+                               Enabled = false,
+                               Location = new Point(9, 66),
+                               Size = new Size(195, 23),
+                               TabIndex = 5
+                           };
+
+            _lblAlternative = new Label
+                                  {
+                                      AutoSize = true,
+                                      Location = new Point(206, 48),
+                                      Size = new Size(185, 15),
+                                      TabIndex = 6,
+                                      Text = @"Alternative (if nickname is in use):"
+                                  };
+
+            _txtAlternate = new TextBox
+                                {
+                                    Enabled = false, 
+                                    Location = new Point(209, 66), 
+                                    Size = new Size(195, 23), 
+                                    TabIndex = 7};
+
+            _lblIdent = new Label
+                            {
+                                AutoSize = true,
+                                Location = new Point(6, 92),
+                                Size = new Size(77, 15),
+                                TabIndex = 8,
+                                Text = @"Ident (email):"
+                            };
+
+            _txtIdent = new TextBox
+                            {
+                                Enabled = false, 
+                                Location = new Point(9, 110), 
+                                Size = new Size(195, 23), 
+                                TabIndex = 9
+                            };
+
+            _lblRealName = new Label
+                               {
+                                   AutoSize = true,
+                                   Location = new Point(207, 92),
+                                   Size = new Size(65, 15),
+                                   TabIndex = 10,
+                                   Text = @"Real name:"
+                               };
+
+            _txtRealName = new TextBox
+                               {
+                                   Enabled = false,
+                                   Location = new Point(210, 110),
+                                   Size = new Size(194, 23),
+                                   TabIndex = 11
+                               };
+
+            _chkInvisible = new CheckBox
+                                {
+                                    AutoSize = true,
+                                    Enabled = false,
+                                    Location = new Point(9, 139),
+                                    Size = new Size(125, 19),
+                                    TabIndex = 12,
+                                    Text = @"Invisible mode (+i)",
+                                    UseVisualStyleBackColor = true
+                                };
+
+            _gbCredentials.Controls.AddRange(new Control[]
+                                                 {
+                                                     _lblUserInfo, _lblNick, _txtNick, _lblAlternative, _txtAlternate,
+                                                     _lblIdent, _txtIdent, _lblRealName, _txtRealName, _chkInvisible
+                                                 });
+
+            _gbServer = new GroupBox
+                            {
+                                BackColor = Color.Transparent,
+                                Location = new Point(12, 182),
+                                Size = new Size(412, 180),
+                                TabIndex = 13,
+                                TabStop = false,
+                                Text = @"Server:"
+                            };
+
+            _lblServerInfo = new Label
+                                 {
+                                     Location = new Point(6, 19),
+                                     Size = new Size(398, 36),
+                                     TabIndex = 14,
+                                     Text = @"You can specify an IRC server to connect to here. Use '+' before the port to specify the server is SSL"
+                                 };
 
             _lblAddress = new Label
                               {
                                   AutoSize = true,
-                                  BackColor = Color.Transparent,
-                                  Location = new Point(12, 53),
+                                  Location = new Point(6, 64),
                                   Size = new Size(85, 15),
+                                  TabIndex = 15,
                                   Text = @"Server address:"
                               };
 
             _txtAddress = new TextBox
                               {
-                                  Location = new Point(15, 71),
-                                  MaxLength = 200,
-                                  Size = new Size(215, 23),
-                                  TabIndex = 0
+                                  Location = new Point(9, 82),
+                                  Size = new Size(216, 23),
+                                  TabIndex = 16
                               };
 
             _lblPort = new Label
                            {
                                AutoSize = true,
-                               BackColor = Color.Transparent,
-                               Location = new Point(233, 53),
+                               Location = new Point(228, 64),
                                Size = new Size(32, 15),
+                               TabIndex = 17,
                                Text = @"Port:"
                            };
 
             _txtPort = new TextBox
                            {
-                               Location = new Point(236, 71),
-                               MaxLength = 6,
-                               Size = new Size(66, 23),
-                               TabIndex = 1
+                               Location = new Point(231, 82),
+                               MaxLength = 5,
+                               Size = new Size(70, 23),
+                               TabIndex = 18
                            };
 
             _lblChannels = new Label
                                {
                                    AutoSize = true,
-                                   BackColor = Color.Transparent,
-                                   Location = new Point(12, 97),
+                                   Location = new Point(6, 108),
                                    Size = new Size(249, 15),
+                                   TabIndex = 19,
                                    Text = @"Channels to join on connect (separated by ','):"
                                };
 
             _txtChannels = new TextBox
                                {
-                                   Location = new Point(15, 115),
-                                   Size = new Size(384, 23),
-                                   TabIndex = 2
+                                   Location = new Point(9, 126), 
+                                   Size = new Size(395, 23), 
+                                   TabIndex = 20
                                };
+
 
             _chkNewWindow = new CheckBox
                                 {
                                     AutoSize = true,
-                                    BackColor = Color.Transparent,
-                                    Location = new Point(15, 144),
+                                    Location = new Point(9, 155),
                                     Size = new Size(158, 19),
-                                    TabIndex = 3,
+                                    TabIndex = 21,
                                     Text = @"New connection window",
-                                    UseVisualStyleBackColor = false
+                                    UseVisualStyleBackColor = true
                                 };
+
+            _gbServer.Controls.AddRange(new Control[]
+                                            {
+                                                _lblServerInfo, _lblAddress, _txtAddress, _lblPort, _txtPort, _lblChannels,
+                                                _txtChannels, _chkNewWindow
+                                           });
 
             _btnConnect = new Button
                               {
-                                  Location = new Point(243, 180),
+                                  Location = new Point(268, 379),                                  
                                   Size = new Size(75, 23),
-                                  TabIndex = 4,
+                                  TabIndex = 0,
                                   Tag = "CONNECT",
                                   Text = @"Connect",
                                   UseVisualStyleBackColor = true
@@ -125,18 +260,17 @@ namespace FusionIRC.Forms
 
             _btnClose = new Button
                             {
-                                Location = new Point(324, 180),
+                                Location = new Point(349, 379),                                
                                 Size = new Size(75, 23),
-                                TabIndex = 5,
+                                TabIndex = 1,
                                 Tag = "CLOSE",
                                 Text = @"Close",
                                 UseVisualStyleBackColor = true
                             };
 
-            Controls.AddRange(new Control[] {_lblHeader, _lblAddress, _txtAddress, _lblPort, _txtPort, _lblChannels, _txtChannels, _chkNewWindow, _btnConnect, _btnClose});            
+            Controls.AddRange(new Control[] {_gbCredentials, _gbServer, _btnConnect, _btnClose});            
 
             AcceptButton = _btnConnect;
-
             _owner = owner;
             /* Set up recent information */
             _isSsl = SettingsManager.Settings.Connection.IsSsl;
@@ -145,23 +279,59 @@ namespace FusionIRC.Forms
             {
                 port = 6667;
             }
+            /* Current client connection */
+            var client = WindowManager.GetActiveConnection(_owner);
+            _console = WindowManager.GetConsoleWindow(client);            
+            /* User information */
+            _txtNick.Text = _console.Client.UserInfo.Nick;
+            _txtAlternate.Text = _console.Client.UserInfo.Alternative;
+            _txtIdent.Text = _console.Client.UserInfo.Ident;
+            _txtRealName.Text = _console.Client.UserInfo.RealName;
+            _chkInvisible.Checked = _console.Client.UserInfo.Invisible;
+            /* Server information */
             _txtAddress.Text = SettingsManager.Settings.Connection.Address;
             _txtAddress.SelectionStart = _txtAddress.Text.Length;
             _txtPort.Text = _isSsl ? string.Format("+{0}", port) : port.ToString();
             _txtChannels.Text = SettingsManager.Settings.Connection.Channels;
             _chkNewWindow.Checked = SettingsManager.Settings.Connection.NewWindow;
 
+            if ((!_console.Client.IsConnecting && !_console.Client.IsConnected) || _chkNewWindow.Checked)
+            {
+                _txtNick.Enabled = true;
+                _txtAlternate.Enabled = true;
+                _txtIdent.Enabled = true;
+                _txtRealName.Enabled = true;
+                _chkInvisible.Enabled = true;
+            }
+            else
+            {
+                _btnConnect.Text = @"Disconnect";
+                _btnConnect.Tag = "DISCONNECT";
+            }
+
+            _chkNewWindow.CheckedChanged += CheckNewWindowHandler;
             _btnConnect.Click += ButtonClickHandler;
-            _btnClose.Click += ButtonClickHandler;
+            _btnClose.Click += ButtonClickHandler;            
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            SettingsManager.Settings.Connection.Address = _address;
-            SettingsManager.Settings.Connection.Port = _port;
-            SettingsManager.Settings.Connection.IsSsl = _isSsl;
-            SettingsManager.Settings.Connection.Channels = _txtChannels.Text;
-            SettingsManager.Settings.Connection.NewWindow = _chkNewWindow.Checked;
+            if (DialogResult == DialogResult.OK)
+            {
+                /* User information */
+                _console.Client.UserInfo.Nick = Functions.GetFirstWord(_txtNick.Text);
+                _console.Client.UserInfo.Alternative = Functions.GetFirstWord(_txtAlternate.Text);
+                _console.Client.UserInfo.Ident = Functions.GetFirstWord(_txtIdent.Text);
+                _console.Client.UserInfo.RealName = _txtRealName.Text.Trim();
+                _console.Client.UserInfo.Invisible = _chkInvisible.Checked;
+                SettingsManager.Settings.UserInfo = new SettingsUserInfo(_console.Client.UserInfo);
+                /* Server information */
+                SettingsManager.Settings.Connection.Address = _address;
+                SettingsManager.Settings.Connection.Port = _port;
+                SettingsManager.Settings.Connection.IsSsl = _isSsl;
+                SettingsManager.Settings.Connection.Channels = _txtChannels.Text;
+                SettingsManager.Settings.Connection.NewWindow = _chkNewWindow.Checked;
+            }
             base.OnFormClosing(e);
         }
 
@@ -174,14 +344,14 @@ namespace FusionIRC.Forms
                 return;
             }
             /* Get address and port */
-            var address = _txtAddress.Text.Split(' ');
-            if (address.Length == 0)
+            var address = Functions.GetFirstWord(_txtAddress.Text);
+            if (string.IsNullOrEmpty(address))
             {
                 Close();
                 return;
             }
             _isSsl = false;
-            _address = address[0];
+            _address = address;
             string[] port = null;
             if (!string.IsNullOrEmpty(_txtPort.Text))
             {
@@ -211,33 +381,57 @@ namespace FusionIRC.Forms
             }
             switch (btn.Tag.ToString())
             {
-                case "CONNECT":                    
-                    /* Either get the current connection or create a new one */
-                    FrmChildWindow c;
-                    if (_chkNewWindow.Checked)
-                    {
-                        c = WindowManager.AddWindow(null, ChildWindowType.Console, _owner, "Console", "Console", true);
-                    }
-                    else
-                    {
-                        var client = WindowManager.GetActiveConnection(_owner);
-                        c = WindowManager.GetConsoleWindow(client);
-                    }
-                    if (c == null)
+                case "CONNECT":
+                    /* Cannot connect if user info is blank ... */
+                    if (string.IsNullOrEmpty(_txtNick.Text) || string.IsNullOrEmpty(_txtIdent.Text) || string.IsNullOrEmpty(_txtRealName.Text))
                     {
                         return;
+                    }
+                    /* Either get the current connection or create a new one */
+                    if (_chkNewWindow.Checked)
+                    {
+                        _console = WindowManager.AddWindow(null, ChildWindowType.Console, _owner, "Console", "Console", true);
                     }
                     var connection = !string.IsNullOrEmpty(_txtChannels.Text)
                                          ? string.Format("SERVER {0}:{1} -j {2}", _address, port[0], _txtChannels.Text)
                                          : string.Format("SERVER {0}:{1}", _address, port[0]);
-                    CommandProcessor.Parse(c.Client, c, connection);
-                    Close();
+                    CommandProcessor.Parse(_console.Client, _console, connection);
+                    DialogResult = DialogResult.OK;
                     break;
 
-                case "CLOSE":
-                    Close();
-                    break;
+                case "DISCONNECT":
+                    if (_console == null)
+                    {
+                        return;
+                    }
+                    _console.Client.Send("QUIT :Leaving.");
+                    _console.Client.Disconnect();
+                    _txtNick.Enabled = true;
+                    _txtAlternate.Enabled = true;
+                    _txtIdent.Enabled = true;
+                    _txtRealName.Enabled = true;
+                    _chkInvisible.Enabled = true;
+                    _btnConnect.Text = @"Connect";
+                    _btnConnect.Tag = "CONNECT";
+                    return;
             }
+            Close();
+        }
+
+        private void CheckNewWindowHandler(object sender, EventArgs e)
+        {
+            if (!_console.Client.IsConnecting && !_console.Client.IsConnected)
+            {
+                return;
+            }
+            var c = _chkNewWindow.Checked;
+            _txtNick.Enabled = c;
+            _txtAlternate.Enabled = c;
+            _txtIdent.Enabled = c;
+            _txtRealName.Enabled = c;
+            _chkInvisible.Enabled = c;
+            _btnConnect.Text = c ? "Connect" : "Disconnect";
+            _btnConnect.Tag = c ? "CONNECT" : "DISCONNECT";
         }
     }
 }

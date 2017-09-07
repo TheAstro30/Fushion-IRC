@@ -23,6 +23,9 @@ namespace ircCore.Settings
         [XmlAttribute("realname")]
         public string RealName { get; set; }
 
+        [XmlAttribute("invisible")]
+        public bool Invisible { get; set; }
+
         [XmlIgnore]
         public bool AlternativeUsed { get; set; } /* On an IRC server during connect "nick in use", switch nick and alternative */
 
@@ -39,6 +42,7 @@ namespace ircCore.Settings
             Alternative = userInfo.Alternative;
             Ident = userInfo.Ident;
             RealName = userInfo.RealName;
+            Invisible = userInfo.Invisible;
         }
     }
 }
