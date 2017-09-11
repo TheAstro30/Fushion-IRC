@@ -7,6 +7,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using ircCore.Utils;
 using ircCore.Utils.Serialization;
 
 namespace ircCore.Settings
@@ -18,7 +19,7 @@ namespace ircCore.Settings
         public static void Load()
         {
             /* Load settings from disk */
-            if (!XmlSerialize<Settings>.Load("settings.xml", ref Settings))
+            if (!XmlSerialize<Settings>.Load(Functions.MainDir(@"\data\settings.xml", false), ref Settings))
             {
                 Settings = new Settings();
             }
@@ -27,7 +28,7 @@ namespace ircCore.Settings
         public static void Save()
         {
             /* Save settings to disk */
-            XmlSerialize<Settings>.Save("settings.xml", Settings);
+            XmlSerialize<Settings>.Save(Functions.MainDir(@"\data\settings.xml", false), Settings);
         }
 
         public static WindowData GetWindowByName(string name)

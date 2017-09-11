@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using ircCore.Controls;
 using ircCore.Settings.Theming.Forms.Controls;
+using ircCore.Utils;
 
 namespace ircCore.Settings.Theming.Forms
 {
@@ -150,15 +151,14 @@ namespace ircCore.Settings.Theming.Forms
             switch (btn.Tag.ToString())
             {
                 case "APPLY":
-                    /* Apply the new theme and close */
-                    System.Diagnostics.Debug.Print("Apply");
+                    /* Apply the new theme and close */                    
                     var t = _themePreview.ThemeData;
                     if (t == null)
                     {
                         return;
                     }
                     SettingsManager.Settings.Themes.CurrentTheme = _themePreview.ThemeIndex;
-                    ThemeManager.Load(t.Path);
+                    ThemeManager.Load(Functions.MainDir(t.Path, false));
                     break;
             }
         }

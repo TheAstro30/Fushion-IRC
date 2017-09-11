@@ -144,14 +144,14 @@ namespace ircCore.Settings.Theming.Forms.Controls
                             t = new SettingsTheme.ThemeListData
                                     {
                                         Name = f.ThemeName,
-                                        Path = Utils.Functions.CleanFileName(string.Format("{0}.thm", f.ThemeName))
-                                    };
+                                        Path = string.Format(@"\themes\{0}.thm", Utils.Functions.CleanFileName(f.ThemeName))
+                                    };                            
                             SettingsManager.Settings.Themes.Theme.Add(t);
                             _theme = new Theme
                                          {
                                              Name = t.Name
                                          };
-                            ThemeManager.Save(t.Path, _theme);
+                            ThemeManager.Save(Utils.Functions.MainDir(t.Path, false), _theme);
                             _cmbThemes.Items.Add(t);
                             _cmbThemes.SelectedIndex = _cmbThemes.Items.Count - 1;
                             BuildTextPreview();
@@ -170,19 +170,21 @@ namespace ircCore.Settings.Theming.Forms.Controls
                     }                    
                     /* Delete theme data */
                     SettingsManager.Settings.Themes.Theme.RemoveAt(_cmbThemes.SelectedIndex);
-                    if (File.Exists(deleted.Path))
+                    var path = Utils.Functions.MainDir(deleted.Path, false);
+                    if (File.Exists(path))
                     {
-                        File.Delete(deleted.Path);
+                        File.Delete(path);
                     }
                     _cmbThemes.Items.RemoveAt(_cmbThemes.SelectedIndex);
                     /* Select previous theme and load it */
                     var theme = new Theme();
-                    ThemeManager.Load(t.Path, ref theme, true);
+                    path = Utils.Functions.MainDir(t.Path, false);
+                    ThemeManager.Load(path, ref theme, true);
                     _theme = theme;                    
                     _cmbThemes.SelectedIndex = sel;
                     BuildTextPreview();                    
                     SettingsManager.Settings.Themes.CurrentTheme = _cmbThemes.SelectedIndex;
-                    ThemeManager.Load(t.Path); /* Make sure client is updated */
+                    ThemeManager.Load(path); /* Make sure client is updated */
                     break;
             }
         }
@@ -196,7 +198,7 @@ namespace ircCore.Settings.Theming.Forms.Controls
                 return;
             }
             var theme = new Theme();
-            ThemeManager.Load(t.Path, ref theme, true);
+            ThemeManager.Load(Utils.Functions.MainDir(t.Path, false), ref theme, true);
             _theme = theme;
             _preview.Clear();
             _preview.Font = new Font(ThemeManager.GetFont(ChildWindowType.Channel).Name, 10); /* We keep the size static so it fits the preview */

@@ -343,6 +343,7 @@ namespace FusionIRC.Helpers
             {
                 client.Send(string.Format("MODE {0} +i", client.UserInfo.Nick));
             }
+            System.Diagnostics.Debug.Print("Updating recent server for " + client.Server.Address);
             /* Update recent servers list */
             foreach (var s in ServerManager.Servers.Recent.Server.Where(s => s.Address.Equals(client.Server.Address, StringComparison.InvariantCultureIgnoreCase)))
             {
@@ -698,7 +699,7 @@ namespace FusionIRC.Helpers
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
-            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.MessageReceived);
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
             /* We need to parse the mode data */
             var plusMode = false;
             var data = modeData.Split(' ');

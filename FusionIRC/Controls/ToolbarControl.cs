@@ -107,13 +107,15 @@ namespace FusionIRC.Controls
             switch (btn.Tag.ToString())
             {
                 case "CONNECT":
-                    var server = ServerManager.Servers.Recent.Server.Count > 0
-                                     ? ServerManager.Servers.Recent.Server[0]
-                                     : new Server
-                                           {
-                                               Address = "irc.dragonirc.com",
-                                               Port = 6667
-                                           };
+                    var server = !string.IsNullOrEmpty(c.Server.Address)
+                                     ? c.Server
+                                     : ServerManager.Servers.Recent.Server.Count > 0
+                                           ? ServerManager.Servers.Recent.Server[0]
+                                           : new Server
+                                                 {
+                                                     Address = "irc.dragonirc.com",
+                                                     Port = 6667
+                                                 };
                     console = WindowManager.GetConsoleWindow(c);
                     if (console == null)
                     {

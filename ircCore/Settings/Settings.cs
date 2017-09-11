@@ -70,7 +70,7 @@ namespace ircCore.Settings
                     };
             Client.Appearance.ControlBars.Control.Add(d);
             /* Create a blank theme */
-            Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = "default.thm"});
+            Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = @"\themes\default.thm"});
             /* Caching defaults */
             Caching.Output = 500;
             Caching.Input = 50;

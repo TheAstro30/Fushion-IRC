@@ -14,6 +14,7 @@ using FusionIRC.Properties;
 using ircCore.Settings;
 using ircCore.Settings.Networks;
 using ircCore.Settings.Theming;
+using ircCore.Utils;
 
 namespace FusionIRC.Forms
 {
@@ -38,13 +39,16 @@ namespace FusionIRC.Forms
         public FrmClientWindow()
         {
             _initialize = true;
+            /* Set main application directory */
+            Functions.SetMainDir();
+            Functions.CheckFolders();
             /* Load client settings */
             SettingsManager.Load();
             /* Load servers */
-            ServerManager.Load("servers.xml");
+            ServerManager.Load(Functions.MainDir(@"\data\servers.xml", false));
             /* Load client current theme */
             ThemeManager.ThemeLoaded += WindowManager.OnThemeLoaded;
-            ThemeManager.Load(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path);
+            ThemeManager.Load(Functions.MainDir(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path, false));
             /* Main form initialization */
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             Text = @"FusionIRC";
@@ -217,9 +221,9 @@ namespace FusionIRC.Forms
             /* Save client settings */
             SettingsManager.Save();
             /* Save servers */
-            ServerManager.Save("servers.xml");
-            /* Save client current theme */            
-            ThemeManager.Save(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path);            
+            ServerManager.Save(Functions.MainDir(@"\data\servers.xml", false));
+            /* Save client current theme */                        
+            ThemeManager.Save(Functions.MainDir(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path, false));            
             base.OnFormClosing(e);
         }
 
