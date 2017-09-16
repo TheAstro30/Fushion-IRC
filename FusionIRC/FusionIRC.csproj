@@ -80,6 +80,9 @@
     <Compile Include="Forms\FrmSslError.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\FrmUrlWarn.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\FrmWhoisInfo.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -140,6 +143,7 @@
     <None Include="Icons\Toolbar\settings.ico" />
     <None Include="Icons\Toolbar\theme.ico" />
     <None Include="Icons\security.ico" />
+    <None Include="Icons\url.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

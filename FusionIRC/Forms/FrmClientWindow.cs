@@ -154,7 +154,7 @@ namespace FusionIRC.Forms
         protected override void OnLoad(EventArgs e)
         {
             /* Create our first connection */
-            WindowManager.AddWindow(null, ChildWindowType.Console, this, "Console", "Console", true);            
+            WindowManager.AddWindow(null, ChildWindowType.Console, this, "Console", "Console", true);
             base.OnLoad(e);
         }
 
@@ -199,6 +199,27 @@ namespace FusionIRC.Forms
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
+            /* First check close confirmation */
+            string msg = null;
+            switch (SettingsManager.Settings.Client.Confirmation.ClientClose)
+            {
+                case ClientCloseConfirmation.Connected:
+                    if (WindowManager.Windows.Any(client => client.Key.IsConnected))
+                    {
+                        msg = "You are still connected to an IRC server. Are you sure you want to exit?";
+                    }                    
+                    break;
+
+                case ClientCloseConfirmation.Always:
+                    msg = "Are you sure you want to exit?";
+                    break;
+            }
+            if (!string.IsNullOrEmpty(msg) && MessageBox.Show(msg, @"Confirm Exit", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+            {
+                /* Abort closing */
+                e.Cancel = true;
+                return;
+            }
             /* Save child forms window state */            
             if (MdiChildren.Where(w => w is FrmChildWindow).Any(w => w.WindowState == FormWindowState.Maximized))
             {

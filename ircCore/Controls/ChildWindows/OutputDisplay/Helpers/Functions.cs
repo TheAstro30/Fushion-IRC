@@ -12,7 +12,7 @@ using ircCore.Settings.Theming;
 
 namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
 {
-    public static class Functions
+    internal static class Functions
     {        
         private static readonly Regex RegExColors = new Regex("(?:(\\d{1,2})?(?:,(\\d{1,2}))?)", RegexOptions.Compiled);
 

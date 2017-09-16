@@ -155,6 +155,7 @@ namespace FusionIRC.Forms
                 Output.BackgroundImageLayout = bd.LayoutStyle;
             }
             /* Callbacks */
+            Output.OnUrlDoubleClicked += OutputUrlDoubleClicked;
             Output.MouseUp += OutputMouseUp;
             Input.TabKeyPress += InputTabKeyPress;
             Input.KeyDown += InputKeyDown;
@@ -311,6 +312,25 @@ namespace FusionIRC.Forms
         }
 
         /* Control callbacks */
+        private void OutputUrlDoubleClicked(string url)
+        {            
+            if (SettingsManager.Settings.Client.Confirmation.Url)
+            {
+                /* Create warning dialog and show it */
+                using (var d = new FrmUrlWarn())
+                {
+                    d.Url = url;
+                    d.ShowDialog(this);
+                    if (d.DialogResult == DialogResult.Cancel)
+                    {
+                        return;                        
+                    }
+                    url = d.Url;
+                }
+            }
+            Functions.OpenProcess(url);            
+        }
+
         private void OutputMouseUp(object sender, MouseEventArgs e)
         {
             Input.Focus();

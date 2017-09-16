@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -39,6 +40,19 @@ namespace ircCore.Utils
         }
 
         /* Static functions */
+        public static bool OpenProcess(string processName)
+        {
+            try
+            {
+                Process.Start(processName);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public static string CleanFileName(string fileName)
         {
             return Path.GetInvalidFileNameChars().Aggregate(fileName, (current, c) => current.Replace(c.ToString(), string.Empty));

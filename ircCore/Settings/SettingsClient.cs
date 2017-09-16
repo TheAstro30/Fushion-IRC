@@ -17,6 +17,9 @@ namespace ircCore.Settings
     {
         [XmlElement("appearance")]
         public AppearanceData Appearance = new AppearanceData();
+
+        [XmlElement("confirmation")]
+        public SettingsConfirmation Confirmation = new SettingsConfirmation();
     }
 
     [Serializable]
