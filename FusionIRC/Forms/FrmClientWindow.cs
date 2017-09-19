@@ -9,6 +9,7 @@ using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Controls;
 using FusionIRC.Controls.SwitchView;
+using FusionIRC.Forms.Child;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
 using ircCore.Settings;

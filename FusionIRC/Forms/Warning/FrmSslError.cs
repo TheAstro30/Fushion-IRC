@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using FusionIRC.Properties;
 using ircCore.Controls;
 
-namespace FusionIRC.Forms
+namespace FusionIRC.Forms.Warning
 {
     public sealed class FrmSslError : FormEx
     {

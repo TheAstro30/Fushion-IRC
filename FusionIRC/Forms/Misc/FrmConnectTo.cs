@@ -6,13 +6,14 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using FusionIRC.Forms.Child;
 using FusionIRC.Helpers;
 using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
 
-namespace FusionIRC.Forms
+namespace FusionIRC.Forms.Misc
 {
     public sealed class FrmConnectTo : FormEx
     {

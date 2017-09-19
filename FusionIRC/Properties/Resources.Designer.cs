@@ -63,6 +63,16 @@ namespace FusionIRC.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon about {
+            get {
+                object obj = ResourceManager.GetObject("about", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon channel {
             get {
                 object obj = ResourceManager.GetObject("channel", resourceCulture);
@@ -107,6 +117,16 @@ namespace FusionIRC.Properties {
             get {
                 object obj = ResourceManager.GetObject("disconnect", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap fusion {
+            get {
+                object obj = ResourceManager.GetObject("fusion", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

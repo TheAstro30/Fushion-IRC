@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using ircClient.Classes;
 using ircCore.Controls;
 
-namespace FusionIRC.Forms
+namespace FusionIRC.Forms.Misc
 {
     public sealed class FrmWhoisInfo : FormEx
     {

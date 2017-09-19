@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Linq;
 using FusionIRC.Forms;
+using FusionIRC.Forms.Child;
 using ircClient;
 using ircCore.Settings;
 using ircCore.Settings.Theming;

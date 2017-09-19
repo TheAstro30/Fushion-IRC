@@ -65,25 +65,28 @@
     <Compile Include="Controls\SwitchView\WindowTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Forms\FrmChatFind.cs">
+    <Compile Include="Forms\Misc\FrmAbout.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FrmChildWindow.cs">
+    <Compile Include="Forms\Child\FrmChatFind.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Child\FrmChildWindow.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\FrmClientWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FrmConnectTo.cs">
+    <Compile Include="Forms\Misc\FrmConnectTo.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FrmSslError.cs">
+    <Compile Include="Forms\Warning\FrmSslError.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FrmUrlWarn.cs">
+    <Compile Include="Forms\Warning\FrmUrlWarn.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FrmWhoisInfo.cs">
+    <Compile Include="Forms\Misc\FrmWhoisInfo.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Settings\FrmSettings.cs">
@@ -144,9 +147,13 @@
     <None Include="Icons\Toolbar\theme.ico" />
     <None Include="Icons\security.ico" />
     <None Include="Icons\url.ico" />
+    <None Include="Icons\Toolbar\about.ico" />
+    <None Include="Images\fusion.jpg" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Forms\Settings\Controls\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

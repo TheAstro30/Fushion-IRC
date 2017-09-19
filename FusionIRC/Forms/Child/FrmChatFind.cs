@@ -13,7 +13,7 @@ using System.Windows.Forms;
 using ircCore.Controls;
 using ircCore.Settings;
 
-namespace FusionIRC.Forms
+namespace FusionIRC.Forms.Child
 {
     public sealed class FrmChatFind : FormEx
     {

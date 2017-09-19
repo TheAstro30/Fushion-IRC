@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using ircCore.Controls;
 using ircCore.Settings;
 
-namespace FusionIRC.Forms
+namespace FusionIRC.Forms.Warning
 {
     public sealed class FrmUrlWarn : FormEx
     {

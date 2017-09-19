@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Media;
 using System.Windows.Forms;
+using FusionIRC.Forms.Warning;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
 using ircClient;
@@ -20,7 +21,7 @@ using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
 
-namespace FusionIRC.Forms
+namespace FusionIRC.Forms.Child
 {
     /* This class is our "main" chat window for console, channel, query and DCC chats - one class for all */
     public enum WindowEvent
