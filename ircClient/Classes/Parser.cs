@@ -73,6 +73,7 @@ namespace ircClient.Classes
         /* Main parsing entry point */
         public void Parse(string first, string second, string third, string fourth)
         {            
+            /* Make sure to reset the ping check! */
             if (!string.IsNullOrEmpty(first))
             {
                 switch (first.ToUpper())

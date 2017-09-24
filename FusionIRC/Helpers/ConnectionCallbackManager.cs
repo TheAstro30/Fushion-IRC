@@ -14,6 +14,7 @@ using FusionIRC.Forms.Warning;
 using ircClient;
 using ircCore.Settings.Networks;
 using ircCore.Settings.Theming;
+using ircCore.Users;
 using ircCore.Utils;
 
 namespace FusionIRC.Helpers
@@ -180,6 +181,11 @@ namespace FusionIRC.Helpers
         /* Text messages */
         public static void OnTextChannel(ClientConnection client, string nick, string address, string channel, string text)
         {
+            /* Check ignored */
+            if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
+            {
+                return;
+            }
             var c = WindowManager.GetWindow(client, channel);
             if (c == null || c.WindowType != ChildWindowType.Channel)
             {
@@ -202,6 +208,11 @@ namespace FusionIRC.Helpers
 
         public static void OnTextSelf(ClientConnection client, string nick, string address, string text)
         {
+            /* Check ignored */
+            if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
+            {
+                return;
+            }
             var c = WindowManager.GetWindow(client, nick) ??
                     WindowManager.AddWindow(client, ChildWindowType.Private, MainForm, nick, nick, false);
             var tmd = new IncomingMessageData
@@ -220,6 +231,11 @@ namespace FusionIRC.Helpers
 
         public static void OnActionChannel(ClientConnection client, string nick, string address, string channel, string text)
         {
+            /* Check ignored */
+            if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
+            {
+                return;
+            }
             var c = WindowManager.GetWindow(client, channel);
             if (c == null || c.WindowType != ChildWindowType.Channel)
             {
@@ -242,6 +258,11 @@ namespace FusionIRC.Helpers
 
         public static void OnActionSelf(ClientConnection client, string nick, string address, string text)
         {
+            /* Check ignored */
+            if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
+            {
+                return;
+            }
             var c = WindowManager.GetWindow(client, nick) ??
                     WindowManager.AddWindow(client, ChildWindowType.Private, MainForm, nick, nick, false);
             var tmd = new IncomingMessageData
@@ -260,6 +281,11 @@ namespace FusionIRC.Helpers
 
         public static void OnNotice(ClientConnection client, string nick, string address, string text)
         {
+            /* Check ignored */
+            if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
+            {
+                return;
+            }
             var c = WindowManager.GetConsoleWindow(client);
             if (c == null)
             {

@@ -31,6 +31,9 @@ namespace ircClient
         private Timer _tmrParse;
         private readonly Timer _tmrWaitToReconnect;
 
+        private readonly Timer _tmrPingTimeout;
+        private int _pingCheck;
+
         public bool IsConnecting { get; internal set; }
         public bool IsConnected { get; internal set; }
 
@@ -60,6 +63,7 @@ namespace ircClient
             _sock.OnDataArrival += OnDataArrival;
             _sock.OnStateChanged += OnStateChanged;
             _sock.OnSslInvalidCertificate += OnSslInvalidCertificate;
+            _sock.OnDebugOut += OnDataSent;
             
             Parser = new Parser(this);
 
@@ -70,6 +74,9 @@ namespace ircClient
                                           Interval = 2000
                                       };
             _tmrWaitToReconnect.Tick += TimerWaitToReconnect;
+
+            _tmrPingTimeout = new Timer {Interval = 1000};
+            _tmrPingTimeout.Tick += TimerPingTimeoutCheck;
         }
 
         /* Connect overloads */
@@ -149,6 +156,9 @@ namespace ircClient
             }
             Send(string.Format("NICK {0}", UserInfo.Nick));
             Send(string.Format("USER {0} {1} {2} :{3}", UserInfo.Ident, _sock.LocalIp, _sock.RemoteHostIp, UserInfo.RealName));
+            /* Start the ping-time out check */
+            _pingCheck = 0;
+            _tmrPingTimeout.Enabled = true;
         }
 
         private void OnDisconnected(ClientSock sock)
@@ -159,6 +169,9 @@ namespace ircClient
             }
             IsConnecting = false;
             IsConnected = false;
+            /* Disable the ping-time out check */
+            _pingCheck = 0;
+            _tmrPingTimeout.Enabled = false;
         }
 
         private void OnError(ClientSock sock, string error)
@@ -184,6 +197,8 @@ namespace ircClient
             var s = _buffer.ToString().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             _sockData.AddRange(s);
             _buffer = new StringBuilder();
+            /* Reset ping-timeout check */
+            _pingCheck = 0;
             if (_tmrParse != null) { return; }
             _tmrParse = new Timer
                             {
@@ -211,6 +226,15 @@ namespace ircClient
             {
                 OnClientSslInvalidCertificate(this, certificate);
             }
+        }
+
+        private void OnDataSent(ClientSock sock, string data)
+        {
+            if (!IsConnected)
+            {
+                return;
+            }           
+            _pingCheck = 0;
         }
 
         /* Timer callbacks */
@@ -298,6 +322,26 @@ namespace ircClient
             if (OnClientConnectionClosed != null)
             {
                 OnClientConnectionClosed(this);
+            }
+        }
+
+        private void TimerPingTimeoutCheck(object sender, EventArgs e)
+        {
+            if (!IsConnected)
+            {
+                return;
+            }
+            _pingCheck++;           
+            if (_pingCheck <= 300)
+            {
+                return;
+            }
+            /* No messages have been sent or received by the socket, close the connection */
+            _sock.Close();
+            _tmrPingTimeout.Enabled = false;
+            if (OnClientDisconnected != null)
+            {
+                OnClientDisconnected(this);
             }
         }
     }

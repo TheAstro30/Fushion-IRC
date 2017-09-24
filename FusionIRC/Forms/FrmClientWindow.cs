@@ -15,6 +15,7 @@ using FusionIRC.Properties;
 using ircCore.Settings;
 using ircCore.Settings.Networks;
 using ircCore.Settings.Theming;
+using ircCore.Users;
 using ircCore.Utils;
 
 namespace FusionIRC.Forms
@@ -50,6 +51,8 @@ namespace FusionIRC.Forms
             /* Load client current theme */
             ThemeManager.ThemeLoaded += WindowManager.OnThemeLoaded;
             ThemeManager.Load(Functions.MainDir(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path, false));
+            /* Load users list */
+            UserManager.Load();
             /* Main form initialization */
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             Text = @"FusionIRC";
@@ -148,7 +151,7 @@ namespace FusionIRC.Forms
             Size = w.Size;
             Location = w.Position;
             WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
-            _initialize = false;
+            _initialize = false;            
         }
 
         /* Overrides */
@@ -246,6 +249,8 @@ namespace FusionIRC.Forms
             ServerManager.Save(Functions.MainDir(@"\data\servers.xml", false));
             /* Save client current theme */                        
             ThemeManager.Save(Functions.MainDir(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path, false));            
+            /* Save users list */
+            UserManager.Save();
             base.OnFormClosing(e);
         }
 
