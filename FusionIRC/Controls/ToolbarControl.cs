@@ -10,6 +10,7 @@ using FusionIRC.Forms;
 using FusionIRC.Forms.Child;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Forms.Settings;
+using FusionIRC.Forms.Users;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
 using ircCore.Settings.Networks;
@@ -28,6 +29,7 @@ namespace FusionIRC.Controls
         private readonly ToolStripButton _btnConnectToLocation;
         private readonly ToolStripButton _btnSettings;
         private readonly ToolStripButton _btnTheme;
+        private readonly ToolStripButton _btnUsers;
         private readonly ToolStripButton _btnAbout;
 
         private readonly Timer _tmrCheck;
@@ -86,6 +88,16 @@ namespace FusionIRC.Controls
                                 ToolTipText = @"Theme manager"
                             };
             _btnTheme.Click += ToolbarButtonClick;
+            /* Users button */
+            _btnUsers = new ToolStripButton
+                            {
+                                Image = Resources.users.ToBitmap(),
+                                ImageScaling = ToolStripItemImageScaling.None,
+                                Size = new Size(32, 32),
+                                Tag = "USERS",
+                                ToolTipText = @"User list"
+                            };
+            _btnUsers.Click += ToolbarButtonClick;
             /* About button */
             _btnAbout = new ToolStripButton
                             {
@@ -96,8 +108,12 @@ namespace FusionIRC.Controls
                                 ToolTipText = @"About FusionIRC"
                             };
             _btnAbout.Click += ToolbarButtonClick;
-            /* Add the buttons to the toolbar */            
-            Items.AddRange(new ToolStripItem[] { _btnConnect, _btnConnectToLocation, new ToolStripSeparator(), _btnSettings, _btnTheme, new ToolStripSeparator(), _btnAbout });
+            /* Add the buttons to the toolbar */
+            Items.AddRange(new ToolStripItem[]
+                               {
+                                   _btnConnect, _btnConnectToLocation, new ToolStripSeparator(), _btnSettings, _btnTheme,
+                                   new ToolStripSeparator(), _btnUsers, new ToolStripSeparator(), _btnAbout
+                               });
 
             _tmrCheck = new Timer
                             {
@@ -161,6 +177,13 @@ namespace FusionIRC.Controls
                     using (var settings = new FrmSettings())
                     {
                         settings.ShowDialog(_owner);
+                    }
+                    break;
+
+                case "USERS":
+                    using (var users = new FrmUsers())
+                    {
+                        users.ShowDialog(_owner);
                     }
                     break;
 

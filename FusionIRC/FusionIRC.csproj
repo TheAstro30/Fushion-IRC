@@ -57,7 +57,6 @@
     <Compile Include="Controls\ToolbarControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Classes\WildcardMatch.cs" />
     <Compile Include="Controls\SwitchView\Base\TreeNodeEx.cs" />
     <Compile Include="Controls\SwitchView\Base\TreeViewEx.cs">
       <SubType>Component</SubType>
@@ -78,6 +77,19 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Misc\FrmConnectTo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Users\Controls\UserListView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Users\Enums.cs" />
+    <Compile Include="Forms\Users\FrmAddIgnore.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Users\FrmAddNotify.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Users\FrmUsers.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Warning\FrmSslError.cs">
@@ -138,6 +150,10 @@
       <Project>{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}</Project>
       <Name>ircCore</Name>
     </ProjectReference>
+    <ProjectReference Include="..\libolv\libolv.csproj">
+      <Project>{18FEDA0C-D147-4286-B39A-01204808106A}</Project>
+      <Name>libolv</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Icons\Toolbar\connect.ico" />
@@ -149,6 +165,7 @@
     <None Include="Icons\url.ico" />
     <None Include="Icons\Toolbar\about.ico" />
     <None Include="Images\fusion.jpg" />
+    <None Include="Icons\Toolbar\users.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup>

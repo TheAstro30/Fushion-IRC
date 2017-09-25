@@ -25,7 +25,7 @@ namespace FusionIRC.Forms.Misc
         {
             ClientSize = new Size(388, 280);
             Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
             MaximizeBox = false;
             MinimizeBox = false;            
             ShowIcon = false;

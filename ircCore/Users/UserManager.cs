@@ -3,7 +3,6 @@
  * Copyright (C) 2016 - 2017
  * Provided AS-IS with no warranty expressed or implied
  */
-
 using System;
 using System.IO;
 using System.Linq;
@@ -14,22 +13,22 @@ namespace ircCore.Users
 {
     public sealed class UserManager
     {
-        private static UserList _userList = new UserList();
+        public static UserList UserList = new UserList();
 
         private static readonly string FileName = Functions.MainDir(@"\data\users.xml", false);
 
         /* Load/save functions */
         public static void Load()
         {
-            if (!XmlSerialize<UserList>.Load(FileName, ref _userList))
+            if (!XmlSerialize<UserList>.Load(FileName, ref UserList))
             {
-                _userList = new UserList();
+                UserList = new UserList();
             }
         }
 
         public static void Save()
         {
-            if (_userList.Notify.Users.Count == 0 && _userList.Ignore.Users.Count == 0)
+            if (UserList.Notify.Users.Count == 0 && UserList.Ignore.Users.Count == 0)
             {               
                 /* No point saving or keeping an empty list */
                 if (File.Exists(FileName))
@@ -38,7 +37,7 @@ namespace ircCore.Users
                 }
                 return;
             }
-            XmlSerialize<UserList>.Save(FileName, _userList);
+            XmlSerialize<UserList>.Save(FileName, UserList);
         }
 
         /* Notify functions */
@@ -58,7 +57,7 @@ namespace ircCore.Users
             }
             /* Create new entry */
             u = new User {Nick = nick, Note = note};
-            _userList.Notify.Users.Add(u);
+            UserList.Notify.Users.Add(u);
         }
 
         public static void RemoveNotify(string nick)
@@ -68,12 +67,12 @@ namespace ircCore.Users
             {
                 return;
             }
-            _userList.Notify.Users.Remove(u);
+            UserList.Notify.Users.Remove(u);
         }
 
         public static User IsNotify(string nick)
         {
-            return _userList.Notify.Users.FirstOrDefault(u => u.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase));
+            return UserList.Notify.Users.FirstOrDefault(u => u.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase));
         }
 
         /* Ignore functions */
@@ -83,21 +82,21 @@ namespace ircCore.Users
             {
                 return;
             }
-            _userList.Ignore.Users.Add(new User {Address = addressMask});
+            UserList.Ignore.Users.Add(new User {Address = addressMask});
         }
 
         public static void RemoveIgnore(string addressMask)
         {
-            foreach (var u in _userList.Ignore.Users.Where(u => u.Address == addressMask))
+            foreach (var u in UserList.Ignore.Users.Where(u => u.Address == addressMask))
             {
-                _userList.Ignore.Users.Remove(u);
+                UserList.Ignore.Users.Remove(u);
                 break;
             }
         }
 
         public static bool IsIgnored(string address)
         {
-            return _userList.Ignore.Users.Select(u => new WildcardMatch(u.Address)).Any(ignore => ignore.IsMatch(address));
+            return UserList.Ignore.Users.Select(u => new WildcardMatch(u.Address)).Any(ignore => ignore.IsMatch(address));
         }
     }
 }

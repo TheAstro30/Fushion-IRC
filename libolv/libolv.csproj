@@ -1,0 +1,325 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{18FEDA0C-D147-4286-B39A-01204808106A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>libolv</RootNamespace>
+    <AssemblyName>libolv</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>
+    </DocumentationFile>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Accessibility" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CellEditing\CellEditors\AutoCompleteCellEditor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CellEditing\CellEditors\BooleanCellEditor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CellEditing\CellEditors\BooleanCellEditor2.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CellEditing\ComboBoxItem.cs" />
+    <Compile Include="CellEditing\CellEditors\EnumCellEditor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CellEditing\CellEditors\FloatCellEditor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CellEditing\CellEditors\IntUpDown.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CellEditing\CellEditors\UintUpDown.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DataTreeListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DragDrop\DragSource\AbstractDragSource.cs" />
+    <Compile Include="DragDrop\DragSource\SimpleDragSource.cs" />
+    <Compile Include="DragDrop\DropSink\AbstractDropSink.cs" />
+    <Compile Include="DragDrop\DropSink\ModelDropEventArgs.cs" />
+    <Compile Include="DragDrop\DropSink\OlvDropEventArgs.cs" />
+    <Compile Include="DragDrop\DropSink\RearrangingDropSink.cs" />
+    <Compile Include="DragDrop\DropSink\SimpleDropSink.cs" />
+    <Compile Include="DragDrop\OlvDataObject.cs" />
+    <Compile Include="FastObjectListDataSource.cs" />
+    <Compile Include="Filtering\DateTimeClusteringStrategy.cs" />
+    <Compile Include="Filtering\Filters\AbstractListFilter.cs" />
+    <Compile Include="Filtering\Filters\AbstractModelFilter.cs" />
+    <Compile Include="Filtering\Filters\CompositeAllFilter.cs" />
+    <Compile Include="Filtering\Filters\CompositeAnyFilter.cs" />
+    <Compile Include="Filtering\Filters\CompositeFilter.cs" />
+    <Compile Include="Filtering\Filters\FlagBitSetFilter.cs" />
+    <Compile Include="Filtering\Filters\Interfaces.cs" />
+    <Compile Include="Filtering\Filters\ListFilter.cs" />
+    <Compile Include="Filtering\Filters\ModelFilter.cs" />
+    <Compile Include="Filtering\Filters\OneOfFilter.cs" />
+    <Compile Include="Filtering\Filters\TailFilter.cs" />
+    <Compile Include="Filtering\FlagClusteringStrategy.cs" />
+    <Compile Include="Filtering\TextMatch\TextBeginsMatchingStrategy.cs" />
+    <Compile Include="Filtering\TextMatch\TextContainsMatchingStrategy.cs" />
+    <Compile Include="Filtering\TextMatch\TextMatchFilter.cs" />
+    <Compile Include="Filtering\TextMatch\TextMatchingStrategy.cs" />
+    <Compile Include="Filtering\TextMatch\TextRegexMatchingStrategy.cs" />
+    <Compile Include="Implementation\Adapters\AbstractVirtualListDataSource.cs" />
+    <Compile Include="Implementation\Adapters\VirtualListVersion1DataSource.cs" />
+    <Compile Include="Implementation\Comparers\ColumnComparer.cs" />
+    <Compile Include="Implementation\Comparers\ModelObjectComparer.cs" />
+    <Compile Include="Implementation\Comparers\OlvGroupComparer.cs" />
+    <Compile Include="Implementation\Delegates.cs" />
+    <Compile Include="Implementation\Events\AfterSearchingEventArgs.cs" />
+    <Compile Include="Implementation\Events\AfterSortingEventArgs.cs" />
+    <Compile Include="Implementation\Events\BeforeSearchingEventArgs.cs" />
+    <Compile Include="Implementation\Events\BeforeSortingEventArgs.cs" />
+    <Compile Include="Implementation\Events\CancellableEventArgs.cs" />
+    <Compile Include="Implementation\Events\CellClickEventArgs.cs" />
+    <Compile Include="Implementation\Events\CellEditEventArgs.cs" />
+    <Compile Include="Implementation\Events\CellEventArgs.cs" />
+    <Compile Include="Implementation\Events\CreateGroupsEventArgs.cs" />
+    <Compile Include="Implementation\Events\FilterEventArgs.cs" />
+    <Compile Include="Implementation\Events\FormatRowEventArgs.cs" />
+    <Compile Include="Implementation\Events\FreezeEventArgs.cs" />
+    <Compile Include="Implementation\Events\HotItemChangedEventArgs.cs" />
+    <Compile Include="Implementation\Events\HyperlinkEventArgs.cs" />
+    <Compile Include="Implementation\Events\ItemsAddingEventArgs.cs" />
+    <Compile Include="Implementation\Events\ItemsChangedEventArgs.cs" />
+    <Compile Include="Implementation\Events\ItemsChangingEventArgs.cs" />
+    <Compile Include="Implementation\Events\ItemsRemovingEventArgs.cs" />
+    <Compile Include="Implementation\Events\SubItemCheckingEventArgs.cs" />
+    <Compile Include="Implementation\Events\ToolTipShowingEventArgs.cs" />
+    <Compile Include="Implementation\Events\TreeBranchExpandingEventArgs.cs" />
+    <Compile Include="Implementation\GroupingParameters.cs" />
+    <Compile Include="Implementation\Munger\MungerException.cs" />
+    <Compile Include="Implementation\Munger\SimpleMunger.cs" />
+    <Compile Include="Implementation\NullableDictionary.cs" />
+    <Compile Include="Implementation\OlvListItem.cs" />
+    <Compile Include="Implementation\OlvListSubItem.cs" />
+    <Compile Include="Implementation\OlvListViewHitTestInfo.cs" />
+    <Compile Include="Implementation\Adapters\TreeDataSourceAdapter.cs" />
+    <Compile Include="Implementation\TreeView\Branch.cs" />
+    <Compile Include="Implementation\TreeView\BranchComparer.cs" />
+    <Compile Include="Implementation\TreeView\Tree.cs" />
+    <Compile Include="Implementation\VirtualGroups\AbstractVirtualGroups.cs" />
+    <Compile Include="Implementation\VirtualGroups\FastListGroupingStrategy.cs" />
+    <Compile Include="Implementation\VirtualGroups\OwnerDataCallbackImpl.cs" />
+    <Compile Include="ObjectListView.CellEditing.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ObjectListView.Checkboxes.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ObjectListView.ColumnHeaders.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ObjectListView.Commands.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ObjectListView.Overlays.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ObjectListView.WndProc.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ObjectListView.Properties.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="OlvColumn.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Rendering\Overlays\AbstractOverlay.cs" />
+    <Compile Include="Rendering\Overlays\BillboardOverlay.cs" />
+    <Compile Include="Rendering\Decoration\AbstractDecoration.cs" />
+    <Compile Include="Rendering\Adornments\Adornments.cs" />
+    <Compile Include="Implementation\Attributes.cs" />
+    <Compile Include="CellEditing\EditorRegistry.cs" />
+    <Compile Include="DataListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Implementation\Adapters\DataSourceAdapter.cs" />
+    <Compile Include="Rendering\Decoration\BorderDecoration.cs" />
+    <Compile Include="Rendering\Decoration\CellBorderDecoration.cs" />
+    <Compile Include="FastDataListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Filtering\ClusteringStrategy.cs" />
+    <Compile Include="Filtering\Cluster.cs" />
+    <Compile Include="Filtering\ClustersFromGroupsStrategy.cs" />
+    <Compile Include="FastObjectListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Filtering\FilterMenuBuilder.cs" />
+    <Compile Include="Filtering\Interfaces.cs" />
+    <Compile Include="Rendering\Decoration\EditingCellBorderDecoration.cs" />
+    <Compile Include="Rendering\Decoration\ImageDecoration.cs" />
+    <Compile Include="Rendering\Adornments\ImageAdornment.cs" />
+    <Compile Include="Rendering\Decoration\LightBoxDecoration.cs" />
+    <Compile Include="Rendering\Decoration\RowBorderDecoration.cs" />
+    <Compile Include="Rendering\Adornments\TextAdornment.cs" />
+    <Compile Include="Rendering\Decoration\TintedColumnDecoration.cs" />
+    <Compile Include="Rendering\Decoration\TextDecoration.cs" />
+    <Compile Include="Rendering\Overlays\ImageOverlay.cs" />
+    <Compile Include="Rendering\Overlays\TextOverlay.cs" />
+    <Compile Include="Rendering\Renderers\AbstractRenderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Rendering\Renderers\BarRenderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Rendering\Renderers\BaseRenderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Rendering\Renderers\CheckStateRenderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Rendering\Renderers\DescribedTaskRenderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Rendering\Renderers\FlagRenderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Rendering\Renderers\HighlightTextRenderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Rendering\Renderers\ImageRenderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Rendering\Renderers\MappedImageRenderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Rendering\Renderers\MultiImageRenderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Rendering\Renderers\Version1Renderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Rendering\Styles\CellStyle.cs" />
+    <Compile Include="Rendering\Styles\HeaderFormatStyle.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Rendering\Styles\HeaderStateStyle.cs" />
+    <Compile Include="Rendering\Styles\HotItemStyle.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Rendering\Styles\HyperlinkStyle.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Rendering\Styles\IItemStyle.cs" />
+    <Compile Include="TreeListView.TreeRenderer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SubControls\ToolStripCheckedListBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Utilities\ColumnSelectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Utilities\ColumnSelectionForm.Designer.cs">
+      <DependentUpon>ColumnSelectionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Utilities\Generator.cs" />
+    <Compile Include="SubControls\GlassPanelForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Implementation\OlvGroup.cs" />
+    <Compile Include="SubControls\HeaderControl.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="CellEditing\CellEditKeyEngine.cs" />
+    <Compile Include="Implementation\Munger\Munger.cs" />
+    <Compile Include="Implementation\NativeMethods.cs" />
+    <Compile Include="ObjectListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ObjectListView.DesignTime.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SubControls\ToolTipControl.cs" />
+    <Compile Include="TreeListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Utilities\OlvExporter.cs" />
+    <Compile Include="Utilities\TypedColumn.cs" />
+    <Compile Include="Utilities\TypedObjectListView.cs" />
+    <Compile Include="VirtualObjectListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ObjectListView.Events.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <None Include="Resources\sort-descending.png" />
+    <None Include="Resources\sort-ascending.png" />
+    <None Include="Resources\filter.png" />
+    <None Include="Resources\clear-filter.png" />
+    <None Include="Resources\filter-icons3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Utilities\ColumnSelectionForm.resx">
+      <DependentUpon>ColumnSelectionForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

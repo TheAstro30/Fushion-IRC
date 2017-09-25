@@ -19,6 +19,9 @@ namespace ircCore.Settings
         [XmlElement("connection")]
         public SettingsConnection Connection = new SettingsConnection();
 
+        [XmlElement("localInfo")]
+        public SettingsLocalInfo LocalInfo = new SettingsLocalInfo();
+
         [XmlElement("windows")]
         public SettingsWindow Windows = new SettingsWindow();
 

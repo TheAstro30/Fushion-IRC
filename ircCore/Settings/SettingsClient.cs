@@ -20,6 +20,9 @@ namespace ircCore.Settings
 
         [XmlElement("confirmation")]
         public SettingsConfirmation Confirmation = new SettingsConfirmation();
+
+        [XmlElement("tabs")]
+        public SettingsTabs Tabs = new SettingsTabs();
     }
 
     [Serializable]
