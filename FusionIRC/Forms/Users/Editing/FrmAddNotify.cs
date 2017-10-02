@@ -9,7 +9,7 @@ using ircCore.Controls;
 using ircCore.Users;
 using ircCore.Utils;
 
-namespace FusionIRC.Forms.Users
+namespace FusionIRC.Forms.Users.Editing
 {
     public sealed class FrmAddNotify : FormEx
     {

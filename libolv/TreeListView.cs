@@ -375,14 +375,14 @@ namespace libolv
                                into index where index >= 0 select index).Concat(new[] {Int32.MaxValue}).Min();
             /* If we didn't refresh any objects, don't do anything else */
             if (firstChange >= GetItemCount())
-            {
+            {                
                 return;
             }
             ClearCachedInfo();
             UpdateVirtualListSize();
             SelectedObjects = selection;
             /* Redraw everything from the first update to the end of the list */
-            RedrawItems(firstChange, GetItemCount() - 1, false);
+            RedrawItems(firstChange, GetItemCount() - 1, true);
         }
 
         public virtual void ToggleExpansion(Object model)

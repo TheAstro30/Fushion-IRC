@@ -79,14 +79,25 @@
     <Compile Include="Forms\Misc\FrmConnectTo.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\Settings\Controls\Base\BaseControlRenderer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\SettingsServer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\Editing\Enums.cs" />
+    <Compile Include="Forms\Settings\Editing\FrmAddServer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Base\ISettings.cs" />
     <Compile Include="Forms\Users\Controls\UserListView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Forms\Users\Enums.cs" />
-    <Compile Include="Forms\Users\FrmAddIgnore.cs">
+    <Compile Include="Forms\Users\Editing\Enums.cs" />
+    <Compile Include="Forms\Users\Editing\FrmAddIgnore.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\Users\FrmAddNotify.cs">
+    <Compile Include="Forms\Users\Editing\FrmAddNotify.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Users\FrmUsers.cs">
@@ -166,11 +177,11 @@
     <None Include="Icons\Toolbar\about.ico" />
     <None Include="Images\fusion.jpg" />
     <None Include="Icons\Toolbar\users.ico" />
+    <None Include="Icons\Options\network.ico" />
+    <None Include="Icons\Options\server.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Forms\Settings\Controls\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -3,7 +3,6 @@
  * Copyright (C) 2016 - 2017
  * Provided AS-IS with no warranty expressed or implied
  */
-
 using System;
 using System.Linq;
 using ircCore.Utils.Serialization;
@@ -26,72 +25,21 @@ namespace ircCore.Settings.Networks
         public static void Save(string fileName)
         {
             XmlSerialize<Servers>.Save(fileName, Servers);
-        }   
- 
-        /* Adding a server methods */
-        public static void AddServer(string address)
-        {
-            AddServer("Unknown", address);
         }
 
-        public static void AddServer(string network, string address)
+        public static NetworkData GetNetworkByName(string name)
         {
-            AddServer(network, address, "6667");
+            return Servers.Networks.Network.FirstOrDefault(o => string.Compare(o.NetworkName, name, StringComparison.InvariantCultureIgnoreCase) == 0);
         }
 
-        public static void AddServer(string network, string address, string portRange)
+        public static NetworkData GetNetworkByServer(ServerData server)
         {
-            AddServer(network, address, portRange, "", "");
+            return (from network in Servers.Networks.Network from s in network.Server where s == server select network).FirstOrDefault();
         }
 
-        public static void AddServer(string network, string address, string portRange, string description)
+        public static string GetNetworkNameByServerAddress(string address)
         {
-            AddServer(network, address, portRange, "", description);
-        }
-
-        public static void AddServer(string network, string address, string portRange, string password, string description)
-        {            
-            /* Find or create a network object */
-            var newNetwork = false;
-            var n = Servers.Networks.Network.FirstOrDefault(o => o.NetworkName.Equals(network, StringComparison.InvariantCultureIgnoreCase));
-            if (n == null)
-            {
-                newNetwork = true;
-                n = new NetworkData();
-            }
-            if (string.IsNullOrEmpty(n.NetworkName))
-            {
-                n.NetworkName = network;
-            }
-            /* Create a new server object */
-            var s = new ServerData
-                        {
-                            Address = address,
-                            PortRange = portRange                            
-                        };
-            if (!string.IsNullOrEmpty(description))
-            {
-                s.Description = description;
-            }
-            if (!string.IsNullOrEmpty(password))
-            {
-                s.Password = password;
-            }
-            n.Server.Add(s);
-            n.Server.Sort();
-            /* Make sure to add the network - if it was not found */
-            if (!newNetwork)
-            {
-                return;
-            }
-            Servers.Networks.Network.Add(n);
-            Servers.Networks.Network.Sort();
-        }
-
-        /* Removal of a server */
-        public static void RemoveServer()
-        {
-            
+            return (from n in Servers.Networks.Network from s in n.Server where string.Compare(s.Address, address, StringComparison.InvariantCultureIgnoreCase) == 0 select n.NetworkName).FirstOrDefault();
         }
 
         public static Server GetNextServer(string network)

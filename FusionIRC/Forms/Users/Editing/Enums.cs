@@ -3,7 +3,7 @@
  * Copyright (C) 2016 - 2017
  * Provided AS-IS with no warranty expressed or implied
  */
-namespace FusionIRC.Forms.Users
+namespace FusionIRC.Forms.Users.Editing
 {
     public enum UserEditType
     {

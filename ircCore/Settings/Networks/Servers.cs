@@ -5,6 +5,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace ircCore.Settings.Networks
@@ -21,6 +22,9 @@ namespace ircCore.Settings.Networks
 
         [XmlAttribute("ssl")]
         public bool IsSsl { get; set; }
+
+        [XmlAttribute("password")]
+        public string Password { get; set; }
 
         public Server()
         {
@@ -45,6 +49,12 @@ namespace ircCore.Settings.Networks
     public class NetworkData : IComparable
     {
         /* Class that holds all servers for one network */
+        [XmlIgnore]
+        public string DisplayName
+        {
+            get { return NetworkName; }
+        }
+
         [XmlAttribute("name")]
         public string NetworkName { get; set; }
 
@@ -65,6 +75,15 @@ namespace ircCore.Settings.Networks
     public class ServerData : IComparable
     {
         /* Class that holds a server address for a particular network */
+        [XmlIgnore]
+        public string DisplayName
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(Description) ? string.Format("{0} ({1})", Description, Address) : Address;
+            }
+        }
+
         [XmlAttribute("address")]
         public string Address { get; set; }
 
@@ -136,6 +155,11 @@ namespace ircCore.Settings.Networks
         {
             return string.Compare(Address, ((ServerData)obj).Address, StringComparison.InvariantCultureIgnoreCase);
         }
+
+        public override string ToString()
+        {
+            return Address;
+        }
     }
 
     [Serializable, XmlRoot("servers")]
@@ -145,7 +169,7 @@ namespace ircCore.Settings.Networks
         public class NetworkList
         {
             [XmlElement("network")]
-            public List<NetworkData> Network = new List<NetworkData>();
+            public List<NetworkData> Network = new List<NetworkData>();            
         }
 
         public class RecentList
@@ -165,6 +189,6 @@ namespace ircCore.Settings.Networks
         public NetworkList Networks = new NetworkList();
 
         [XmlElement("recent")]
-        public RecentList Recent = new RecentList();
+        public RecentList Recent = new RecentList();        
     }
 }

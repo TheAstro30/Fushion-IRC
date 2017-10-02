@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<servers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <networks>
+    <network name="DALnet" last="0">
+      <server address="irc.dal.net" portRange="6667" description="Random server" />
+    </network>
+    <network name="DragonIRC" last="0">
+      <server address="irc.dragonirc.com" portRange="6667,+6697" description="DragonIRC Network" />
+    </network>
+  </networks>
+  <recent>
+    <server address="irc.dragonirc.com" port="6667" ssl="false" />
+  </recent>
+</servers>

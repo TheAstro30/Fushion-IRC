@@ -133,6 +133,16 @@ namespace FusionIRC.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon network {
+            get {
+                object obj = ResourceManager.GetObject("network", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon query {
             get {
                 object obj = ResourceManager.GetObject("query", resourceCulture);
@@ -146,6 +156,16 @@ namespace FusionIRC.Properties {
         internal static System.Drawing.Icon security {
             get {
                 object obj = ResourceManager.GetObject("security", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon server {
+            get {
+                object obj = ResourceManager.GetObject("server", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

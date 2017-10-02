@@ -65,7 +65,7 @@ namespace FusionIRC.Helpers
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
-            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);            
         }
 
         public static void OnClientCancelConnection(ClientConnection client)
@@ -75,6 +75,7 @@ namespace FusionIRC.Helpers
             {
                 return;
             }
+            client.IsManualDisconnect = false;
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.ConnectionCancelledText,
@@ -107,6 +108,12 @@ namespace FusionIRC.Helpers
             {
                 win.Nicklist.Clear();
             }
+            if (client.IsManualDisconnect)
+            {
+                client.IsManualDisconnect = false;
+                return;
+            }
+            /* Now we process re-connection code if the server wasn't manually disconnected by the user */
         }
 
         public static void OnClientConnectionError(ClientConnection client, string error)

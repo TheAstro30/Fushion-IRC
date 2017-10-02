@@ -38,6 +38,7 @@ namespace ircClient
         public bool IsConnected { get; internal set; }
 
         public bool IsWaitingToReconnect { get; set; }
+        public bool IsManualDisconnect { get; set; }
 
         public Server Server = new Server();
 

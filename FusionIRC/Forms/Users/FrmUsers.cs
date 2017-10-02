@@ -7,6 +7,7 @@ using System;
 using System.Windows.Forms;
 using System.Drawing;
 using FusionIRC.Forms.Users.Controls;
+using FusionIRC.Forms.Users.Editing;
 using ircCore.Controls;
 using ircCore.Settings;
 

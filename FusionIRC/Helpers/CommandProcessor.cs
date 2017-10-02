@@ -232,6 +232,7 @@ namespace FusionIRC.Helpers
             {         
                 return;
             }
+            client.IsManualDisconnect = true;
             if (client.IsConnecting)
             {
                 /* Cancel current connection */                
