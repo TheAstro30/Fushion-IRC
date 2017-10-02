@@ -36,6 +36,7 @@
             // 
             // tvMenu
             // 
+            this.tvMenu.HideSelection = false;
             this.tvMenu.Location = new System.Drawing.Point(12, 12);
             this.tvMenu.Name = "tvMenu";
             this.tvMenu.Size = new System.Drawing.Size(150, 344);

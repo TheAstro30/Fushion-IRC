@@ -11,6 +11,9 @@ namespace ircCore.Settings
     [Serializable]
     public class SettingsTabs
     {
+        [XmlAttribute("settings")]
+        public string Settings { get; set; }
+
         [XmlAttribute("userList")]
         public int UserList { get; set; }
     }

@@ -12,9 +12,9 @@ using FusionIRC.Forms.Settings.Editing;
 using ircCore.Settings.Networks;
 using libolv;
 
-namespace FusionIRC.Forms.Settings.Controls
+namespace FusionIRC.Forms.Settings.Controls.Connection
 {
-    public class SettingsServer : BaseControlRenderer, ISettings
+    public class ConnectionServers : BaseControlRenderer, ISettings
     {
         private readonly TreeListView _lvServers;
         private readonly OlvColumn _colName;
@@ -24,9 +24,13 @@ namespace FusionIRC.Forms.Settings.Controls
         private readonly Button _btnSort;
         private readonly Button _btnClear;
 
-        public event Action SettingsChanged; /* Currently not implemented */
+        private readonly Servers _servers;
 
-        public SettingsServer()
+        public event Action OnSettingsChanged;
+
+        public bool SettingsChanged { get; set; }
+
+        public ConnectionServers()
         {
             Header = "Servers";
 
@@ -138,8 +142,9 @@ namespace FusionIRC.Forms.Settings.Controls
                                                            DashStyle = DashStyle.Dot
                                                        };
 
-            //_lvServers.Roots = ServerManager.Servers.Networks.Network;
-            _lvServers.AddObjects(ServerManager.Servers.Networks.Network);
+            _servers = new Servers(ServerManager.Servers);
+            
+            _lvServers.AddObjects(_servers.Networks.Network);
             _lvServers.SelectedIndexChanged += SelectedObjectChanged;
 
             var enable = _lvServers.GetItemCount() > 0;
@@ -155,7 +160,9 @@ namespace FusionIRC.Forms.Settings.Controls
         
         public void SaveSettings()
         {
-            /* Not implemented */
+            ServerManager.Servers = new Servers(_servers);
+            ServerManager.Save();
+            SettingsChanged = false;
         }
 
         /* Callbacks */
@@ -192,13 +199,19 @@ namespace FusionIRC.Forms.Settings.Controls
                     break;
 
                 case "CLEAR":
-                    _lvServers.RemoveObjects(ServerManager.Servers.Networks.Network);
-                    ServerManager.Servers.Networks = new Servers.NetworkList();
-                    _lvServers.RefreshObjects(ServerManager.Servers.Networks.Network);
+                    _lvServers.RemoveObjects(_servers.Networks.Network);
+                    _servers.Networks = new Servers.NetworkList();
+                    _lvServers.RefreshObjects(_servers.Networks.Network);
                     _btnEdit.Enabled = false;
                     _btnDelete.Enabled = false;
                     _btnSort.Enabled = false;
                     _btnClear.Enabled = false;
+                    /* Servers modified */
+                    SettingsChanged = true;
+                    if (OnSettingsChanged != null)
+                    {
+                        OnSettingsChanged();
+                    }
                     break;
             }
         }
@@ -210,7 +223,7 @@ namespace FusionIRC.Forms.Settings.Controls
             {
                 var network = (_lvServers.SelectedObject is NetworkData
                                    ? (NetworkData) _lvServers.SelectedObject
-                                   : ServerManager.GetNetworkByServer((ServerData) _lvServers.SelectedObject)) ??
+                                   : _servers.GetNetworkByServer((ServerData) _lvServers.SelectedObject)) ??
                               new NetworkData();
                 var server = new ServerData();
                 d.Text = @"Add new server";
@@ -226,7 +239,7 @@ namespace FusionIRC.Forms.Settings.Controls
                 /* Create a new server - first determine if a network name of "network" all ready exists */
                 if (string.Compare(d.Network.NetworkName, network.NetworkName, StringComparison.InvariantCultureIgnoreCase) != 0)
                 {
-                    var n = ServerManager.GetNetworkByName(d.Network.NetworkName);
+                    var n = _servers.GetNetworkByName(d.Network.NetworkName);
                     if (n != null)
                     {
                         /* Found the network, add the server to it */
@@ -235,26 +248,30 @@ namespace FusionIRC.Forms.Settings.Controls
                         _lvServers.Expand(n);
                     }
                     else
-                    {
+                    {                        
                         d.Network.Server.Add(server);
-                        ServerManager.Servers.Networks.Network.Add(d.Network);
+                        _servers.Networks.Network.Add(d.Network);
                         _lvServers.AddObject(d.Network);
                         _lvServers.Expand(d.Network);
                     }
                 }
                 else
-                {
+                {                    
                     /* Doesn't exist, just add network to list and server to network */
                     network.Server.Add(server);
-                    ServerManager.Servers.Networks.Network.Add(network);
-                    _lvServers.AddObject(network);
-                    _lvServers.Expand(network);
+                    _lvServers.RefreshObject(network);
                 }
-                _lvServers.SelectObject(server);
+                _lvServers.SelectObject(server);               
                 _btnEdit.Enabled = true;
                 _btnDelete.Enabled = true;
                 _btnSort.Enabled = true;
                 _btnClear.Enabled = true;
+                /* Servers modified */
+                SettingsChanged = true;
+                if (OnSettingsChanged != null)
+                {
+                    OnSettingsChanged();
+                }
             }
         }
 
@@ -265,7 +282,7 @@ namespace FusionIRC.Forms.Settings.Controls
             {
                 return;
             }
-            var network = ServerManager.GetNetworkByServer(server);
+            var network = _servers.GetNetworkByServer(server);
             if (network == null)
             {
                 return;
@@ -291,10 +308,10 @@ namespace FusionIRC.Forms.Settings.Controls
                     if (network.Server.Count == 0)
                     {
                         /* Remove empty networks */
-                        ServerManager.Servers.Networks.Network.Remove(network);
+                        _servers.Networks.Network.Remove(network);
                         _lvServers.RemoveObject(network);
                     }
-                    var n = ServerManager.GetNetworkByName(d.Network.NetworkName);
+                    var n = _servers.GetNetworkByName(d.Network.NetworkName);
                     if (n != null)
                     {
                         n.Server.Add(server);
@@ -306,7 +323,7 @@ namespace FusionIRC.Forms.Settings.Controls
                         /* Doesn't exist, just add network to list and server to network */
                         network = d.Network;
                         network.Server.Add(server);
-                        ServerManager.Servers.Networks.Network.Add(network);
+                        _servers.Networks.Network.Add(network);
                         _lvServers.AddObject(network);
                         _lvServers.Expand(network);
                     }
@@ -321,6 +338,12 @@ namespace FusionIRC.Forms.Settings.Controls
                 _btnDelete.Enabled = true;
                 _btnSort.Enabled = true;
                 _btnClear.Enabled = true;
+                /* Servers modified */
+                SettingsChanged = true;
+                if (OnSettingsChanged != null)
+                {
+                    OnSettingsChanged();
+                }
             }
         }
 
@@ -332,26 +355,32 @@ namespace FusionIRC.Forms.Settings.Controls
             }
             if (_lvServers.SelectedObject is NetworkData)
             {
-                ServerManager.Servers.Networks.Network.Remove((NetworkData) _lvServers.SelectedObject);
+                _servers.Networks.Network.Remove((NetworkData)_lvServers.SelectedObject);
                 _lvServers.RemoveObject(_lvServers.SelectedObject);
             }
             else if (_lvServers.SelectedObject is ServerData)
             {
                 var server = (ServerData) _lvServers.SelectedObject;
-                var n = ServerManager.GetNetworkByServer(server);
+                var n = _servers.GetNetworkByServer(server);
                 n.Server.Remove(server);
                 _lvServers.RemoveObject(server);
                 if (n.Server.Count == 0)
                 {
                     /* Remove empty network */
-                    ServerManager.Servers.Networks.Network.Remove(n);
+                    _servers.Networks.Network.Remove(n);
                     _lvServers.RemoveObject(n);
                 }
             }
             /* Refresh list */
-            _lvServers.RefreshObjects(ServerManager.Servers.Networks.Network);
+            _lvServers.RefreshObjects(_servers.Networks.Network);
             _btnEdit.Enabled = false;
             _btnDelete.Enabled = false;
+            /* Servers modified */
+            SettingsChanged = true;
+            if (OnSettingsChanged != null)
+            {
+                OnSettingsChanged();
+            }
             if (_lvServers.GetItemCount() != 0)
             {
                 return;
@@ -365,17 +394,23 @@ namespace FusionIRC.Forms.Settings.Controls
             if (_lvServers.SelectedObject == null)
             {
                 /* Nothing selected, sort ALL networks */
-                ServerManager.Servers.Networks.Network.Sort();
+                _servers.Networks.Network.Sort();
                 /* For some stupid reason, the ObjectListView third party control has an issue with refreshing the objects
                  * after sorted if its a TreeList - so, -sigh- clear objects and add back... */
-                _lvServers.RemoveObjects(ServerManager.Servers.Networks.Network);
-                _lvServers.AddObjects(ServerManager.Servers.Networks.Network);
+                _lvServers.RemoveObjects(_servers.Networks.Network);
+                _lvServers.AddObjects(_servers.Networks.Network);
             }
             else
             {
                 var n = (NetworkData) _lvServers.SelectedObject;
                 n.Server.Sort();
                 _lvServers.RefreshObject(n);
+            }
+            /* Servers modified */
+            SettingsChanged = true;
+            if (OnSettingsChanged != null)
+            {
+                OnSettingsChanged();
             }
         }
     }

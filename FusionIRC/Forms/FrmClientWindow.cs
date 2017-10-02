@@ -47,7 +47,7 @@ namespace FusionIRC.Forms
             /* Load client settings */
             SettingsManager.Load();
             /* Load servers */
-            ServerManager.Load(Functions.MainDir(@"\data\servers.xml", false));
+            ServerManager.Load();
             /* Load client current theme */
             ThemeManager.ThemeLoaded += WindowManager.OnThemeLoaded;
             ThemeManager.Load(Functions.MainDir(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path, false));
@@ -248,7 +248,7 @@ namespace FusionIRC.Forms
             /* Save client settings */
             SettingsManager.Save();
             /* Save servers */
-            ServerManager.Save(Functions.MainDir(@"\data\servers.xml", false));
+            ServerManager.Save();
             /* Save client current theme */                        
             ThemeManager.Save(Functions.MainDir(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path, false));            
             /* Save users list */

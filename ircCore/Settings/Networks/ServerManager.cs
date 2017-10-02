@@ -5,6 +5,7 @@
  */
 using System;
 using System.Linq;
+using ircCore.Utils;
 using ircCore.Utils.Serialization;
 
 namespace ircCore.Settings.Networks
@@ -14,27 +15,27 @@ namespace ircCore.Settings.Networks
         /* Management class for our server data */
         public static Servers Servers = new Servers();
 
-        public static void Load(string fileName)
+        public static void Load()
         {
-            if (!XmlSerialize<Servers>.Load(fileName, ref Servers))
+            if (!XmlSerialize<Servers>.Load(Functions.MainDir(@"\data\servers.xml", false), ref Servers))
             {
                 Servers = new Servers();
             }
         }
 
-        public static void Save(string fileName)
+        public static void Save()
         {
-            XmlSerialize<Servers>.Save(fileName, Servers);
+            XmlSerialize<Servers>.Save(Functions.MainDir(@"\data\servers.xml", false), Servers);
         }
 
         public static NetworkData GetNetworkByName(string name)
         {
-            return Servers.Networks.Network.FirstOrDefault(o => string.Compare(o.NetworkName, name, StringComparison.InvariantCultureIgnoreCase) == 0);
+            return Servers.GetNetworkByName(name);
         }
 
         public static NetworkData GetNetworkByServer(ServerData server)
         {
-            return (from network in Servers.Networks.Network from s in network.Server where s == server select network).FirstOrDefault();
+            return Servers.GetNetworkByServer(server);
         }
 
         public static string GetNetworkNameByServerAddress(string address)

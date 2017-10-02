@@ -169,13 +169,35 @@ namespace ircCore.Settings.Networks
         public class NetworkList
         {
             [XmlElement("network")]
-            public List<NetworkData> Network = new List<NetworkData>();            
+            public List<NetworkData> Network = new List<NetworkData>();     
+       
+            public NetworkList()
+            {
+                /* Empty constructor */
+            }
+
+            public NetworkList(NetworkList networkList)
+            {
+                /* Copy constructor */
+                Network = new List<NetworkData>(networkList.Network.GetRange(0, networkList.Network.Count));
+            }
         }
 
         public class RecentList
         {
             [XmlElement("server")]
             public List<Server> Server = new List<Server>(); 
+
+            public RecentList()
+            {
+                /* Empty constructor */
+            }
+
+            public RecentList(RecentList recentList)
+            {
+                /* Copy constructor */
+                Server = new List<Server>(recentList.Server.GetRange(0, recentList.Server.Count));
+            }
         }
 
         /* The reason I put this as a class is because I wanted the formatted XML to look like the following:
@@ -189,6 +211,28 @@ namespace ircCore.Settings.Networks
         public NetworkList Networks = new NetworkList();
 
         [XmlElement("recent")]
-        public RecentList Recent = new RecentList();        
+        public RecentList Recent = new RecentList();
+
+        public Servers()
+        {
+            /* Empty constructor */
+        }
+
+        public Servers(Servers servers)
+        {
+            /* Copy constructor */
+            Networks = new NetworkList(servers.Networks);
+            Recent = new RecentList(servers.Recent);
+        }
+
+        public NetworkData GetNetworkByName(string name)
+        {
+            return Networks.Network.FirstOrDefault(o => String.Compare(o.NetworkName, name, StringComparison.InvariantCultureIgnoreCase) == 0);
+        }
+
+        public NetworkData GetNetworkByServer(ServerData server)
+        {
+            return (from network in Networks.Network from s in network.Server where s == server select network).FirstOrDefault();
+        }
     }
 }

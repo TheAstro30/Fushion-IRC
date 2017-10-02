@@ -82,7 +82,13 @@
     <Compile Include="Forms\Settings\Controls\Base\BaseControlRenderer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Forms\Settings\Controls\SettingsServer.cs">
+    <Compile Include="Forms\Settings\Controls\Connection\ConnectionOptions.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Connection\ConnectionOptions.Designer.cs">
+      <DependentUpon>ConnectionOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Connection\ConnectionServers.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Forms\Settings\Editing\Enums.cs" />

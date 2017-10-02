@@ -9,7 +9,9 @@ namespace FusionIRC.Forms.Settings.Controls.Base
 {
     public interface ISettings
     {
-        event Action SettingsChanged;
+        event Action OnSettingsChanged;
+
+        bool SettingsChanged { get; set; }
 
         void SaveSettings();
     }
