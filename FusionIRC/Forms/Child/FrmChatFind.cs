@@ -145,12 +145,12 @@ namespace FusionIRC.Forms.Child
             StartPosition = FormStartPosition.CenterParent;
             Text = @"Find Text";
             /* Initialize settings for each control */
-            _cmbSearch.Items.AddRange(SettingsManager.Settings.Search.History.ToArray());
+            _cmbSearch.Items.AddRange(SettingsManager.Settings.Windows.Search.History.ToArray());
             if (_cmbSearch.Items.Count > 0)
             {
                 _cmbSearch.SelectedIndex = 0;
             }
-            switch (SettingsManager.Settings.Search.Direction)
+            switch (SettingsManager.Settings.Windows.Search.Direction)
             {
                 case SearchDirection.Up:
                     _rbUp.Checked = true;
@@ -160,7 +160,7 @@ namespace FusionIRC.Forms.Child
                     _rbDown.Checked = true;
                     break;
             }
-            _chkCase.Checked = SettingsManager.Settings.Search.MatchCase;
+            _chkCase.Checked = SettingsManager.Settings.Windows.Search.MatchCase;
 
             _btnClear.Click += ButtonClickHandler;
             _btnFind.Click += ButtonClickHandler;
@@ -169,14 +169,14 @@ namespace FusionIRC.Forms.Child
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             /* Update current settings */
-            SettingsManager.Settings.Search.History = new List<String>();            
+            SettingsManager.Settings.Windows.Search.History = new List<String>();            
             foreach (var s in _cmbSearch.Items)
             {
-                SettingsManager.Settings.Search.History.Add(s.ToString());
+                SettingsManager.Settings.Windows.Search.History.Add(s.ToString());
             }
-            
-            SettingsManager.Settings.Search.Direction = _rbUp.Checked ? SearchDirection.Up : SearchDirection.Down;
-            SettingsManager.Settings.Search.MatchCase = _chkCase.Checked;
+
+            SettingsManager.Settings.Windows.Search.Direction = _rbUp.Checked ? SearchDirection.Up : SearchDirection.Down;
+            SettingsManager.Settings.Windows.Search.MatchCase = _chkCase.Checked;
             base.OnFormClosing(e);
         }
 
@@ -219,7 +219,7 @@ namespace FusionIRC.Forms.Child
                             _cmbSearch.SelectionStart = search.Length;
                         }
                         /* Adjust the size of the list */
-                        if (_cmbSearch.Items.Count > SettingsManager.Settings.Caching.ChatSearch)
+                        if (_cmbSearch.Items.Count > SettingsManager.Settings.Windows.Caching.ChatSearch)
                         {
                             /* Remove last item */
                             _cmbSearch.Items.RemoveAt(_cmbSearch.Items.Count - 1);

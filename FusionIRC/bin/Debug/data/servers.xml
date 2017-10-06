@@ -84,7 +84,7 @@
     </network>
   </networks>
   <recent>
-    <server address="irc.freenode.org" port="6667" ssl="false" />
     <server address="irc.dragonirc.com" port="6667" ssl="false" />
+    <server address="irc.freenode.org" port="6667" ssl="false" />
   </recent>
 </servers>

@@ -115,6 +115,9 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.CtcpText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts [$nick ($address)] $ctcp" });
             Messages.Add(ThemeMessage.CtcpSelfText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts -> [$nick] $ctcp" });
             Messages.Add(ThemeMessage.CtcpReplyText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts [$nick ($address) $ctcp reply]: $text" });
+            Messages.Add(ThemeMessage.LocalInfoReplyText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts Local IP: $dnsip ($dnshost)" });
+            Messages.Add(ThemeMessage.DnsText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts DNS Look-up: $text" });
+            Messages.Add(ThemeMessage.DnsLookupReplyText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts Dns Look-up: $dnsip ($dnshost)" });
             /* Set this flag to true to ensure it will be saved if it doesn't exist (ie: load fails) */
             ThemeChanged = true;
         }        

@@ -6,7 +6,6 @@
 using System;
 using System.Linq;
 using System.Windows.Forms;
-using FusionIRC.Forms;
 using FusionIRC.Forms.Child;
 using ircClient;
 using ircClient.Classes;
@@ -132,6 +131,10 @@ namespace FusionIRC.Helpers
 
                 case "CTCP":
                     ParseCtcp(client, args);
+                    break;
+
+                case "DNS":
+                    ParseDns(client, args);
                     break;
 
                 default:
@@ -418,6 +421,27 @@ namespace FusionIRC.Helpers
             client.Send(ct == "PING"
                             ? string.Format("PRIVMSG {0} :{1}{2} {3}{4}", ctcp[0], (char) 1, ct, TimeFunctions.CTime(), (char) 1)
                             : string.Format("PRIVMSG {0} :{1}{2}{3}", ctcp[0], (char) 1, ct, (char) 1));
+        }
+
+        private static void ParseDns(ClientConnection client, string args)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.DnsText,
+                              TimeStamp = DateTime.Now,
+                              Text = args
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, ConnectionCallbackManager.MainForm, WindowEvent.EventReceived);
+            /* Now, get the DNS information */
+            client.ResolveDns(args);
         }
 
         private static void ParseNames(ClientConnection client, string args)

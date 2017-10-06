@@ -7,7 +7,6 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using FusionIRC.Forms;
 using FusionIRC.Forms.Child;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Helpers;

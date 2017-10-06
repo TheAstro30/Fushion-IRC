@@ -104,7 +104,7 @@ namespace FusionIRC.Forms.Child
                             BackColor = ThemeManager.GetColor(ThemeColor.InputWindowBackColor),
                             ForeColor = ThemeManager.GetColor(ThemeColor.InputWindowForeColor),
                             Font = ThemeManager.CurrentTheme.ThemeFonts[type],
-                            MaximumHistoryCache = SettingsManager.Settings.Caching.Input
+                            MaximumHistoryCache = SettingsManager.Settings.Windows.Caching.Input
                         };
 
             Output = new OutputWindow
@@ -113,7 +113,7 @@ namespace FusionIRC.Forms.Child
                              ForeColor = ThemeManager.GetColor(ThemeColor.OutputWindowForeColor),
                              Font = ThemeManager.CurrentTheme.ThemeFonts[type],
                              LineSpacingStyle = LineSpacingStyle.Paragraph,
-                             MaximumLines = SettingsManager.Settings.Caching.Output                             
+                             MaximumLines = SettingsManager.Settings.Windows.Caching.Output                             
                          };
 
             if (type == ChildWindowType.Channel)

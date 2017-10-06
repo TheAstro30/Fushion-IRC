@@ -5,7 +5,6 @@
  */
 using System.Windows.Forms;
 using FusionIRC.Controls.SwitchView.Base;
-using FusionIRC.Forms;
 using FusionIRC.Forms.Child;
 using FusionIRC.Helpers;
 using ircCore.Settings.Theming;

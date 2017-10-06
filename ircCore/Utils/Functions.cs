@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -25,6 +26,11 @@ namespace ircCore.Utils
                                     .GetCustomAttributes(typeof(DescriptionAttribute), false)
                                     .SingleOrDefault() as DescriptionAttribute;
                 return attribute == null ? value.ToString() : attribute.Description;
+            }
+
+            public static object[] GetAllDescriptionsFromEnumValues(IEnumerable values)
+            {
+                return (from object enumValue in values select GetDescriptionFromEnumValue((Enum)enumValue)).ToArray();
             }
         }
 

@@ -36,6 +36,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Speech" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -115,6 +116,7 @@
     </Compile>
     <Compile Include="Users\UserManager.cs" />
     <Compile Include="Users\UserList.cs" />
+    <Compile Include="Utils\DnsResult.cs" />
     <Compile Include="Utils\Functions.cs" />
     <Compile Include="Utils\Serialization\BinarySerialize.cs" />
     <Compile Include="Settings\Settings.cs" />
@@ -123,7 +125,9 @@
     <Compile Include="Settings\SettingsWindow.cs" />
     <Compile Include="Settings\Theming\Theme.cs" />
     <Compile Include="Settings\Theming\ThemeManager.cs" />
+    <Compile Include="Utils\Speech.cs" />
     <Compile Include="Utils\TimeFunctions.cs" />
+    <Compile Include="Utils\UiSynchronize.cs" />
     <Compile Include="Utils\Utf8.cs" />
     <Compile Include="Utils\WildcardMatch.cs" />
     <Compile Include="Utils\XmlFormatting.cs" />

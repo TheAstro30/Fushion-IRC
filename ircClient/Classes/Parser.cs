@@ -53,6 +53,7 @@ namespace ircClient.Classes
         public event Action<ClientConnection, string, string, string, string> OnCtcpReply;
         public event Action<ClientConnection> OnWhois;
         public event Action<ClientConnection, string> OnRaw;
+        public event Action<ClientConnection, string> OnUserInfo;
 
         public event Action<ClientConnection, string> OnOther; //probably deleting this
        
@@ -196,6 +197,14 @@ namespace ircClient.Classes
                     if (OnLUsers != null)
                     {
                         OnLUsers(_client, fourth.Replace(":", ""));
+                    }
+                    break;
+
+                case "302":
+                    /* Userinfo */
+                    if (OnUserInfo != null)
+                    {
+                        OnUserInfo(_client, fourth.Replace(":", "").Trim());
                     }
                     break;
 
