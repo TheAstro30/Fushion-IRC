@@ -26,6 +26,7 @@ namespace ircClient
         private readonly ClientSock _sock;
         private readonly DnsResolve _localInfo;
         private readonly DnsResolve _dns;
+        private readonly Identd _identd;
         
         private StringBuilder _buffer = new StringBuilder();
         private readonly List<string> _sockData = new List<string>();
@@ -88,6 +89,9 @@ namespace ircClient
             _dns.DnsResolved += OnDnsResolved;
             _dns.DnsFailed += OnDnsFailed;
 
+            _identd = new Identd(syncObject, SettingsManager.Settings.Connection.Identd);
+            _identd.OnIdentDaemonData += OnIdentDaemonData;
+
             _tmrWaitToReconnect = new Timer
                                       {
                                           Interval = 2000
@@ -115,7 +119,9 @@ namespace ircClient
             Server.IsSsl = ssl;
             IsConnecting = true;
             _sock.IsSsl = ssl;
-            _sock.Connect(address, port);            
+            _sock.Connect(address, port);
+            /* Turn on identd */
+            _identd.BeginIdentDaemon();            
             if (OnClientBeginConnect != null)
             {
                 OnClientBeginConnect(this);
@@ -298,6 +304,13 @@ namespace ircClient
             {
                 OnClientDnsFailed(this, result);
             }
+        }
+
+        /* Identd callback */
+        private void OnIdentDaemonData(string remoteHost, string data)
+        {
+            System.Diagnostics.Debug.Print(remoteHost + " = " + data);
+            _identd.StopIdentDaemon();
         }
 
         /* Timer callbacks */

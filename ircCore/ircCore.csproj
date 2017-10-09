@@ -93,6 +93,7 @@
     <Compile Include="Settings\SettingsConfirmation.cs" />
     <Compile Include="Settings\SettingsConnection.cs" />
     <Compile Include="Settings\SettingsFind.cs" />
+    <Compile Include="Settings\SettingsIdentd.cs" />
     <Compile Include="Settings\SettingsLocalInfo.cs" />
     <Compile Include="Settings\SettingsTabs.cs" />
     <Compile Include="Settings\SettingsUserInfo.cs" />

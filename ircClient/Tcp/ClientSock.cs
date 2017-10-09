@@ -48,7 +48,7 @@ namespace ircClient.Tcp
         private string _remoteIp;
         private int _localPort;
         private int _remotePort;
-        private List<byte[]> _byteData;
+        private List<byte[]> _byteData = new List<byte[]>();
         private byte[] _buffer = new byte[BufferSize];
         private TcpListener _listenSocket;
         private Socket _clientSocket;
@@ -264,6 +264,8 @@ namespace ircClient.Tcp
                     _sync.Execute(() => OnConnected(this));
                 }
                 ChangeState(WinsockStates.Connected);
+                _buffer = new byte[BufferSize];
+                _byteData = new List<byte[]>();
                 _clientSocket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnClientRead, null);
             }
             catch (SocketException ex)
@@ -603,7 +605,7 @@ namespace ircClient.Tcp
                             _sync.Execute(() => OnDisconnected(this));
                         }
                         return;
-                    }
+                    }                  
                     var buffer = _buffer; /* Marshal-by-reference may cause runtime exception when passed by ref/out as in the next line... */
                     Array.Resize(ref buffer, intCount);
                     _buffer = buffer; /* Shouldn't have to re-assign it back, but doesn't work without doing so... */

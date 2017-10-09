@@ -51,6 +51,8 @@ namespace ircCore.Settings
             Windows.Caching.Output = 500;
             Windows.Caching.Input = 50;
             Windows.Caching.ChatSearch = 25;
+            /* Identd */
+            Connection.Identd.Port = 113;
             /* Local info */
             Connection.LocalInfo.LookupMethod = LocalInfoLookupMethod.Socket;
             /* Create control styles */

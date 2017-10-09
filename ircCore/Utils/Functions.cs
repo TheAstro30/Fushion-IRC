@@ -4,7 +4,6 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -21,6 +20,7 @@ namespace ircCore.Utils
         {
             public static string GetDescriptionFromEnumValue(Enum value)
             {
+                /* GetDescriptionFromEnumValue((EnumName)<intValue>) */
                 var attribute = value.GetType()
                                     .GetField(value.ToString())
                                     .GetCustomAttributes(typeof(DescriptionAttribute), false)
@@ -28,20 +28,11 @@ namespace ircCore.Utils
                 return attribute == null ? value.ToString() : attribute.Description;
             }
 
-            public static object[] GetAllDescriptionsFromEnumValues(IEnumerable values)
+            public static object[] GetDescriptions(Type type)
             {
-                return (from object enumValue in values select GetDescriptionFromEnumValue((Enum)enumValue)).ToArray();
-            }
-        }
-
-        public class EnumComboData
-        {
-            public string Text { get; set; }
-            public uint Data { get; set; }
-
-            public override string ToString()
-            {
-                return Text;
+                /* Used for populating combos/list boxes using AddRange */
+                var names = Enum.GetNames(type);
+                return (from name in names select type.GetField(name) into field from DescriptionAttribute fd in field.GetCustomAttributes(typeof (DescriptionAttribute), true) select fd.Description).Cast<object>().ToArray();
             }
         }
 

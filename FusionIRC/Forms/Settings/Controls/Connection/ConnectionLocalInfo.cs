@@ -32,7 +32,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
 
             Header = "Local Information";
 
-            _cmbLookup.Items.AddRange(Functions.EnumUtils.GetAllDescriptionsFromEnumValues(Enum.GetValues(typeof(LocalInfoLookupMethod))));
+            _cmbLookup.Items.AddRange(Functions.EnumUtils.GetDescriptions(typeof(LocalInfoLookupMethod)));
             _cmbLookup.SelectedIndex = (int) SettingsManager.Settings.Connection.LocalInfo.LookupMethod;
 
             _txtAddress.Text = SettingsManager.Settings.Connection.LocalInfo.HostInfo.Address;
