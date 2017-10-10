@@ -82,6 +82,9 @@
     <Compile Include="Forms\Settings\Controls\Base\BaseControlRenderer.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Forms\Settings\Controls\Connection\ConnectionIdentDaemon.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Forms\Settings\Controls\Connection\ConnectionLocalInfo.cs">
       <SubType>UserControl</SubType>
     </Compile>

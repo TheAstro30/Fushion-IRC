@@ -48,7 +48,6 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
             SettingsManager.Settings.Connection.LocalInfo.LookupMethod = (LocalInfoLookupMethod) _cmbLookup.SelectedIndex;
             SettingsManager.Settings.Connection.LocalInfo.HostInfo.Address = Functions.GetFirstWord(_txtAddress.Text);
             SettingsManager.Settings.Connection.LocalInfo.HostInfo.HostName = Functions.GetFirstWord(_txtHost.Text);
-            SettingsManager.Save();
             SettingsChanged = false;
         }
 
@@ -64,7 +63,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
             _lblLookup = new Label
                              {
                                  AutoSize = true,
-                                 Location = new Point(28, 129),
+                                 Location = new Point(88, 129),
                                  Text = @"Look-up method:"
                              };
 
@@ -72,7 +71,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
                              {
                                  DropDownStyle = ComboBoxStyle.DropDownList,
                                  FormattingEnabled = true,
-                                 Location = new Point(31, 147),
+                                 Location = new Point(91, 147),
                                  Size = new Size(245, 23),
                                  TabIndex = 1
                              };
@@ -80,30 +79,30 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
             _lblAddress = new Label
                               {
                                   AutoSize = true,
-                                  Location = new Point(28, 188),
+                                  Location = new Point(88, 188),
                                   Size = new Size(65, 15),
                                   Text = @"IP Address:"
                               };
 
             _txtAddress = new TextBox
                               {
-                                  Location = new Point(31, 206),
-                                  Size = new Size(245, 23),
+                                  Location = new Point(91, 206),
+                                  Size = new Size(120, 23),
                                   TabIndex = 0
                               };
 
             _lblHost = new Label
                            {
                                AutoSize = true,
-                               Location = new Point(28, 246),
+                               Location = new Point(88, 246),
                                Size = new Size(68, 15),
                                Text = @"Host name:"
                            };
 
             _txtHost = new TextBox
                            {
-                               Location = new Point(31, 264),
-                               Size = new Size(368, 23),
+                               Location = new Point(91, 264),
+                               Size = new Size(245, 23),
                                TabIndex = 2
                            };
 

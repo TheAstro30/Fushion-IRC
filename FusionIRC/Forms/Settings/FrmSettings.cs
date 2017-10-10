@@ -18,6 +18,7 @@ namespace FusionIRC.Forms.Settings
     {
         private readonly ConnectionServers _connectionServers;
         private readonly ConnectionOptions _connectionOptions;
+        private readonly ConnectionIdentDaemon _connectionIdentDaemon;
         private readonly ConnectionLocalInfo _connectionLocalInfo;
 
         private readonly Timer _tmrSelect;
@@ -29,12 +30,17 @@ namespace FusionIRC.Forms.Settings
 
             _connectionServers = new ConnectionServers { Location = new Point(168, 12), Visible = false };
             _connectionOptions = new ConnectionOptions { Location = new Point(168, 12), Visible = false };
+            _connectionIdentDaemon = new ConnectionIdentDaemon { Location = new Point(168, 12), Visible = false };
             _connectionLocalInfo = new ConnectionLocalInfo { Location = new Point(168, 12), Visible = false };
-            
-            Controls.AddRange(new Control[] {_connectionServers,_connectionOptions,_connectionLocalInfo});
+
+            Controls.AddRange(new Control[]
+                                  {
+                                      _connectionServers, _connectionOptions, _connectionIdentDaemon, _connectionLocalInfo
+                                  });
                         
             _connectionServers.OnSettingsChanged += OnSettingsChanged;
             _connectionOptions.OnSettingsChanged += OnSettingsChanged;
+            _connectionIdentDaemon.OnSettingsChanged += OnSettingsChanged;
             _connectionLocalInfo.OnSettingsChanged += OnSettingsChanged;
 
             btnApply.Click += ButtonClickHandler;
@@ -77,6 +83,10 @@ namespace FusionIRC.Forms.Settings
                     _connectionOptions.Visible = true;
                     break;
 
+                case "CONNECTIONIDENTDAEMON":
+                    _connectionIdentDaemon.Visible = true;
+                    break;
+
                 case "CONNECTIONLOCALINFO":
                     _connectionLocalInfo.Visible = true;
                     break;
@@ -104,6 +114,7 @@ namespace FusionIRC.Forms.Settings
             var node = tvMenu.Nodes.Add("CONNECTION", "Connection");
             node.Nodes.Add("CONNECTIONSERVERS", "Servers");
             node.Nodes.Add("CONNECTIONOPTIONS", "Options");
+            node.Nodes.Add("CONNECTIONIDENTDAEMON", "Identd");
             node.Nodes.Add("CONNECTIONLOCALINFO", "Local Info"); 
         }
 

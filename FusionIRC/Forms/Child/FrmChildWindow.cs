@@ -268,7 +268,12 @@ namespace FusionIRC.Forms.Child
 
         protected override void OnResize(EventArgs e)
         {
-            /* Adjust our controls based on window type */            
+            /* Adjust our controls based on window type */
+            if (WindowState == FormWindowState.Minimized)
+            {
+                /* We don't do anything - can cause application lock-up */
+                return;
+            }
             var height = ClientRectangle.Height - Input.ClientRectangle.Height - 1;
             if (WindowType == ChildWindowType.Channel)
             {

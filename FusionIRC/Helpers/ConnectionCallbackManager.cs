@@ -253,6 +253,29 @@ namespace FusionIRC.Helpers
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
 
+        public static void OnClientIdentDaemonRequest(ClientConnection client, string remoteHost, string data)
+        {
+            if (!SettingsManager.Settings.Connection.Identd.ShowRequests)
+            {
+                return;
+            }
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || c.WindowType != ChildWindowType.Console)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.InfoText,
+                              TimeStamp = DateTime.Now,
+                              Text = string.Format("Identd request: ({0}) {1}", remoteHost, data)
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+        }
+
         /* IRC events */
         public static void OnServerPingPong(ClientConnection client)
         {

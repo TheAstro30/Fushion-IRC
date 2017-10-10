@@ -173,7 +173,10 @@ namespace ircCore.Settings.Theming
         DnsText = 40,
 
         [Description("DNS Look-up Reply")]
-        DnsLookupReplyText = 41
+        DnsLookupReplyText = 41,
+
+        [Description("Info Text")]
+        InfoText = 42
     }
 
     public class IncomingMessageData

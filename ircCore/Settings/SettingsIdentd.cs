@@ -14,6 +14,9 @@ namespace ircCore.Settings
         [XmlAttribute("enable")]
         public bool Enable { get; set; }
 
+        [XmlAttribute("showRequests")]
+        public bool ShowRequests { get; set; }
+
         [XmlAttribute("userID")]
         public string UserId { get; set; }
 

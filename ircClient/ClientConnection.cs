@@ -62,6 +62,8 @@ namespace ircClient
         public event Action<ClientConnection, DnsResult> OnClientDnsResolved;
         public event Action<ClientConnection, DnsResult> OnClientDnsFailed;
 
+        public event Action<ClientConnection, string, string> OnClientIdentDaemonRequest;
+
         /* Constructor */
         public ClientConnection(ISynchronizeInvoke syncObject, SettingsUserInfo userInfo)
         {
@@ -309,8 +311,11 @@ namespace ircClient
         /* Identd callback */
         private void OnIdentDaemonData(string remoteHost, string data)
         {
-            System.Diagnostics.Debug.Print(remoteHost + " = " + data);
             _identd.StopIdentDaemon();
+            if (OnClientIdentDaemonRequest != null)
+            {
+                OnClientIdentDaemonRequest(this, remoteHost, data);
+            }
         }
 
         /* Timer callbacks */
