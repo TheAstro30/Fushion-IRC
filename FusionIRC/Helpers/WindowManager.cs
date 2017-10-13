@@ -197,6 +197,7 @@ namespace FusionIRC.Helpers
             client.OnClientConnectionError += ConnectionCallbackManager.OnClientConnectionError;
             client.OnClientConnectionClosed += CommandProcessor.OnClientWaitToReconnect;
             client.Parser.OnServerPingPong += ConnectionCallbackManager.OnServerPingPong;
+            client.Parser.OnErrorLink += ConnectionCallbackManager.OnErrorLink;
             client.OnClientSslInvalidCertificate += ConnectionCallbackManager.OnClientSslInvalidCertificate;
             client.OnClientLocalInfoResolved += ConnectionCallbackManager.OnClientLocalInfoResolved;
             client.OnClientLocalInfoFailed += ConnectionCallbackManager.OnClientLocalInfoFailed;
@@ -252,6 +253,7 @@ namespace FusionIRC.Helpers
             client.OnClientDnsFailed -= ConnectionCallbackManager.OnClientDnsFailed;
             client.OnClientIdentDaemonRequest -= ConnectionCallbackManager.OnClientIdentDaemonRequest;
             client.Parser.OnServerPingPong -= ConnectionCallbackManager.OnServerPingPong;
+            client.Parser.OnErrorLink -= ConnectionCallbackManager.OnErrorLink;
             client.Parser.OnMotd -= ConnectionCallbackManager.OnMotd;
             client.Parser.OnLUsers -= ConnectionCallbackManager.OnLUsers;
             client.Parser.OnWelcome -= ConnectionCallbackManager.OnWelcome;

@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using FusionIRC.Forms.Child;
 using ircClient;
 using ircClient.Classes;
+using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
 
@@ -101,6 +102,10 @@ namespace FusionIRC.Helpers
 
                 case "PART":
                     ParsePart(client, child, args);
+                    break;
+
+                case "HOP":
+                    ParseHop(client, child);
                     break;
 
                 case "NICK":
@@ -497,6 +502,12 @@ namespace FusionIRC.Helpers
             {
                 return;
             }
+            /* Offline nick change ... if the newnick == alternative nick, we switch them back */
+            if (nick.Equals(client.UserInfo.Alternative, StringComparison.InvariantCultureIgnoreCase))
+            {
+                /* Otherwise both alternative and nick will be the same defeating having an alternative to begin with */
+                client.UserInfo.Alternative = client.UserInfo.Nick;
+            }
             client.UserInfo.Nick = nick;
             var console = WindowManager.GetConsoleWindow(client);
             if (console == null)
@@ -538,6 +549,24 @@ namespace FusionIRC.Helpers
                 channel = c[0];
             }            
             client.Send(string.Format("PART {0}", channel));
+        }
+
+        private static void ParseHop(ClientConnection client, FrmChildWindow child)
+        {
+            /* Cannot hop a non-channel (or on a connection that isn't even connected...) */
+            if (child.WindowType != ChildWindowType.Channel || !client.IsConnected)
+            {
+                return;
+            }
+            if (SettingsManager.Settings.Client.Channels.KeepChannelsOpen)
+            {
+                child.KeepOpen = true;
+            }
+            else
+            {
+                child.AutoClose = true; /* This will stop the child window sending "PART" on closing */
+            }
+            client.Send(string.Format("PART {0}\r\nJOIN {0}", child.Tag));
         }
 
         /* Timer callback */

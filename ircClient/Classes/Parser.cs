@@ -16,6 +16,8 @@ namespace ircClient.Classes
         /* Public events */
         public event Action<ClientConnection> OnServerPingPong;
 
+        public event Action<ClientConnection, string> OnErrorLink;
+
         public event Action<ClientConnection, string, string, string> OnJoinUser;
         public event Action<ClientConnection, string> OnJoinSelf;
         public event Action<ClientConnection, string, string, string> OnPartUser;
@@ -73,7 +75,7 @@ namespace ircClient.Classes
 
         /* Main parsing entry point */
         public void Parse(string first, string second, string third, string fourth)
-        {            
+        {
             /* Make sure to reset the ping check! */
             if (!string.IsNullOrEmpty(first))
             {
@@ -85,7 +87,8 @@ namespace ircClient.Classes
                         {
                             if (OnNotice != null)
                             {
-                                OnNotice(_client, _client.Server.Address, "", RemoveColon(string.Format("{0} {1}", third, fourth)));
+                                OnNotice(_client, _client.Server.Address, "",
+                                         RemoveColon(string.Format("{0} {1}", third, fourth)));
                             }
                         }
                         break;
@@ -103,16 +106,24 @@ namespace ircClient.Classes
                     }
                     break;
 
+                case "ERROR":
+                    /* Error closing link */
+                    if (OnErrorLink != null)
+                    {
+                        OnErrorLink(_client, string.Format("ERROR Closing Link: {0}", RemoveColon(fourth)));
+                    }
+                    break;
+
                 case "JOIN":
                     /* First token is the nick and address - third is target */
-                    ParseJoin(first, third);                    
+                    ParseJoin(first, third);
                     break;
 
                 case "PART":
                     ParsePart(first, third);
                     break;
 
-                case "PRIVMSG":                    
+                case "PRIVMSG":
                     ParsePrivateMesasage(first, third, fourth);
                     break;
 
@@ -140,7 +151,7 @@ namespace ircClient.Classes
                     ParseMode(first, third, fourth);
                     break;
 
-                case "WALLOPS":                    
+                case "WALLOPS":
                     ParseWallops(first, string.Format("{0} {1}", third, fourth));
                     break;
 
@@ -234,7 +245,7 @@ namespace ircClient.Classes
 
                 case "376":
                 case "422":
-                    /* End of MOTD/MOTD file missing */                    
+                    /* End of MOTD/MOTD file missing */
                     if (!string.IsNullOrEmpty(JoinChannelsOnConnect))
                     {
                         _client.Send(string.Format("JOIN {0}", JoinChannelsOnConnect));
@@ -284,7 +295,7 @@ namespace ircClient.Classes
 
                 case "311":
                     /* Whois user <nick> <user> <host> * :<real_name> */
-                    var colon = fourth.IndexOf(':');                    
+                    var colon = fourth.IndexOf(':');
                     if (colon > -1)
                     {
                         var nick = fourth.Substring(0, colon).Trim();
@@ -296,7 +307,7 @@ namespace ircClient.Classes
                             Whois.Address = string.Format("{0}@{1}", n[1], n[2]);
                         }
                         Whois.Realname = RemoveColon(name);
-                    }                    
+                    }
                     break;
 
                 case "312":
@@ -348,8 +359,7 @@ namespace ircClient.Classes
                 case "331":
                 case "381":
                 case "396":
-                case "401":                
-                case "433":
+                case "401":
                 case "437":
                 case "464":
                 case "468":
@@ -367,6 +377,22 @@ namespace ircClient.Classes
                 case "353":
                     /* Channel names :server yournick := #channel :names */
                     ParseNames(fourth);
+                    break;
+
+                case "433":
+                    /* Nickname is already in use - switch alternative and nick in user info */
+                    if (OnRaw != null)
+                    {
+                        OnRaw(_client, string.Format("{0}", fourth.Replace(":", "")));
+                    }
+                    if (_client.IsConnecting)
+                    {
+                        /* We only use alternative nick during connecting */
+                        var tmp = _client.UserInfo.Alternative;
+                        _client.UserInfo.Alternative = _client.UserInfo.Nick;
+                        _client.UserInfo.Nick = tmp;
+                        _client.Send(string.Format("NICK {0}", tmp));
+                    }
                     break;
 
                 default:

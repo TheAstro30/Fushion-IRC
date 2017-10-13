@@ -72,7 +72,7 @@ namespace ircCore.Settings
                         Visible = true
                     };
             Client.Appearance.ControlBars.Control.Add(d);
-            Client.Confirmation.ClientClose = ClientCloseConfirmation.Connected;
+            Client.Confirmation.ClientClose = CloseConfirmation.Connected;
             Client.Confirmation.Url = true;
             /* Create a blank theme */
             Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = @"\themes\default.thm"});            

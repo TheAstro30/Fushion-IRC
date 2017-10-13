@@ -26,9 +26,6 @@ namespace ircCore.Settings
         [XmlAttribute("invisible")]
         public bool Invisible { get; set; }
 
-        [XmlIgnore]
-        public bool AlternativeUsed { get; set; } /* On an IRC server during connect "nick in use", switch nick and alternative */
-
         /* Constructors */
         public SettingsUserInfo()
         {

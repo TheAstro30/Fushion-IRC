@@ -177,7 +177,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         protected override void OnPaint(PaintEventArgs e)
         {
             /* Where the magic happens ;) - simplified to a separate class */
-            if (!Visible || _isDesignMode || TextData.Lines.Count == 0)
+            if (!Visible || _isDesignMode || TextData.Lines.Count == 0 || _wrapUpdate.Enabled)
             {
                 return;
             }
@@ -551,17 +551,16 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             var t = new TextData.Text
                         {
                             DefaultColor = ThemeManager.CurrentTheme.Colors[defaultColor % 15],
-                            //IsIndented = indented,
                             Line = text
                         };
             TextData.Lines.Add(t);
             WrapData w;
             using (var g = CreateGraphics())
             {
-                Wrapping.WordWrap(g, t.DefaultColor, BackColor, WordWrap, IndentWidth, text, _windowWidth, _font, out w);    
-            }            
+                Wrapping.WordWrap(g, t.DefaultColor, BackColor, WordWrap, IndentWidth, text, _windowWidth, _font, out w);
+            }
             if (w.Lines.Count == 0)
-            {                
+            {
                 return; /* It's unlikely ... */
             }            
             TextData.Wrapped.Add(w);            

@@ -52,10 +52,16 @@ namespace FusionIRC.Controls
                                  Text = @"&Window"
                              };
             _mnuWindow.DropDownItems.AddRange(new ToolStripItem[]
-                                                  {
-                                                      new ToolStripMenuItem("Find Text...", null, OnMenuWindowClick, Keys.Control | Keys.F)
-                                                  });            
-            Items.AddRange(new[] { _mnuFile, _mnuWindow });                        
+                                                  {                                                       
+                                                      new ToolStripMenuItem("Find Text...", null, OnMenuWindowClick, Keys.Control | Keys.F),
+                                                      new ToolStripSeparator(), 
+                                                      new ToolStripMenuItem("Cascade", null, OnMenuWindowClick),
+                                                      new ToolStripMenuItem("Tile Vertically", null, OnMenuWindowClick),
+                                                      new ToolStripMenuItem("Tile Horizontally", null, OnMenuWindowClick)
+                                                  });
+            _mnuWindow.DropDownOpening += OnMenuWindowDropDownOpening;
+            /* Add all menus */
+            Items.AddRange(new[] { _mnuFile, _mnuWindow });           
         }
 
         public void ConnectionUpdate(bool connected)
@@ -89,6 +95,12 @@ namespace FusionIRC.Controls
                                                new ToolStripSeparator(),
                                                new ToolStripMenuItem("Clear", null, OnMenuRecentServerClick)
                                            });
+        }
+
+        private void OnMenuWindowDropDownOpening(object sender, EventArgs e)
+        {
+            /* We would list all open windows here (up to a certain amount), then provide a separate dialog showing
+             * all the rest */
         }
 
         private void OnMenuFileClick(object sender, EventArgs e)
@@ -198,6 +210,18 @@ namespace FusionIRC.Controls
                     {                                              
                         f.ShowDialog(_owner);
                     }
+                    break;
+
+                case "CASCADE":
+                    _owner.LayoutMdi(MdiLayout.Cascade);
+                    break;
+
+                case "TILE VERTICALLY":
+                    _owner.LayoutMdi(MdiLayout.TileVertical);
+                    break;
+
+                case "TILE HORIZONTALLY":
+                    _owner.LayoutMdi(MdiLayout.TileHorizontal);
                     break;
             }
         }

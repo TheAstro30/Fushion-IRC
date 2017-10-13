@@ -46,7 +46,7 @@ namespace FusionIRC.Forms.Users.Controls
                             View = View.Details
                         };            
 
-            _colNote = new OlvColumn("@Note:", "Note")
+            _colNote = new OlvColumn("Note:", "Note")
                            {
                                CellPadding = null,
                                IsEditable = false,
@@ -104,7 +104,7 @@ namespace FusionIRC.Forms.Users.Controls
             switch (_userListType)
             {
                 case UserListType.Notify:
-                    _colNick = new OlvColumn(@"Nick:", "Nick")
+                    _colNick = new OlvColumn("Nick:", "Nick")
                                    {
                                        CellPadding = null,
                                        IsEditable = false,
@@ -115,7 +115,7 @@ namespace FusionIRC.Forms.Users.Controls
                     break;
 
                 case UserListType.Ignore:
-                    _colNick = new OlvColumn(@"Address:", "Address")
+                    _colNick = new OlvColumn("Address:", "Address")
                                    {
                                        CellPadding = null,
                                        IsEditable = false,

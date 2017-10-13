@@ -28,6 +28,7 @@ namespace FusionIRC.Forms.Child
         private readonly CheckBox _chkCase;
         private readonly Button _btnClear;
         private readonly Button _btnFind;
+        private readonly Button _btnClose;
 
         public FrmChatFind(FrmChildWindow child)
         {
@@ -124,7 +125,7 @@ namespace FusionIRC.Forms.Child
             _btnFind = new Button
                            {
                                Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0),
-                               Location = new Point(279, 151),
+                               Location = new Point(198, 151),
                                Size = new Size(75, 23),
                                TabIndex = 5,
                                Tag = "FIND",
@@ -132,9 +133,20 @@ namespace FusionIRC.Forms.Child
                                UseVisualStyleBackColor = true
                            };
 
+            _btnClose = new Button
+                            {
+                                Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0),
+                                Location = new Point(279, 151),
+                                Size = new Size(75, 23),
+                                TabIndex = 5,
+                                Tag = "CLOSE",
+                                Text = @"Close",
+                                UseVisualStyleBackColor = true
+                            };
+
             Controls.AddRange(new Control[]
                                   {
-                                      _lblHeader, _cmbSearch, _btnClear, _gbDirection,_gbOption,_btnFind
+                                      _lblHeader, _cmbSearch, _btnClear, _gbDirection, _gbOption, _btnFind, _btnClose
                                   });
             AcceptButton = _btnFind;
             ClientSize = new Size(366, 186);
@@ -164,6 +176,7 @@ namespace FusionIRC.Forms.Child
 
             _btnClear.Click += ButtonClickHandler;
             _btnFind.Click += ButtonClickHandler;
+            _btnClose.Click += ButtonClickHandler;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -226,6 +239,10 @@ namespace FusionIRC.Forms.Child
                         }
                         FindWord(_cmbSearch.Text, _rbDown.Checked, _chkCase.Checked);
                     }
+                    break;
+
+                case "CLOSE":
+                    Close();
                     break;
             }
         }

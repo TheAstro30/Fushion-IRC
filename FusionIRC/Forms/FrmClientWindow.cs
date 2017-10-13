@@ -207,14 +207,14 @@ namespace FusionIRC.Forms
             string msg = null;
             switch (SettingsManager.Settings.Client.Confirmation.ClientClose)
             {
-                case ClientCloseConfirmation.Connected:
+                case CloseConfirmation.Connected:
                     if (WindowManager.Windows.Any(client => client.Key.IsConnected))
                     {
                         msg = "You are still connected to an IRC server. Are you sure you want to exit?";
                     }                    
                     break;
 
-                case ClientCloseConfirmation.Always:
+                case CloseConfirmation.Always:
                     msg = "Are you sure you want to exit?";
                     break;
             }
@@ -355,7 +355,7 @@ namespace FusionIRC.Forms
             }
             win.Restore();
             _mdi.ActivateChild(win);
-            win.MyActivate();
+            win.MyActivate();            
         }
     }
 }

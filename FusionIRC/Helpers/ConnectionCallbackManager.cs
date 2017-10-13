@@ -295,6 +295,25 @@ namespace FusionIRC.Helpers
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
 
+        public static void OnErrorLink(ClientConnection client, string message)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || c.WindowType != ChildWindowType.Console)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.InfoText,
+                              TimeStamp = DateTime.Now,
+                              Text = message
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+        }
+
         /* Text messages */
         public static void OnTextChannel(ClientConnection client, string nick, string address, string channel, string text)
         {
@@ -516,6 +535,15 @@ namespace FusionIRC.Helpers
                     client.Send(string.Format("USERHOST {0}", client.UserInfo.Nick));
                     break;
             }
+            /* Finally, join open channels */
+            if (SettingsManager.Settings.Client.Channels.JoinOpenChannelsOnConnect)
+            {
+                foreach (var chan in WindowManager.Windows[client].Where(chan => chan.WindowType == ChildWindowType.Channel))
+                {
+                    client.Send(string.Format("JOIN {0}", chan.Tag));
+                }
+            }
+            /* Process auto-join ... */
         }
 
         public static void OnLUsers(ClientConnection client, string text)
@@ -697,6 +725,12 @@ namespace FusionIRC.Helpers
             /* If the nick is me, update client user info data */
             if (nick.Equals(client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
             {
+                /* If the newnick == alternative nick, we switch them back */
+                if (newNick.Equals(client.UserInfo.Alternative, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    /* Otherwise both alternative and nick will be the same defeating having an alternative to begin with */
+                    client.UserInfo.Alternative = client.UserInfo.Nick;
+                }
                 client.UserInfo.Nick = newNick;
                 var console = WindowManager.GetConsoleWindow(client);
                 if (console == null)
@@ -772,25 +806,40 @@ namespace FusionIRC.Helpers
             {
                 return;
             }
-            c.AutoClose = true;
-            c.Close();
-            c = WindowManager.GetConsoleWindow(client);
-            if (c == null)
+            if (!SettingsManager.Settings.Client.Channels.KeepChannelsOpen)
             {
-                return;
+                c.AutoClose = true;
+                c.Close();
+                c = null;
             }
-            var tmd = new IncomingMessageData
-                          {
-                              Message = ThemeMessage.ChannelSelfKickText,
-                              TimeStamp = DateTime.Now,
-                              Target = channel,
-                              Nick = nick,
-                              Text = msg
-                          };
-            var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
-            /* Update treenode color */
-            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+            var console = WindowManager.GetConsoleWindow(client);
+            if (console != null)
+            {
+                var tmd = new IncomingMessageData
+                              {
+                                  Message = ThemeMessage.ChannelSelfKickText,
+                                  TimeStamp = DateTime.Now,
+                                  Target = channel,
+                                  Nick = nick,
+                                  Text = msg
+                              };
+                var pmd = ThemeManager.ParseMessage(tmd);
+                console.Output.AddLine(pmd.DefaultColor, pmd.Message);
+                /* Update treenode color */
+                WindowManager.SetWindowEvent(console, MainForm, WindowEvent.EventReceived);
+                if (c != null)
+                {
+                    /* IE: channel is still open ... */
+                    c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+                    /* Update treenode color */
+                    WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+                }
+            }
+            /* Attempt to rejoin the channel */
+            if (SettingsManager.Settings.Client.Channels.ReJoinChannelsOnKick)
+            {
+                client.Send(string.Format("JOIN {0}", channel));
+            }
         }
 
         public static void OnKickUser(ClientConnection client, string nick, string knick, string channel, string msg)

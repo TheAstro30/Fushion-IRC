@@ -53,6 +53,9 @@ namespace FusionIRC.Forms.Child
         
         public bool AutoClose { get; set; }
 
+        /* This allows the child to be temporarily kept open during "hop" or "kick" for example */
+        public bool KeepOpen { get; set; } /* In FormClosing, this will be reset to false automatically */
+
         public WindowEvent CurrentWindowEvent
         {
             get
@@ -222,6 +225,12 @@ namespace FusionIRC.Forms.Child
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
+            if (KeepOpen)
+            {
+                KeepOpen = false;
+                e.Cancel = true;
+                return;
+            }
             /* Update window position in settings ... */
             switch (e.CloseReason)
             {
@@ -229,25 +238,53 @@ namespace FusionIRC.Forms.Child
                 case CloseReason.WindowsShutDown:
                 case CloseReason.MdiFormClosing:
                     return;
-            }            
-            if (WindowType == ChildWindowType.Console)                
-            {
-                if (WindowManager.Windows.Count == 1)
-                {
-                    /* Make sure we're not trying to close the only open console!! */
-                    e.Cancel = true;
-                    SystemSounds.Beep.Play();
-                    return;
-                }
-                /* Before removing the window, it would be a good idea to 1) send the quit message & 2) close all windows associated with this console */
-                Client.Send(string.Format("QUIT :Leaving."));
-                WindowManager.RemoveAllWindowsOfConsole(Client);                
-            }            
-            if (WindowType == ChildWindowType.Channel && Client.IsConnected && !AutoClose)
-            {
-                /* Part channel if closing it */
-                Client.Send(string.Format("PART {0}", Tag));
             }
+            switch (WindowType)
+            {
+                case ChildWindowType.Console:
+                    if (WindowManager.Windows.Count == 1)
+                    {
+                        /* Make sure we're not trying to close the only open console!! */
+                        e.Cancel = true;
+                        SystemSounds.Beep.Play();
+                        return;
+                    }
+                    /* Check confirmation setting */
+                    string msg = null;
+                    switch (SettingsManager.Settings.Client.Confirmation.ConsoleClose)
+                    {
+                        case CloseConfirmation.Connected:
+                            if (Client.IsConnected)
+                            {
+                                msg = "You are still connected to an IRC server. Are you sure you want to close this console window? ";
+                            }
+                            break;
+                        
+                        case CloseConfirmation.Always:
+                            msg = "Are you sure you want to close this console window?";
+                            break;
+                    }
+                    if (MessageBox.Show(msg, @"Confirm Close Console", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                    if (Client.IsConnected)
+                    {
+                        Client.Send(string.Format("QUIT :Leaving."));
+                    }
+                    WindowManager.RemoveAllWindowsOfConsole(Client);
+                    break;
+
+                case ChildWindowType.Channel:
+                    if (Client.IsConnected && !AutoClose)
+                    {
+                        /* Part channel if closing it */
+                        Client.Send(string.Format("PART {0}", Tag));
+                    }
+                    break;
+            }
+            /* Remove the window from the client */
             WindowManager.RemoveWindow(Client, this);
             _focus.Enabled = false;
             base.OnFormClosing(e);
@@ -292,23 +329,23 @@ namespace FusionIRC.Forms.Child
                 Input.SetBounds(0, Output.ClientRectangle.Height + 1, ClientRectangle.Width, Input.ClientRectangle.Height);
             }
             /* Update settings */
-            if (!_initialize)
+            if (_initialize)
             {
-                switch (WindowState)
-                {
-                    case FormWindowState.Normal:
-                        var w = SettingsManager.GetWindowByName(_windowChildName);
-                        w.Size = Size;
-                        //w.Position = Location;
-                        SettingsManager.Settings.Windows.ChildrenMaximized = false;
-                        break;
-
-                    case FormWindowState.Maximized:
-                        SettingsManager.Settings.Windows.ChildrenMaximized = true;
-                        break;
-                }
+                return;
             }
-            base.OnResize(e);
+            switch (WindowState)
+            {
+                case FormWindowState.Normal:
+                    var w = SettingsManager.GetWindowByName(_windowChildName);
+                    w.Size = Size;
+                    //w.Position = Location;
+                    SettingsManager.Settings.Windows.ChildrenMaximized = false;
+                    break;
+
+                case FormWindowState.Maximized:
+                    SettingsManager.Settings.Windows.ChildrenMaximized = true;
+                    break;
+            }
         }
 
         public override string ToString()
