@@ -6,19 +6,16 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using FusionIRC.Forms;
-using FusionIRC.Forms.Child;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Forms.Settings;
 using FusionIRC.Forms.Users;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
-using ircCore.Settings.Networks;
 using ircCore.Settings.Theming.Forms;
 
-namespace FusionIRC.Controls
+namespace FusionIRC.Controls.ControlBars
 {
-    public sealed class ToolbarControl : ToolStrip
+    public sealed class ToolbarControl : ControlBar
     {
         private readonly Form _owner;
 
@@ -132,45 +129,23 @@ namespace FusionIRC.Controls
             {
                 return;
             }
-            FrmChildWindow console;
+            var console = WindowManager.GetConsoleWindow(c);
+            if (console == null)
+            {
+                return;
+            }
             switch (btn.Tag.ToString())
             {
                 case "CONNECT":
-                    var server = !string.IsNullOrEmpty(c.Server.Address)
-                                     ? c.Server
-                                     : ServerManager.Servers.Recent.Server.Count > 0
-                                           ? ServerManager.Servers.Recent.Server[0]
-                                           : new Server
-                                                 {
-                                                     Address = "irc.dragonirc.com",
-                                                     Port = 6667
-                                                 };
-                    console = WindowManager.GetConsoleWindow(c);
-                    if (console == null)
-                    {
-                        return;
-                    }
-                    CommandProcessor.Parse(c, console,
-                                           string.Format("SERVER {0}:{1}", server.Address,
-                                                         server.IsSsl
-                                                             ? string.Format("+{0}", server.Port)
-                                                             : server.Port.ToString()));
+                    ConnectToServer(c, console);
                     break;
 
                 case "DISCONNECT":                    
-                    console = WindowManager.GetConsoleWindow(c);
-                    if (console == null)
-                    {
-                        return;
-                    }
-                    CommandProcessor.Parse(c, console, "DISCONNECT");
+                    DisconnectFromServer(c, console);
                     break;
 
                 case "CONNECTTO":
-                    using (var connect = new FrmConnectTo(_owner))
-                    {
-                        connect.ShowDialog(_owner);
-                    }
+                    ConnectToLocation(_owner, console);
                     break;
 
                 case "SETTINGS":

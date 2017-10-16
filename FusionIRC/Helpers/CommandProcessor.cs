@@ -6,10 +6,10 @@
 using System;
 using System.Linq;
 using System.Windows.Forms;
-using FusionIRC.Forms;
 using FusionIRC.Forms.Child;
 using ircClient;
 using ircClient.Classes;
+using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
 
@@ -104,6 +104,10 @@ namespace FusionIRC.Helpers
                     ParsePart(client, child, args);
                     break;
 
+                case "HOP":
+                    ParseHop(client, child);
+                    break;
+
                 case "NICK":
                     ParseNick(client, args);
                     break;
@@ -132,6 +136,10 @@ namespace FusionIRC.Helpers
 
                 case "CTCP":
                     ParseCtcp(client, args);
+                    break;
+
+                case "DNS":
+                    ParseDns(client, args);
                     break;
 
                 default:
@@ -420,6 +428,27 @@ namespace FusionIRC.Helpers
                             : string.Format("PRIVMSG {0} :{1}{2}{3}", ctcp[0], (char) 1, ct, (char) 1));
         }
 
+        private static void ParseDns(ClientConnection client, string args)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.DnsText,
+                              TimeStamp = DateTime.Now,
+                              Text = args
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, ConnectionCallbackManager.MainForm, WindowEvent.EventReceived);
+            /* Now, get the DNS information */
+            client.ResolveDns(args);
+        }
+
         private static void ParseNames(ClientConnection client, string args)
         {
             if (!client.IsConnected || string.IsNullOrEmpty(args))
@@ -473,7 +502,14 @@ namespace FusionIRC.Helpers
             {
                 return;
             }
+            /* Offline nick change ... if the newnick == alternative nick, we switch them back */
+            if (nick.Equals(client.UserInfo.Alternative, StringComparison.InvariantCultureIgnoreCase))
+            {
+                /* Otherwise both alternative and nick will be the same defeating having an alternative to begin with */
+                client.UserInfo.Alternative = client.UserInfo.Nick;
+            }
             client.UserInfo.Nick = nick;
+            client.UserInfo.AlternateUsed = false;
             var console = WindowManager.GetConsoleWindow(client);
             if (console == null)
             {
@@ -514,6 +550,24 @@ namespace FusionIRC.Helpers
                 channel = c[0];
             }            
             client.Send(string.Format("PART {0}", channel));
+        }
+
+        private static void ParseHop(ClientConnection client, FrmChildWindow child)
+        {
+            /* Cannot hop a non-channel (or on a connection that isn't even connected...) */
+            if (child.WindowType != ChildWindowType.Channel || !client.IsConnected)
+            {
+                return;
+            }
+            if (SettingsManager.Settings.Client.Channels.KeepChannelsOpen)
+            {
+                child.KeepOpen = true;
+            }
+            else
+            {
+                child.AutoClose = true; /* This will stop the child window sending "PART" on closing */
+            }
+            client.Send(string.Format("PART {0}\r\nJOIN {0}", child.Tag));
         }
 
         /* Timer callback */

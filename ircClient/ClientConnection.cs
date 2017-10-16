@@ -24,6 +24,9 @@ namespace ircClient
         public readonly Parser Parser;
 
         private readonly ClientSock _sock;
+        private readonly DnsResolve _localInfo;
+        private readonly DnsResolve _dns;
+        private readonly Identd _identd;
         
         private StringBuilder _buffer = new StringBuilder();
         private readonly List<string> _sockData = new List<string>();
@@ -40,6 +43,9 @@ namespace ircClient
         public bool IsWaitingToReconnect { get; set; }
         public bool IsManualDisconnect { get; set; }
 
+        public string SocketLocalIp { get { return _sock.LocalIp; } }
+        public string SocketRemoteIp { get { return _sock.RemoteHostIp; } }
+
         public Server Server = new Server();
 
         public event Action<ClientConnection> OnClientBeginConnect;
@@ -50,12 +56,19 @@ namespace ircClient
         public event Action<ClientConnection> OnClientConnectionClosed;
         public event Action<ClientConnection, X509Certificate> OnClientSslInvalidCertificate;
 
+        public event Action<ClientConnection, DnsResult> OnClientLocalInfoResolved;
+        public event Action<ClientConnection, DnsResult> OnClientLocalInfoFailed;
+
+        public event Action<ClientConnection, DnsResult> OnClientDnsResolved;
+        public event Action<ClientConnection, DnsResult> OnClientDnsFailed;
+
+        public event Action<ClientConnection, string, string> OnClientIdentDaemonRequest;
+
         /* Constructor */
-        public ClientConnection(ISynchronizeInvoke syncObjcet, SettingsUserInfo userInfo)
+        public ClientConnection(ISynchronizeInvoke syncObject, SettingsUserInfo userInfo)
         {
-            _sock = new ClientSock
+            _sock = new ClientSock(syncObject)
                         {
-                            SynchronizingObject = syncObjcet,
                             EnableSslAuthentication = true
                         };
             _sock.OnConnected += OnConnected;
@@ -69,6 +82,17 @@ namespace ircClient
             Parser = new Parser(this);
 
             UserInfo = new SettingsUserInfo(userInfo);
+
+            _localInfo = new DnsResolve(syncObject);
+            _localInfo.DnsResolved += OnLocalInfoResolved;
+            _localInfo.DnsFailed += OnLocalInfoFailed;
+
+            _dns = new DnsResolve(syncObject);
+            _dns.DnsResolved += OnDnsResolved;
+            _dns.DnsFailed += OnDnsFailed;
+
+            _identd = new Identd(syncObject, SettingsManager.Settings.Connection.Identd);
+            _identd.OnIdentDaemonData += OnIdentDaemonData;
 
             _tmrWaitToReconnect = new Timer
                                       {
@@ -97,7 +121,9 @@ namespace ircClient
             Server.IsSsl = ssl;
             IsConnecting = true;
             _sock.IsSsl = ssl;
-            _sock.Connect(address, port);            
+            _sock.Connect(address, port);
+            /* Turn on identd */
+            _identd.BeginIdentDaemon();            
             if (OnClientBeginConnect != null)
             {
                 OnClientBeginConnect(this);
@@ -148,6 +174,17 @@ namespace ircClient
             _sock.SendData(string.Format("{0}\r\n", data));
         }
 
+        /* DNS Methods */
+        public void ResolveLocalInfo(string ip)
+        {
+            _localInfo.Resolve(ip);
+        }
+
+        public void ResolveDns(string dns)
+        {
+            _dns.Resolve(dns);
+        }
+
         /* Socket callbacks */
         private void OnConnected(ClientSock sock)
         {
@@ -155,8 +192,7 @@ namespace ircClient
             {
                 OnClientConnected(this);
             }
-            Send(string.Format("NICK {0}", UserInfo.Nick));
-            Send(string.Format("USER {0} {1} {2} :{3}", UserInfo.Ident, _sock.LocalIp, _sock.RemoteHostIp, UserInfo.RealName));
+            Send(string.Format("NICK {0}\r\nUSER {1} {2} {3} :{4}", UserInfo.Nick, UserInfo.Ident, _sock.LocalIp, _sock.RemoteHostIp, UserInfo.RealName));
             /* Start the ping-time out check */
             _pingCheck = 0;
             _tmrPingTimeout.Enabled = true;
@@ -236,6 +272,50 @@ namespace ircClient
                 return;
             }           
             _pingCheck = 0;
+        }
+
+        /* DNS callbacks */
+        private void OnLocalInfoResolved(DnsResolve dns, DnsResult result)
+        {
+            if (OnClientLocalInfoResolved != null)
+            {
+                OnClientLocalInfoResolved(this, result);
+            }
+        }
+
+        private void OnLocalInfoFailed(DnsResolve dns, DnsResult result)
+        {
+            if (OnClientLocalInfoFailed != null)
+            {
+                OnClientLocalInfoFailed(this, result);
+            }
+        }
+
+        private void OnDnsResolved(DnsResolve dns, DnsResult result)
+        {
+            System.Diagnostics.Debug.Print("resolved");
+            if (OnClientDnsResolved != null)
+            {
+                OnClientDnsResolved(this, result);
+            }
+        }
+
+        private void OnDnsFailed(DnsResolve dns, DnsResult result)
+        {
+            if (OnClientDnsFailed != null)
+            {
+                OnClientDnsFailed(this, result);
+            }
+        }
+
+        /* Identd callback */
+        private void OnIdentDaemonData(string remoteHost, string data)
+        {
+            _identd.StopIdentDaemon();
+            if (OnClientIdentDaemonRequest != null)
+            {
+                OnClientIdentDaemonRequest(this, remoteHost, data);
+            }
         }
 
         /* Timer callbacks */

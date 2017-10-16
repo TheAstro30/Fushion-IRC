@@ -20,22 +20,19 @@ namespace ircCore.Utils
         {
             public static string GetDescriptionFromEnumValue(Enum value)
             {
+                /* GetDescriptionFromEnumValue((EnumName)<intValue>) */
                 var attribute = value.GetType()
                                     .GetField(value.ToString())
                                     .GetCustomAttributes(typeof(DescriptionAttribute), false)
                                     .SingleOrDefault() as DescriptionAttribute;
                 return attribute == null ? value.ToString() : attribute.Description;
             }
-        }
 
-        public class EnumComboData
-        {
-            public string Text { get; set; }
-            public uint Data { get; set; }
-
-            public override string ToString()
+            public static object[] GetDescriptions(Type type)
             {
-                return Text;
+                /* Used for populating combos/list boxes using AddRange */
+                var names = Enum.GetNames(type);
+                return (from name in names select type.GetField(name) into field from DescriptionAttribute fd in field.GetCustomAttributes(typeof (DescriptionAttribute), true) select fd.Description).Cast<object>().ToArray();
             }
         }
 

@@ -7,11 +7,10 @@ using System;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
-using FusionIRC.Forms;
-using FusionIRC.Forms.Child;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Forms.Warning;
 using ircClient;
+using ircCore.Settings;
 using ircCore.Settings.Networks;
 using ircCore.Settings.Theming;
 using ircCore.Users;
@@ -76,6 +75,7 @@ namespace FusionIRC.Helpers
                 return;
             }
             client.IsManualDisconnect = false;
+            client.UserInfo.AlternateUsed = false;
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.ConnectionCancelledText,
@@ -103,16 +103,14 @@ namespace FusionIRC.Helpers
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
-            /* Iterate all open channels and clear nick list */
-            foreach (var win in WindowManager.Windows[client].Where(win => win.WindowType == ChildWindowType.Channel))
-            {
-                win.Nicklist.Clear();
-            }
+            /* Iterate all open channels and clear nick list (or close it's window) */
+            UpdateChannelsOnDisconnect(client, pmd);
+            client.UserInfo.AlternateUsed = false;
             if (client.IsManualDisconnect)
             {
                 client.IsManualDisconnect = false;
                 return;
-            }
+            }            
             /* Now we process re-connection code if the server wasn't manually disconnected by the user */
         }
 
@@ -134,11 +132,9 @@ namespace FusionIRC.Helpers
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
-            /* Iterate all open channels and clear nick list */
-            foreach (var win in WindowManager.Windows[client].Where(win => win.WindowType == ChildWindowType.Channel))
-            {
-                win.Nicklist.Clear();
-            }
+            /* Iterate all open channels and clear nick list (or close it's window) */
+            UpdateChannelsOnDisconnect(client, pmd);
+            client.UserInfo.AlternateUsed = false;
         }
 
         public static void OnClientSslInvalidCertificate(ClientConnection client, X509Certificate certificate)
@@ -167,6 +163,116 @@ namespace FusionIRC.Helpers
             client.SslAcceptCertificate(true);
         }
 
+        /* Local info/DNS callbacks */
+        public static void OnClientLocalInfoResolved(ClientConnection client, DnsResult result)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || c.WindowType != ChildWindowType.Console)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.LocalInfoReplyText,
+                              TimeStamp = DateTime.Now,
+                              DnsAddress = result.Address,
+                              DnsHost = result.HostName
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+            /* Update settings */
+            SettingsManager.Settings.Connection.LocalInfo.HostInfo = result;
+        }
+
+        public static void OnClientLocalInfoFailed(ClientConnection client, DnsResult result)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || c.WindowType != ChildWindowType.Console)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.LocalInfoReplyText,
+                              TimeStamp = DateTime.Now,
+                              DnsAddress = result.Lookup,
+                              DnsHost = "Unknown host"
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+            /* Update settings */
+            result.Address = result.Lookup;
+            SettingsManager.Settings.Connection.LocalInfo.HostInfo = result;
+        }
+
+        public static void OnClientDnsResolved(ClientConnection client, DnsResult result)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || c.WindowType != ChildWindowType.Console)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.DnsLookupReplyText,
+                              TimeStamp = DateTime.Now,
+                              DnsAddress = result.Address,
+                              DnsHost = result.HostName
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+        }
+
+        public static void OnClientDnsFailed(ClientConnection client, DnsResult result)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || c.WindowType != ChildWindowType.Console)
+            {
+                return;
+            }           
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.DnsLookupReplyText,
+                              TimeStamp = DateTime.Now,
+                              DnsAddress = result.Lookup,
+                              DnsHost = "Host unresolvable"
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+        }
+
+        public static void OnClientIdentDaemonRequest(ClientConnection client, string remoteHost, string data)
+        {
+            if (!SettingsManager.Settings.Connection.Identd.ShowRequests)
+            {
+                return;
+            }
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || c.WindowType != ChildWindowType.Console)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.InfoText,
+                              TimeStamp = DateTime.Now,
+                              Text = string.Format("Identd request: ({0}) {1}", remoteHost, data)
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+        }
+
+        /* IRC events */
         public static void OnServerPingPong(ClientConnection client)
         {
             var c = WindowManager.GetConsoleWindow(client);
@@ -177,7 +283,26 @@ namespace FusionIRC.Helpers
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.ServerPingPongText,
+                              TimeStamp = DateTime.Now
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+        }
+
+        public static void OnErrorLink(ClientConnection client, string message)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || c.WindowType != ChildWindowType.Console)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.InfoText,
                               TimeStamp = DateTime.Now,
+                              Text = message
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
@@ -197,7 +322,7 @@ namespace FusionIRC.Helpers
             if (c == null || c.WindowType != ChildWindowType.Channel)
             {
                 return;
-            }
+            }            
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.ChannelText,
@@ -247,7 +372,7 @@ namespace FusionIRC.Helpers
             if (c == null || c.WindowType != ChildWindowType.Channel)
             {
                 return;
-            }
+            }            
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.ChannelActionText,
@@ -381,20 +506,11 @@ namespace FusionIRC.Helpers
             }
             System.Diagnostics.Debug.Print("Updating recent server for " + client.Server.Address);
             /* Update recent servers list */
-            foreach (var s in ServerManager.Servers.Recent.Server.Where(s => s.Address.Equals(client.Server.Address, StringComparison.InvariantCultureIgnoreCase)))
-            {
-                System.Diagnostics.Debug.Print("remove " + s.Address);
-                /* Remove it from it's current position */
-                ServerManager.Servers.Recent.Server.Remove(s);
-                break;
-            }
-            /* Insert current server at the top of the recent list */
-            ServerManager.Servers.Recent.Server.Insert(0, client.Server);
-            /* Keep the list length down */
-            if (ServerManager.Servers.Recent.Server.Count > 25)
-            {
-                ServerManager.Servers.Recent.Server.RemoveAt(ServerManager.Servers.Recent.Server.Count - 1);
-            }
+            UpdateRecentServers(client);
+            /* Resolve local IP */
+            ResolveLocalInfo(client);            
+            /* Finally process auto join/rejoin open channels */
+            ProcessAutoJoin(client);
         }
 
         public static void OnLUsers(ClientConnection client, string text)
@@ -460,7 +576,7 @@ namespace FusionIRC.Helpers
             if (c == null || c.WindowType != ChildWindowType.Channel)
             {
                 return;
-            }
+            }            
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.ChannelTopicChange,
@@ -576,7 +692,14 @@ namespace FusionIRC.Helpers
             /* If the nick is me, update client user info data */
             if (nick.Equals(client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
             {
+                /* If the newnick == alternative nick, we switch them back */
+                if (newNick.Equals(client.UserInfo.Alternative, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    /* Otherwise both alternative and nick will be the same defeating having an alternative to begin with */
+                    client.UserInfo.Alternative = client.UserInfo.Nick;
+                }
                 client.UserInfo.Nick = newNick;
+                client.UserInfo.AlternateUsed = false;
                 var console = WindowManager.GetConsoleWindow(client);
                 if (console == null)
                 {                    
@@ -651,26 +774,40 @@ namespace FusionIRC.Helpers
             {
                 return;
             }
-            c.AutoClose = true;
-            c.Close();
-            c = WindowManager.GetConsoleWindow(client);
-            if (c == null)
+            if (!SettingsManager.Settings.Client.Channels.KeepChannelsOpen)
             {
-                return;
+                c.AutoClose = true;
+                c.Close();
+                c = null;
             }
-            var tmd = new IncomingMessageData
-                          {
-                              Message = ThemeMessage.ChannelSelfKickText,
-                              TimeStamp = DateTime.Now,
-                              Target = channel,
-                              Nick = nick,
-                              Prefix = c.Nicklist.GetNickPrefix(nick),
-                              Text = msg
-                          };
-            var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
-            /* Update treenode color */
-            WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+            var console = WindowManager.GetConsoleWindow(client);
+            if (console != null)
+            {
+                var tmd = new IncomingMessageData
+                              {
+                                  Message = ThemeMessage.ChannelSelfKickText,
+                                  TimeStamp = DateTime.Now,
+                                  Target = channel,
+                                  Nick = nick,
+                                  Text = msg
+                              };
+                var pmd = ThemeManager.ParseMessage(tmd);
+                console.Output.AddLine(pmd.DefaultColor, pmd.Message);
+                /* Update treenode color */
+                WindowManager.SetWindowEvent(console, MainForm, WindowEvent.EventReceived);
+                if (c != null)
+                {
+                    /* IE: channel is still open ... */
+                    c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+                    /* Update treenode color */
+                    WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+                }
+            }
+            /* Attempt to rejoin the channel */
+            if (SettingsManager.Settings.Client.Channels.ReJoinChannelsOnKick)
+            {
+                client.Send(string.Format("JOIN {0}", channel));
+            }
         }
 
         public static void OnKickUser(ClientConnection client, string nick, string knick, string channel, string msg)
@@ -800,6 +937,26 @@ namespace FusionIRC.Helpers
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
 
+        public static void OnUserInfo(ClientConnection client, string info)
+        {
+            System.Diagnostics.Debug.Print(info);
+            var n = info.Split('=');
+            if (n.Length < 2)
+            {
+                return;
+            }
+            if (string.Compare(n[0], client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase) != 0)
+            {
+                return;
+            }
+            var address = n[1].Split('@');
+            if (address.Length < 2)
+            {
+                return;
+            }
+            client.ResolveLocalInfo(address[1]);
+        }
+
         public static void OnWhois(ClientConnection client)
         {            
             using (var whois = new FrmWhoisInfo(client.Parser.Whois))
@@ -884,6 +1041,63 @@ namespace FusionIRC.Helpers
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+        }
+
+        /* Private methods */
+        private static void UpdateChannelsOnDisconnect(ClientConnection client, ParsedMessageData message)
+        {
+            /* Here we either close all open windows or just clear the nicklist - dependant on settings */
+            foreach (var win in WindowManager.Windows[client].Where(win => win.WindowType == ChildWindowType.Channel))
+            {
+                win.Nicklist.Clear();
+                win.Output.AddLine(message.DefaultColor, message.Message);
+                /* Update treenode color */
+                WindowManager.SetWindowEvent(win, MainForm, WindowEvent.EventReceived);
+            }
+        }
+
+        private static void UpdateRecentServers(ClientConnection client)
+        {
+            var servers = ServerManager.Servers.Recent.Server;
+            var index = servers.FindIndex(s => s.Address.Equals(client.Server.Address, StringComparison.InvariantCultureIgnoreCase));
+            if (index > 0)
+            {
+                servers.RemoveAt(index);
+                /* Insert current server at the top of the recent list */
+                servers.Insert(0, client.Server);
+            }
+            /* Keep the list length down */
+            if (servers.Count > 25)
+            {
+                servers.RemoveAt(servers.Count - 1);
+            }
+        }
+
+        private static void ResolveLocalInfo(ClientConnection client)
+        {
+            switch (SettingsManager.Settings.Connection.LocalInfo.LookupMethod)
+            {
+                case LocalInfoLookupMethod.Socket:
+                    client.ResolveLocalInfo(client.SocketLocalIp);
+                    break;
+
+                case LocalInfoLookupMethod.Server:
+                    client.Send(string.Format("USERHOST {0}", client.UserInfo.Nick));
+                    break;
+            }
+        }
+
+        private static void ProcessAutoJoin(ClientConnection client)
+        {
+            /* Join any open channels */
+            if (SettingsManager.Settings.Client.Channels.JoinOpenChannelsOnConnect)
+            {
+                foreach (var chan in WindowManager.Windows[client].Where(chan => chan.WindowType == ChildWindowType.Channel))
+                {
+                    client.Send(string.Format("JOIN {0}", chan.Tag));
+                }
+            }
+            /* Process auto-join ... */
         }
     }
 }

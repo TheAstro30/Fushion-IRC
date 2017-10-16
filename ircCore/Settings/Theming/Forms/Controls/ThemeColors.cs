@@ -16,16 +16,8 @@ namespace ircCore.Settings.Theming.Forms.Controls
         {
             InitializeComponent();
             _theme = theme;
-            for (var win = 0; win <= 7; win++)
-            {
-                lstWindowColors.Items.Add(Functions.EnumUtils.GetDescriptionFromEnumValue((ThemeColor) win));
-            }
-
-            for (var ev = 0; ev <= 38; ev++)
-            {
-                lstEventColors.Items.Add(Functions.EnumUtils.GetDescriptionFromEnumValue((ThemeMessage)ev));
-            }
-
+            lstWindowColors.Items.AddRange(Functions.EnumUtils.GetDescriptions(typeof(ThemeColor)));
+            lstEventColors.Items.AddRange(Functions.EnumUtils.GetDescriptions(typeof(ThemeMessage)));
             for (var i = 0; i <= _theme.Colors.Length - 1; i++)
             {
                 colorSelector.SetBoxColor(i, _theme.Colors[i]);

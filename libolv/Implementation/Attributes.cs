@@ -36,11 +36,11 @@ namespace libolv.Implementation
         private bool _triStateCheckBoxes;
         private int _width = 150;
 
-        internal bool IsTriStateCheckBoxesSet = false;
-        internal bool IsTextAlignSet = false;
-        internal bool IsEditableSet = false;
-        internal bool IsFreeSpaceProportionSet = false;
-        internal bool IsCheckBoxesSet = false;
+        internal bool IsTriStateCheckBoxesSet;
+        internal bool IsTextAlignSet;
+        internal bool IsEditableSet;
+        internal bool IsFreeSpaceProportionSet;
+        internal bool IsCheckBoxesSet;
 
         public OlvColumnAttribute()
         {

@@ -60,6 +60,11 @@ namespace ircCore.Controls
             OnActivated(new EventArgs());
         }
 
+        public override void Refresh()
+        {
+            OnResize(new EventArgs());
+        }
+
         public void Restore()
         {
             SendMessage(Parent.Handle, WmMdirestore, Handle, IntPtr.Zero);

@@ -7,16 +7,16 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using FusionIRC.Forms;
 using FusionIRC.Forms.Child;
-using FusionIRC.Forms.Misc;
 using FusionIRC.Helpers;
+using ircCore.Forms;
 using ircCore.Settings.Networks;
 using ircCore.Settings.Theming;
+using ircCore.Utils;
 
-namespace FusionIRC.Controls
+namespace FusionIRC.Controls.ControlBars
 {    
-    public sealed class MenubarControl : MenuStrip
+    public sealed class MenubarControl : ControlBar
     {
         private readonly Form _owner;
 
@@ -53,10 +53,17 @@ namespace FusionIRC.Controls
                                  Text = @"&Window"
                              };
             _mnuWindow.DropDownItems.AddRange(new ToolStripItem[]
-                                                  {
-                                                      new ToolStripMenuItem("Find Text...", null, OnMenuWindowClick, Keys.Control | Keys.F)
-                                                  });            
-            Items.AddRange(new[] { _mnuFile, _mnuWindow });                        
+                                                  {                                                       
+                                                      new ToolStripMenuItem("Find Text...", null, OnMenuWindowClick, Keys.Control | Keys.F),
+                                                      new ToolStripMenuItem("Font...", null, OnMenuWindowClick), 
+                                                      new ToolStripSeparator(), 
+                                                      new ToolStripMenuItem("Cascade", null, OnMenuWindowClick),
+                                                      new ToolStripMenuItem("Tile Vertically", null, OnMenuWindowClick),
+                                                      new ToolStripMenuItem("Tile Horizontally", null, OnMenuWindowClick)
+                                                  });
+            _mnuWindow.DropDownOpening += OnMenuWindowDropDownOpening;
+            /* Add all menus */
+            Items.AddRange(new[] { _mnuFile, _mnuWindow });           
         }
 
         public void ConnectionUpdate(bool connected)
@@ -92,6 +99,12 @@ namespace FusionIRC.Controls
                                            });
         }
 
+        private void OnMenuWindowDropDownOpening(object sender, EventArgs e)
+        {
+            /* We would list all open windows here (up to a certain amount), then provide a separate dialog showing
+             * all the rest */
+        }
+
         private void OnMenuFileClick(object sender, EventArgs e)
         {
             var item = (ToolStripMenuItem) sender;
@@ -100,7 +113,11 @@ namespace FusionIRC.Controls
             {
                 return;
             }
-            FrmChildWindow console;            
+            var console = WindowManager.GetConsoleWindow(c);
+            if (console == null)
+            {
+                return;
+            }
             switch (item.Text.ToUpper())
             {
                 case "NEW WINDOW":
@@ -108,39 +125,15 @@ namespace FusionIRC.Controls
                     break;
 
                 case "CONNECT TO LOCATION...":
-                    using (var connect = new FrmConnectTo(_owner))
-                    {
-                        connect.ShowDialog(_owner);
-                    }
+                    ConnectToLocation(_owner, console);
                     break;    
 
-                case "CONNECT":
-                    var server = ServerManager.Servers.Recent.Server.Count > 0
-                                     ? ServerManager.Servers.Recent.Server[0]
-                                     : new Server
-                                           {
-                                               Address = "irc.dragonirc.com",
-                                               Port = 6667
-                                           };
-                    console = WindowManager.GetConsoleWindow(c);
-                    if (console == null)
-                    {
-                        return;
-                    }
-                    CommandProcessor.Parse(c, console,
-                                           string.Format("SERVER {0}:{1}", server.Address,
-                                                         server.IsSsl
-                                                             ? string.Format("+{0}", server.Port)
-                                                             : server.Port.ToString()));
+                case "CONNECT":                    
+                    ConnectToServer(c, console);
                     break;
 
                 case "DISCONNECT":
-                    console = WindowManager.GetConsoleWindow(c);
-                    if (console == null)
-                    {
-                        return;
-                    }
-                    CommandProcessor.Parse(c, console, "DISCONNECT");
+                    DisconnectFromServer(c, console);
                     break;
 
                 case "EXIT":
@@ -200,7 +193,63 @@ namespace FusionIRC.Controls
                         f.ShowDialog(_owner);
                     }
                     break;
+
+                case "FONT...":
+                    ChangeFont(c);
+                    break;
+
+                case "CASCADE":
+                    _owner.LayoutMdi(MdiLayout.Cascade);
+                    break;
+
+                case "TILE VERTICALLY":
+                    _owner.LayoutMdi(MdiLayout.TileVertical);
+                    break;
+
+                case "TILE HORIZONTALLY":
+                    _owner.LayoutMdi(MdiLayout.TileHorizontal);
+                    break;
             }
+        }
+
+        /* Private methods */
+        private void ChangeFont(FrmChildWindow c)
+        {
+            var def = string.Format("Set as default {0} window font",Functions.EnumUtils.GetDescriptionFromEnumValue(c.WindowType).ToLower());
+            using (var font = new FrmFont { SelectedFont = c.Output.Font, SelectedFontDefaultText = def })
+            {
+                if (font.ShowDialog(_owner) == DialogResult.Cancel)
+                {
+                    return;
+                }
+                /* Let's change the font for the current window */
+                ChangeFont(c, font.SelectedFont);
+                if (font.SelectedFontDefault)
+                {
+                    /* We now iterate all open windows and change the font of the same type */
+                    foreach (var win in WindowManager.Windows[c.Client])
+                    {
+                        if (win.WindowType == c.WindowType && win != c)
+                        {
+                            ChangeFont(win, font.SelectedFont);
+                        }
+                    }
+                }
+                /* Update theme settings */
+                ThemeManager.CurrentTheme.ThemeFonts[c.WindowType] = font.SelectedFont;
+                ThemeManager.CurrentTheme.ThemeChanged = true;
+            }
+        }
+
+        private static void ChangeFont(FrmChildWindow c, Font font)
+        {
+            c.Output.Font = font;
+            c.Input.Font = font;
+            if (c.WindowType == ChildWindowType.Channel)
+            {
+                c.Nicklist.Font = font;
+            }
+            c.Refresh();
         }
     }
 }

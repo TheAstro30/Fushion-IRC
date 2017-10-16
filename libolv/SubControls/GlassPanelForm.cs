@@ -44,7 +44,7 @@ namespace libolv.SubControls
         public GlassPanelForm()
         {
             Name = "GlassPanelForm";
-            Text = "GlassPanelForm";
+            Text = @"GlassPanelForm";
             ClientSize = new Size(0, 0);
             ControlBox = false;
             FormBorderStyle = FormBorderStyle.None;

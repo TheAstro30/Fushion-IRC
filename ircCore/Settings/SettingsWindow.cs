@@ -23,8 +23,14 @@ namespace ircCore.Settings
         [XmlAttribute("nicklistWidth")]
         public int NicklistWidth { get; set; }
 
+        [XmlElement("search")]
+        public SettingsFind Search = new SettingsFind();
+
+        [XmlElement("caching")]
+        public SettingsCaching Caching = new SettingsCaching();
+
         [XmlElement("window")]
-        public List<WindowData> Window = new List<WindowData>();
+        public List<WindowData> Window = new List<WindowData>();        
     }
 
     [Serializable]

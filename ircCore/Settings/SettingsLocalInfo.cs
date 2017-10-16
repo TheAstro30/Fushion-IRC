@@ -4,17 +4,31 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.ComponentModel;
 using System.Xml.Serialization;
+using ircCore.Utils;
 
 namespace ircCore.Settings
 {
+    public enum LocalInfoLookupMethod
+    {
+        [Description("None (info will not be updated)")]
+        None = 0,
+
+        [Description("Normal (local socket-side look-up)")]
+        Socket = 1,
+
+        [Description("Server (remote socket-side look-up)")]
+        Server = 2
+    }
+
     [Serializable]
     public class SettingsLocalInfo
     {
-        [XmlAttribute("address")]
-        public string Address { get; set; }
+        [XmlAttribute("lookupMethod")]
+        public LocalInfoLookupMethod LookupMethod { get; set; }
 
-        [XmlAttribute("host")]
-        public string Host { get; set; }
+        [XmlElement("hostInfo")]
+        public DnsResult HostInfo = new DnsResult();
     }
 }

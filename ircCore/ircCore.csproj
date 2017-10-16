@@ -36,6 +36,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Speech" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -81,17 +82,30 @@
     <Compile Include="Controls\ChildWindows\Input\ColorBox\ColorTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\FontComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Forms\FrmColorIndex.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FrmFont.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Settings\Networks\ServerManager.cs" />
     <Compile Include="Settings\Networks\Servers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\SettingsCaching.cs" />
     <Compile Include="Settings\SettingsClient.cs" />
+    <Compile Include="Settings\SettingsChannel.cs" />
     <Compile Include="Settings\SettingsConfirmation.cs" />
     <Compile Include="Settings\SettingsConnection.cs" />
     <Compile Include="Settings\SettingsFind.cs" />
+    <Compile Include="Settings\SettingsIdentd.cs" />
     <Compile Include="Settings\SettingsLocalInfo.cs" />
     <Compile Include="Settings\SettingsTabs.cs" />
     <Compile Include="Settings\SettingsUserInfo.cs" />
@@ -115,6 +129,7 @@
     </Compile>
     <Compile Include="Users\UserManager.cs" />
     <Compile Include="Users\UserList.cs" />
+    <Compile Include="Utils\DnsResult.cs" />
     <Compile Include="Utils\Functions.cs" />
     <Compile Include="Utils\Serialization\BinarySerialize.cs" />
     <Compile Include="Settings\Settings.cs" />
@@ -123,16 +138,25 @@
     <Compile Include="Settings\SettingsWindow.cs" />
     <Compile Include="Settings\Theming\Theme.cs" />
     <Compile Include="Settings\Theming\ThemeManager.cs" />
+    <Compile Include="Utils\Speech.cs" />
     <Compile Include="Utils\TimeFunctions.cs" />
+    <Compile Include="Utils\UiSynchronize.cs" />
     <Compile Include="Utils\Utf8.cs" />
     <Compile Include="Utils\WildcardMatch.cs" />
     <Compile Include="Utils\XmlFormatting.cs" />
     <Compile Include="Utils\Serialization\XmlSerialize.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Settings\Theming\Forms\Controls\ThemeColors.resx">
       <DependentUpon>ThemeColors.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\ttfIcon.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

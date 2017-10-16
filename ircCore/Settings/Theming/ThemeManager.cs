@@ -14,9 +14,16 @@ namespace ircCore.Settings.Theming
 {
     public enum ChildWindowType
     {
+        [Description("Console")]
         Console = 0,
+
+        [Description("Channel")]
         Channel = 1,
+
+        [Description("Private")]
         Private = 2,
+
+        [Description("Chat")]
         DccChat = 3
     }
 
@@ -164,7 +171,19 @@ namespace ircCore.Settings.Theming
         CtcpSelfText = 37,
 
         [Description("CTCP Reply")]
-        CtcpReplyText = 38
+        CtcpReplyText = 38,
+
+        [Description("Local Info Reply")]
+        LocalInfoReplyText = 39,
+
+        [Description("DNS Text")]
+        DnsText = 40,
+
+        [Description("DNS Look-up Reply")]
+        DnsLookupReplyText = 41,
+
+        [Description("Info Text")]
+        InfoText = 42
     }
 
     public class IncomingMessageData
@@ -184,6 +203,10 @@ namespace ircCore.Settings.Theming
         /* Server related properties */
         public string Server { get; set; }
         public int Port { get; set; }
+
+        /* DNS */
+        public string DnsAddress { get; set; }
+        public string DnsHost { get; set; }
     }
 
     public class ParsedMessageData
@@ -294,6 +317,8 @@ namespace ircCore.Settings.Theming
             sb.Replace("$target", messageData.Target);
             sb.Replace("$server", messageData.Server);
             sb.Replace("$port", messageData.Port.ToString());
+            sb.Replace("$dnsip", messageData.DnsAddress);
+            sb.Replace("$dnshost", messageData.DnsHost);
             pmd.DefaultColor = theme.Messages[messageData.Message].DefaultColor;
             pmd.Message = sb.ToString();
             return pmd;

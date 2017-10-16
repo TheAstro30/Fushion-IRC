@@ -215,7 +215,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
             var rectBottom = rect.Height;
             var linePosition = TextData.Lines.Count - 1;            
             var totalLines = TextData.WrappedLinesCount - 1;
-            int line;            
+            int line;
             for (line = TextData.Wrapped.Count - 1; line >= 0; line--)
             {
                 var lineData = TextData.Wrapped[linePosition];                

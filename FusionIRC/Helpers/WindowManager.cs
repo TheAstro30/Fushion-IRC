@@ -16,6 +16,13 @@ using ircCore.Settings.Theming;
 
 namespace FusionIRC.Helpers
 {
+    public enum WindowEvent
+    {
+        None = 0,
+        EventReceived = 1,
+        MessageReceived = 2
+    }
+
     public static class WindowManager
     {
         /* Main child window list */
@@ -197,7 +204,13 @@ namespace FusionIRC.Helpers
             client.OnClientConnectionError += ConnectionCallbackManager.OnClientConnectionError;
             client.OnClientConnectionClosed += CommandProcessor.OnClientWaitToReconnect;
             client.Parser.OnServerPingPong += ConnectionCallbackManager.OnServerPingPong;
+            client.Parser.OnErrorLink += ConnectionCallbackManager.OnErrorLink;
             client.OnClientSslInvalidCertificate += ConnectionCallbackManager.OnClientSslInvalidCertificate;
+            client.OnClientLocalInfoResolved += ConnectionCallbackManager.OnClientLocalInfoResolved;
+            client.OnClientLocalInfoFailed += ConnectionCallbackManager.OnClientLocalInfoFailed;
+            client.OnClientDnsResolved += ConnectionCallbackManager.OnClientDnsResolved;
+            client.OnClientDnsFailed += ConnectionCallbackManager.OnClientDnsFailed;
+            client.OnClientIdentDaemonRequest += ConnectionCallbackManager.OnClientIdentDaemonRequest;
             client.Parser.OnMotd += ConnectionCallbackManager.OnMotd;
             client.Parser.OnLUsers += ConnectionCallbackManager.OnLUsers;
             client.Parser.OnWelcome += ConnectionCallbackManager.OnWelcome;
@@ -222,6 +235,7 @@ namespace FusionIRC.Helpers
             client.Parser.OnModeSelf += ConnectionCallbackManager.OnModeSelf;
             client.Parser.OnModeChannel += ConnectionCallbackManager.OnModeChannel;
             client.Parser.OnRaw += ConnectionCallbackManager.OnRaw;
+            client.Parser.OnUserInfo += ConnectionCallbackManager.OnUserInfo;
             client.Parser.OnWallops += ConnectionCallbackManager.OnWallops;
             client.Parser.OnWhois += ConnectionCallbackManager.OnWhois;
             client.Parser.OnInvite += ConnectionCallbackManager.OnInvite;
@@ -240,7 +254,13 @@ namespace FusionIRC.Helpers
             client.OnClientConnectionError -= ConnectionCallbackManager.OnClientConnectionError;
             client.OnClientConnectionClosed -= CommandProcessor.OnClientWaitToReconnect;
             client.OnClientSslInvalidCertificate -= ConnectionCallbackManager.OnClientSslInvalidCertificate;
+            client.OnClientLocalInfoResolved -= ConnectionCallbackManager.OnClientLocalInfoResolved;
+            client.OnClientLocalInfoFailed -= ConnectionCallbackManager.OnClientLocalInfoFailed;
+            client.OnClientDnsResolved -= ConnectionCallbackManager.OnClientDnsResolved;
+            client.OnClientDnsFailed -= ConnectionCallbackManager.OnClientDnsFailed;
+            client.OnClientIdentDaemonRequest -= ConnectionCallbackManager.OnClientIdentDaemonRequest;
             client.Parser.OnServerPingPong -= ConnectionCallbackManager.OnServerPingPong;
+            client.Parser.OnErrorLink -= ConnectionCallbackManager.OnErrorLink;
             client.Parser.OnMotd -= ConnectionCallbackManager.OnMotd;
             client.Parser.OnLUsers -= ConnectionCallbackManager.OnLUsers;
             client.Parser.OnWelcome -= ConnectionCallbackManager.OnWelcome;
@@ -264,6 +284,7 @@ namespace FusionIRC.Helpers
             client.Parser.OnModeSelf -= ConnectionCallbackManager.OnModeSelf;
             client.Parser.OnModeChannel -= ConnectionCallbackManager.OnModeChannel;
             client.Parser.OnRaw -= ConnectionCallbackManager.OnRaw;
+            client.Parser.OnUserInfo -= ConnectionCallbackManager.OnUserInfo;
             client.Parser.OnWallops -= ConnectionCallbackManager.OnWallops;
             client.Parser.OnWhois -= ConnectionCallbackManager.OnWhois;
             client.Parser.OnInvite -= ConnectionCallbackManager.OnInvite;

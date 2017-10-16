@@ -49,7 +49,7 @@ namespace FusionIRC.Forms.Misc
         private readonly Form _owner;        
         private bool _isSsl;
 
-        public FrmConnectTo(Form owner)
+        public FrmConnectTo(Form owner, FrmChildWindow console)
         {
             ClientSize = new Size(436, 414);
             Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -281,8 +281,7 @@ namespace FusionIRC.Forms.Misc
                 port = 6667;
             }
             /* Current client connection */
-            var client = WindowManager.GetActiveConnection(_owner);
-            _console = WindowManager.GetConsoleWindow(client);            
+            _console = console;           
             /* User information */
             _txtNick.Text = _console.Client.UserInfo.Nick;
             _txtAlternate.Text = _console.Client.UserInfo.Alternative;

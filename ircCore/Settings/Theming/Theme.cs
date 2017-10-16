@@ -107,7 +107,7 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.NoticeText, new ThemeMessageData { DefaultColor = 5, MessageFormat = "$ts -$nick- $text" });
             Messages.Add(ThemeMessage.NoticeSelfText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts -> -$target- $text" });
             Messages.Add(ThemeMessage.MotdText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts $text" });
-            Messages.Add(ThemeMessage.WelcomeText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $text" });
+            Messages.Add(ThemeMessage.WelcomeText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$ts * $text" });
             Messages.Add(ThemeMessage.RawText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $text" });
             Messages.Add(ThemeMessage.WallopsText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts !$nick! $text" });
             Messages.Add(ThemeMessage.LUsersText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * $text" });
@@ -115,6 +115,10 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.CtcpText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts [$nick ($address)] $ctcp" });
             Messages.Add(ThemeMessage.CtcpSelfText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts -> [$nick] $ctcp" });
             Messages.Add(ThemeMessage.CtcpReplyText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts [$nick ($address) $ctcp reply]: $text" });
+            Messages.Add(ThemeMessage.LocalInfoReplyText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts Local IP: $dnsip ($dnshost)" });
+            Messages.Add(ThemeMessage.DnsText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * DNS Look-up: $text" });
+            Messages.Add(ThemeMessage.DnsLookupReplyText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * DNS Look-up: $dnsip ($dnshost)" });
+            Messages.Add(ThemeMessage.InfoText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $text" });
             /* Set this flag to true to ensure it will be saved if it doesn't exist (ie: load fails) */
             ThemeChanged = true;
         }        

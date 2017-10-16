@@ -23,6 +23,9 @@ namespace ircCore.Settings
 
         [XmlElement("tabs")]
         public SettingsTabs Tabs = new SettingsTabs();
+
+        [XmlElement("channels")]
+        public SettingsChannel Channels = new SettingsChannel();
     }
 
     [Serializable]

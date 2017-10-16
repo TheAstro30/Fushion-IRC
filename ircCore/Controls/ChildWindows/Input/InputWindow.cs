@@ -58,7 +58,7 @@ namespace ircCore.Controls.ChildWindows.Input
                 if (DesignMode) { return; }
                 /* This overcomes drawing 'errors' with using the TextRenderer (on IRC window and nicklist controls)
                   vs DrawString (+ 0.5f) */
-                base.Font = new Font(value.Name, value.Size + 0.5f);
+                base.Font = new Font(value.Name, value.Size + 0.5f, value.Style);
                 _txtOut.Font = base.Font;
                 OnResize(new EventArgs());
             }

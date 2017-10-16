@@ -29,7 +29,10 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
         {
             /* Sets the font object to the current formatting of the line being drawn/measured */
             var fs = default(FontStyle);
-            if (!bold && !underLine && !italic) { fs = FontStyle.Regular; }
+            if (!bold && !underLine && !italic)
+            {
+                fs = FontStyle.Regular; 
+            }
             else
             {
                 if (bold) { fs = fs | FontStyle.Bold; }

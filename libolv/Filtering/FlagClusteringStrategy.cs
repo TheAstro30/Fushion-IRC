@@ -31,10 +31,10 @@ namespace libolv.Filtering
         public FlagClusteringStrategy(Type enumType)
         {
             if (enumType == null) { throw new ArgumentNullException("enumType"); }
-            if (!enumType.IsEnum) { throw new ArgumentException("Type must be enum", "enumType"); }
+            if (!enumType.IsEnum) { throw new ArgumentException(@"Type must be enum", "enumType"); }
             if (enumType.GetCustomAttributes(typeof (FlagsAttribute), false) == null)
             {
-                throw new ArgumentException("Type must have [Flags] attribute", "enumType");
+                throw new ArgumentException(@"Type must have [Flags] attribute", "enumType");
             }
             SetValues((from object x in Enum.GetValues(enumType) select Convert.ToInt64(x)).ToArray(),
                       Enum.GetNames(enumType).ToArray());
@@ -56,7 +56,7 @@ namespace libolv.Filtering
             if (flagLabels == null || flagLabels.Length == 0) throw new ArgumentNullException("flagLabels");
             if (flags.Length != flagLabels.Length)
             {
-                throw new ArgumentException("values and labels must have the same number of entries", "flags");
+                throw new ArgumentException(@"values and labels must have the same number of entries", "flags");
             }
             Values = flags;
             Labels = flagLabels;

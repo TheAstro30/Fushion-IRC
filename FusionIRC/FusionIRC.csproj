@@ -51,10 +51,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\MenubarControl.cs">
+    <Compile Include="Controls\ControlBars\ControlBar.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\ToolbarControl.cs">
+    <Compile Include="Controls\ControlBars\MenubarControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ControlBars\ToolbarControl.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\SwitchView\Base\TreeNodeEx.cs" />
@@ -80,6 +83,12 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Settings\Controls\Base\BaseControlRenderer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Connection\ConnectionIdentDaemon.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Connection\ConnectionLocalInfo.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Forms\Settings\Controls\Connection\ConnectionOptions.cs">
@@ -181,10 +190,10 @@
     <None Include="Icons\security.ico" />
     <None Include="Icons\url.ico" />
     <None Include="Icons\Toolbar\about.ico" />
-    <None Include="Images\fusion.jpg" />
     <None Include="Icons\Toolbar\users.ico" />
     <None Include="Icons\Options\network.ico" />
     <None Include="Icons\Options\server.ico" />
+    <None Include="Images\about-dialog.jpg" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

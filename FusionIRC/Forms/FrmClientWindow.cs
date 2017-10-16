@@ -7,7 +7,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using FusionIRC.Controls;
+using FusionIRC.Controls.ControlBars;
 using FusionIRC.Controls.SwitchView;
 using FusionIRC.Forms.Child;
 using FusionIRC.Helpers;
@@ -151,9 +151,7 @@ namespace FusionIRC.Forms
             Size = w.Size;
             Location = w.Position;
             WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
-            _initialize = false;            
-
-            //ServerManager.AddServer("Unknown", "irc.yourmomo.com", "6667", "alpha20", "Your mom's server");
+            _initialize = false;
         }
 
         /* Overrides */
@@ -209,14 +207,14 @@ namespace FusionIRC.Forms
             string msg = null;
             switch (SettingsManager.Settings.Client.Confirmation.ClientClose)
             {
-                case ClientCloseConfirmation.Connected:
+                case CloseConfirmation.Connected:
                     if (WindowManager.Windows.Any(client => client.Key.IsConnected))
                     {
                         msg = "You are still connected to an IRC server. Are you sure you want to exit?";
                     }                    
                     break;
 
-                case ClientCloseConfirmation.Always:
+                case CloseConfirmation.Always:
                     msg = "Are you sure you want to exit?";
                     break;
             }
@@ -357,7 +355,7 @@ namespace FusionIRC.Forms
             }
             win.Restore();
             _mdi.ActivateChild(win);
-            win.MyActivate();
+            win.MyActivate();            
         }
     }
 }

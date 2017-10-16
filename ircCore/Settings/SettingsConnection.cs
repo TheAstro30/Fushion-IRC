@@ -25,5 +25,11 @@ namespace ircCore.Settings
 
         [XmlAttribute("isSsl")]
         public bool IsSsl { get; set; }
+
+        [XmlElement("identd")]
+        public SettingsIdentd Identd = new SettingsIdentd();
+
+        [XmlElement("localInfo")]
+        public SettingsLocalInfo LocalInfo = new SettingsLocalInfo();
     }
 }

@@ -15,7 +15,6 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Design;
 using ircClient.Tcp.Helpers;
 using ircCore.Utils;
 
@@ -36,22 +35,23 @@ namespace ircClient.Tcp
     }
 
     [DefaultEvent("OnError")]
-    public class ClientSock : Component
+    public class ClientSock
     {
         /* Winsock component class
            Original author: Unknown
            Modified by: Jason James Newland (2008-2009/2011-2012)
          */
+        private readonly UiSynchronize _sync;
+
         private const int BufferSize = 32769;
 
         private string _remoteIp;
         private int _localPort;
         private int _remotePort;
-        private List<byte[]> _byteData;
+        private List<byte[]> _byteData = new List<byte[]>();
         private byte[] _buffer = new byte[BufferSize];
         private TcpListener _listenSocket;
         private Socket _clientSocket;
-        private ISynchronizeInvoke _syncObject;
 
         private NetworkStream _networkStream;
         private SslStream _sslStream;
@@ -60,71 +60,18 @@ namespace ircClient.Tcp
         private bool _sslCertificateAccepted;
 
         /* Need to be virtual so they can be "overriden" in another class */
-        public virtual event Action<ClientSock> OnConnected;
-        public virtual event Action<ClientSock> OnDisconnected;
-        public virtual event Action<ClientSock, int> OnDataArrival;
-        public virtual event Action<ClientSock, Socket> OnConnectionRequest;
-        public virtual event Action<ClientSock, string> OnError;
-        public virtual event Action<ClientSock, WinsockStates> OnStateChanged;
-        public virtual event Action<ClientSock, string> OnDebugOut;
-        public virtual event Action<ClientSock, X509Certificate> OnSslInvalidCertificate;
+        public event Action<ClientSock> OnConnected;
+        public event Action<ClientSock> OnDisconnected;
+        public event Action<ClientSock, int> OnDataArrival;
+        public event Action<ClientSock, Socket> OnConnectionRequest;
+        public event Action<ClientSock, string> OnError;
+        public event Action<ClientSock, WinsockStates> OnStateChanged;
+        public event Action<ClientSock, string> OnDebugOut;
+        public event Action<ClientSock, X509Certificate> OnSslInvalidCertificate;
 
-        public ClientSock() : this(80)
-        {
-            /* Empty */
-        }
-
-        public ClientSock(int port) : this("127.0.0.1", port)
-        {
-            /* Empty */
-        }
-
-        public ClientSock(string ip) : this(ip, 80)
-        {
-            /* Empty */
-        }
-
-        public ClientSock(string ip, int port)
-        {
-            Bind = "0";
-            RemoteIp = ip;
-            RemotePort = port;
-            LocalPort = port;
-            _byteData = new List<byte[]>();
-        }
-
-        [Browsable(false)]
-        public ISynchronizeInvoke SynchronizingObject
-        {
-            get
-            {
-                if (_syncObject == null & DesignMode)
-                {
-                    var designer = (IDesignerHost) GetService(typeof (IDesignerHost));
-                    if (designer != null)
-                    {
-                        _syncObject = (ISynchronizeInvoke) designer.RootComponent;
-                    }
-                }
-                return _syncObject;
-            }
-            set
-            {
-                if (DesignMode)
-                {
-                    return;
-                }
-                if (_syncObject != null && !ReferenceEquals(_syncObject, value))
-                {
-                    throw new Exception("Property can not be set at run-time");
-                }
-                _syncObject = value;
-            }
-        }
-
+        /* Public properties */
         public bool IsSsl { get; set; }
 
-        [DefaultValue(80)]
         public int LocalPort
         {
             get { return _localPort; }
@@ -137,7 +84,6 @@ namespace ircClient.Tcp
             }
         }
 
-        [DefaultValue(80)]
         public int RemotePort
         {
             get { return _remotePort; }
@@ -150,7 +96,6 @@ namespace ircClient.Tcp
             }
         }
 
-        [DefaultValue("127.0.0.1")]
         public string RemoteIp
         {
             get { return _remoteIp; }
@@ -225,18 +170,25 @@ namespace ircClient.Tcp
             }
         }
 
-        [DefaultValue(WinsockStates.Closed)]
         public WinsockStates GetState { get; private set; }
 
-        [DefaultValue("0")]
         public string Bind { private get; set; }
 
-        [DefaultValue(false)]
         public bool EnableSslAuthentication { get; set; }
 
-        [DefaultValue(false)]
         public bool SslAutoAccept { get; set; }
 
+        /* Constructor */
+        public ClientSock(ISynchronizeInvoke syncObject)
+        {
+            _sync = new UiSynchronize(syncObject);
+            Bind = "0";
+            RemoteIp = "127.0.0.1";
+            RemotePort = 80;
+            LocalPort = 80;
+        }
+
+        /* Methods */
         public void Listen()
         {
             var x = new System.Threading.Thread(BeginListen);
@@ -309,9 +261,11 @@ namespace ircClient.Tcp
                 _clientSocket = requestId;
                 if (OnConnected != null)
                 {
-                    _syncObject.Invoke(OnConnected, new object[] {this});
+                    _sync.Execute(() => OnConnected(this));
                 }
                 ChangeState(WinsockStates.Connected);
+                _buffer = new byte[BufferSize];
+                _byteData = new List<byte[]>();
                 _clientSocket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, OnClientRead, null);
             }
             catch (SocketException ex)
@@ -357,7 +311,7 @@ namespace ircClient.Tcp
                 SendData(Utf8.StringToByteArray(data));
                 if (OnDebugOut != null)
                 {
-                    _syncObject.Invoke(OnDebugOut, new object[] {this, data});
+                    _sync.Execute(() => OnDebugOut(this, data));
                 }
             }
             catch
@@ -517,8 +471,8 @@ namespace ircClient.Tcp
                                                    _clientSocket);
                     }
                     if (OnConnected != null)
-                    {
-                        _syncObject.Invoke(OnConnected, new object[] {this});
+                    {                        
+                        _sync.Execute(() => OnConnected(this));
                     }
                 }
             }
@@ -553,7 +507,7 @@ namespace ircClient.Tcp
                     if (OnSslInvalidCertificate != null)
                     {
                         _sslWaitingAccept = true;
-                        _syncObject.Invoke(OnSslInvalidCertificate, new object[] {this, certificate});
+                        _sync.Execute(() => OnSslInvalidCertificate(this, certificate));                        
                     }
                     else
                     {
@@ -578,7 +532,7 @@ namespace ircClient.Tcp
                     var tmpSock = _listenSocket.EndAcceptSocket(ar);
                     if (OnConnectionRequest != null)
                     {
-                        _syncObject.Invoke(OnConnectionRequest, new object[] {this, tmpSock});
+                        _sync.Execute(() => OnConnectionRequest(this, tmpSock));
                     }
                     /* Stop listening as we no longer need it */
                     _listenSocket.Stop();
@@ -588,8 +542,8 @@ namespace ircClient.Tcp
                     Close();
                     ChangeState(WinsockStates.Error);
                     if (OnError != null)
-                    {
-                        _syncObject.Invoke(OnError, new object[] {this, "Unknown error"});
+                    {                        
+                        _sync.Execute(() => OnError(this, "Unknown error"));
                     }
                 }
             }
@@ -648,17 +602,17 @@ namespace ircClient.Tcp
                         _buffer = new byte[BufferSize];
                         if (OnDisconnected != null)
                         {
-                            _syncObject.Invoke(OnDisconnected, new object[] {this});
+                            _sync.Execute(() => OnDisconnected(this));
                         }
                         return;
-                    }
+                    }                  
                     var buffer = _buffer; /* Marshal-by-reference may cause runtime exception when passed by ref/out as in the next line... */
                     Array.Resize(ref buffer, intCount);
                     _buffer = buffer; /* Shouldn't have to re-assign it back, but doesn't work without doing so... */
                     _byteData.Add(_buffer);
                     if (OnDataArrival != null)
                     {
-                        _syncObject.Invoke(OnDataArrival, new object[] {this, _buffer.Length});
+                        _sync.Execute(() => OnDataArrival(this, _buffer.Length));                        
                     }
                     _buffer = new byte[BufferSize];
                     if (IsSsl)
@@ -695,7 +649,7 @@ namespace ircClient.Tcp
                 {
                     if (OnDisconnected != null)
                     {
-                        _syncObject.Invoke(OnDisconnected, new object[] {this});
+                        _sync.Execute(() => OnDisconnected(this));
                     }
                 }
                 catch
@@ -711,11 +665,9 @@ namespace ircClient.Tcp
             {
                 if (OnError != null)
                 {
-                    _syncObject.Invoke(
-                        OnError,
-                        ex != null
-                            ? new object[] {this, ErrorHandling.GetErrorDescription(ex.ErrorCode)}
-                            : new object[] {this, ErrorHandling.GetErrorDescription(-1)});
+                    _sync.Execute(() => OnError(this, ex != null
+                                                          ? ErrorHandling.GetErrorDescription(ex.ErrorCode)
+                                                          : ErrorHandling.GetErrorDescription(-1)));
                 }
                 ChangeState(WinsockStates.Error);
                 if (_sslStream != null)
@@ -740,7 +692,7 @@ namespace ircClient.Tcp
                 GetState = newState;
                 if (OnStateChanged != null)
                 {
-                    _syncObject.Invoke(OnStateChanged, new object[] {this, GetState});
+                    _sync.Execute(() => OnStateChanged(this, GetState));
                 }
             }
             catch

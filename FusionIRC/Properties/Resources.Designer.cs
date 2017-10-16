@@ -71,6 +71,16 @@ namespace FusionIRC.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap about_dialog {
+            get {
+                object obj = ResourceManager.GetObject("about_dialog", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon channel {
@@ -117,16 +127,6 @@ namespace FusionIRC.Properties {
             get {
                 object obj = ResourceManager.GetObject("disconnect", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap fusion {
-            get {
-                object obj = ResourceManager.GetObject("fusion", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

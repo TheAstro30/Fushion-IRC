@@ -23,7 +23,6 @@ using ircCore.Utils.Serialization;
 namespace ircCore.Controls.ChildWindows.OutputDisplay
 {
     /* Main output window control */
-
     public sealed class OutputWindow : OutputRenderer
     {
         private readonly bool _isDesignMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
@@ -62,7 +61,6 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         public event Action OnWindowRightClicked;
 
         /* Constructor */
-
         public OutputWindow()
         {
             /* Double buffering */
@@ -99,7 +97,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             /* Addline wait to finish adding timer */
             _update = new Timer {Interval = 5};
             _update.Tick += TimerUpdate;
-            _initialized = true;
+            _initialized = true;           
         }
 
         /* Public properties */
@@ -108,7 +106,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             get { return _font; }
             set
             {
-                _font = new Font(value.Name, value.Size, FontStyle.Regular);
+                _font = new Font(value.Name, value.Size, value.Style);
                 AdjustWidth(_initialized);
             }
         }
@@ -119,16 +117,18 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             set
             {
                 _showScrollBar = value;
-                if (_vScroll != null)
+                if (_vScroll == null)
                 {
-                    _vScroll.Visible = _showScrollBar;
-                    AdjustWidth(true);
+                    return;
                 }
+                _vScroll.Visible = _showScrollBar;
+                AdjustWidth(true);
             }
         }
 
         public bool WordWrap { get; set; }
         public bool AllowCopySelection { get; set; }
+        public bool UserResize { get; set; }
 
         public int MaximumLines
         {
@@ -159,15 +159,15 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 _scrolledToBottom = _scrollValue == TextData.WrappedLinesCount - 1;
                 Invalidate();
             }
-        }
+        }        
 
-        /* Control overrides */
+        /* Control overrides */        
         protected override void OnResize(EventArgs e)
         {
             if (_isDesignMode)
             {
                 return;
-            }
+            }            
             /* Adjust the vertical scrollbar's large change based on client window size - we also need to re-wrap the line data */
             AdjustWidth(true);
             Invalidate();
@@ -179,6 +179,12 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             /* Where the magic happens ;) - simplified to a separate class */
             if (!Visible || _isDesignMode || TextData.Lines.Count == 0)
             {
+                return;
+            }
+            if (!UserResize && _wrapUpdate.Enabled)
+            {
+                /* Because of the way the control wraps/rewraps lines on resize, there is a slight jump if the parent form is maximized -
+                 * this gets around that issue (but will flicker if the end user is resizing the form) */
                 return;
             }
             /* Set initial graphics modes - not sure they actually make any difference to the overall speed... */
@@ -495,8 +501,9 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         
         protected override void OnMouseDoubleClick(MouseEventArgs e)
         {
+            MarkingData = null; /* Make sure this is nulled */
             if (!string.IsNullOrEmpty(_url))
-            {
+            {                
                 if (OnUrlDoubleClicked != null)
                 {
                     OnUrlDoubleClicked(_url);
@@ -550,17 +557,16 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             var t = new TextData.Text
                         {
                             DefaultColor = ThemeManager.CurrentTheme.Colors[defaultColor % 15],
-                            //IsIndented = indented,
                             Line = text
                         };
             TextData.Lines.Add(t);
             WrapData w;
             using (var g = CreateGraphics())
             {
-                Wrapping.WordWrap(g, t.DefaultColor, BackColor, WordWrap, IndentWidth, text, _windowWidth, _font, out w);    
-            }            
+                Wrapping.WordWrap(g, t.DefaultColor, BackColor, WordWrap, IndentWidth, text, _windowWidth, _font, out w);
+            }
             if (w.Lines.Count == 0)
-            {                
+            {
                 return; /* It's unlikely ... */
             }            
             TextData.Wrapped.Add(w);            

@@ -17,10 +17,7 @@ namespace ircCore.Settings
         public SettingsUserInfo UserInfo = new SettingsUserInfo();
     
         [XmlElement("connection")]
-        public SettingsConnection Connection = new SettingsConnection();
-
-        [XmlElement("localInfo")]
-        public SettingsLocalInfo LocalInfo = new SettingsLocalInfo();
+        public SettingsConnection Connection = new SettingsConnection();        
 
         [XmlElement("windows")]
         public SettingsWindow Windows = new SettingsWindow();
@@ -29,13 +26,7 @@ namespace ircCore.Settings
         public SettingsClient Client = new SettingsClient();
 
         [XmlElement("themes")]
-        public SettingsTheme Themes = new SettingsTheme();
-
-        [XmlElement("search")]
-        public SettingsFind Search = new SettingsFind();
-
-        [XmlElement("caching")]
-        public SettingsCaching Caching = new SettingsCaching();
+        public SettingsTheme Themes = new SettingsTheme();        
 
         public Settings()
         {
@@ -56,6 +47,15 @@ namespace ircCore.Settings
             Windows.Window.Add(w);
             w = new WindowData {Name = "console", Size = new Size(731, 255), Position = new Point(-1, -1)};
             Windows.Window.Add(w);
+            /* Caching defaults */
+            Windows.Caching.Output = 500;
+            Windows.Caching.Input = 50;
+            Windows.Caching.ChatSearch = 25;
+            /* Identd */
+            Connection.Identd.System = "UNIX";
+            Connection.Identd.Port = 113;
+            /* Local info */
+            Connection.LocalInfo.LookupMethod = LocalInfoLookupMethod.Socket;
             /* Create control styles */
             var d = new AppearanceData.ControlBarData.ControlData
                         {
@@ -72,14 +72,10 @@ namespace ircCore.Settings
                         Visible = true
                     };
             Client.Appearance.ControlBars.Control.Add(d);
-            Client.Confirmation.ClientClose = ClientCloseConfirmation.Connected;
+            Client.Confirmation.ClientClose = CloseConfirmation.Connected;
             Client.Confirmation.Url = true;
             /* Create a blank theme */
-            Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = @"\themes\default.thm"});
-            /* Caching defaults */
-            Caching.Output = 500;
-            Caching.Input = 50;
-            Caching.ChatSearch = 25;
+            Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = @"\themes\default.thm"});            
         }
     }
 }

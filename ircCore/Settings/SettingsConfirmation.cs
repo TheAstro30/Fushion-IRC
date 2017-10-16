@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 
 namespace ircCore.Settings
 {
-    public enum ClientCloseConfirmation
+    public enum CloseConfirmation
     {
         None = 0,
         Connected = 1,
@@ -14,7 +14,10 @@ namespace ircCore.Settings
     public class SettingsConfirmation
     {
         [XmlAttribute("clientClose")]
-        public ClientCloseConfirmation ClientClose { get; set; }
+        public CloseConfirmation ClientClose { get; set; }
+
+        [XmlAttribute("consoleClose")]
+        public CloseConfirmation ConsoleClose { get; set; }
 
         [XmlAttribute("url")]
         public bool Url { get; set; }

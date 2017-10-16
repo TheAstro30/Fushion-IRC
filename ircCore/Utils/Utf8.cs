@@ -55,8 +55,7 @@ namespace ircCore.Utils
                 array2[1] = (byte)(charCode & 255);
                 decoder.GetChars(array2, 0, 2, array, 0);
             }
-            var result = array[0];
-            return result;
+            return array[0];            
         }
 
         /* Convert to UTF8 */

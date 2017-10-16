@@ -40,7 +40,7 @@ namespace FusionIRC.Forms.Misc
                                BorderStyle = BorderStyle.Fixed3D,
                                Location = new Point(12, 12),
                                Size = new Size(68, 68),
-                               BackgroundImage = Properties.Resources.fusion
+                               BackgroundImage = Properties.Resources.about_dialog
                            };
 
             _lblFusion = new Label
