@@ -7,10 +7,6 @@ using System;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
-<<<<<<< HEAD
-=======
-using FusionIRC.Forms.Child;
->>>>>>> origin/master
 using FusionIRC.Forms.Misc;
 using FusionIRC.Forms.Warning;
 using ircClient;
@@ -239,11 +235,7 @@ namespace FusionIRC.Helpers
             if (c == null || c.WindowType != ChildWindowType.Console)
             {
                 return;
-<<<<<<< HEAD
             }           
-=======
-            }
->>>>>>> origin/master
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.DnsLookupReplyText,
@@ -514,48 +506,11 @@ namespace FusionIRC.Helpers
             }
             System.Diagnostics.Debug.Print("Updating recent server for " + client.Server.Address);
             /* Update recent servers list */
-<<<<<<< HEAD
             UpdateRecentServers(client);
             /* Resolve local IP */
             ResolveLocalInfo(client);            
             /* Finally process auto join/rejoin open channels */
             ProcessAutoJoin(client);
-=======
-            foreach (var s in ServerManager.Servers.Recent.Server.Where(s => s.Address.Equals(client.Server.Address, StringComparison.InvariantCultureIgnoreCase)))
-            {
-                System.Diagnostics.Debug.Print("remove " + s.Address);
-                /* Remove it from it's current position */
-                ServerManager.Servers.Recent.Server.Remove(s);
-                break;
-            }
-            /* Insert current server at the top of the recent list */
-            ServerManager.Servers.Recent.Server.Insert(0, client.Server);
-            /* Keep the list length down */
-            if (ServerManager.Servers.Recent.Server.Count > 25)
-            {
-                ServerManager.Servers.Recent.Server.RemoveAt(ServerManager.Servers.Recent.Server.Count - 1);
-            }
-            /* Resolve local IP */
-            switch (SettingsManager.Settings.Connection.LocalInfo.LookupMethod)
-            {
-                case LocalInfoLookupMethod.Socket:
-                    client.ResolveLocalInfo(client.SocketLocalIp);
-                    break;
-
-                case LocalInfoLookupMethod.Server:
-                    client.Send(string.Format("USERHOST {0}", client.UserInfo.Nick));
-                    break;
-            }
-            /* Finally, join open channels */
-            if (SettingsManager.Settings.Client.Channels.JoinOpenChannelsOnConnect)
-            {
-                foreach (var chan in WindowManager.Windows[client].Where(chan => chan.WindowType == ChildWindowType.Channel))
-                {
-                    client.Send(string.Format("JOIN {0}", chan.Tag));
-                }
-            }
-            /* Process auto-join ... */
->>>>>>> origin/master
         }
 
         public static void OnLUsers(ClientConnection client, string text)

@@ -26,12 +26,9 @@ namespace ircCore.Settings
         [XmlAttribute("invisible")]
         public bool Invisible { get; set; }
 
-<<<<<<< HEAD
         [XmlIgnore]
         public bool AlternateUsed { get; set; }
 
-=======
->>>>>>> origin/master
         /* Constructors */
         public SettingsUserInfo()
         {

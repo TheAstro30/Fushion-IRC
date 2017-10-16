@@ -55,10 +55,7 @@ namespace FusionIRC.Controls.ControlBars
             _mnuWindow.DropDownItems.AddRange(new ToolStripItem[]
                                                   {                                                       
                                                       new ToolStripMenuItem("Find Text...", null, OnMenuWindowClick, Keys.Control | Keys.F),
-<<<<<<< HEAD:FusionIRC/Controls/ControlBars/MenubarControl.cs
                                                       new ToolStripMenuItem("Font...", null, OnMenuWindowClick), 
-=======
->>>>>>> origin/master:FusionIRC/Controls/MenubarControl.cs
                                                       new ToolStripSeparator(), 
                                                       new ToolStripMenuItem("Cascade", null, OnMenuWindowClick),
                                                       new ToolStripMenuItem("Tile Vertically", null, OnMenuWindowClick),
@@ -197,13 +194,10 @@ namespace FusionIRC.Controls.ControlBars
                     }
                     break;
 
-<<<<<<< HEAD:FusionIRC/Controls/ControlBars/MenubarControl.cs
                 case "FONT...":
                     ChangeFont(c);
                     break;
 
-=======
->>>>>>> origin/master:FusionIRC/Controls/MenubarControl.cs
                 case "CASCADE":
                     _owner.LayoutMdi(MdiLayout.Cascade);
                     break;
@@ -215,7 +209,6 @@ namespace FusionIRC.Controls.ControlBars
                 case "TILE HORIZONTALLY":
                     _owner.LayoutMdi(MdiLayout.TileHorizontal);
                     break;
-<<<<<<< HEAD:FusionIRC/Controls/ControlBars/MenubarControl.cs
             }
         }
 
@@ -255,8 +248,6 @@ namespace FusionIRC.Controls.ControlBars
             if (c.WindowType == ChildWindowType.Channel)
             {
                 c.Nicklist.Font = font;
-=======
->>>>>>> origin/master:FusionIRC/Controls/MenubarControl.cs
             }
             c.Refresh();
         }
