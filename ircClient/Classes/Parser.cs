@@ -385,14 +385,21 @@ namespace ircClient.Classes
                     {
                         OnRaw(_client, string.Format("{0}", fourth.Replace(":", "")));
                     }
+<<<<<<< HEAD
                     if (_client.IsConnecting && !_client.UserInfo.AlternateUsed)
+=======
+                    if (_client.IsConnecting)
+>>>>>>> origin/master
                     {
                         /* We only use alternative nick during connecting */
                         var tmp = _client.UserInfo.Alternative;
                         _client.UserInfo.Alternative = _client.UserInfo.Nick;
                         _client.UserInfo.Nick = tmp;
                         _client.Send(string.Format("NICK {0}", tmp));
+<<<<<<< HEAD
                         _client.UserInfo.AlternateUsed = true;
+=======
+>>>>>>> origin/master
                     }
                     break;
 

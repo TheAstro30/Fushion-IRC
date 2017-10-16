@@ -6,6 +6,10 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+<<<<<<< HEAD:FusionIRC/Controls/ControlBars/ToolbarControl.cs
+=======
+using FusionIRC.Forms.Child;
+>>>>>>> origin/master:FusionIRC/Controls/ToolbarControl.cs
 using FusionIRC.Forms.Misc;
 using FusionIRC.Forms.Settings;
 using FusionIRC.Forms.Users;

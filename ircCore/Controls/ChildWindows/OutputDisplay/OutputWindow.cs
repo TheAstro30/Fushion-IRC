@@ -177,7 +177,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         protected override void OnPaint(PaintEventArgs e)
         {
             /* Where the magic happens ;) - simplified to a separate class */
-            if (!Visible || _isDesignMode || TextData.Lines.Count == 0)
+            if (!Visible || _isDesignMode || TextData.Lines.Count == 0 || _wrapUpdate.Enabled)
             {
                 return;
             }
