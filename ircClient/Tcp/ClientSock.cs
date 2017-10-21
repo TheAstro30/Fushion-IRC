@@ -345,15 +345,15 @@ namespace ircClient.Tcp
                                     _sslStream.Write(data);
                                 }
                                 catch
-                                {
-                                    Close();
+                                {                                    
                                     SocketErrorHandler(null);
+                                    Close();
                                 }
                             }
                             else
                             {
-                                Close();
                                 SocketErrorHandler(null);
+                                Close();
                             }
                         }
                         else
@@ -363,8 +363,8 @@ namespace ircClient.Tcp
                     }
                     catch (SocketException ex)
                     {
-                        Close();
                         SocketErrorHandler(ex);
+                        Close();
                     }
                     catch
                     {
@@ -435,8 +435,8 @@ namespace ircClient.Tcp
                     }
                     catch
                     {
-                        Close();
                         SocketErrorHandler(null);
+                        Close();
                         return;
                     }
                 }
@@ -453,15 +453,15 @@ namespace ircClient.Tcp
                             }
                             catch
                             {
-                                Close();
                                 SocketErrorHandler(null);
+                                Close();
                                 return;
                             }
                         }
                         else
                         {
-                            Close();
                             SocketErrorHandler(null);
+                            Close();
                             return;
                         }
                     }
@@ -538,13 +538,13 @@ namespace ircClient.Tcp
                     _listenSocket.Stop();
                 }
                 else
-                {
-                    Close();
-                    ChangeState(WinsockStates.Error);
+                {                   
                     if (OnError != null)
                     {                        
                         _sync.Execute(() => OnError(this, "Unknown error"));
                     }
+                    Close();
+                    ChangeState(WinsockStates.Error);
                 }
             }
             catch
@@ -573,8 +573,8 @@ namespace ircClient.Tcp
                             }
                             catch
                             {
-                                Close();
                                 SocketErrorHandler(null);
+                                Close();
                                 return;
                             }
                         }
@@ -586,8 +586,8 @@ namespace ircClient.Tcp
                             }
                             catch (SocketException ex)
                             {
-                                Close();
                                 SocketErrorHandler(ex);
+                                Close();
                                 return;
                             }
                         }
@@ -597,13 +597,13 @@ namespace ircClient.Tcp
                         return;
                     }
                     if (intCount < 1)
-                    {
-                        Close();
-                        _buffer = new byte[BufferSize];
+                    {                        
                         if (OnDisconnected != null)
                         {
                             _sync.Execute(() => OnDisconnected(this));
                         }
+                        Close();
+                        _buffer = new byte[BufferSize];
                         return;
                     }                  
                     var buffer = _buffer; /* Marshal-by-reference may cause runtime exception when passed by ref/out as in the next line... */
@@ -625,14 +625,14 @@ namespace ircClient.Tcp
                             }
                             else
                             {
-                                Close();
                                 SocketErrorHandler(null);
+                                Close();
                             }
                         }
                         catch
                         {
-                            Close();
                             SocketErrorHandler(null);
+                            Close();
                         }
                     }
                     else
@@ -643,8 +643,6 @@ namespace ircClient.Tcp
             }
             catch
             {
-                Close();
-                _buffer = new byte[BufferSize];
                 try
                 {
                     if (OnDisconnected != null)
@@ -655,6 +653,11 @@ namespace ircClient.Tcp
                 catch
                 {
                     Debug.Assert(true);
+                }
+                finally
+                {
+                    Close();
+                    _buffer = new byte[BufferSize];
                 }
             }
         }
