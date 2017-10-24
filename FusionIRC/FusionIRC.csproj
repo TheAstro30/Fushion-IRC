@@ -188,12 +188,16 @@
     <None Include="Icons\Toolbar\settings.ico" />
     <None Include="Icons\Toolbar\theme.ico" />
     <None Include="Icons\security.ico" />
-    <None Include="Icons\url.ico" />
+    <None Include="Icons\warning.ico" />
     <None Include="Icons\Toolbar\about.ico" />
     <None Include="Icons\Toolbar\users.ico" />
     <None Include="Icons\Options\network.ico" />
     <None Include="Icons\Options\server.ico" />
     <None Include="Images\about-dialog.jpg" />
+    <None Include="Icons\Toolbar\join.ico" />
+    <None Include="Icons\Toolbar\part.ico" />
+    <None Include="Icons\Toolbar\favorites.ico" />
+    <None Include="Icons\Toolbar\chanlist.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

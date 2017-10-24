@@ -24,6 +24,10 @@ namespace FusionIRC.Controls.ControlBars
 
         private readonly ToolStripButton _btnConnect;
         private readonly ToolStripButton _btnConnectToLocation;
+        private readonly ToolStripButton _btnChanList;
+        private readonly ToolStripButton _btnFavorites;
+        private readonly ToolStripButton _btnJoin;
+        private readonly ToolStripButton _btnPart;
         private readonly ToolStripButton _btnSettings;
         private readonly ToolStripButton _btnTheme;
         private readonly ToolStripButton _btnUsers;
@@ -65,6 +69,46 @@ namespace FusionIRC.Controls.ControlBars
                                             ToolTipText = @"Connect to location"
                                         };
             _btnConnectToLocation.Click += ToolbarButtonClick;
+            /* Channels list */
+            _btnChanList = new ToolStripButton
+                               {
+                                   Image = Resources.chanlist.ToBitmap(),
+                                   ImageScaling = ToolStripItemImageScaling.None,
+                                   Size = new Size(32, 32),
+                                   Tag = "CHANLIST",
+                                   ToolTipText = @"Channels list"
+                               };
+            _btnChanList.Click += ToolbarButtonClick;
+            /* Favorites */
+            _btnFavorites = new ToolStripButton
+                                {
+                                    Image = Resources.favorites.ToBitmap(),
+                                    ImageScaling = ToolStripItemImageScaling.None,
+                                    Size = new Size(32, 32),
+                                    Tag = "FAVORITES",
+                                    ToolTipText = @"Favorite channels"
+                                };
+            _btnFavorites.Click += ToolbarButtonClick;
+            /* Join channel */
+            _btnJoin = new ToolStripButton
+                           {
+                               Image = Resources.join.ToBitmap(),
+                               ImageScaling = ToolStripItemImageScaling.None,
+                               Size = new Size(32, 32),
+                               Tag = "JOIN",
+                               ToolTipText = @"Join a channel"
+                           };
+            _btnJoin.Click += ToolbarButtonClick;
+            /* Part channel */
+            _btnPart = new ToolStripButton
+                           {
+                               Image = Resources.part.ToBitmap(),
+                               ImageScaling = ToolStripItemImageScaling.None,
+                               Size = new Size(32, 32),
+                               Tag = "PART",
+                               ToolTipText = @"Part a channel"
+                           };
+            _btnPart.Click += ToolbarButtonClick;
             /* Settings button */
             _btnSettings = new ToolStripButton
                                {
@@ -109,6 +153,7 @@ namespace FusionIRC.Controls.ControlBars
             Items.AddRange(new ToolStripItem[]
                                {
                                    _btnConnect, _btnConnectToLocation, new ToolStripSeparator(), _btnSettings, _btnTheme,
+                                   new ToolStripSeparator(), _btnChanList, _btnFavorites, _btnJoin, _btnPart,
                                    new ToolStripSeparator(), _btnUsers, new ToolStripSeparator(), _btnAbout
                                });
 
