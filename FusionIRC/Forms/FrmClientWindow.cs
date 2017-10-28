@@ -13,6 +13,7 @@ using FusionIRC.Forms.Child;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
 using ircCore.Settings;
+using ircCore.Settings.Channels;
 using ircCore.Settings.Networks;
 using ircCore.Settings.Theming;
 using ircCore.Users;
@@ -53,6 +54,8 @@ namespace FusionIRC.Forms
             ThemeManager.Load(Functions.MainDir(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path, false));
             /* Load users list */
             UserManager.Load();
+            /* Channel manager */
+            ChannelManager.Load();
             /* Main form initialization */
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             Text = @"FusionIRC";
@@ -251,6 +254,8 @@ namespace FusionIRC.Forms
             ThemeManager.Save(Functions.MainDir(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path, false));            
             /* Save users list */
             UserManager.Save();
+            /* Channel manager */
+            ChannelManager.Save();
             base.OnFormClosing(e);
         }
 

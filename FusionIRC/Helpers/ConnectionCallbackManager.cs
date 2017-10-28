@@ -133,7 +133,10 @@ namespace FusionIRC.Helpers
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
             /* Iterate all open channels and clear nick list (or close it's window) */
-            UpdateChannelsOnDisconnect(client, pmd);
+            if (!client.IsConnecting)
+            {
+                UpdateChannelsOnDisconnect(client, pmd);
+            }
             client.UserInfo.AlternateUsed = false;
         }
 

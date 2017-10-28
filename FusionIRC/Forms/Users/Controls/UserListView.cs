@@ -20,6 +20,7 @@ namespace FusionIRC.Forms.Users.Controls
         private readonly ObjectListView _list;
         private readonly OlvColumn _colNick;
         private readonly OlvColumn _colNote;
+        private readonly ImageList _imageList;
         private readonly Button _btnAdd;
         private readonly Button _btnEdit;
         private readonly Button _btnDelete;
@@ -99,6 +100,15 @@ namespace FusionIRC.Forms.Users.Controls
                                 UseVisualStyleBackColor = true
                             };
 
+            /* Image list for listview */
+            _imageList = new ImageList {ColorDepth = ColorDepth.Depth32Bit, ImageSize = new Size(16, 16)};
+            _imageList.Images.AddRange(new Image[]
+                                           {
+                                               Properties.Resources.notify.ToBitmap(),
+                                               Properties.Resources.ignored.ToBitmap()
+                                           });
+            _list.SmallImageList = _imageList;
+
             Controls.AddRange(new Control[] {_list, _btnAdd, _btnEdit, _btnDelete, _btnClear});
 
             switch (_userListType)
@@ -109,7 +119,8 @@ namespace FusionIRC.Forms.Users.Controls
                                        CellPadding = null,
                                        IsEditable = false,
                                        Sortable = false,
-                                       Width = 120
+                                       Width = 120,
+                                       ImageGetter = delegate { return 0; }
                                    };
                     _list.AddObjects(UserManager.UserList.Notify.Users);
                     break;
@@ -120,7 +131,8 @@ namespace FusionIRC.Forms.Users.Controls
                                        CellPadding = null,
                                        IsEditable = false,
                                        Sortable = false,
-                                       Width = 300
+                                       Width = 300,
+                                       ImageGetter = delegate { return 1; }
                                    };
                     _list.AddObjects(UserManager.UserList.Ignore.Users);
                     break;

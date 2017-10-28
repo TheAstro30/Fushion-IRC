@@ -83,6 +83,16 @@ namespace FusionIRC.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon chanlist {
+            get {
+                object obj = ResourceManager.GetObject("chanlist", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon channel {
             get {
                 object obj = ResourceManager.GetObject("channel", resourceCulture);
@@ -133,9 +143,79 @@ namespace FusionIRC.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon favorites {
+            get {
+                object obj = ResourceManager.GetObject("favorites", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon ignored {
+            get {
+                object obj = ResourceManager.GetObject("ignored", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon join {
+            get {
+                object obj = ResourceManager.GetObject("join", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon joinChan {
+            get {
+                object obj = ResourceManager.GetObject("joinChan", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon network {
             get {
                 object obj = ResourceManager.GetObject("network", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon notify {
+            get {
+                object obj = ResourceManager.GetObject("notify", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon part {
+            get {
+                object obj = ResourceManager.GetObject("part", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon partChan {
+            get {
+                object obj = ResourceManager.GetObject("partChan", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -203,9 +283,9 @@ namespace FusionIRC.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon url {
+        internal static System.Drawing.Icon users {
             get {
-                object obj = ResourceManager.GetObject("url", resourceCulture);
+                object obj = ResourceManager.GetObject("users", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -213,9 +293,9 @@ namespace FusionIRC.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon users {
+        internal static System.Drawing.Icon warning {
             get {
-                object obj = ResourceManager.GetObject("users", resourceCulture);
+                object obj = ResourceManager.GetObject("warning", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

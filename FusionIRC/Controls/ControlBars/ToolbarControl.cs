@@ -11,6 +11,7 @@ using FusionIRC.Forms.Settings;
 using FusionIRC.Forms.Users;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
+using ircCore.Settings.Networks;
 using ircCore.Settings.Theming.Forms;
 
 namespace FusionIRC.Controls.ControlBars
@@ -23,7 +24,12 @@ namespace FusionIRC.Controls.ControlBars
         private bool _disconnect;
 
         private readonly ToolStripButton _btnConnect;
+        private readonly ToolStripDropDownButton _btnConnectDrop;
         private readonly ToolStripButton _btnConnectToLocation;
+        private readonly ToolStripButton _btnChanList;
+        private readonly ToolStripButton _btnFavorites;
+        private readonly ToolStripButton _btnJoin;
+        private readonly ToolStripButton _btnPart;
         private readonly ToolStripButton _btnSettings;
         private readonly ToolStripButton _btnTheme;
         private readonly ToolStripButton _btnUsers;
@@ -55,6 +61,8 @@ namespace FusionIRC.Controls.ControlBars
                                   ToolTipText = @"Connect"
                               };
             _btnConnect.Click += ToolbarButtonClick;
+            _btnConnectDrop = new ToolStripDropDownButton { Tag = "CONNECT" };
+            _btnConnectDrop.DropDownOpening += DropDownOpening;
             /* Connect to location button */
             _btnConnectToLocation = new ToolStripButton
                                         {
@@ -65,6 +73,46 @@ namespace FusionIRC.Controls.ControlBars
                                             ToolTipText = @"Connect to location"
                                         };
             _btnConnectToLocation.Click += ToolbarButtonClick;
+            /* Channels list */
+            _btnChanList = new ToolStripButton
+                               {
+                                   Image = Resources.chanlist.ToBitmap(),
+                                   ImageScaling = ToolStripItemImageScaling.None,
+                                   Size = new Size(32, 32),
+                                   Tag = "CHANLIST",
+                                   ToolTipText = @"Channels list"
+                               };
+            _btnChanList.Click += ToolbarButtonClick;
+            /* Favorites */
+            _btnFavorites = new ToolStripButton
+                                {
+                                    Image = Resources.favorites.ToBitmap(),
+                                    ImageScaling = ToolStripItemImageScaling.None,
+                                    Size = new Size(32, 32),
+                                    Tag = "FAVORITES",
+                                    ToolTipText = @"Favorite channels"
+                                };
+            _btnFavorites.Click += ToolbarButtonClick;
+            /* Join channel */
+            _btnJoin = new ToolStripButton
+                           {
+                               Image = Resources.join.ToBitmap(),
+                               ImageScaling = ToolStripItemImageScaling.None,
+                               Size = new Size(32, 32),
+                               Tag = "JOIN",
+                               ToolTipText = @"Join a channel"
+                           };
+            _btnJoin.Click += ToolbarButtonClick;
+            /* Part channel */
+            _btnPart = new ToolStripButton
+                           {
+                               Image = Resources.part.ToBitmap(),
+                               ImageScaling = ToolStripItemImageScaling.None,
+                               Size = new Size(32, 32),
+                               Tag = "PART",
+                               ToolTipText = @"Part a channel"
+                           };
+            _btnPart.Click += ToolbarButtonClick;            
             /* Settings button */
             _btnSettings = new ToolStripButton
                                {
@@ -108,7 +156,8 @@ namespace FusionIRC.Controls.ControlBars
             /* Add the buttons to the toolbar */
             Items.AddRange(new ToolStripItem[]
                                {
-                                   _btnConnect, _btnConnectToLocation, new ToolStripSeparator(), _btnSettings, _btnTheme,
+                                   _btnConnect, _btnConnectDrop, _btnConnectToLocation, new ToolStripSeparator(), _btnSettings, _btnTheme,
+                                   new ToolStripSeparator(), _btnChanList, _btnFavorites, _btnJoin, _btnPart, 
                                    new ToolStripSeparator(), _btnUsers, new ToolStripSeparator(), _btnAbout
                                });
 
@@ -155,6 +204,45 @@ namespace FusionIRC.Controls.ControlBars
                     }
                     break;
 
+                case "CHANLIST":
+                    break;
+
+                case "FAVORITES":
+                    using (var fav = new FrmFavorites())
+                    {
+                        fav.ShowDialog(_owner);
+                    }
+                    break;
+
+                case "JOIN":
+                    if (!c.IsConnected)
+                    {
+                        return;
+                    }
+                    using (var join = new FrmJoin())
+                    {
+                        if (join.ShowDialog(_owner) == DialogResult.OK)
+                        {
+                            c.Send(string.Format("JOIN {0}", join.Channels));
+                        }                        
+                    }
+                    break;
+
+                case "PART":
+                    if (!c.IsConnected)
+                    {
+                        return;
+                    }
+                    using (var part = new FrmPart(c))
+                    {
+                        if (part.ShowDialog(_owner) == DialogResult.OK)
+                        {
+                            System.Diagnostics.Debug.Print(part.Channels);
+                            c.Send(part.Channels == "0" ? "JOIN 0" : string.Format("PART {0}", part.Channels));
+                        }
+                    }
+                    break;
+
                 case "USERS":
                     using (var users = new FrmUsers())
                     {
@@ -176,6 +264,36 @@ namespace FusionIRC.Controls.ControlBars
                     }
                     break;
             }
+        }
+
+        private void DropDownOpening(object sender, EventArgs e)
+        {
+            var btn = (ToolStripDropDownButton) sender;
+            if (btn == null)
+            {
+                return;
+            }
+            switch (btn.Tag.ToString())
+            {
+                case "CONNECT":
+                    btn.DropDownItems.Clear();
+                    foreach (var s in ServerManager.Servers.Recent.Server)
+                    {
+                        btn.DropDownItems.Add(s.ToString(), null, OnRecentServerClick);
+                    }
+                    break;
+            }
+        }
+
+        private void OnRecentServerClick(object sender, EventArgs e)
+        {
+            var item = (ToolStripMenuItem)sender;
+            var c = WindowManager.GetActiveConnection(_owner);
+            if (c == null || item == null)
+            {
+                return;
+            }
+            ConnectToRecentServer(c, item);
         }
 
         private void TimerCheckConnection(object sender, EventArgs e)

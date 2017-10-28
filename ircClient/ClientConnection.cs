@@ -141,8 +141,6 @@ namespace ircClient
             {
                 _sock.Close();
             }
-            IsConnecting = false;
-            IsConnected = false;
         }
 
         public void CancelConnection()
@@ -155,8 +153,6 @@ namespace ircClient
             {
                 _sock.Close();
             }
-            IsConnecting = false;
-            IsConnected = false;
             if (OnClientCancelConnection != null)
             {
                 OnClientCancelConnection(this);
@@ -249,7 +245,7 @@ namespace ircClient
         {
             switch (state)
             {
-                case WinsockStates.Closed:                    
+                case WinsockStates.Closed:     
                     IsConnecting = false;
                     IsConnected = false;
                     _tmrWaitToReconnect.Enabled = true;
@@ -293,7 +289,6 @@ namespace ircClient
 
         private void OnDnsResolved(DnsResolve dns, DnsResult result)
         {
-            System.Diagnostics.Debug.Print("resolved");
             if (OnClientDnsResolved != null)
             {
                 OnClientDnsResolved(this, result);

@@ -257,7 +257,7 @@ namespace FusionIRC.Forms.Child
                             msg = "Are you sure you want to close this console window?";
                             break;
                     }
-                    if (MessageBox.Show(msg, @"Confirm Close Console", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                    if (string.IsNullOrEmpty(msg) && MessageBox.Show(msg, @"Confirm Close Console", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
                     {
                         e.Cancel = true;
                         return;

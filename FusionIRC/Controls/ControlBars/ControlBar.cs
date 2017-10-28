@@ -3,6 +3,9 @@
  * Copyright (C) 2016 - 2017
  * Provided AS-IS with no warranty expressed or implied
  */
+
+using System;
+using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Forms.Child;
 using FusionIRC.Forms.Misc;
@@ -44,6 +47,35 @@ namespace FusionIRC.Controls.ControlBars
         public virtual void DisconnectFromServer(ClientConnection client, FrmChildWindow console)
         {
             CommandProcessor.Parse(client, console, "DISCONNECT");
+        }
+
+        public virtual void ConnectToRecentServer(ClientConnection client, ToolStripMenuItem item)
+        {
+            if (item.Text.ToUpper() == "CLEAR")
+            {
+                ServerManager.Servers.Recent.Server.Clear();
+                return;
+            }
+            var address = item.Text.Split(':');
+            if (address.Length == 0)
+            {
+                return;
+            }
+            var server = ServerManager.Servers.Recent.Server.FirstOrDefault(s => s.Address.Equals(address[0], StringComparison.InvariantCultureIgnoreCase));
+            if (server == null)
+            {
+                return;
+            }
+            var console = WindowManager.GetConsoleWindow(client);
+            if (console == null)
+            {
+                return;
+            }
+            CommandProcessor.Parse(client, console,
+                                   string.Format("SERVER {0}:{1}", server.Address,
+                                                 server.IsSsl
+                                                     ? string.Format("+{0}", server.Port)
+                                                     : server.Port.ToString()));
         }
     }
 }

@@ -82,6 +82,18 @@
     <Compile Include="Forms\Misc\FrmConnectTo.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\Misc\FrmFavorites.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Misc\FrmFavorites.Designer.cs">
+      <DependentUpon>FrmFavorites.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Misc\FrmJoin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Misc\FrmPart.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\Settings\Controls\Base\BaseControlRenderer.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -139,6 +151,9 @@
     <Compile Include="Helpers\WindowManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Forms\Misc\FrmFavorites.resx">
+      <DependentUpon>FrmFavorites.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\FrmSettings.resx">
       <DependentUpon>FrmSettings.cs</DependentUpon>
     </EmbeddedResource>
@@ -188,12 +203,21 @@
     <None Include="Icons\Toolbar\settings.ico" />
     <None Include="Icons\Toolbar\theme.ico" />
     <None Include="Icons\security.ico" />
-    <None Include="Icons\url.ico" />
+    <None Include="Icons\warning.ico" />
     <None Include="Icons\Toolbar\about.ico" />
     <None Include="Icons\Toolbar\users.ico" />
     <None Include="Icons\Options\network.ico" />
     <None Include="Icons\Options\server.ico" />
     <None Include="Images\about-dialog.jpg" />
+    <None Include="Icons\Toolbar\join.ico" />
+    <None Include="Icons\Toolbar\part.ico" />
+    <None Include="Icons\Toolbar\favorites.ico" />
+    <None Include="Icons\Toolbar\chanlist.ico" />
+    <None Include="Icons\Dialog\ignored.ico" />
+    <None Include="Icons\Dialog\notify.ico" />
+    <None Include="Icons\Dialog\userList.ico" />
+    <None Include="Icons\Dialog\joinChan.ico" />
+    <None Include="Icons\Dialog\partChan.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

@@ -45,7 +45,7 @@ namespace FusionIRC.Forms.Warning
                               BackgroundImageLayout = ImageLayout.Center,
                               Location = new Point(12, 12),                              
                               Size = new Size(48, 48),                              
-                              BackgroundImage = Properties.Resources.url.ToBitmap()
+                              BackgroundImage = Properties.Resources.warning.ToBitmap()
                           };
 
             _lblInfo1 = new Label

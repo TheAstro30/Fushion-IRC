@@ -5,7 +5,6 @@
  */
 using System;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Forms.Child;
 using FusionIRC.Helpers;
@@ -150,31 +149,7 @@ namespace FusionIRC.Controls.ControlBars
             {
                 return;
             }
-            if (item.Text.ToUpper() == "CLEAR")
-            {
-                ServerManager.Servers.Recent.Server.Clear();
-                return;
-            }
-            var address = item.Text.Split(':');
-            if (address.Length == 0)
-            {
-                return;
-            }
-            var server = ServerManager.Servers.Recent.Server.FirstOrDefault(s => s.Address.Equals(address[0], StringComparison.InvariantCultureIgnoreCase));
-            if (server == null)
-            {
-                return;
-            }
-            var console = WindowManager.GetConsoleWindow(c);
-            if (console == null)
-            {
-                return;
-            }
-            CommandProcessor.Parse(c, console,
-                                   string.Format("SERVER {0}:{1}", server.Address,
-                                                 server.IsSsl
-                                                     ? string.Format("+{0}", server.Port)
-                                                     : server.Port.ToString()));
+            ConnectToRecentServer(c, item);
         }
 
         private void OnMenuWindowClick(object sender, EventArgs e)

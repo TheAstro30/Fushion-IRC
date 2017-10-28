@@ -96,6 +96,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Settings\Channels\Channels.cs" />
+    <Compile Include="Settings\Channels\ChannelManager.cs" />
     <Compile Include="Settings\Networks\ServerManager.cs" />
     <Compile Include="Settings\Networks\Servers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
