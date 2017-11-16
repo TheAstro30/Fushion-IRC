@@ -121,7 +121,10 @@ namespace FusionIRC.Forms.Child
                                    Font = ThemeManager.CurrentTheme.ThemeFonts[type],
                                    UserModes = Client.Parser.UserModes,
                                    UserModeCharacters = Client.Parser.UserModeCharacters,
-                                   Dock = DockStyle.Fill
+                                   Dock = DockStyle.Fill,
+                                   Images = ThemeManager.GetNicklistImages(),
+                                   ShowIcons = true, /* Change these two lines to the Theme.cs */
+                                   ShowPrefix = true
                                };
                 Nicklist.OnNicklistDoubleClick += NicklistDoubleClickNick;
                 /* Split control for nicklist */
