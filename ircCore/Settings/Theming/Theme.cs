@@ -47,6 +47,8 @@ namespace ircCore.Settings.Theming
         public Dictionary<ChildWindowType, ThemeBackgroundData> ThemeBackgrounds = new Dictionary<ChildWindowType, ThemeBackgroundData>();
 
         public Dictionary<ThemeMessage, ThemeMessageData> Messages = new Dictionary<ThemeMessage, ThemeMessageData>();
+
+        public Dictionary<ThemeNicklistImage, Bitmap> NicklistImages = new Dictionary<ThemeNicklistImage, Bitmap>();
         
         /* Constructor */
         public Theme()
@@ -119,6 +121,12 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.DnsText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * DNS Look-up: $text" });
             Messages.Add(ThemeMessage.DnsLookupReplyText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * DNS Look-up: $dnsip ($dnshost)" });
             Messages.Add(ThemeMessage.InfoText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $text" });
+            /* Image list... */
+            NicklistImages.Add(ThemeNicklistImage.Owner, Properties.Resources.owner.ToBitmap());
+            NicklistImages.Add(ThemeNicklistImage.Protected, Properties.Resources.prot.ToBitmap());
+            NicklistImages.Add(ThemeNicklistImage.Operator, Properties.Resources.op.ToBitmap());
+            NicklistImages.Add(ThemeNicklistImage.HalfOperator, Properties.Resources.halfop.ToBitmap());
+            NicklistImages.Add(ThemeNicklistImage.Voice, Properties.Resources.voice.ToBitmap());
             /* Set this flag to true to ensure it will be saved if it doesn't exist (ie: load fails) */
             ThemeChanged = true;
         }        
@@ -135,6 +143,7 @@ namespace ircCore.Settings.Theming
             TimeStampFormat = theme.TimeStampFormat;
             ThemeFonts = new Dictionary<ChildWindowType, Font>(theme.ThemeFonts);
             Messages = new Dictionary<ThemeMessage, ThemeMessageData>(theme.Messages);
+            NicklistImages = new Dictionary<ThemeNicklistImage, Bitmap>(theme.NicklistImages);
         }
     }
 }

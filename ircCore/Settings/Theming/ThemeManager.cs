@@ -7,6 +7,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Text;
+using System.Windows.Forms;
 using ircCore.Utils;
 using ircCore.Utils.Serialization;
 
@@ -186,6 +187,24 @@ namespace ircCore.Settings.Theming
         InfoText = 42
     }
 
+    public enum ThemeNicklistImage
+    {
+        [Description("Owner (!,~, .)")]
+        Owner = 0,
+
+        [Description("Protected Operator (&)")]
+        Protected = 1,
+
+        [Description("Operator (@)")]
+        Operator = 2,
+
+        [Description("Half Operator (&)")]
+        HalfOperator = 3,
+
+        [Description("Voiced (+)")]
+        Voice = 4
+    }
+
     public class IncomingMessageData
     {
         public ThemeMessage Message { get; set; }
@@ -283,6 +302,21 @@ namespace ircCore.Settings.Theming
         public static Color GetColor(ThemeColor color, Theme theme)
         {
             return !theme.ThemeColors.ContainsKey(color) ? theme.Colors[0] : theme.Colors[theme.ThemeColors[color]];
+        }
+
+        public static ImageList GetNicklistImages()
+        {
+            return GetNicklistImages(CurrentTheme);
+        }
+
+        public static ImageList GetNicklistImages(Theme theme)
+        {
+            var images = new ImageList {ColorDepth = ColorDepth.Depth32Bit, ImageSize = new Size(16, 16)};
+            foreach (var keyPair in theme.NicklistImages)
+            {
+                images.Images.Add(keyPair.Value);
+            }
+            return images;
         }
 
         /* The main theme message parser */
