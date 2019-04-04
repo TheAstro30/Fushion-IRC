@@ -3,11 +3,11 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
-namespace FusionIRC.Forms.Settings.Editing
+using System.Windows.Forms;
+
+namespace ircCore.Controls.ChildWindows.Nicklist.Helpers
 {
-    public enum ServerEditType
+    public class NicklistStyler : ListBox
     {
-        Add = 0,
-        Edit = 1
     }
 }

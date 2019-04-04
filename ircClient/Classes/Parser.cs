@@ -1,6 +1,6 @@
 ﻿/* FusionIRC IRC Client
  * Written by Jason James Newland
- * Copyright (C) 2016 - 2017
+ * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
@@ -531,8 +531,14 @@ namespace ircClient.Classes
                     switch (s)
                     {
                         case "VERSION":
-                            var version = Assembly.GetExecutingAssembly().GetName().Version;
-                            _client.Send(string.Format("NOTICE {0} :{1}VERSION FusionIRC v{2}.{3} by Jason James Newland{4}", n[0], (char) 1, version.Major, version.Minor, (char) 1));
+                            /* We cannot use "GetExecutingAssembly" here to get the version information from the main
+                             * executable as this DLL IS the executing assembly - so we use "GetEntryAssembly" instead,
+                             * which is basically the same as the original assembly that "called" this DLL */
+                            var version = Assembly.GetEntryAssembly().GetName().Version;
+                            _client.Send(
+                                string.Format(
+                                    "NOTICE {0} :{1}VERSION FusionIRC v{2}.{3}.{4} by Jason James Newland{5}", n[0],
+                                    (char) 1, version.Major, version.Minor, version.MinorRevision, (char) 1));
                             break;
 
                         case "TIME":

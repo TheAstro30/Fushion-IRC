@@ -1,6 +1,6 @@
 ﻿/* FusionIRC IRC Client
  * Written by Jason James Newland
- * Copyright (C) 2016 - 2017
+ * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
@@ -42,7 +42,7 @@ namespace ircCore.Settings
             UserInfo = info;
             /* Set up basic settings */
             Windows.SwitchTreeWidth = 160;
-            Windows.NicklistWidth = 130;
+            Windows.NicklistWidth = 112;
             var w = new WindowData { Name = "application", Size = new Size(1100, 750), Position = new Point(55, 55) };
             Windows.Window.Add(w);
             w = new WindowData {Name = "console", Size = new Size(731, 255), Position = new Point(-1, -1)};

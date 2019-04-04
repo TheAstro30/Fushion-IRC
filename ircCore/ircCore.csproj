@@ -52,12 +52,6 @@
     <Compile Include="Controls\ChildWindows\Input\InputWindow.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\ChildWindows\Nicklist\Helpers\NickComparer.cs" />
-    <Compile Include="Controls\ChildWindows\Nicklist\Helpers\NickComparerHelper.cs" />
-    <Compile Include="Controls\ChildWindows\Nicklist\Nicklist.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\ChildWindows\Nicklist\Structures\NickData.cs" />
     <Compile Include="Controls\ChildWindows\OutputDisplay\Helpers\Functions.cs" />
     <Compile Include="Controls\ChildWindows\OutputDisplay\Helpers\Character.cs" />
     <Compile Include="Controls\ChildWindows\Helpers\InternalClipboard.cs" />
@@ -73,6 +67,15 @@
     <Compile Include="Controls\ChildWindows\OutputDisplay\Structures\MarkingData.cs" />
     <Compile Include="Controls\ChildWindows\OutputDisplay\Structures\TextData.cs" />
     <Compile Include="Controls\ChildWindows\OutputDisplay\Structures\WrapData.cs" />
+    <Compile Include="Controls\ChildWindows\Nicklist\Helpers\NickComparer.cs" />
+    <Compile Include="Controls\ChildWindows\Nicklist\Helpers\NickComparerHelper.cs" />
+    <Compile Include="Controls\ChildWindows\Nicklist\Helpers\NicklistStyler.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ChildWindows\Nicklist\Nicklist.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ChildWindows\Nicklist\Structures\NickData.cs" />
     <Compile Include="Controls\ChildWindows\Input\ColorBox\ColorSelectionBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -156,30 +159,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\ttfIcon.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\libolv\libolv.csproj">
-      <Project>{18FEDA0C-D147-4286-B39A-01204808106A}</Project>
-      <Name>libolv</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\op.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\voice.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\halfop.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\owner.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\protected.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\prot.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

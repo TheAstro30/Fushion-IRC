@@ -1,6 +1,6 @@
 ﻿/* FusionIRC IRC Client
  * Written by Jason James Newland
- * Copyright (C) 2016 - 2017
+ * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
@@ -121,10 +121,7 @@ namespace FusionIRC.Forms.Child
                                    Font = ThemeManager.CurrentTheme.ThemeFonts[type],
                                    UserModes = Client.Parser.UserModes,
                                    UserModeCharacters = Client.Parser.UserModeCharacters,
-                                   Dock = DockStyle.Fill,
-                                   Images = ThemeManager.GetNicklistImages(),
-                                   ShowIcons = true, /* Change these two lines to the Theme.cs */
-                                   ShowPrefix = true
+                                   Dock = DockStyle.Fill
                                };
                 Nicklist.OnNicklistDoubleClick += NicklistDoubleClickNick;
                 /* Split control for nicklist */

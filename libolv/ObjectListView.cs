@@ -1134,7 +1134,9 @@ namespace libolv
         private void SetupBaseImageList()
         {
             /* If a row height hasn't been set, or an image list has been give which is the required size, just assign it */
-            if (_rowHeight == -1 || View != View.Details || (_shadowedImageList != null && _shadowedImageList.ImageSize.Height == _rowHeight))
+            if (_rowHeight == -1 ||
+                View != View.Details ||
+                (_shadowedImageList != null && _shadowedImageList.ImageSize.Height == _rowHeight))
             {
                 BaseSmallImageList = _shadowedImageList;
             }

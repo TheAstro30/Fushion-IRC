@@ -1,6 +1,6 @@
 ﻿/* FusionIRC IRC Client
  * Written by Jason James Newland
- * Copyright (C) 2016 - 2017
+ * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
 using System.Drawing;
@@ -70,7 +70,9 @@ namespace FusionIRC.Forms.Misc
                                   BackColor = Color.Transparent,
                                   Location = new Point(89, 63),
                                   Size = new Size(49, 15),
-                                  Text = string.Format("Version: v{0}.{1}", version.Major, version.Minor)
+                                  Text =
+                                      string.Format("Version: v{0}.{1}.{2} (build: {3})", version.Major, version.Minor,
+                                                    version.MinorRevision, version.Build)
                               };
 
             _lblAuthor = new Label
@@ -87,7 +89,7 @@ namespace FusionIRC.Forms.Misc
                                     BackColor = Color.Transparent,
                                     Location = new Point(89, 118),
                                     Size = new Size(287, 36),
-                                    Text = @"Copyright © 2016 - 2017 KangaSoft Software, All Rights Reserved."
+                                    Text = @"Copyright © 2016 - 2019 KangaSoft Software, All Rights Reserved."
                                 };
 
             _lblDisclaimer = new Label

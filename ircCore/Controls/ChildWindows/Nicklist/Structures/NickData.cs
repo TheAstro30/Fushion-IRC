@@ -1,6 +1,6 @@
 ﻿/* FusionIRC IRC Client
  * Written by Jason James Newland
- * Copyright (C) 2016 - 2017
+ * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
 using System.Collections.Generic;
@@ -55,42 +55,6 @@ namespace ircCore.Controls.ChildWindows.Nicklist.Structures
             return _userModes.Count > 0 ? _userModes[0] : string.Empty;
         }
 
-        public string GetAllUserModes()
-        {
-            return string.Join("", _userModes);
-        }
-
-        public string GetUserModeString()
-        {
-            if (_userModes.Count == 0)
-            {
-                return "Regular user";                
-            }
-            /* Note these are known and/or expected user modes only */
-            switch (_userModes[0])
-            {
-                case "!":
-                    return "Administrator";
-
-                case "~":
-                case ".":
-                    return "Channel owner";
-
-                case "&":
-                    return "Protected operator";
-
-                case "@":
-                    return "Channel operator";
-
-                case "%":
-                    return "Channel half-operator";
-
-                default:
-                    return "Voiced user";
-            }            
-        }
-
-        /* Method to return nick with prefix (eg: @somedude) */
         public override string ToString()
         {
             return string.Format("{0}{1}", _userModes.Count > 0 ? _userModes[0] : "", Nick);

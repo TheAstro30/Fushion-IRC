@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<channels xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <favorites>
-    <favorite name="#test2" description="Testing channel ;)" />
-    <favorite name="#test" description="Testing channel ;)" />
-  </favorites>
-  <recent />
-</channels>
