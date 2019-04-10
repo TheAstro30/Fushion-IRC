@@ -407,8 +407,8 @@ namespace ircClient
             {
                 return;
             }
-            _pingCheck++;           
-            if (_pingCheck <= 300)
+            _pingCheck++;     
+            if (_pingCheck <= 450)
             {
                 return;
             }

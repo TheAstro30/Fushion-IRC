@@ -142,6 +142,10 @@ namespace FusionIRC.Helpers
                     ParseDns(client, args);
                     break;
 
+                case "PASS":
+                    client.Send(string.Format("PASS :{0}", args));
+                    break;
+
                 default:
                     /* Send command to server */
                     if (!client.IsConnected)
