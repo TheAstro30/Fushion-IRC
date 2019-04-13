@@ -82,6 +82,12 @@
     <Compile Include="Forms\Misc\FrmConnectTo.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\Misc\FrmDccManager.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Misc\FrmDccManager.Designer.cs">
+      <DependentUpon>FrmDccManager.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Misc\FrmFavorites.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -151,6 +157,9 @@
     <Compile Include="Helpers\WindowManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Forms\Misc\FrmDccManager.resx">
+      <DependentUpon>FrmDccManager.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Misc\FrmFavorites.resx">
       <DependentUpon>FrmFavorites.cs</DependentUpon>
     </EmbeddedResource>
@@ -218,6 +227,10 @@
     <None Include="Icons\Dialog\userList.ico" />
     <None Include="Icons\Dialog\joinChan.ico" />
     <None Include="Icons\Dialog\partChan.ico" />
+    <None Include="Icons\Toolbar\dcc.ico" />
+    <None Include="Icons\Dialog\dccManager.ico" />
+    <None Include="Icons\Dcc\dccDown.ico" />
+    <None Include="Icons\Dcc\dccUp.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

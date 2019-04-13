@@ -82,6 +82,7 @@
     <Compile Include="Controls\FontComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Dcc\DccManager.cs" />
     <Compile Include="Forms\FrmColorIndex.cs">
       <SubType>Form</SubType>
     </Compile>

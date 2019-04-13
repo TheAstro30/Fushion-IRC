@@ -3,13 +3,13 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
-
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Linq;
 using FusionIRC.Forms;
 using FusionIRC.Forms.Child;
+using FusionIRC.Forms.Misc;
 using ircClient;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
@@ -25,6 +25,9 @@ namespace FusionIRC.Helpers
 
     public static class WindowManager
     {
+        /* DCC file transfer manager window */
+        public static FrmDccManager DccManagerWindow;
+
         /* Main child window list */
         public static Dictionary<ClientConnection, List<FrmChildWindow>> Windows = new Dictionary<ClientConnection, List<FrmChildWindow>>();
 

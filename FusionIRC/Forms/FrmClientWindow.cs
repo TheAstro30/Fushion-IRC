@@ -10,8 +10,10 @@ using System.Windows.Forms;
 using FusionIRC.Controls.ControlBars;
 using FusionIRC.Controls.SwitchView;
 using FusionIRC.Forms.Child;
+using FusionIRC.Forms.Misc;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
+using ircCore.Dcc;
 using ircCore.Settings;
 using ircCore.Settings.Channels;
 using ircCore.Settings.Networks;
@@ -38,6 +40,8 @@ namespace FusionIRC.Forms
         public ToolbarControl ToolBar { get; private set; }
         public MenubarControl MenuBar { get; private set; }
 
+        //private Timer _test;
+
         /* Constructor */
         public FrmClientWindow()
         {
@@ -56,6 +60,8 @@ namespace FusionIRC.Forms
             UserManager.Load();
             /* Channel manager */
             ChannelManager.Load();
+            /* DCC File transfers manager */
+            DccManager.Load();
             /* Main form initialization */
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             Text = @"FusionIRC";
@@ -154,8 +160,33 @@ namespace FusionIRC.Forms
             Size = w.Size;
             Location = w.Position;
             WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
+            /* Create DCC file manager window */
+            WindowManager.DccManagerWindow = new FrmDccManager();
             _initialize = false;
+            /* test code */
+            //var fd = new DccFile();
+            //fd.FileName = "new_test_file105.mp3";
+            //fd.UserName = "IRCUser5";
+            //fd.Address = "58.89.91.2";
+            //fd.FileType = DccFileType.Download;
+            //WindowManager.DccManagerWindow.AddFile(fd);
+            //_test = new Timer();
+            //_test.Interval = 1000;
+            //_test.Enabled = true;
+            //_test.Tick += TestTick;
         }
+
+        //private void TestTick(object sender, EventArgs e)
+        //{
+        //    //get 3rd object in list
+        //    var fd = DccManager.DccTransfers.FileData[2];
+        //    fd.Progress++;
+        //    if (fd.Progress > 100)
+        //    {
+        //        fd.Progress = 0;
+        //    }
+        //    WindowManager.DccManagerWindow.UpdateTransferData();
+        //}
 
         /* Overrides */
         protected override void OnLoad(EventArgs e)
@@ -256,6 +287,8 @@ namespace FusionIRC.Forms
             UserManager.Save();
             /* Channel manager */
             ChannelManager.Save();
+            /* DCC File transfers manager */
+            DccManager.Save();
             base.OnFormClosing(e);
         }
 

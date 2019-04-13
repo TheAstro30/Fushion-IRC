@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<dccTransfers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <fileData type="Download" fileName="new_test_file22.mp3" userName="IRCUser5" address="58.89.91.2" fileSize="0" fileProgress="0" fileStatus="Waiting" />
+  <fileData type="Download" fileName="new_test_file22.mp3" userName="IRCUser5" address="58.89.91.2" fileSize="0" fileProgress="0" fileStatus="Waiting" />
+  <fileData type="Download" fileName="new_test_file4.mp3" userName="IRCUser5" address="58.89.91.2" fileSize="0" fileProgress="100" fileStatus="Completed" />
+  <fileData type="Download" fileName="testfile_name1.txt" userName="IRCUsername1" address="59.0.0.2" fileSize="8024" fileProgress="84" fileStatus="Downloading" />
+  <fileData type="Upload" fileName="new_test_file.mp3" userName="IRCUser5" address="58.89.91.2" fileSize="0" fileProgress="0" fileStatus="Waiting" />
+  <fileData type="Upload" fileName="new_test_file1.mp3" userName="IRCUser5" address="58.89.91.2" fileSize="0" fileProgress="6" fileStatus="Waiting" />
+</dccTransfers>

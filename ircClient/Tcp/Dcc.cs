@@ -3,34 +3,31 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
+using ircCore.Dcc;
 
 namespace ircClient.Tcp
 {
     public enum DccType
     {
-        DccFileTransfer = 0,
-        DccChat = 1
+        DccChat = 0,
+        DccFileTransfer = 1        
     }
 
     public class Dcc
     {
         /* This class handles both direct connection communication plus file transfers */
         private ClientSock _sock;
-        private ISynchronizeInvoke _sync;
+        private readonly ISynchronizeInvoke _sync;
 
         public DccType DccType { get; set; }
-        public int FileProgress { get; private set; }
-        public string FileName { get; set; }
+        public DccFile DccFile { get; set; }
 
         public Dcc(ISynchronizeInvoke syncObject)
         {
             _sync = syncObject;
             _sock = new ClientSock(_sync);
+            /* Penis */
         }
     }
 }

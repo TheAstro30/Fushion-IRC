@@ -32,6 +32,7 @@ namespace FusionIRC.Controls.ControlBars
         private readonly ToolStripButton _btnPart;
         private readonly ToolStripButton _btnSettings;
         private readonly ToolStripButton _btnTheme;
+        private readonly ToolStripButton _btnDcc;
         private readonly ToolStripButton _btnUsers;
         private readonly ToolStripButton _btnAbout;
 
@@ -133,6 +134,16 @@ namespace FusionIRC.Controls.ControlBars
                                 ToolTipText = @"Theme manager"
                             };
             _btnTheme.Click += ToolbarButtonClick;
+            /* DCC manager button */
+            _btnDcc = new ToolStripButton
+                          {
+                              Image = Resources.dcc.ToBitmap(),
+                              ImageScaling = ToolStripItemImageScaling.None,
+                              Size = new Size(32, 32),
+                              Tag = "DCC",
+                              ToolTipText = @"DCC transfer manager"
+                          };
+            _btnDcc.Click += ToolbarButtonClick;
             /* Users button */
             _btnUsers = new ToolStripButton
                             {
@@ -158,7 +169,7 @@ namespace FusionIRC.Controls.ControlBars
                                {
                                    _btnConnect, _btnConnectDrop, _btnConnectToLocation, new ToolStripSeparator(), _btnSettings, _btnTheme,
                                    new ToolStripSeparator(), _btnChanList, _btnFavorites, _btnJoin, _btnPart, 
-                                   new ToolStripSeparator(), _btnUsers, new ToolStripSeparator(), _btnAbout
+                                   new ToolStripSeparator(), _btnDcc, _btnUsers, new ToolStripSeparator(), _btnAbout
                                });
 
             _tmrCheck = new Timer
@@ -241,6 +252,10 @@ namespace FusionIRC.Controls.ControlBars
                             c.Send(part.Channels == "0" ? "JOIN 0" : string.Format("PART {0}", part.Channels));
                         }
                     }
+                    break;
+
+                case "DCC":
+                    WindowManager.DccManagerWindow.Show(_owner);
                     break;
 
                 case "USERS":

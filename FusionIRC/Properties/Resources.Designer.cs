@@ -123,9 +123,39 @@ namespace FusionIRC.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon dcc {
+            get {
+                object obj = ResourceManager.GetObject("dcc", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon dcc_chat {
             get {
                 object obj = ResourceManager.GetObject("dcc_chat", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon dccDown {
+            get {
+                object obj = ResourceManager.GetObject("dccDown", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon dccUp {
+            get {
+                object obj = ResourceManager.GetObject("dccUp", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

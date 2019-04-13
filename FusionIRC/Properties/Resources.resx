@@ -190,4 +190,13 @@
   <data name="partChan" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Icons\Dialog\partChan.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="dcc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\Toolbar\dcc.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="dccDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\Dcc\dccDown.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="dccUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\Dcc\dccUp.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
