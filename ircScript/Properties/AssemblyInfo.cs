@@ -1,15 +1,16 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("FusionIRC")]
-[assembly: AssemblyDescription("IRC Client for Windows 8.1")]
+[assembly: AssemblyTitle("ircScript")]
+[assembly: AssemblyDescription("Script parser enging")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("KangaSoft Software")]
-[assembly: AssemblyProduct("FusionIRC")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyProduct("ircScript")]
+[assembly: AssemblyCopyright("Copyright ©  2016 - 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -19,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("3c61c537-9691-4c82-a079-afeb499115f0")]
+[assembly: Guid("2a1d13f7-4bd0-4594-a3ac-a86bf8688feb")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -31,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.38.2")]
-[assembly: AssemblyFileVersion("1.0.38.2")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

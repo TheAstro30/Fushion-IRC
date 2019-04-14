@@ -47,6 +47,10 @@ namespace ircCore.Settings
             Windows.Window.Add(w);
             w = new WindowData {Name = "console", Size = new Size(731, 255), Position = new Point(-1, -1)};
             Windows.Window.Add(w);
+            w = new WindowData { Name = "dcc-manager", Size = new Size(613, 301), Position = new Point(200, 183) };
+            Windows.Window.Add(w);
+            w = new WindowData { Name = "editor", Size = new Size(366, 395), Position = new Point(150, 160) };
+            Windows.Window.Add(w);
             /* Caching defaults */
             Windows.Caching.Output = 500;
             Windows.Caching.Input = 50;

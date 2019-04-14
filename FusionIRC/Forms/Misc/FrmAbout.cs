@@ -3,7 +3,9 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
+using System;
 using System.Drawing;
+using System.Media;
 using System.Reflection;
 using System.Windows.Forms;
 using ircCore.Controls;
@@ -117,7 +119,15 @@ namespace FusionIRC.Forms.Misc
                                       _btnClose
                                   });
 
+            _pnlIcon.Click += PanelClick;
+
             AcceptButton = _btnClose;            
+        }
+
+        private static void PanelClick(object sender, EventArgs e)
+        {
+            var player = new SoundPlayer(Properties.Resources.penguin);
+            player.Play();
         }
     }
 }

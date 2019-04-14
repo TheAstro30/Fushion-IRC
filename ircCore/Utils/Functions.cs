@@ -96,6 +96,10 @@ namespace ircCore.Utils
             {
                 Directory.CreateDirectory(_mainFolder + @"\themes");
             }
+            if (!Directory.Exists(_mainFolder + @"\scripts"))
+            {
+                Directory.CreateDirectory(_mainFolder + @"\scripts");
+            }
         }
 
         public static string MainDir(string path, bool forceAppDir)

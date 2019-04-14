@@ -12,6 +12,8 @@ using ircClient.Classes;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
+using ircScript;
+using ircScript.Structures;
 
 namespace FusionIRC.Helpers
 {
@@ -67,6 +69,24 @@ namespace FusionIRC.Helpers
         /* Private parsing methods */
         private static void ParseCommand(ClientConnection client, FrmChildWindow child, string command, string args)
         {            
+            /* First check it's not an alias, if it is - pass it back to command processor */
+            var alias = ScriptManager.GetScript(ScriptType.Alias, command);
+            if (alias != null)
+            {
+                var data = alias.Parse(args.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries));
+                if (!string.IsNullOrEmpty(data))
+                {
+                    var i = data.IndexOf(' ');
+                    if (i == -1)
+                    {
+                        return;
+                    }
+                    command = data.Substring(0, i).Trim().ToUpper().Replace("/", "");
+                    args = data.Substring(i + 1).Trim();
+                    ParseCommand(client, child, command, args);
+                    return;
+                }
+            }
             switch (command)
             {
                 case "SERVER":
@@ -94,6 +114,10 @@ namespace FusionIRC.Helpers
 
                 case "MSG":
                     ParseMsg(client, child, args);
+                    break;
+
+                case "SAY":
+                    ParseSay(client, child, args);
                     break;
 
                 case "NOTICE":
@@ -292,6 +316,16 @@ namespace FusionIRC.Helpers
             {
                 ParseAction(client, c, args);
             }
+        }
+
+        private static void ParseSay(ClientConnection client, FrmChildWindow child, string args)
+        {
+            /* Message args to active window */
+            if (child.WindowType == ChildWindowType.Console || !client.IsConnected)
+            {
+                return;
+            }
+            ParseMsg(client, child, string.Format("{0} {1}", child.Tag, args));
         }
 
         private static void ParseMsg(ClientConnection client, FrmChildWindow child, string args)

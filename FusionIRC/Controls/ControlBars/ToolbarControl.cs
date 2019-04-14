@@ -27,6 +27,7 @@ namespace FusionIRC.Controls.ControlBars
         private readonly ToolStripDropDownButton _btnConnectDrop;
         private readonly ToolStripButton _btnConnectToLocation;
         private readonly ToolStripButton _btnChanList;
+        private readonly ToolStripButton _btnAliases;
         private readonly ToolStripButton _btnFavorites;
         private readonly ToolStripButton _btnJoin;
         private readonly ToolStripButton _btnPart;
@@ -84,6 +85,16 @@ namespace FusionIRC.Controls.ControlBars
                                    ToolTipText = @"Channels list"
                                };
             _btnChanList.Click += ToolbarButtonClick;
+            /* Aliases */
+            _btnAliases = new ToolStripButton
+                              {
+                                  Image = Resources.aliases.ToBitmap(),
+                                  ImageScaling = ToolStripItemImageScaling.None,
+                                  Size = new Size(32, 32),
+                                  Tag = "ALIASES",
+                                  ToolTipText = @"Aliases editor"
+                              };
+            _btnAliases.Click += ToolbarButtonClick;
             /* Favorites */
             _btnFavorites = new ToolStripButton
                                 {
@@ -168,7 +179,7 @@ namespace FusionIRC.Controls.ControlBars
             Items.AddRange(new ToolStripItem[]
                                {
                                    _btnConnect, _btnConnectDrop, _btnConnectToLocation, new ToolStripSeparator(), _btnSettings, _btnTheme,
-                                   new ToolStripSeparator(), _btnChanList, _btnFavorites, _btnJoin, _btnPart, 
+                                   _btnAliases, new ToolStripSeparator(), _btnChanList, _btnFavorites, _btnJoin, _btnPart, 
                                    new ToolStripSeparator(), _btnDcc, _btnUsers, new ToolStripSeparator(), _btnAbout
                                });
 
@@ -213,6 +224,11 @@ namespace FusionIRC.Controls.ControlBars
                     {
                         settings.ShowDialog(_owner);
                     }
+                    break;
+
+                case "ALIASES":
+                    var edit = new FrmScript();
+                    edit.Show(_owner);
                     break;
 
                 case "CHANLIST":

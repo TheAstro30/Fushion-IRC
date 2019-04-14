@@ -20,6 +20,7 @@ using ircCore.Settings.Networks;
 using ircCore.Settings.Theming;
 using ircCore.Users;
 using ircCore.Utils;
+using ircScript;
 
 namespace FusionIRC.Forms
 {
@@ -62,6 +63,8 @@ namespace FusionIRC.Forms
             ChannelManager.Load();
             /* DCC File transfers manager */
             DccManager.Load();
+            /* Load aliases */
+            ScriptManager.LoadScript(ScriptType.Alias, Functions.MainDir(@"scripts/aliases.xml", false));
             /* Main form initialization */
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             Text = @"FusionIRC";
