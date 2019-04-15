@@ -58,6 +58,8 @@ namespace ircClient.Classes
         public event Action<ClientConnection, string> OnUserInfo;
 
         public event Action<ClientConnection, string> OnOther; //probably deleting this
+
+        public event Action<ClientConnection, string> OnNetworkNameChanged;
        
         /* Public properties */
         public string JoinChannelsOnConnect { get; set; }
@@ -777,6 +779,13 @@ namespace ircClient.Classes
                         {                            
                             UserModes = prefix[0].Replace("(", "");
                             UserModeCharacters = prefix[1];
+                        }
+                        break;
+
+                    case "NETWORK":                        
+                        if (OnNetworkNameChanged != null)
+                        {
+                            OnNetworkNameChanged(_client, sections[1]);
                         }
                         break;
                 }

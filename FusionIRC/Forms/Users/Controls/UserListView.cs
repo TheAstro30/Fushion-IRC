@@ -200,7 +200,7 @@ namespace FusionIRC.Forms.Users.Controls
                         add.User = user;
                         if (add.ShowDialog(this) == DialogResult.OK)
                         {
-                            UserManager.UserList.Notify.Users.Add(user);
+                            UserManager.UserList.Notify.Users.Add(user);                            
                         }
                     }
                     break;
@@ -216,6 +216,10 @@ namespace FusionIRC.Forms.Users.Controls
                         }
                     }
                     break;
+            }
+            if (string.IsNullOrEmpty(user.Nick))
+            {
+                return;
             }
             _list.AddObject(user);
             _btnClear.Enabled = _list.GetItemCount() > 0;
@@ -235,7 +239,7 @@ namespace FusionIRC.Forms.Users.Controls
                     {
                         edit.Text = @"Edit current user on notify list";
                         edit.User = user;
-                        if (edit.ShowDialog(this) == DialogResult.OK)
+                        if (edit.ShowDialog(this) == DialogResult.OK && !string.IsNullOrEmpty(user.Nick))
                         {
                             _list.RefreshObject(user);
                         }
@@ -247,7 +251,7 @@ namespace FusionIRC.Forms.Users.Controls
                     {
                         edit.Text = @"Edit current user on ignore list";
                         edit.User = user;
-                        if (edit.ShowDialog(this) == DialogResult.OK)
+                        if (edit.ShowDialog(this) == DialogResult.OK && !string.IsNullOrEmpty(user.Nick))
                         {
                             _list.RefreshObject(user);
                         }

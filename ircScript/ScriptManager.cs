@@ -14,7 +14,8 @@ namespace ircScript
 {
     public enum ScriptType
     {
-        Alias = 0   
+        Alias = 0,
+        Popup = 1
     }
 
     [Serializable, XmlRoot("aliases")]
@@ -24,14 +25,22 @@ namespace ircScript
         public List<Alias> AliasData = new List<Alias>();
     }
 
+    [Serializable, XmlRoot("popups")]
+    public class Popups
+    {
+        [XmlElement("popups")]
+        public List<Popup> PopupData = new List<Popup>();
+    }
+
     public static class ScriptManager
     {
         public static Aliases Aliases = new Aliases();
+        public static Popups Popups = new Popups();
 
         public static void AddScript(ScriptType type, string data)
         {
             /* Find first space which will become our "Name" */
-            var i = data.Trim().IndexOf(' ');
+            var i = data.Trim().IndexOf(type == ScriptType.Alias ? ' ' : ':');
             string name;
             string displayName;
             var lineData = string.Empty;
@@ -48,24 +57,22 @@ namespace ircScript
                 displayName = name;
                 name = name.Replace("/", ""); /* Remove '/' */
             }
-            /* Check script doesn't already exist, if it does, we overwrite it */
-            var script = GetScript(type, name);
-            if (script == null)
+            IScript script;
+            switch (type)
             {
-                /* Create script data */
-                switch (type)
-                {
-                    default:
-                        script = new Alias();
-                        CreateUpdateScriptData(script, name, displayName, lineData);
-                        Aliases.AliasData.Add((Alias)script);
-                        break;
-                }
-            }
-            else
-            {
-                /* Update script data */
-                CreateUpdateScriptData(script, name, displayName, lineData);
+                case ScriptType.Popup:
+                    /* Create popup */
+                    script = new Popup();
+                    CreateUpdateScriptData(script, name, displayName, lineData);
+                    Popups.PopupData.Add((Popup) script);
+                    break;
+
+                default:
+                    /* Create alias */
+                    script = new Alias();
+                    CreateUpdateScriptData(script, name, displayName, lineData);
+                    Aliases.AliasData.Add((Alias) script);
+                    break;
             }
         }
 
@@ -75,6 +82,9 @@ namespace ircScript
             {
                 case ScriptType.Alias:
                     return GetScript(Aliases.AliasData, name);
+
+                case ScriptType.Popup:
+                    return GetScript(Popups.PopupData, name);
             }
             return null;
         }
@@ -96,6 +106,13 @@ namespace ircScript
                         Aliases = new Aliases();
                     }
                     break;
+
+                case ScriptType.Popup:
+                    if (!XmlSerialize<Popups>.Load(fileName, ref Popups))
+                    {
+                        Popups = new Popups();
+                    }
+                    break;
             }
         }
 
@@ -106,19 +123,12 @@ namespace ircScript
                 case ScriptType.Alias:
                     XmlSerialize<Aliases>.Save(fileName, Aliases);
                     break;
+
+                case ScriptType.Popup:
+                    XmlSerialize<Popups>.Save(fileName, Popups);
+                    break;
             }
         }
-
-        ///* Parsing */
-        //public static string Parse(IScript script)
-        //{
-        //    return Parse(script, null);
-        //}
-
-        //public static string Parse(IScript script, string[] args)
-        //{
-        //    return script == null ? string.Empty : script.Parse(args);
-        //}
 
         /* Private methods */
         private static void CreateUpdateScriptData(IScript script, string name, string displayName, string lineData)

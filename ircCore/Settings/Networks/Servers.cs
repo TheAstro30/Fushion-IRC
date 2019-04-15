@@ -69,6 +69,11 @@ namespace ircCore.Settings.Networks
         {
             return string.Compare(NetworkName, ((NetworkData) obj).NetworkName, StringComparison.InvariantCultureIgnoreCase);
         }
+
+        public override string ToString()
+        {
+            return NetworkName;
+        }
     }
 
     [Serializable]

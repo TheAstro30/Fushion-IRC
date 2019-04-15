@@ -13,6 +13,7 @@ using FusionIRC.Forms.Child;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
+using ircCore.Autos;
 using ircCore.Dcc;
 using ircCore.Settings;
 using ircCore.Settings.Channels;
@@ -59,6 +60,8 @@ namespace FusionIRC.Forms
             ThemeManager.Load(Functions.MainDir(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path, false));
             /* Load users list */
             UserManager.Load();
+            /* Load automations */
+            AutomationsManager.Load();
             /* Channel manager */
             ChannelManager.Load();
             /* DCC File transfers manager */
@@ -177,6 +180,23 @@ namespace FusionIRC.Forms
             //_test.Interval = 1000;
             //_test.Enabled = true;
             //_test.Tick += TestTick;
+
+            //AutoList.AutoNetworkData ld = new AutoList.AutoNetworkData();
+            //ld.Name = "Test";
+
+            //AutoList.AutoData ad = new AutoList.AutoData();
+            //ad.Item = "hithere";
+            //ad.Value = "this is just a test";
+
+            //ld.Data.Add(ad);
+
+            //ad = new AutoList.AutoData();
+            //ad.Item = "testing";
+            //ad.Value = "again, just testing stuff";
+
+            //ld.Data.Add(ad);
+
+            //AutomationsManager.Automations.Identify.Network.Add(ld);
         }
 
         //private void TestTick(object sender, EventArgs e)
@@ -288,6 +308,8 @@ namespace FusionIRC.Forms
             ThemeManager.Save(Functions.MainDir(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path, false));            
             /* Save users list */
             UserManager.Save();
+            /* Save automations */
+            AutomationsManager.Save();
             /* Channel manager */
             ChannelManager.Save();
             /* DCC File transfers manager */

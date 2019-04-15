@@ -6,6 +6,7 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using FusionIRC.Forms.Autos;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Forms.Settings;
 using FusionIRC.Forms.Users;
@@ -35,6 +36,7 @@ namespace FusionIRC.Controls.ControlBars
         private readonly ToolStripButton _btnTheme;
         private readonly ToolStripButton _btnDcc;
         private readonly ToolStripButton _btnUsers;
+        private readonly ToolStripButton _btnAutos;
         private readonly ToolStripButton _btnAbout;
 
         private readonly Timer _tmrCheck;
@@ -155,6 +157,16 @@ namespace FusionIRC.Controls.ControlBars
                               ToolTipText = @"DCC transfer manager"
                           };
             _btnDcc.Click += ToolbarButtonClick;
+            /* Automations button */
+            _btnAutos = new ToolStripButton
+                            {
+                                Image = Resources.autos.ToBitmap(),
+                                ImageScaling = ToolStripItemImageScaling.None,
+                                Size = new Size(32, 32),
+                                Tag = "AUTOS",
+                                ToolTipText = @"Automations"
+                            };
+            _btnAutos.Click += ToolbarButtonClick;
             /* Users button */
             _btnUsers = new ToolStripButton
                             {
@@ -180,7 +192,7 @@ namespace FusionIRC.Controls.ControlBars
                                {
                                    _btnConnect, _btnConnectDrop, _btnConnectToLocation, new ToolStripSeparator(), _btnSettings, _btnTheme,
                                    _btnAliases, new ToolStripSeparator(), _btnChanList, _btnFavorites, _btnJoin, _btnPart, 
-                                   new ToolStripSeparator(), _btnDcc, _btnUsers, new ToolStripSeparator(), _btnAbout
+                                   new ToolStripSeparator(), _btnDcc, _btnUsers, _btnAutos, new ToolStripSeparator(), _btnAbout
                                });
 
             _tmrCheck = new Timer
@@ -278,6 +290,13 @@ namespace FusionIRC.Controls.ControlBars
                     using (var users = new FrmUsers())
                     {
                         users.ShowDialog(_owner);
+                    }
+                    break;
+
+                case "AUTOS":
+                    using (var autos = new FrmAutos())
+                    {
+                        autos.ShowDialog(_owner);
                     }
                     break;
 

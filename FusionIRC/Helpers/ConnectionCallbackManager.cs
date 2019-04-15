@@ -29,6 +29,12 @@ namespace FusionIRC.Helpers
         }
 
         /* Connection events */
+        public static void OnNetworkNameChanged(ClientConnection client, string network)
+        {
+            client.Network = network;
+            System.Diagnostics.Debug.Print("Network changed to " + network);
+        }
+
         public static void OnClientBeginConnect(ClientConnection client)
         {
             var c = WindowManager.GetConsoleWindow(client);

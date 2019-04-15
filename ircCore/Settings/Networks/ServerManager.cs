@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ircCore.Utils;
 using ircCore.Utils.Serialization;
@@ -26,6 +27,12 @@ namespace ircCore.Settings.Networks
         public static void Save()
         {
             XmlSerialize<Servers>.Save(Functions.MainDir(@"\data\servers.xml", false), Servers);
+        }
+
+        public static object[] GetAllNetworks()
+        {
+            /* Get all network names */
+            return Servers.Networks.Network.ToArray();
         }
 
         public static NetworkData GetNetworkByName(string name)

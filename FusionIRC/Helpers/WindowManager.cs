@@ -200,6 +200,7 @@ namespace FusionIRC.Helpers
         {
             /* Add the callback handlers to ConnectionCallbackManager */
             client.Parser.OnOther += ConnectionCallbackManager.OnOther;
+            client.Parser.OnNetworkNameChanged += ConnectionCallbackManager.OnNetworkNameChanged;
             client.OnClientBeginConnect += ConnectionCallbackManager.OnClientBeginConnect;
             client.OnClientCancelConnection += ConnectionCallbackManager.OnClientCancelConnection;
             client.OnClientConnected += ConnectionCallbackManager.OnClientConnected;
@@ -250,6 +251,7 @@ namespace FusionIRC.Helpers
         {
             /* Add the callback handlers to ConnectionCallbackManager */
             client.Parser.OnOther -= ConnectionCallbackManager.OnOther;
+            client.Parser.OnNetworkNameChanged -= ConnectionCallbackManager.OnNetworkNameChanged;
             client.OnClientBeginConnect -= ConnectionCallbackManager.OnClientBeginConnect;
             client.OnClientCancelConnection -= ConnectionCallbackManager.OnClientCancelConnection;
             client.OnClientConnected -= ConnectionCallbackManager.OnClientConnected;

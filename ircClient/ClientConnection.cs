@@ -47,6 +47,7 @@ namespace ircClient
         public string SocketRemoteIp { get { return _sock.RemoteHostIp; } }
 
         public Server Server = new Server();
+        public string Network { get; set; }
 
         public event Action<ClientConnection> OnClientBeginConnect;
         public event Action<ClientConnection> OnClientConnected;
@@ -116,6 +117,9 @@ namespace ircClient
 
         public void Connect(string address, int port, bool ssl)
         {
+            /* Attempt to get Network the server belongs to from network list */
+            Network = ServerManager.GetNetworkNameByServerAddress(address);
+            /* Update current server details */
             Server.Address = address;
             Server.Port = port;
             Server.IsSsl = ssl;
