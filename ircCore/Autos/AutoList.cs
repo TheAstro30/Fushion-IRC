@@ -5,8 +5,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace ircCore.Autos
@@ -29,7 +27,15 @@ namespace ircCore.Autos
 
             [XmlElement("data")]
             public List<AutoData> Data = new List<AutoData>();
+
+            public override string ToString()
+            {
+                return Name;
+            }
         }
+
+        [XmlAttribute("enable")]
+        public bool Enable { get; set; }
 
         [XmlElement("network")]
         public List<AutoNetworkData> Network = new List<AutoNetworkData>();

@@ -3,7 +3,9 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
-namespace ircScript.Structures
+using ircScript.Structures;
+
+namespace ircScript.Interface
 {
     public interface IScript
     {
@@ -13,6 +15,6 @@ namespace ircScript.Structures
 
         string LineData { get; set; }
 
-        string Parse(string[] args);
+        string Parse(ScriptArgs e, string[] args);
     }
 }

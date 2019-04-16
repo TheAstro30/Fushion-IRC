@@ -7,6 +7,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using FusionIRC.Forms.Autos;
+using FusionIRC.Forms.Favorites;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Forms.Settings;
 using FusionIRC.Forms.Users;
@@ -247,7 +248,7 @@ namespace FusionIRC.Controls.ControlBars
                     break;
 
                 case "FAVORITES":
-                    using (var fav = new FrmFavorites())
+                    using (var fav = new FrmFavorites(console.Client))
                     {
                         fav.ShowDialog(_owner);
                     }

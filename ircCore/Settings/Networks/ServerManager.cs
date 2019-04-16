@@ -4,7 +4,6 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using ircCore.Utils;
 using ircCore.Utils.Serialization;

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
 using ircCore.Utils.Serialization;
+using ircScript.Interface;
 using ircScript.Structures;
 
 namespace ircScript

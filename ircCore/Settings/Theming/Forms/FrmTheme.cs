@@ -39,7 +39,7 @@ namespace ircCore.Settings.Theming.Forms
             ShowInTaskbar = false;
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterParent;
-            Text = "FusionIRC Theme Manager";
+            Text = @"FusionIRC Theme Manager";
 
             _themePreview = new ThemePreview(_theme)
                                 {
@@ -67,7 +67,7 @@ namespace ircCore.Settings.Theming.Forms
                                 Padding = new Padding(3),
                                 Size = new Size(577, 414),
                                 TabIndex = 0,
-                                Text = "Current Theme",
+                                Text = @"Current Theme",
                                 UseVisualStyleBackColor = true
                             };
 
@@ -79,7 +79,7 @@ namespace ircCore.Settings.Theming.Forms
                                  Padding = new Padding(3),
                                  Size = new Size(577, 416),
                                  TabIndex = 1,
-                                 Text = "Theme Colors",
+                                 Text = @"Theme Colors",
                                  UseVisualStyleBackColor = true
                              };
 
@@ -90,7 +90,7 @@ namespace ircCore.Settings.Theming.Forms
                                 Location = new Point(4, 22),
                                 Size = new Size(577, 416),
                                 TabIndex = 2,
-                                Text = "Theme Fonts",
+                                Text = @"Theme Fonts",
                                 UseVisualStyleBackColor = true
                             };
 
@@ -99,7 +99,7 @@ namespace ircCore.Settings.Theming.Forms
                                    Location = new Point(4, 22),
                                    Size = new Size(577, 416),
                                    TabIndex = 3,
-                                   Text = "Theme Messages",
+                                   Text = @"Theme Messages",
                                    UseVisualStyleBackColor = true
                                };
 
@@ -108,7 +108,7 @@ namespace ircCore.Settings.Theming.Forms
                                       Location = new Point(4, 22),
                                       Size = new Size(577, 416),
                                       TabIndex = 4,
-                                      Text = "Backgrounds",
+                                      Text = @"Backgrounds",
                                       UseVisualStyleBackColor = true
                                   };
 
@@ -121,7 +121,7 @@ namespace ircCore.Settings.Theming.Forms
                                 Size = new Size(75, 23),
                                 TabIndex = 5,
                                 Tag = "APPLY",
-                                Text = "Apply",
+                                Text = @"Apply",
                                 UseVisualStyleBackColor = true
                             };
 
@@ -132,7 +132,7 @@ namespace ircCore.Settings.Theming.Forms
                                 Size = new Size(75, 23),
                                 TabIndex = 6,
                                 Tag = "CLOSE",
-                                Text = "Close",
+                                Text = @"Close",
                                 UseVisualStyleBackColor = true
                             };
 

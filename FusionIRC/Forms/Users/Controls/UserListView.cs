@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using FusionIRC.Forms.Users.Editing;
 using ircCore.Users;
+using ircCore.Utils;
 using libolv;
 
 namespace FusionIRC.Forms.Users.Controls
@@ -194,7 +195,7 @@ namespace FusionIRC.Forms.Users.Controls
             switch (_userListType)
             {
                 case UserListType.Notify:
-                    using (var add = new FrmAddNotify(UserEditType.Add))
+                    using (var add = new FrmAddNotify(DialogEditType.Add))
                     {
                         add.Text = @"Add new nick to notify list";
                         add.User = user;
@@ -206,7 +207,7 @@ namespace FusionIRC.Forms.Users.Controls
                     break;
 
                 case UserListType.Ignore:
-                    using (var add = new FrmAddIgnore(UserEditType.Add))
+                    using (var add = new FrmAddIgnore(DialogEditType.Add))
                     {
                         add.Text = @"Add new nick/address to ignore list";
                         add.User = user;
@@ -235,7 +236,7 @@ namespace FusionIRC.Forms.Users.Controls
             switch (_userListType)
             {
                 case UserListType.Notify:
-                    using (var edit = new FrmAddNotify(UserEditType.Edit))
+                    using (var edit = new FrmAddNotify(DialogEditType.Edit))
                     {
                         edit.Text = @"Edit current user on notify list";
                         edit.User = user;
@@ -247,7 +248,7 @@ namespace FusionIRC.Forms.Users.Controls
                     break;
 
                 case UserListType.Ignore:
-                    using (var edit = new FrmAddIgnore(UserEditType.Edit))
+                    using (var edit = new FrmAddIgnore(DialogEditType.Edit))
                     {
                         edit.Text = @"Edit current user on ignore list";
                         edit.User = user;

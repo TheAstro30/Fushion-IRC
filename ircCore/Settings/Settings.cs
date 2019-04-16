@@ -78,6 +78,8 @@ namespace ircCore.Settings
             Client.Appearance.ControlBars.Control.Add(d);
             Client.Confirmation.ClientClose = CloseConfirmation.Connected;
             Client.Confirmation.Url = true;
+            /* Channel seetings */
+            Client.Channels.ShowFavoritesDialogOnConnect = true;
             /* Create a blank theme */
             Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = @"\themes\default.thm"});            
         }

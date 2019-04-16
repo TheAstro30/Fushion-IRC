@@ -17,6 +17,9 @@ namespace ircCore.Settings
         [XmlAttribute("joinOpenChannelsOnConnect")]
         public bool JoinOpenChannelsOnConnect { get; set; }
 
+        [XmlAttribute("showFavoritesDialogOnConnect")]
+        public bool ShowFavoritesDialogOnConnect { get; set; }
+
         [XmlAttribute("rejoinChannelsOnKick")]
         public bool ReJoinChannelsOnKick { get; set; }
 

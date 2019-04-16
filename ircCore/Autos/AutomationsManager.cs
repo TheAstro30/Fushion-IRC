@@ -4,12 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using ircCore.Settings.Networks;
-using ircCore.Users;
 using ircCore.Utils;
 using ircCore.Utils.Serialization;
 
@@ -18,6 +13,12 @@ namespace ircCore.Autos
     public static class AutomationsManager
     {
         /* Mangaement class for automations such as auto join, identify, etc. */
+        public enum AutomationType
+        {
+            Join = 0,
+            Identify = 1
+        }
+
         public static Automations Automations = new Automations();
 
         public static void Load()
@@ -31,6 +32,36 @@ namespace ircCore.Autos
         public static void Save()
         {            
             XmlSerialize<Automations>.Save(Functions.MainDir(@"\data\autos.xml", false), Automations);
+        }
+
+        public static object[] GetAllNetworks(AutomationType type)
+        {
+            switch (type)
+            {
+                case AutomationType.Join:
+                    return Automations.Join.Network.ToArray();
+                    
+                default:
+                    return Automations.Identify.Network.ToArray();
+            }            
+        }
+
+        public static AutoList.AutoNetworkData GetAutomationByNetwork(AutomationType type, string network)
+        {            
+            switch (type)
+            {
+                case AutomationType.Join:
+                    return Automations.Join.Network.FirstOrDefault(n => n.Name.Equals(network, StringComparison.InvariantCultureIgnoreCase));
+
+                case AutomationType.Identify:
+                    return Automations.Identify.Network.FirstOrDefault(n => n.Name.Equals(network, StringComparison.InvariantCultureIgnoreCase));
+            }
+            return null;
+        }
+
+        public static AutoList.AutoData GetAutomationValueByItem(AutoList.AutoNetworkData network, string item)
+        {
+            return network.Data.FirstOrDefault(d => d.Item.Equals(item, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

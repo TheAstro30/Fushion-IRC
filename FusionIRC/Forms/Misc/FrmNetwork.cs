@@ -13,6 +13,7 @@ namespace FusionIRC.Forms.Misc
 {
     public sealed class FrmNetwork : FormEx
     {
+        /* Simple form for display all currently stored networks */
         private readonly Label _lblInfo;
         private readonly ListBox _lstNetwork;
         private readonly Button _btnOk;
@@ -21,8 +22,18 @@ namespace FusionIRC.Forms.Misc
         public string Network { get; private set; }
 
         public FrmNetwork()
-        {
-            /* Simple form for display all currently stored networks */
+        {           
+            /* Form code */
+            ClientSize = new Size(215, 234);
+            Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            ShowIcon = false;
+            ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterParent;
+            Text = @"Networks";
+
             _lblInfo = new Label
                            {
                                AutoSize = true,
@@ -65,17 +76,7 @@ namespace FusionIRC.Forms.Misc
 
             Controls.AddRange(new Control[] {_lblInfo, _lstNetwork, _btnOk, _btnCancel});
 
-            AcceptButton = _btnOk;
-            ClientSize = new Size(215, 234);
-            
-            Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
-            FormBorderStyle = FormBorderStyle.FixedToolWindow;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            ShowIcon = false;
-            ShowInTaskbar = false;
-            StartPosition = FormStartPosition.CenterParent;
-            Text = @"Networks";
+            AcceptButton = _btnOk;          
 
             /* Output all installed IRC servers to listbox */
             _lstNetwork.Items.AddRange(ServerManager.GetAllNetworks());

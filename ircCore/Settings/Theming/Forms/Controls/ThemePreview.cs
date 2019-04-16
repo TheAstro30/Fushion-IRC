@@ -31,7 +31,7 @@ namespace ircCore.Settings.Theming.Forms.Controls
 
             _lblTheme = new Label
                             {
-                                AutoSize = true, Location = new Point(8, 8), Size = new Size(47, 15), Text = "Theme:"
+                                AutoSize = true, Location = new Point(8, 8), Size = new Size(47, 15), Text = @"Theme:"
                             };
 
             _cmbThemes = new ComboBox
@@ -48,7 +48,7 @@ namespace ircCore.Settings.Theming.Forms.Controls
                               Location = new Point(283, 26),
                               Size = new Size(75, 23),
                               TabIndex = 1,
-                              Text = "New...",
+                              Text = @"New...",
                               Tag = "NEW",
                               UseVisualStyleBackColor = true
                           };
@@ -58,7 +58,7 @@ namespace ircCore.Settings.Theming.Forms.Controls
                                  Location = new Point(364, 26),
                                  Size = new Size(75, 23),
                                  TabIndex = 1,
-                                 Text = "Delete",
+                                 Text = @"Delete",
                                  Tag = "DELETE",
                                  UseVisualStyleBackColor = true,
                                  Enabled = false
@@ -69,7 +69,7 @@ namespace ircCore.Settings.Theming.Forms.Controls
                                   AutoSize = true,
                                   Location = new Point(8, 64),
                                   Size = new Size(51, 15),
-                                  Text = "Preview:"
+                                  Text = @"Preview:"
                               };
 
             _preview = new OutputWindow

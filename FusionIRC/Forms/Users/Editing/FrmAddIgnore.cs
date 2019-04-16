@@ -30,7 +30,7 @@ namespace FusionIRC.Forms.Users.Editing
             }
         }
 
-        public FrmAddIgnore(UserEditType userEditType)
+        public FrmAddIgnore(DialogEditType dialogEditType)
         {
             ClientSize = new Size(377, 99);
             Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -61,7 +61,7 @@ namespace FusionIRC.Forms.Users.Editing
                               Location = new Point(209, 64),
                               Size = new Size(75, 23),
                               TabIndex = 1,
-                              Text = userEditType == UserEditType.Add ? @"Add" : @"Edit",
+                              Text = dialogEditType == DialogEditType.Add ? @"Add" : @"Edit",
                               UseVisualStyleBackColor = true
                           };
 

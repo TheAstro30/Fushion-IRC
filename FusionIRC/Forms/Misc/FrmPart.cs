@@ -3,8 +3,6 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
-
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;

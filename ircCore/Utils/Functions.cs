@@ -12,6 +12,18 @@ using System.Linq;
 
 namespace ircCore.Utils
 {
+    public enum DialogEditType
+    {
+        Add = 0,
+        Edit = 1
+    }
+
+    public enum UserListType
+    {
+        Notify = 0,
+        Ignore = 1
+    }
+
     public static class Functions
     {
         private static string _mainFolder;
@@ -52,7 +64,7 @@ namespace ircCore.Utils
 
         public static string CleanFileName(string fileName)
         {
-            return Path.GetInvalidFileNameChars().Aggregate(fileName, (current, c) => current.Replace(c.ToString(), string.Empty));
+            return Path.GetInvalidFileNameChars().Aggregate(fileName, (current, c) => current.Replace(c.ToString(), String.Empty));
         }
 
         public static string GetFirstWord(string input)
@@ -105,7 +117,7 @@ namespace ircCore.Utils
         public static string MainDir(string path, bool forceAppDir)
         {
             var sFolder = !forceAppDir ? _mainFolder : AppDomain.CurrentDomain.BaseDirectory;
-            if (!string.IsNullOrEmpty(path))
+            if (!String.IsNullOrEmpty(path))
             {
                 if (path.ToLower().Contains(sFolder.ToLower()))
                 {
@@ -115,9 +127,10 @@ namespace ircCore.Utils
                 return path.Substring(0, 1) == @"\" ? (sFolder + path).Replace(@"\\", @"\") : path.Replace(@"\\", @"\");
             }
             /* Failed */
-            return string.Empty;
+            return String.Empty;
         }
 
+        /* Private methods */
         private static void CopyDirectory(string srcFolder, string destFolder)
         {
             if (!Directory.Exists(srcFolder)) { return; }

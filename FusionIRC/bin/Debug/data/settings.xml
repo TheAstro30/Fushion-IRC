@@ -25,8 +25,8 @@
       </controlBars>
     </appearance>
     <confirmation clientClose="Connected" consoleClose="None" url="true" />
-    <tabs settings="CONNECTIONSERVERS" userList="0" />
-    <channels keepChannelsOpen="false" joinOpenChannelsOnConnect="false" rejoinChannelsOnKick="false" joinChannelsOnInvite="false" />
+    <tabs settings="CONNECTIONSERVERS" userList="0" autoList="0" />
+    <channels keepChannelsOpen="false" joinOpenChannelsOnConnect="false" showFavoritesDialogOnConnect="true" rejoinChannelsOnKick="false" joinChannelsOnInvite="false" />
   </client>
   <themes currentTheme="0">
     <theme name="Default" path="\themes\default.thm" />

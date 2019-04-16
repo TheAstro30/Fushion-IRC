@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System.Text.RegularExpressions;
+using ircScript.Structures;
 
 namespace ircScript.Classes
 {
@@ -13,9 +14,14 @@ namespace ircScript.Classes
         private readonly Regex _paramStrip = new Regex(@"\$\d+", RegexOptions.Compiled);
 
         /* Inherited on all subsequent "script" classes - this will grow over time and be improved upon */
-        public string Parse(string lineData, string[] args)
+        public string Parse(ScriptArgs e, string lineData, string[] args)
         {
-            /* Main script "parser" - mainly for parsing arguments */ 
+            /* Main script "parser" - mainly for parsing arguments - first check ScriptArgs */
+            if (e != null)
+            {
+                /* Probably ugly code... */
+                lineData = lineData.Replace("$chan", e.Channel).Replace("$nick", e.Nick);
+            }
             if (args == null || args.Length == 0)
             {
                 /* Strip out $1, $2 - etc */

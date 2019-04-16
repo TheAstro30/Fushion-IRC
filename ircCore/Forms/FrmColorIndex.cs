@@ -35,7 +35,7 @@ namespace ircCore.Forms
             ShowIcon = false;
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.Manual;
-            Text = "Color Palette";
+            Text = @"Color Palette";
 
             for (var i = 0; i <= 15; i++)
             {

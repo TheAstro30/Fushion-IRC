@@ -23,7 +23,7 @@ namespace FusionIRC.Helpers
 
         /* Constructor */
         static CommandProcessor()
-        {            
+        {
             /* Wait at least N number of seconds for socket to disconenct when issuing a new /server connection on a connected socket */
             TmrWaitToReconnectTimeOut = new Timer
                                              {
@@ -50,7 +50,7 @@ namespace FusionIRC.Helpers
 
         /* Main parsing entry point */
         public static void Parse(ClientConnection client, FrmChildWindow child, string data)
-        {            
+        {
             var i = data.IndexOf(' ');
             string com;
             var args = string.Empty;
@@ -62,30 +62,19 @@ namespace FusionIRC.Helpers
             else
             {
                 com = data.ToUpper().Replace("/", "");
-            }            
+            }
             ParseCommand(client, child, com, args);
         }
 
         /* Private parsing methods */
         private static void ParseCommand(ClientConnection client, FrmChildWindow child, string command, string args)
-        {            
-            /* First check it's not an alias, if it is - pass it back to command processor */
-            var alias = ScriptManager.GetScript(ScriptType.Alias, command);
-            if (alias != null)
+        {
+            /* First check it's not an alias */
+            if (ParseAlias(child, ref command, ref args))
             {
-                var data = alias.Parse(args.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries));
-                if (!string.IsNullOrEmpty(data))
-                {
-                    var i = data.IndexOf(' ');
-                    if (i == -1)
-                    {
-                        return;
-                    }
-                    command = data.Substring(0, i).Trim().ToUpper().Replace("/", "");
-                    args = data.Substring(i + 1).Trim();
-                    ParseCommand(client, child, command, args);
-                    return;
-                }
+                /* Alias was parsed, re-call this function */
+                ParseCommand(client, child, command, args);
+                return;
             }
             switch (command)
             {
@@ -181,6 +170,39 @@ namespace FusionIRC.Helpers
             }
         }
 
+        /* Parse alias as command line */
+        private static bool ParseAlias(FrmChildWindow child, ref string command, ref string args)
+        {
+            /* First check it's not an alias, if it is - pass it back to command processor */
+            var alias = ScriptManager.GetScript(ScriptType.Alias, command);
+            if (alias == null)
+            {
+                return false;
+            }
+            var sp = new ScriptArgs
+                         {
+                             Channel = child.Tag.ToString()[0] == '#' ? child.Tag.ToString() : string.Empty,
+                             Nick =
+                                 child.WindowType == ChildWindowType.Private ||
+                                 child.WindowType == ChildWindowType.DccChat
+                                     ? child.Tag.ToString()
+                                     : string.Empty
+                         };
+            var data = alias.Parse(sp, args.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+            if (!string.IsNullOrEmpty(data))
+            {
+                var i = data.IndexOf(' ');
+                if (i == -1)
+                {
+                    return false;
+                }
+                command = data.Substring(0, i).Trim().ToUpper().Replace("/", "");
+                args = data.Substring(i + 1).Trim();
+                return true;
+            }
+            return false;
+        }
+
         /* Connection events */
         private static void ParseServerConnection(ClientConnection client, string args)
         {
@@ -262,19 +284,19 @@ namespace FusionIRC.Helpers
         }
 
         private static void ParseServerDisconnection(ClientConnection client)
-        {            
+        {
             var c = WindowManager.GetConsoleWindow(client);
             if (c == null)
-            {         
+            {
                 return;
             }
             client.IsManualDisconnect = true;
             if (client.IsConnecting)
             {
-                /* Cancel current connection */                
+                /* Cancel current connection */
                 client.CancelConnection();
                 return;
-            }            
+            }
             client.Disconnect();
         }
 
@@ -344,7 +366,7 @@ namespace FusionIRC.Helpers
             var c = WindowManager.GetWindow(client, target);
             if (c == null)
             {
-                /* Echo the message to the active window */                
+                /* Echo the message to the active window */
                 if (child != null)
                 {
                     tmd = new IncomingMessageData
@@ -358,7 +380,7 @@ namespace FusionIRC.Helpers
                     child.Output.AddLine(pmd.DefaultColor, pmd.Message);
                     /* Update treenode color */
                     WindowManager.SetWindowEvent(child, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
-                    child.Client.Send(string.Format("PRIVMSG {0} :{1}", target, args));                    
+                    child.Client.Send(string.Format("PRIVMSG {0} :{1}", target, args));
                 }
                 return;
             }
@@ -462,8 +484,8 @@ namespace FusionIRC.Helpers
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
             client.Send(ct == "PING"
-                            ? string.Format("PRIVMSG {0} :{1}{2} {3}{4}", ctcp[0], (char) 1, ct, TimeFunctions.CTime(), (char) 1)
-                            : string.Format("PRIVMSG {0} :{1}{2}{3}", ctcp[0], (char) 1, ct, (char) 1));
+                            ? string.Format("PRIVMSG {0} :{1}{2} {3}{4}", ctcp[0], (char)1, ct, TimeFunctions.CTime(), (char)1)
+                            : string.Format("PRIVMSG {0} :{1}{2}{3}", ctcp[0], (char)1, ct, (char)1));
         }
 
         private static void ParseDns(ClientConnection client, string args)
@@ -532,7 +554,7 @@ namespace FusionIRC.Helpers
             }
             if (client.IsConnecting && !client.IsConnected)
             {
-                /* Client is in the middle of connecting - but not fully connected, update credentials */               
+                /* Client is in the middle of connecting - but not fully connected, update credentials */
                 client.UserInfo.Nick = nick;
             }
             client.Send(string.Format("NICK {0}", nick));
@@ -575,7 +597,7 @@ namespace FusionIRC.Helpers
             if (string.IsNullOrEmpty(args))
             {
                 if (child.WindowType != ChildWindowType.Channel)
-                {         
+                {
                     /* Cannot part a console, query or DCC chat! */
                     return;
                 }
@@ -586,7 +608,7 @@ namespace FusionIRC.Helpers
             {
                 var c = args.Split(' ');
                 channel = c[0];
-            }            
+            }
             client.Send(string.Format("PART {0}", channel));
         }
 

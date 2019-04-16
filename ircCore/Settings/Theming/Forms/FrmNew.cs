@@ -24,7 +24,7 @@ namespace ircCore.Settings.Theming.Forms
             ShowIcon = false;
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
-            Text = "Create new theme";
+            Text = @"Create new theme";
 
             _lblHeader = new Label
                              {
@@ -43,7 +43,7 @@ namespace ircCore.Settings.Theming.Forms
                              Location = new Point(210, 93),
                              Size = new Size(75, 23),
                              TabIndex = 1,
-                             Text = "Create",
+                             Text = @"Create",
                              UseVisualStyleBackColor = true
                          };
 
@@ -53,7 +53,7 @@ namespace ircCore.Settings.Theming.Forms
                                       Location = new Point(291, 93),
                                       Size = new Size(75, 23),
                                       TabIndex = 2,
-                                      Text = "Cancel",
+                                      Text = @"Cancel",
                                       UseVisualStyleBackColor = true
                                   };
 

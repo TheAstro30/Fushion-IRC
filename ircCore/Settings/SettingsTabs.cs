@@ -16,5 +16,8 @@ namespace ircCore.Settings
 
         [XmlAttribute("userList")]
         public int UserList { get; set; }
+
+        [XmlAttribute("autoList")]
+        public int AutoList { get; set; }
     }
 }

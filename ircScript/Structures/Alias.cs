@@ -6,6 +6,7 @@
 using System;
 using System.Xml.Serialization;
 using ircScript.Classes;
+using ircScript.Interface;
 
 namespace ircScript.Structures
 {
@@ -22,9 +23,9 @@ namespace ircScript.Structures
         [XmlAttribute("data")]
         public string LineData { get; set; }
 
-        public string Parse(string[] args)
+        public string Parse(ScriptArgs e, string[] args)
         {
-            return Parse(LineData, args);
+            return Parse(e, LineData, args);
         }
 
         public override string ToString()

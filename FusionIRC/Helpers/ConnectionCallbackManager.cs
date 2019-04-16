@@ -7,9 +7,11 @@ using System;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
+using FusionIRC.Forms.Favorites;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Forms.Warning;
 using ircClient;
+using ircCore.Autos;
 using ircCore.Settings;
 using ircCore.Settings.Networks;
 using ircCore.Settings.Theming;
@@ -1106,7 +1108,30 @@ namespace FusionIRC.Helpers
                     client.Send(string.Format("JOIN {0}", chan.Tag));
                 }
             }
-            /* Process auto-join ... */
+            /* Process auto-join ... */      
+            if (!AutomationsManager.Automations.Join.Enable)
+            {
+                return;
+            }
+            var join = AutomationsManager.GetAutomationByNetwork(AutomationsManager.AutomationType.Join, client.Network);
+            if (join != null)
+            {
+                foreach (var j in join.Data)
+                {
+                    client.Send(string.IsNullOrEmpty(j.Value)
+                                    ? string.Format("JOIN {0}", j.Item)
+                                    : string.Format("JOIN {0} {1}", j.Item, j.Value));
+                }
+            }
+            /* Show favorites dialog */
+            if (!SettingsManager.Settings.Client.Channels.ShowFavoritesDialogOnConnect)
+            {
+                return;
+            }
+            using (var fave = new FrmFavorites(client))
+            {                
+                fave.ShowDialog(MainForm);
+            }
         }
     }
 }

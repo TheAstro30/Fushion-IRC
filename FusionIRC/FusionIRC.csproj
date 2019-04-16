@@ -67,6 +67,15 @@
     <Compile Include="Controls\SwitchView\WindowTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Forms\Autos\Controls\AutomationsListView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Autos\Editing\FrmAutoEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Favorites\Editing\FrmChannelEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\Misc\FrmAbout.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -82,9 +91,6 @@
     <Compile Include="Forms\Autos\FrmAutos.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\Autos\FrmAutos.Designer.cs">
-      <DependentUpon>FrmAutos.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\Misc\FrmConnectTo.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -94,11 +100,8 @@
     <Compile Include="Forms\Misc\FrmDccManager.Designer.cs">
       <DependentUpon>FrmDccManager.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Misc\FrmFavorites.cs">
+    <Compile Include="Forms\Favorites\FrmFavorites.cs">
       <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Misc\FrmFavorites.Designer.cs">
-      <DependentUpon>FrmFavorites.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Misc\FrmJoin.cs">
       <SubType>Form</SubType>
@@ -141,7 +144,6 @@
     <Compile Include="Forms\Users\Controls\UserListView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Forms\Users\Editing\Enums.cs" />
     <Compile Include="Forms\Users\Editing\FrmAddIgnore.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -172,14 +174,8 @@
     <Compile Include="Helpers\WindowManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Forms\Autos\FrmAutos.resx">
-      <DependentUpon>FrmAutos.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Misc\FrmDccManager.resx">
       <DependentUpon>FrmDccManager.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Misc\FrmFavorites.resx">
-      <DependentUpon>FrmFavorites.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Misc\FrmScript.resx">
       <DependentUpon>FrmScript.cs</DependentUpon>
@@ -259,12 +255,10 @@
     <None Include="Icons\Dcc\dccUp.ico" />
     <None Include="Icons\Toolbar\aliases.ico" />
     <None Include="Icons\Toolbar\autos.ico" />
+    <None Include="Icons\Dialog\identify.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Forms\Autos\Controls\" />
-    <Folder Include="Forms\Autos\Editing\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
