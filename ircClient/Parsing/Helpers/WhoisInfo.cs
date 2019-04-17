@@ -5,7 +5,7 @@
  */
 using System.Collections.Generic;
 
-namespace ircClient.Classes
+namespace ircClient.Parsing.Helpers
 {
     public class WhoisInfo
     {

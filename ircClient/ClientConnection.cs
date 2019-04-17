@@ -9,7 +9,8 @@ using System.ComponentModel;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Windows.Forms;
-using ircClient.Classes;
+using ircClient.Parsing;
+using ircClient.Parsing.Helpers;
 using ircClient.Tcp;
 using ircCore.Settings;
 using ircCore.Settings.Networks;
@@ -47,7 +48,7 @@ namespace ircClient
         public string SocketRemoteIp { get { return _sock.RemoteHostIp; } }
 
         public Server Server = new Server();
-        public string Network { get; set; }
+        public string Network { get; set; }        
 
         public event Action<ClientConnection> OnClientBeginConnect;
         public event Action<ClientConnection> OnClientConnected;
@@ -123,11 +124,16 @@ namespace ircClient
             Server.Address = address;
             Server.Port = port;
             Server.IsSsl = ssl;
+            /* Clear other parser variables */
+            Parser.UserModeCharacters = string.Empty;
+            Parser.UserModes = string.Empty;
+            Parser.ChannelPrefixTypes = new ChannelTypes();
+            /* Begin connection */
             IsConnecting = true;
             _sock.IsSsl = ssl;
             _sock.Connect(address, port);
             /* Turn on identd */
-            _identd.BeginIdentDaemon();            
+            _identd.BeginIdentDaemon();          
             if (OnClientBeginConnect != null)
             {
                 OnClientBeginConnect(this);
@@ -183,7 +189,7 @@ namespace ircClient
         public void ResolveDns(string dns)
         {
             _dns.Resolve(dns);
-        }
+        }        
 
         /* Socket callbacks */
         private void OnConnected(ClientSock sock)

@@ -81,6 +81,7 @@ namespace FusionIRC.Forms.Misc
             /* Output all installed IRC servers to listbox */
             _lstNetwork.Items.AddRange(ServerManager.GetAllNetworks());
             _lstNetwork.SelectedIndexChanged += OnSelectedIndexChanged;
+            _lstNetwork.DoubleClick += OnItemDoubleClicked;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -94,7 +95,22 @@ namespace FusionIRC.Forms.Misc
 
         private void OnSelectedIndexChanged(object sender, EventArgs e)
         {
-            Network = _lstNetwork.SelectedItem.ToString();            
+            var item = _lstNetwork.SelectedItem;
+            if (item == null)
+            {
+                return;
+            }
+            Network = item.ToString();            
+        }
+
+        private void OnItemDoubleClicked(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(Network))
+            {
+                return;
+            }
+            DialogResult = DialogResult.OK;
+            Close();
         }
     }
 }

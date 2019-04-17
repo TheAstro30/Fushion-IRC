@@ -45,13 +45,15 @@ namespace FusionIRC.Forms.Autos
                             };
 
             /* Auto join tab */
-            _tabJoin = new TabPage();            
-            _tabJoin.Location = new Point(4, 22);
-            _tabJoin.Padding = new Padding(3);
-            _tabJoin.Size = new Size(389, 342);
-            _tabJoin.TabIndex = 0;
-            _tabJoin.Text = @"Join";
-            _tabJoin.UseVisualStyleBackColor = true;
+            _tabJoin = new TabPage
+                           {
+                               Location = new Point(4, 22),
+                               Padding = new Padding(3),
+                               Size = new Size(389, 342),
+                               TabIndex = 0,
+                               Text = @"Join",
+                               UseVisualStyleBackColor = true
+                           };
 
             _autoJoin = new AutomationsListView(AutomationsManager.AutomationType.Join)
                             {

@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace ircCore.Utils
 {
@@ -27,6 +28,8 @@ namespace ircCore.Utils
     public static class Functions
     {
         private static string _mainFolder;
+
+        private static readonly Regex AddressValidate = new Regex(@"(?<nick>[^ ]+?)\!(?<user>[^ ]+?)@(?<host>[^ ]+?)$", RegexOptions.Compiled);
 
         public sealed class EnumUtils
         {
@@ -128,6 +131,43 @@ namespace ircCore.Utils
             }
             /* Failed */
             return String.Empty;
+        }
+
+        /* Check IRC addrss - validate the input is of *!*@* */
+        public static string CheckAddress(string address)
+        {
+            if (string.IsNullOrEmpty(address))
+            {
+                return "*!*@*";
+            }
+            /* Validate the passed address mask matches the IRC protocol */
+            var m = AddressValidate.Match(address);
+            if (m.Success)
+            {
+                /* Valid address format */
+                return !address.Contains(".") || address.EndsWith(".") ? string.Format("{0}*", address) : address;
+            }
+            var index = address.IndexOf('!');
+            switch (index)
+            {
+                case -1:
+                    return string.Format("{0}!*@*", address);
+                default:
+                    if (index == address.Length - 1)
+                    {
+                        return string.Format("{0}*@*", address);
+                    }
+                    break;
+            }
+            index = address.IndexOf('@');
+            if (index == -1)
+            {
+                return string.Format("{0}*@*", address);
+            }
+            /* Make sure @ or . isn't the last character */
+            return index == address.Length - 1
+                       ? string.Format("{0}*", address)
+                       : address;
         }
 
         /* Private methods */

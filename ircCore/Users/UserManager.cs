@@ -6,6 +6,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using ircCore.Utils;
 using ircCore.Utils.Serialization;
 
@@ -96,7 +97,9 @@ namespace ircCore.Users
 
         public static bool IsIgnored(string address)
         {
-            return UserList.Ignore.Users.Select(u => new WildcardMatch(u.Address)).Any(ignore => ignore.IsMatch(address));
+            return
+                UserList.Ignore.Users.Select(u => new WildcardMatch(u.Address, RegexOptions.IgnoreCase)).Any(
+                    ignore => ignore.IsMatch(address));
         }
     }
 }

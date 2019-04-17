@@ -85,8 +85,8 @@ namespace FusionIRC.Forms.Users.Editing
             if (DialogResult == DialogResult.OK)
             {
                 _user.Nick = null;
-                _user.Note = null;
-                _user.Address = Functions.GetFirstWord(_txtAddress.Text);
+                _user.Note = null;                
+                _user.Address = Functions.GetFirstWord(_txtAddress.Text);                
             }
             base.OnFormClosing(e);
         }

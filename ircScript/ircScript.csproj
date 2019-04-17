@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,6 +35,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,6 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\ScriptEditor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ScriptEditor.Designer.cs">
+      <DependentUpon>ScriptEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="ScriptManager.cs" />
     <Compile Include="Classes\ScriptParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -48,12 +57,31 @@
     <Compile Include="Interface\IScript.cs" />
     <Compile Include="Structures\Popup.cs" />
     <Compile Include="Structures\ScriptArgs.cs" />
+    <Compile Include="Controls\SyntaxHightlight\AutoCompleteForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\SyntaxHightlight\HighlightDescriptor.cs" />
+    <Compile Include="Controls\SyntaxHightlight\HighlightDescriptorCollection.cs" />
+    <Compile Include="Controls\SyntaxHightlight\SeperaratorCollection.cs" />
+    <Compile Include="Controls\SyntaxHightlight\SyntaxHighlightingTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\SyntaxHightlight\Win32.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ircCore\ircCore.csproj">
       <Project>{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}</Project>
       <Name>ircCore</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Controls\SyntaxHightlight\AutoCompleteForm.resx">
+      <DependentUpon>AutoCompleteForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\SyntaxHightlight\SyntaxHighlightingTextBox.resx">
+      <DependentUpon>SyntaxHighlightingTextBox.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

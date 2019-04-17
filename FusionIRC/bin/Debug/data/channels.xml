@@ -1,7 +1,66 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <channels xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <favorites>
+    <favorite name="#Adults" description="Adult entertainment, 18+" password="" />
+    <favorite name="#AllNiteCafe" description="" password="" />
+    <favorite name="#Beginner" description="" password="" />
+    <favorite name="#Cafebleu" description="" password="" />
+    <favorite name="#Casual" description="" password="" />
+    <favorite name="#CasualChat" description="" password="" />
+    <favorite name="#Chataholics" description="" password="" />
+    <favorite name="#Chataway" description="" password="" />
+    <favorite name="#chatbuddies" description="" password="" />
+    <favorite name="#Chatterz" description="Fun chat for all =)" password="" />
+    <favorite name="#Chat-World" description="" password="" />
+    <favorite name="#Chatzone" description="" password="" />
+    <favorite name="#Cheers" description="" password="" />
+    <favorite name="#Cybar" description="" password="" />
+    <favorite name="#CyberCafe" description="" password="" />
+    <favorite name="#CyberChat" description="" password="" />
+    <favorite name="#CyberFriends" description="" password="" />
+    <favorite name="#CyberParty" description="" password="" />
+    <favorite name="#CyberWorld" description="" password="" />
+    <favorite name="#DewDropInn" description="" password="" />
+    <favorite name="#Family_Chat" description="" password="" />
+    <favorite name="#FunChat" description="" password="" />
+    <favorite name="#Funfactory" description="" password="" />
+    <favorite name="#Funshack" description="The Fun and Friendly, All Welcome, Funchannel" password="" />
+    <favorite name="#Giggles" description="" password="" />
+    <favorite name="#Help" description="" password="" />
     <favorite name="#helpdesk" description="IRC help channel" password="" />
+    <favorite name="#Hottub" description="Relaxing Chat" password="" />
+    <favorite name="#IRCAddicts" description="" password="" />
+    <favorite name="#ircbar" description="" password="" />
+    <favorite name="#irchelp" description="General IRC Help" password="" />
+    <favorite name="#irclub" description="" password="" />
+    <favorite name="#ircnewblies" description="IRC Questions Answered with a smile :-)" password="" />
+    <favorite name="#ircpassage" description="" password="" />
+    <favorite name="#ircsupport" description="" password="" />
+    <favorite name="#irctalk" description="" password="" />
+    <favorite name="#JustChillin" description="" password="" />
+    <favorite name="#NetChat" description="" password="" />
+    <favorite name="#new2irc" description="" password="" />
+    <favorite name="#newbiehelp" description="Friendly chat and help for beginners" password="" />
+    <favorite name="#newbies" description="" password="" />
+    <favorite name="#NewsTalk" description="" password="" />
+    <favorite name="#PartyHouse" description="Party Party Party!" password="" />
+    <favorite name="#PlanetChat" description="" password="" />
+    <favorite name="#PopInn" description="Friendly Chat, Popups &amp; Colours help" password="" />
+    <favorite name="#SpeakEasy" description="" password="" />
+    <favorite name="#Speaker's_corner" description="" password="" />
+    <favorite name="#Teen" description="" password="" />
+    <favorite name="#TeenConnection" description="" password="" />
+    <favorite name="#TeenFactory" description="" password="" />
+    <favorite name="#TeenLounge" description="" password="" />
+    <favorite name="#TeenParty" description="" password="" />
+    <favorite name="#Teens" description="" password="" />
+    <favorite name="#TeenWorld" description="" password="" />
+    <favorite name="#TeenZone" description="" password="" />
+    <favorite name="#TwilightTavern" description="" password="" />
+    <favorite name="#UserGuide" description="The official Undernet help channel" password="" />
+    <favorite name="#UserHelp" description="" password="" />
+    <favorite name="#WobblyWorld" description="" password="" />
+    <favorite name="#WorldChat" description="" password="" />
   </favorites>
   <recent />
 </channels>

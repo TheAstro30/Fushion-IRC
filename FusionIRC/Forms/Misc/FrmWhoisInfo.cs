@@ -6,7 +6,7 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using ircClient.Classes;
+using ircClient.Parsing.Helpers;
 using ircCore.Controls;
 
 namespace FusionIRC.Forms.Misc

@@ -7,6 +7,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Media;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using FusionIRC.Forms.Warning;
 using FusionIRC.Helpers;
@@ -25,7 +26,10 @@ namespace FusionIRC.Forms.Child
 {
     /* This class is our "main" chat window for console, channel, query and DCC chats - one class for all */
     public sealed class FrmChildWindow : ChildWindow
-    {        
+    {
+        /* Non alpha-numeric check - used for nick name on mouse-over of output window */
+        private readonly Regex _regExNick = new Regex(@"[^A-Za-z0-9_-|#|\[\]\\\/`\^{}]", RegexOptions.Compiled);
+        
         private readonly Timer _focus;
         private WindowEvent _event;
         private readonly SplitContainer _splitter;
@@ -156,7 +160,9 @@ namespace FusionIRC.Forms.Child
             }
             /* Callbacks */
             Output.OnUrlDoubleClicked += OutputUrlDoubleClicked;
+            Output.OnSpecialWordDoubleClicked += OutputSpecialWordDoubleClicked;
             Output.MouseUp += OutputMouseUp;
+            Output.OnWordUnderMouse += OutputWordUnderMouse;
             Input.TabKeyPress += InputTabKeyPress;
             Input.KeyDown += InputKeyDown;
             Input.MouseWheel += InputMouseWheel;
@@ -293,6 +299,9 @@ namespace FusionIRC.Forms.Child
                 var w = SettingsManager.GetWindowByName(_windowChildName);
                 if (WindowState != FormWindowState.Maximized)
                 {
+                    /* I think this is remarked out so I could modify WindowManger to get specific positions for
+                     * chat windows named a certain name, eg: #dragonsrealm = this position in the MDI window, all
+                     * other windows, assume default position ... etc. */
                     //w.Position = Location;
                 }
             }
@@ -380,6 +389,59 @@ namespace FusionIRC.Forms.Child
                 }
             }
             Functions.OpenProcess(url);            
+        }
+
+        private void OutputSpecialWordDoubleClicked(string word)
+        {
+            /* Just incase... */
+            if (string.IsNullOrEmpty(word))
+            {
+                return;
+            }
+            if (word[0] == Client.Parser.ChannelPrefixTypes.MatchChannelType(Tag.ToString()[0]))
+            {
+                /* Channel */
+                Client.Send(string.Format("JOIN {0}", word));
+            }
+            else
+            {
+                /* Open a query window with the nick (default action) */
+                var nick = _regExNick.Replace(word, "");
+                var win = WindowManager.GetWindow(Client, nick) ?? WindowManager.AddWindow(Client, ChildWindowType.Private, MdiParent, nick, nick, true);
+                win.BringToFront();     
+            }
+        }
+
+        private void OutputWordUnderMouse(string word)
+        {
+            /* This may or may not be a convoluted way of doing channel name/nick checks (instead of doing it on
+             * the control itself), but I did it this way for 2 reasons:
+             * a) We don't have to pass the Nicklist control as a property to the OutputWindow (means that the
+             *    output window is a separate control to be used elsewhere without the need for another dependancy)
+             * b) Not all channels start with # (some start with + or &), so we can look at the protocols string
+             *    (RAW 005) for what the channel prefixes are and test for them externally here */
+            if (!string.IsNullOrEmpty(word))
+            {
+                if (word[0] == Client.Parser.ChannelPrefixTypes.MatchChannelType(Tag.ToString()[0]))
+                {
+                    /* It's a channel name - including it's self */
+                    Output.Cursor = Cursors.Hand;
+                    Output.AllowSpecialWordDoubleClick = true;
+                }
+                else
+                {
+                    /* Check if it's a nick? */
+                    if (Nicklist != null && Nicklist.ContainsNick(_regExNick.Replace(word, "")))
+                    {
+                        Output.Cursor = Cursors.Hand;
+                        Output.AllowSpecialWordDoubleClick = true;
+                        return;
+                    }
+                }
+                return;
+            }
+            Output.Cursor = Cursors.Default;
+            Output.AllowSpecialWordDoubleClick = false;
         }
 
         private void OutputMouseUp(object sender, MouseEventArgs e)

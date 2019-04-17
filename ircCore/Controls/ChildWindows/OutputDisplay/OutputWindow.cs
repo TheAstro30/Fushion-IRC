@@ -27,13 +27,10 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
     {
         private readonly bool _isDesignMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
 
-        private const string UrlRegex =
-            "((www\\.|www\\d\\.|(https?|shttp|ftp|irc):((//)|(\\\\\\\\)))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
-
-        private readonly Regex _regExUrl = new Regex(UrlRegex, RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-        private static readonly Regex RegExNick = new Regex(@"[^A-Za-z0-9_-|#|\[\]\\\/`\^{}]", RegexOptions.Compiled);
-                                      /* Non alpha-numeric check */
+        private readonly Regex _regExUrl =
+            new Regex(
+                "((www\\.|www\\d\\.|(https?|shttp|ftp|irc):((//)|(\\\\\\\\)))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)",
+                RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private readonly VScrollBar _vScroll;
         private Font _font;
@@ -46,6 +43,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         private bool _scrolledToBottom;
 
         private string _url;
+        private string _word;
 
         private readonly Timer _wrapUpdate;
         private readonly Timer _update;
@@ -56,6 +54,9 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         /* Public events */
         public event Action<string> OnLineAdded;
         public event Action<string> OnUrlDoubleClicked;
+        public event Action<string> OnSpecialWordDoubleClicked;
+
+        public event Action<string> OnWordUnderMouse;
 
         public event Action OnWindowDoubleClicked;
         public event Action OnWindowRightClicked;
@@ -129,6 +130,8 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         public bool WordWrap { get; set; }
         public bool AllowCopySelection { get; set; }
         public bool UserResize { get; set; }
+
+        public bool AllowSpecialWordDoubleClick { get; set; } /* Used for double-clicking of nicks/channel names in text */
 
         public int MaximumLines
         {
@@ -382,7 +385,12 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             var currentLine = Character.GetLineNumber(TextData, e.Y, ClientRectangle.Height, _scrollValue, _font.Height, LineSpacing, LinePadding, out lineIndex, out wrapIndex, out startY);            
             if (lineIndex == -1)
             {
-                return; /* Nothing under mouse */
+                /* Nothing under mouse - clear all word detection variables */
+                _url = string.Empty;
+                _word = string.Empty;
+                AllowSpecialWordDoubleClick = false;
+                Cursor = Cursors.Default;
+                return;
             }
             using (var g = CreateGraphics())
             {
@@ -487,12 +495,18 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                         {
                             Cursor = Cursors.Default;
                             _url = string.Empty;
+                            _word = wordUnderMouse;
+                            if (OnWordUnderMouse != null)
+                            {
+                                OnWordUnderMouse(_word);
+                            }
                         }
                     }
                     else
                     {
                         Cursor = Cursors.Default;
                         _url = string.Empty;
+                        _word = null;
                     }
                 }
             }
@@ -511,6 +525,14 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             }
             else
             {
+                if (AllowSpecialWordDoubleClick && !string.IsNullOrEmpty(_word))
+                {
+                    if (OnSpecialWordDoubleClicked != null)
+                    {
+                        OnSpecialWordDoubleClicked(_word);
+                    }
+                    return;
+                }
                 if (OnWindowDoubleClicked != null)
                 {
                     OnWindowDoubleClicked();

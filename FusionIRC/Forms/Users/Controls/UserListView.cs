@@ -199,10 +199,11 @@ namespace FusionIRC.Forms.Users.Controls
                     {
                         add.Text = @"Add new nick to notify list";
                         add.User = user;
-                        if (add.ShowDialog(this) == DialogResult.OK)
+                        if (add.ShowDialog(this) != DialogResult.OK || string.IsNullOrEmpty(user.Nick))
                         {
-                            UserManager.UserList.Notify.Users.Add(user);                            
+                            return;
                         }
+                        UserManager.UserList.Notify.Users.Add(user); 
                     }
                     break;
 
@@ -211,16 +212,16 @@ namespace FusionIRC.Forms.Users.Controls
                     {
                         add.Text = @"Add new nick/address to ignore list";
                         add.User = user;
-                        if (add.ShowDialog(this) == DialogResult.OK)
+                        if (add.ShowDialog(this) != DialogResult.OK || string.IsNullOrEmpty(user.Address))
                         {
-                            UserManager.UserList.Ignore.Users.Add(user);
+                            return;
                         }
+                        /* If someone types just a persons nick (no address/no wildcards), we need to convert this
+                         * to a wildcard string */
+                        user.Address = Functions.CheckAddress(user.Address);
+                        UserManager.UserList.Ignore.Users.Add(user);
                     }
                     break;
-            }
-            if (string.IsNullOrEmpty(user.Nick))
-            {
-                return;
             }
             _list.AddObject(user);
             _btnClear.Enabled = _list.GetItemCount() > 0;
@@ -252,7 +253,7 @@ namespace FusionIRC.Forms.Users.Controls
                     {
                         edit.Text = @"Edit current user on ignore list";
                         edit.User = user;
-                        if (edit.ShowDialog(this) == DialogResult.OK && !string.IsNullOrEmpty(user.Nick))
+                        if (edit.ShowDialog(this) == DialogResult.OK && !string.IsNullOrEmpty(user.Address))
                         {
                             _list.RefreshObject(user);
                         }

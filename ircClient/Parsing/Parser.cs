@@ -5,9 +5,10 @@
  */
 using System;
 using System.Reflection;
+using ircClient.Parsing.Helpers;
 using ircCore.Utils;
 
-namespace ircClient.Classes
+namespace ircClient.Parsing
 {
     public class Parser
     {
@@ -66,6 +67,7 @@ namespace ircClient.Classes
 
         public string UserModeCharacters { get; set; }
         public string UserModes { get; set; }
+        public ChannelTypes ChannelPrefixTypes { get; set; } 
 
         public WhoisInfo Whois = new WhoisInfo();
 
@@ -73,6 +75,7 @@ namespace ircClient.Classes
         public Parser(ClientConnection client)
         {
             _client = client;
+            ChannelPrefixTypes = new ChannelTypes();
         }
 
         /* Main parsing entry point */
@@ -787,6 +790,11 @@ namespace ircClient.Classes
                         {
                             OnNetworkNameChanged(_client, sections[1]);
                         }
+                        break;
+
+                    case "CHANTYPES":
+                        /* Fill out channel prefix types */
+                        ChannelPrefixTypes = new ChannelTypes(sections[0].ToCharArray());
                         break;
                 }
             }

@@ -393,16 +393,30 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
         {
             if (_lvServers.SelectedObject == null)
             {
-                /* Nothing selected, sort ALL networks */
+                /* Nothing selected, sort ALL networks - doesn't sort servers */
                 _servers.Networks.Network.Sort();
-                /* For some stupid reason, the ObjectListView third party control has an issue with refreshing the objects
-                 * after sorted if its a TreeList - so, -sigh- clear objects and add back... */
-                _lvServers.RemoveObjects(_servers.Networks.Network);
-                _lvServers.AddObjects(_servers.Networks.Network);
+                _lvServers.SetObjects(_servers.Networks.Network);
             }
             else
             {
-                var n = (NetworkData) _lvServers.SelectedObject;
+                /* This won't work if the selected object is the server itself...*/
+                NetworkData n;
+                var sel = _lvServers.SelectedObject;
+                if (sel.GetType() == typeof(ServerData))
+                {
+                    /* Get the network group associated with this server */
+                    n = _servers.GetNetworkByServer((ServerData) sel);
+                }
+                else
+                {
+                    /* It's already a network */
+                    n = (NetworkData) sel;
+                }
+                if (n == null)
+                {
+                    /* It shouldn't be null, but you never know ;) */
+                    return;
+                }
                 n.Server.Sort();
                 _lvServers.RefreshObject(n);
             }

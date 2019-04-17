@@ -22,7 +22,7 @@ namespace ircCore.Settings.Channels
     public class ChannelFavorites
     {
         [Serializable]
-        public class ChannelFavoriteData
+        public class ChannelFavoriteData : IComparable
         {
             [XmlAttribute("name")]
             public string Name { get; set; }
@@ -32,6 +32,11 @@ namespace ircCore.Settings.Channels
 
             [XmlAttribute("password")]
             public string Password { get; set; }
+
+            public int CompareTo(object obj)
+            {
+                return string.Compare(Name, ((ChannelFavoriteData)obj).Name, StringComparison.InvariantCultureIgnoreCase);
+            }
         }
 
         [XmlElement("favorite")]

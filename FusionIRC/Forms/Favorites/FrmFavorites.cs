@@ -53,7 +53,6 @@ namespace FusionIRC.Forms.Favorites
                               Location = new Point(12, 12),
                               MultiSelect = false,
                               Size = new Size(277, 341),
-                              Sorting = SortOrder.Ascending,
                               TabIndex = 0,
                               UseCompatibleStateImageBehavior = false,
                               View = View.Details
@@ -249,7 +248,8 @@ namespace FusionIRC.Forms.Favorites
             }
             /* Add channel to list */
             ChannelManager.Channels.Favorites.Favorite.Add(data);
-            _lvFave.AddObject(data);
+            ChannelManager.Channels.Favorites.Favorite.Sort();
+            _lvFave.SetObjects(ChannelManager.Channels.Favorites.Favorite);
             _btnEdit.Enabled = false;
             _btnDelete.Enabled = false;
             _btnJoin.Enabled = false;
@@ -278,7 +278,8 @@ namespace FusionIRC.Forms.Favorites
                 d.Password = Functions.GetFirstWord(edit.Password);
                 d.Description = edit.Description;
             }
-            _lvFave.RefreshObject(d);
+            ChannelManager.Channels.Favorites.Favorite.Sort();
+            _lvFave.SetObjects(ChannelManager.Channels.Favorites.Favorite);            
             _btnEdit.Enabled = false;
             _btnDelete.Enabled = false;
             _btnJoin.Enabled = false;
