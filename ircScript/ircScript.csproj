@@ -50,6 +50,7 @@
     <Compile Include="Controls\ScriptEditor.Designer.cs">
       <DependentUpon>ScriptEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SyntaxHightlight\Helpers\HighlightDescriptorCollection.cs" />
     <Compile Include="ScriptManager.cs" />
     <Compile Include="Classes\ScriptParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -60,13 +61,12 @@
     <Compile Include="Controls\SyntaxHightlight\AutoCompleteForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Controls\SyntaxHightlight\HighlightDescriptor.cs" />
-    <Compile Include="Controls\SyntaxHightlight\HighlightDescriptorCollection.cs" />
-    <Compile Include="Controls\SyntaxHightlight\SeperaratorCollection.cs" />
-    <Compile Include="Controls\SyntaxHightlight\SyntaxHighlightingTextBox.cs">
+    <Compile Include="Controls\SyntaxHightlight\Helpers\HighlightDescriptor.cs" />
+    <Compile Include="Controls\SyntaxHightlight\Helpers\SeperaratorCollection.cs" />
+    <Compile Include="Controls\SyntaxHightlight\BaseControl\SyntaxHighlight.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\SyntaxHightlight\Win32.cs" />
+    <Compile Include="Controls\SyntaxHightlight\Helpers\Win32.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ircCore\ircCore.csproj">
@@ -75,14 +75,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <EmbeddedResource Include="Controls\SyntaxHightlight\AutoCompleteForm.resx">
-      <DependentUpon>AutoCompleteForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\SyntaxHightlight\SyntaxHighlightingTextBox.resx">
-      <DependentUpon>SyntaxHighlightingTextBox.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
