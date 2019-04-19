@@ -13,7 +13,8 @@ using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
 using ircScript;
-using ircScript.Structures;
+using ircScript.Classes;
+using ircScript.Classes.Structures;
 
 namespace FusionIRC.Helpers
 {
@@ -70,11 +71,9 @@ namespace FusionIRC.Helpers
         private static void ParseCommand(ClientConnection client, FrmChildWindow child, string command, string args)
         {
             /* First check it's not an alias */
-            if (ParseAlias(child, ref command, ref args))
+            if (ParseAlias(client, child, command, args))
             {
-                /* Alias was parsed, re-call this function */
-                ParseCommand(client, child, command, args);
-                return;
+                return; /* Process no further */
             }
             switch (command)
             {
@@ -171,16 +170,18 @@ namespace FusionIRC.Helpers
         }
 
         /* Parse alias as command line */
-        private static bool ParseAlias(FrmChildWindow child, ref string command, ref string args)
+        private static bool ParseAlias(ClientConnection client, FrmChildWindow child, string command, string args)
         {
             /* First check it's not an alias, if it is - pass it back to command processor */
-            var alias = ScriptManager.GetScript(ScriptType.Alias, command);
+            var alias = ScriptManager.GetScript(ScriptManager.Aliases, command);
             if (alias == null)
             {
                 return false;
             }
             var sp = new ScriptArgs
                          {
+                             ClientConnection = client,
+                             ChildWindow = child,
                              Channel = child.Tag.ToString()[0] == '#' ? child.Tag.ToString() : string.Empty,
                              Nick =
                                  child.WindowType == ChildWindowType.Private ||
@@ -188,19 +189,38 @@ namespace FusionIRC.Helpers
                                      ? child.Tag.ToString()
                                      : string.Empty
                          };
-            var data = alias.Parse(sp, args.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
-            if (!string.IsNullOrEmpty(data))
+            alias.LineParsed += ScriptLineParsed;
+            alias.ParseCompleted += ScriptParseCompleted;
+            alias.Parse(sp, args.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries));
+            return true;
+        }
+
+        /* Script callbacks */
+        private static void ScriptLineParsed(Script script, ScriptArgs e, string data)
+        {           
+            if (string.IsNullOrEmpty(data))
             {
-                var i = data.IndexOf(' ');
-                if (i == -1)
-                {
-                    return false;
-                }
+                return;
+            }
+            var i = data.IndexOf(' ');
+            string command;
+            var args = string.Empty;
+            if (i == -1)
+            {
+                command = data.Trim();
+            }
+            else
+            {
                 command = data.Substring(0, i).Trim().ToUpper().Replace("/", "");
                 args = data.Substring(i + 1).Trim();
-                return true;
             }
-            return false;
+            ParseCommand(e.ClientConnection, (FrmChildWindow) e.ChildWindow, command, args);
+        }
+
+        private static void ScriptParseCompleted(Script script)
+        {
+            script.LineParsed -= ScriptLineParsed;
+            script.ParseCompleted -= ScriptParseCompleted;
         }
 
         /* Connection events */

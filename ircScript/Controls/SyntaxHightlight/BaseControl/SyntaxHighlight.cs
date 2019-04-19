@@ -36,10 +36,10 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
         private bool _isUndo;
         private UndoRedoInfo _lastInfo = new UndoRedoInfo("", new Win32.Point(), 0);
         private bool _parsing;
-        private bool _bufferSet;
+        private bool _bufferSet;        
 
         public SyntaxHighlight()
-        {
+        {           
             HighlightDescriptors = new HighLightDescriptorCollection();
             Seperators = new SeperaratorCollection();
             MaxUndoRedoSteps = 50;
@@ -56,6 +56,34 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
         public SeperaratorCollection Seperators { get; private set; }
 
         public HighLightDescriptorCollection HighlightDescriptors { get; private set; }
+
+        /* Properties */
+        public new bool CanUndo
+        {
+            get { return _bufferSet ? _undoList.Count > 1 : _undoList.Count > 0; }
+        }
+
+        public new bool CanRedo
+        {
+            get { return _redoStack.Count > 0; }
+        }
+
+        public bool CanCopy
+        {
+            get { return SelectionLength > 0; }
+        }
+
+        public new string[] Lines
+        {
+            get { return base.Lines; }
+            set
+            {
+                /* We override the default behaviour of Lines.Set to prevent undo from removing what was
+                 * originally added */
+                _bufferSet = true;
+                base.Lines = value;
+            }
+        }
 
         /* Overrides */
         protected override void OnTextChanged(EventArgs e)
@@ -162,7 +190,7 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
 
                                 case DescriptorRecognition.Contains:
                                     if (curToken.IndexOf(compareStr) != -1)
-                                    {
+                                    {                                        
                                         match = true;
                                     }
                                     break;
@@ -172,7 +200,7 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
                                 /* If this token doesn't match chech the next one. */
                                 continue;
                             }
-                            /* printing this token will be handled by the inner code, don't apply default settings... */
+                            /* Printing this token will be handled by the inner code, don't apply default settings... */
                             bAddToken = false;
                             /* Set colors to current descriptor settings. */
                             SetDescriptorSettings(sb, hd, colors, fonts);
@@ -282,86 +310,77 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
                     }
 
                 case Win32.WmKeydown:
-                    {
-                        if (_autoCompleteShown)
-                        {
-                            switch ((Keys) (int) m.WParam)
-                            {
-                                case Keys.Down:
-                                    {
-                                        if (_autoComplete.Items.Count != 0)
-                                        {
-                                            _autoComplete.SelectedIndex = (_autoComplete.SelectedIndex + 1)%
-                                                                              _autoComplete.Items.Count;
-                                        }
-                                        return;
-                                    }
-
-                                case Keys.Up:
-                                    {
-                                        if (_autoComplete.Items.Count != 0)
-                                        {
-                                            if (_autoComplete.SelectedIndex < 1)
-                                            {
-                                                _autoComplete.SelectedIndex = _autoComplete.Items.Count - 1;
-                                            }
-                                            else
-                                            {
-                                                _autoComplete.SelectedIndex--;
-                                            }
-                                        }
-                                        return;
-                                    }
-
-                                case Keys.Enter:
-                                case Keys.Space:
-                                    {
-                                        AcceptAutoCompleteItem();
-                                        return;
-                                    }
-
-                                case Keys.Escape:
-                                    {
-                                        HideAutoCompleteForm();
-                                        return;
-                                    }
-                            }
-                        }
-                        else
-                        {
-                            if (((Keys) (int) m.WParam == Keys.Space) && ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
-                            {
-                                CompleteWord();
-                            }
-                            else if (((Keys) (int) m.WParam == Keys.Z) && ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
-                            {
-                                Undo();
-                                return;
-                            }
-                            else if (((Keys) (int) m.WParam == Keys.Y) && ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
-                            {
-                                Redo();
-                                return;
-                            }
-                        }
-                        break;
-                    }
-
-                case Win32.WmChar:
+                    if (_autoCompleteShown)
                     {
                         switch ((Keys) (int) m.WParam)
                         {
-                            case Keys.Space:
-                                if ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0)
+                            case Keys.Down:
+                                if (_autoComplete.Items.Count != 0)
                                 {
-                                    return;
+                                    _autoComplete.SelectedIndex = (_autoComplete.SelectedIndex + 1)%
+                                                                  _autoComplete.Items.Count;
                                 }
-                                break;
+                                return;
+
+                            case Keys.Up:
+                                if (_autoComplete.Items.Count != 0)
+                                {
+                                    if (_autoComplete.SelectedIndex < 1)
+                                    {
+                                        _autoComplete.SelectedIndex = _autoComplete.Items.Count - 1;
+                                    }
+                                    else
+                                    {
+                                        _autoComplete.SelectedIndex--;
+                                    }
+                                }
+                                return;
 
                             case Keys.Enter:
-                                if (_autoCompleteShown) return;
-                                break;
+                            case Keys.Space:
+                                AcceptAutoCompleteItem();
+                                return;
+
+                            case Keys.Escape:
+                                HideAutoCompleteForm();
+                                return;
                         }
+                    }
+                    else
+                    {
+                        if (((Keys) (int) m.WParam == Keys.Space) &&
+                            ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
+                        {
+                            CompleteWord();
+                        }
+                        else if (((Keys) (int) m.WParam == Keys.Z) &&
+                                 ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
+                        {
+                            Undo();
+                            return;
+                        }
+                        else if (((Keys) (int) m.WParam == Keys.Y) &&
+                                 ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
+                        {
+                            Redo();
+                            return;
+                        }
+                    }
+                    break;
+
+                case Win32.WmChar:
+                    switch ((Keys) (int) m.WParam)
+                    {
+                        case Keys.Space:
+                            if ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0)
+                            {
+                                return;
+                            }
+                            break;
+
+                        case Keys.Enter:
+                            if (_autoCompleteShown) return;
+                            break;
                     }
                     break;
             }
@@ -377,30 +396,7 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
             base.OnLostFocus(e);
         }
 
-        public void SetBuffer(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                return;
-            }
-            Text = text;
-            _bufferSet = true;
-        }
-
         /* Undo/redo */
-        public new bool CanUndo
-        {
-            get
-            {
-                return _undoList.Count > 0;
-            }            
-        }
-
-        public new bool CanRedo
-        {
-            get { return _redoStack.Count > 0; }
-        }
-
         private void LimitUndo()
         {
             while (_undoList.Count > MaxUndoRedoSteps)
@@ -411,8 +407,7 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
 
         public new void Undo()
         {
-            System.Diagnostics.Debug.Print(CanUndo.ToString() + " can undo?");
-            if (!CanUndo || (_bufferSet && _undoList.Count == 1))
+            if (!CanUndo)
             {
                 return;
             }

@@ -4,17 +4,17 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System.Text.RegularExpressions;
-using ircScript.Structures;
+using ircScript.Classes.Structures;
 
-namespace ircScript.Classes
+namespace ircScript.Helpers
 {
     /* Script parser class */
-    public class ScriptParser
+    public static class ScriptParser
     {
-        private readonly Regex _paramStrip = new Regex(@"\$\d+", RegexOptions.Compiled);
+        private static readonly Regex ParamStrip = new Regex(@"\$\d+", RegexOptions.Compiled);
 
         /* Inherited on all subsequent "script" classes - this will grow over time and be improved upon */
-        public string Parse(ScriptArgs e, string lineData, string[] args)
+        public static string ParseLine(ScriptArgs e, string lineData, string[] args)
         {
             /* Main script "parser" - mainly for parsing arguments - first check ScriptArgs */
             if (e != null)
@@ -25,7 +25,7 @@ namespace ircScript.Classes
             if (args == null || args.Length == 0)
             {
                 /* Strip out $1, $2 - etc */
-                return _paramStrip.Replace(lineData, "");
+                return ParamStrip.Replace(lineData, "");
             }
             /* Process command-line arguments - replacing $1, $2 etc */
             var index = 1;
@@ -35,7 +35,7 @@ namespace ircScript.Classes
                 index++;
             }
             /* Return the parsed line (remove any unused params) */
-            return _paramStrip.Replace(lineData, "");
+            return ParamStrip.Replace(lineData, "");
         }
     }
 }

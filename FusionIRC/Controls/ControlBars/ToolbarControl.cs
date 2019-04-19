@@ -95,7 +95,7 @@ namespace FusionIRC.Controls.ControlBars
                                   ImageScaling = ToolStripItemImageScaling.None,
                                   Size = new Size(32, 32),
                                   Tag = "ALIASES",
-                                  ToolTipText = @"Aliases editor"
+                                  ToolTipText = @"Script editor"
                               };
             _btnAliases.Click += ToolbarButtonClick;
             /* Favorites */

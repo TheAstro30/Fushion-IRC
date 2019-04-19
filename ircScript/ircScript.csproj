@@ -44,20 +44,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\Structures\ScriptVariable.cs" />
     <Compile Include="Controls\ScriptEditor.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\ScriptEditor.Designer.cs">
-      <DependentUpon>ScriptEditor.cs</DependentUpon>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\SyntaxHightlight\Helpers\HighlightDescriptorCollection.cs" />
+    <Compile Include="Controls\SyntaxHightlight\LineNumberStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ScriptManager.cs" />
-    <Compile Include="Classes\ScriptParser.cs" />
+    <Compile Include="Helpers\ScriptParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Structures\Alias.cs" />
-    <Compile Include="Interface\IScript.cs" />
-    <Compile Include="Structures\Popup.cs" />
-    <Compile Include="Structures\ScriptArgs.cs" />
+    <Compile Include="Classes\Script.cs" />
+    <Compile Include="Classes\Structures\ScriptArgs.cs" />
     <Compile Include="Controls\SyntaxHightlight\AutoCompleteForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -67,8 +66,13 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\SyntaxHightlight\Helpers\Win32.cs" />
+    <Compile Include="Classes\Structures\ScriptData.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ircClient\ircClient.csproj">
+      <Project>{883E7B5A-3260-4A3D-A5F9-DF69B08CAF7F}</Project>
+      <Name>ircClient</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ircCore\ircCore.csproj">
       <Project>{2F9EB210-3AC8-4410-AD3A-C4FA3D37E1F2}</Project>
       <Name>ircCore</Name>

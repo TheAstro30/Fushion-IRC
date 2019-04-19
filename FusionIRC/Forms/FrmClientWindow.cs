@@ -42,12 +42,11 @@ namespace FusionIRC.Forms
         public ToolbarControl ToolBar { get; private set; }
         public MenubarControl MenuBar { get; private set; }
 
-        //private Timer _test;
-
         /* Constructor */
         public FrmClientWindow()
         {
             _initialize = true;
+            MinimumSize = new Size(400, 300);
             /* Set main application directory */
             Functions.SetMainDir();
             Functions.CheckFolders();
@@ -67,7 +66,11 @@ namespace FusionIRC.Forms
             /* DCC File transfers manager */
             DccManager.Load();
             /* Load aliases */
-            ScriptManager.LoadScript(ScriptType.Alias, Functions.MainDir(@"scripts/aliases.xml", false));
+            ScriptManager.AliasData.Add(ScriptManager.LoadScript(Functions.MainDir(@"scripts/aliases.xml", false)));
+            /* Build script data */
+            ScriptManager.BuildScripts(ScriptManager.AliasData, ScriptManager.Aliases);
+            /* Load variables */
+            ScriptManager.LoadVariables(Functions.MainDir(@"scripts/variables.xml", false));
             /* Main form initialization */
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             Text = @"FusionIRC";
@@ -168,48 +171,8 @@ namespace FusionIRC.Forms
             WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
             /* Create DCC file manager window */
             WindowManager.DccManagerWindow = new FrmDccManager();
-            _initialize = false;
-            /* test code */
-            //var fd = new DccFile();
-            //fd.FileName = "new_test_file105.mp3";
-            //fd.UserName = "IRCUser5";
-            //fd.Address = "58.89.91.2";
-            //fd.FileType = DccFileType.Download;
-            //WindowManager.DccManagerWindow.AddFile(fd);
-            //_test = new Timer();
-            //_test.Interval = 1000;
-            //_test.Enabled = true;
-            //_test.Tick += TestTick;
-
-            //AutoList.AutoNetworkData ld = new AutoList.AutoNetworkData();
-            //ld.Name = "Test";
-
-            //AutoList.AutoData ad = new AutoList.AutoData();
-            //ad.Item = "hithere";
-            //ad.Value = "this is just a test";
-
-            //ld.Data.Add(ad);
-
-            //ad = new AutoList.AutoData();
-            //ad.Item = "testing";
-            //ad.Value = "again, just testing stuff";
-
-            //ld.Data.Add(ad);
-
-            //AutomationsManager.Automations.Identify.Network.Add(ld);            
+            _initialize = false;         
         }
-
-        //private void TestTick(object sender, EventArgs e)
-        //{
-        //    //get 3rd object in list
-        //    var fd = DccManager.DccTransfers.FileData[2];
-        //    fd.Progress++;
-        //    if (fd.Progress > 100)
-        //    {
-        //        fd.Progress = 0;
-        //    }
-        //    WindowManager.DccManagerWindow.UpdateTransferData();
-        //}
 
         /* Overrides */
         protected override void OnLoad(EventArgs e)
@@ -314,6 +277,8 @@ namespace FusionIRC.Forms
             ChannelManager.Save();
             /* DCC File transfers manager */
             DccManager.Save();
+            /* Save variables */
+            ScriptManager.SaveVariables(Functions.MainDir(@"scripts/variables.xml", false));
             base.OnFormClosing(e);
         }
 
