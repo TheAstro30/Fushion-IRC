@@ -50,57 +50,56 @@ namespace ircScript.Controls
                             BorderStyle = BorderStyle.None,
                             WordWrap = false,
                             ScrollBars = RichTextBoxScrollBars.Both,
-                            FilterAutoComplete = true,
                             MaxUndoRedoSteps = 500 /* Should be more than adequate */
                         };
 
             /* These break up tokens if used between them */
-            _text.Seperators.AddRange(new[] {' ', ',', '.', '-', '+', '(', ')', '{', '}', '<', '>', '=', '!'});
+            _text.Seperators.AddRange(new[] {'\r', '\n', ' ', ',', '.', '-', '+', '(', ')', '{', '}', '<', '>', '=', '!'});
             /* Highlighted "words" - note: might have to modify this to only highlight first word in some instances */
             _text.HighlightDescriptors.AddRange(new[]
                                                     {
                                                         new HighlightDescriptor("/*", "*/", Color.Green, null,
                                                                                 DescriptorType.ToCloseToken,
-                                                                                DescriptorRecognition.StartsWith, true),
+                                                                                DescriptorRecognition.StartsWith),
                                                         new HighlightDescriptor("$", Color.DarkCyan, null,
                                                                                 DescriptorType.Word,
-                                                                                DescriptorRecognition.StartsWith, true),
+                                                                                DescriptorRecognition.StartsWith),
                                                         new HighlightDescriptor("%", Color.Red, null,
                                                                                 DescriptorType.Word,
-                                                                                DescriptorRecognition.StartsWith, false),
+                                                                                DescriptorRecognition.StartsWith),
                                                         new HighlightDescriptor("//", Color.Green, null,
                                                                                 DescriptorType.ToEol,
-                                                                                DescriptorRecognition.StartsWith, false),
+                                                                                DescriptorRecognition.StartsWith),
                                                         new HighlightDescriptor("if", Color.Blue, null,
                                                                                 DescriptorType.Word,
-                                                                                DescriptorRecognition.WholeWord, true),
+                                                                                DescriptorRecognition.WholeWord),
                                                         new HighlightDescriptor("elseif", Color.Blue, null,
                                                                                 DescriptorType.Word,
-                                                                                DescriptorRecognition.WholeWord, true),
+                                                                                DescriptorRecognition.WholeWord),
                                                         new HighlightDescriptor("else", Color.Blue, null,
                                                                                 DescriptorType.Word,
-                                                                                DescriptorRecognition.WholeWord, true),
+                                                                                DescriptorRecognition.WholeWord),
                                                         new HighlightDescriptor("while", Color.Blue, null,
                                                                                 DescriptorType.Word,
-                                                                                DescriptorRecognition.WholeWord, true),
+                                                                                DescriptorRecognition.WholeWord),
                                                         new HighlightDescriptor("alias", Color.Purple, null,
                                                                                 DescriptorType.Word,
-                                                                                DescriptorRecognition.StartsWith, true),
+                                                                                DescriptorRecognition.StartsWith),
                                                         new HighlightDescriptor("on", Color.Purple, null,
                                                                                 DescriptorType.Word,
-                                                                                DescriptorRecognition.StartsWith, true),
+                                                                                DescriptorRecognition.StartsWith),
                                                         new HighlightDescriptor("inc", Color.SkyBlue, null,
                                                                                 DescriptorType.Word,
-                                                                                DescriptorRecognition.StartsWith, true),
+                                                                                DescriptorRecognition.StartsWith),
                                                         new HighlightDescriptor("dec", Color.SkyBlue, null,
                                                                                 DescriptorType.Word,
-                                                                                DescriptorRecognition.StartsWith, true),
+                                                                                DescriptorRecognition.StartsWith),
                                                         new HighlightDescriptor("set", Color.SkyBlue, null,
                                                                                 DescriptorType.Word,
-                                                                                DescriptorRecognition.StartsWith, true),
+                                                                                DescriptorRecognition.StartsWith),
                                                         new HighlightDescriptor("unset", Color.SkyBlue, null,
                                                                                 DescriptorType.Word,
-                                                                                DescriptorRecognition.StartsWith, true)
+                                                                                DescriptorRecognition.StartsWith)
                                                     });          
 
             _strip = new LineNumberStrip(_text);

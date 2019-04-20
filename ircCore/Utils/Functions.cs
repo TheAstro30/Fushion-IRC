@@ -170,6 +170,21 @@ namespace ircCore.Utils
                        : address;
         }
 
+        public static bool IsNumeric(string s)
+        {
+            if (!string.IsNullOrEmpty(s))
+            {
+                if (!s.Contains("."))
+                {
+                    int i;
+                    return int.TryParse(s, out i);
+                }
+                decimal d;
+                return decimal.TryParse(s, out d);
+            }
+            return false;
+        }
+
         /* Private methods */
         private static void CopyDirectory(string srcFolder, string destFolder)
         {

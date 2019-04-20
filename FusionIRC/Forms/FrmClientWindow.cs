@@ -215,6 +215,7 @@ namespace FusionIRC.Forms
                 {
                     w.Size = Size;
                     w.Position = Location;
+                    System.Diagnostics.Debug.Print("setting location... " + w.Position);
                 }
                 w.Maximized = WindowState == FormWindowState.Maximized;
             }

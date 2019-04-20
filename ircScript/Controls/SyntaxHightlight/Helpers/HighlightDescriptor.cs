@@ -29,9 +29,8 @@ namespace ircScript.Controls.SyntaxHightlight.Helpers
         public readonly DescriptorType DescriptorType;
         public readonly Font Font;
         public readonly string Token;
-        public readonly bool UseForAutoComplete;
 
-        public HighlightDescriptor(string token, Color color, Font font, DescriptorType descriptorType, DescriptorRecognition dr, bool useForAutoComplete)
+        public HighlightDescriptor(string token, Color color, Font font, DescriptorType descriptorType, DescriptorRecognition dr)
         {
             if (descriptorType == DescriptorType.ToCloseToken)
             {
@@ -43,10 +42,9 @@ namespace ircScript.Controls.SyntaxHightlight.Helpers
             DescriptorType = descriptorType;
             DescriptorRecognition = dr;
             CloseToken = null;
-            UseForAutoComplete = useForAutoComplete;
         }
 
-        public HighlightDescriptor(string token, string closeToken, Color color, Font font, DescriptorType descriptorType, DescriptorRecognition dr, bool useForAutoComplete)
+        public HighlightDescriptor(string token, string closeToken, Color color, Font font, DescriptorType descriptorType, DescriptorRecognition dr)
         {
             Color = color;
             Font = font;
@@ -54,7 +52,6 @@ namespace ircScript.Controls.SyntaxHightlight.Helpers
             DescriptorType = descriptorType;
             CloseToken = closeToken;
             DescriptorRecognition = dr;
-            UseForAutoComplete = useForAutoComplete;
         }
     }
 }

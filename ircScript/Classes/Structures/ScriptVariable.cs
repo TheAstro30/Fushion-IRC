@@ -5,6 +5,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace ircScript.Classes.Structures
@@ -12,11 +13,17 @@ namespace ircScript.Classes.Structures
     [Serializable]
     public class ScriptVariable
     {
+        //regex %[a-zA-Z]+
         [XmlAttribute("name")]
         public string Name { get; set; }
 
         [XmlAttribute("value")]
         public string Value { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("{0}={1}", Name, Value);
+        }
     }
 
     [Serializable, XmlRoot("variables")]
@@ -24,5 +31,42 @@ namespace ircScript.Classes.Structures
     {
         [XmlElement("variable")]
         public List<ScriptVariable> Variable = new List<ScriptVariable>();
+
+        public ScriptVariable GetVariable(string name)
+        {
+            return Variable.FirstOrDefault(v => v.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        public void Increment(ScriptVariable v)
+        {
+            if (v == null)
+            {
+                return;
+            }
+            /* Use "GetVariable" first - this assumes it's numerical */
+            int i;
+            if (!int.TryParse(v.Value, out i))
+            {
+                return;
+            }
+            i++;
+            v.Value = i.ToString();
+        }
+
+        public void Decrement(ScriptVariable v)
+        {
+            if (v == null)
+            {
+                return;
+            }
+            /* Use "GetVariable" first - this assumes it's numerical */
+            int i;
+            if (!int.TryParse(v.Value, out i))
+            {
+                return;
+            }
+            i--;
+            v.Value = i.ToString();
+        }
     }
 }

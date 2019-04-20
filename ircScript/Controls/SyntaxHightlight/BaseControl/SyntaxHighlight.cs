@@ -27,12 +27,9 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
             }
         }
 
-        private readonly AutoCompleteForm _autoComplete = new AutoCompleteForm();
         private readonly Stack _redoStack = new Stack();
         private readonly ArrayList _undoList = new ArrayList();
-        private bool _autoCompleteShown;
 
-        private bool _ignoreLostFocus;
         private bool _isUndo;
         private UndoRedoInfo _lastInfo = new UndoRedoInfo("", new Win32.Point(), 0);
         private bool _parsing;
@@ -45,19 +42,15 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
             MaxUndoRedoSteps = 50;
         }
 
-        /* Determines if token recognition is case sensitive. */
-        public bool CaseSensitive { get; set; }
-
-        /* Sets whether or not to remove items from the Autocomplete window as the user types... */
-        public bool FilterAutoComplete { get; set; }
+        /* Properties */
+        public bool CaseSensitive { get; set; } /* Determines if token recognition is case sensitive. */
 
         public int MaxUndoRedoSteps { get; set; }
 
         public SeperaratorCollection Seperators { get; private set; }
 
         public HighLightDescriptorCollection HighlightDescriptors { get; private set; }
-
-        /* Properties */
+        
         public new bool CanUndo
         {
             get { return _bufferSet ? _undoList.Count > 1 : _undoList.Count > 0; }
@@ -266,17 +259,6 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
             SetScrollPos(scrollPos);
             Win32.LockWindowUpdate((IntPtr) 0);
             Invalidate();
-            if (!_autoCompleteShown)
-            {
-                return;
-            }
-            if (FilterAutoComplete)
-            {
-                SetAutoCompleteItems();
-                SetAutoCompleteSize();
-                SetAutoCompleteLocation(false);
-            }
-            SetBestSelectedAutoCompleteItem();
         }
 
         protected override void OnVScroll(EventArgs e)
@@ -288,112 +270,33 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
             base.OnVScroll(e);
         }
 
-        protected override void OnMouseDown(MouseEventArgs e)
-        {
-            HideAutoCompleteForm();
-            base.OnMouseDown(e);
-        }
-
         /* Window procedure */
         protected override void WndProc(ref Message m)
         {
             switch (m.Msg)
             {
                 case Win32.WmPaint:
+                    /* Don't draw the control while parsing to avoid flicker. */
+                    if (_parsing)
                     {
-                        /* Don't draw the control while parsing to avoid flicker. */
-                        if (_parsing)
-                        {
-                            return;
-                        }
-                        break;
-                    }
-
-                case Win32.WmKeydown:
-                    if (_autoCompleteShown)
-                    {
-                        switch ((Keys) (int) m.WParam)
-                        {
-                            case Keys.Down:
-                                if (_autoComplete.Items.Count != 0)
-                                {
-                                    _autoComplete.SelectedIndex = (_autoComplete.SelectedIndex + 1)%
-                                                                  _autoComplete.Items.Count;
-                                }
-                                return;
-
-                            case Keys.Up:
-                                if (_autoComplete.Items.Count != 0)
-                                {
-                                    if (_autoComplete.SelectedIndex < 1)
-                                    {
-                                        _autoComplete.SelectedIndex = _autoComplete.Items.Count - 1;
-                                    }
-                                    else
-                                    {
-                                        _autoComplete.SelectedIndex--;
-                                    }
-                                }
-                                return;
-
-                            case Keys.Enter:
-                            case Keys.Space:
-                                AcceptAutoCompleteItem();
-                                return;
-
-                            case Keys.Escape:
-                                HideAutoCompleteForm();
-                                return;
-                        }
-                    }
-                    else
-                    {
-                        if (((Keys) (int) m.WParam == Keys.Space) &&
-                            ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
-                        {
-                            CompleteWord();
-                        }
-                        else if (((Keys) (int) m.WParam == Keys.Z) &&
-                                 ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
-                        {
-                            Undo();
-                            return;
-                        }
-                        else if (((Keys) (int) m.WParam == Keys.Y) &&
-                                 ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
-                        {
-                            Redo();
-                            return;
-                        }
+                        return;
                     }
                     break;
 
-                case Win32.WmChar:
-                    switch ((Keys) (int) m.WParam)
+                case Win32.WmKeydown:
+                    if (((Keys) (int) m.WParam == Keys.Z) && ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
                     {
-                        case Keys.Space:
-                            if ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0)
-                            {
-                                return;
-                            }
-                            break;
-
-                        case Keys.Enter:
-                            if (_autoCompleteShown) return;
-                            break;
+                        Undo();
+                        return;
+                    }
+                    if (((Keys) (int) m.WParam == Keys.Y) && ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
+                    {
+                        Redo();
+                        return;
                     }
                     break;
             }
             base.WndProc(ref m);
-        }
-
-        protected override void OnLostFocus(EventArgs e)
-        {
-            if (!_ignoreLostFocus)
-            {
-                HideAutoCompleteForm();
-            }
-            base.OnLostFocus(e);
         }
 
         /* Undo/redo */
@@ -436,201 +339,6 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
             SelectionStart = info.CursorLocation;
             SetScrollPos(info.ScrollPos);
             _isUndo = false;
-        }
-
-        /* Auto complete function */
-        private void CompleteWord()
-        {
-            var curTokenStartIndex =
-                Text.LastIndexOfAny(Seperators.GetAsCharArray(), Math.Min(SelectionStart, Text.Length - 1)) + 1;
-            var curTokenEndIndex = Text.IndexOfAny(Seperators.GetAsCharArray(), SelectionStart);
-            if (curTokenEndIndex == -1)
-            {
-                curTokenEndIndex = Text.Length;
-            }
-            var curTokenString =
-                Text.Substring(curTokenStartIndex, Math.Max(curTokenEndIndex - curTokenStartIndex, 0)).ToUpper();
-
-            string token = null;
-            foreach (HighlightDescriptor hd in HighlightDescriptors)
-            {
-                if (!hd.UseForAutoComplete || !hd.Token.ToUpper().StartsWith(curTokenString))
-                {
-                    continue;
-                }
-                if (token == null)
-                {
-                    token = hd.Token;
-                }
-                else
-                {
-                    token = null;
-                    break;
-                }
-            }
-            if (token == null)
-            {
-                ShowAutoComplete();
-            }
-            else
-            {
-                SelectionStart = curTokenStartIndex;
-                SelectionLength = curTokenEndIndex - curTokenStartIndex;
-                SelectedText = token;
-                SelectionStart = SelectionStart + SelectionLength;
-                SelectionLength = 0;
-            }
-        }
-
-        /* Replace the current word of the cursor with the one from the AutoComplete form and close it. */
-        private void AcceptAutoCompleteItem()
-        {
-            if (_autoComplete.SelectedItem == null)
-            {
-                return;
-            }
-            var curTokenStartIndex =
-                Text.LastIndexOfAny(Seperators.GetAsCharArray(), Math.Min(SelectionStart, Text.Length - 1)) + 1;
-            var curTokenEndIndex = Text.IndexOfAny(Seperators.GetAsCharArray(), SelectionStart);
-            if (curTokenEndIndex == -1)
-            {
-                curTokenEndIndex = Text.Length;
-            }
-            SelectionStart = Math.Max(curTokenStartIndex, 0);
-            SelectionLength = Math.Max(0, curTokenEndIndex - curTokenStartIndex);
-            SelectedText = _autoComplete.SelectedItem;
-            SelectionStart = SelectionStart + SelectionLength;
-            SelectionLength = 0;
-            HideAutoCompleteForm();
-            return;
-        }
-
-        private void SetBestSelectedAutoCompleteItem()
-        {
-            var curTokenStartIndex =
-                Text.LastIndexOfAny(Seperators.GetAsCharArray(), Math.Min(SelectionStart, Text.Length - 1)) + 1;
-            var curTokenEndIndex = Text.IndexOfAny(Seperators.GetAsCharArray(), SelectionStart);
-            if (curTokenEndIndex == -1)
-            {
-                curTokenEndIndex = Text.Length;
-            }
-            var curTokenString = Text.Substring(curTokenStartIndex, Math.Max(curTokenEndIndex - curTokenStartIndex, 0)).ToUpper();
-            if ((_autoComplete.SelectedItem != null) && _autoComplete.SelectedItem.ToUpper().StartsWith(curTokenString))
-            {
-                return;
-            }
-            var matchingChars = -1;
-            string bestMatchingToken = null;
-            foreach (var item in _autoComplete.Items)
-            {
-                var isWholeItemMatching = true;
-                for (var i = 0; i < Math.Min(item.Length, curTokenString.Length); i++)
-                {
-                    if (char.ToUpper(item[i]) == char.ToUpper(curTokenString[i]))
-                    {
-                        continue;
-                    }
-                    isWholeItemMatching = false;
-                    if (i - 1 <= matchingChars)
-                    {
-                        continue;
-                    }
-                    matchingChars = i;
-                    bestMatchingToken = item;
-                    break;
-                }
-                if (!isWholeItemMatching || (Math.Min(item.Length, curTokenString.Length) <= matchingChars))
-                {
-                    continue;
-                }
-                matchingChars = Math.Min(item.Length, curTokenString.Length);
-                bestMatchingToken = item;
-            }
-            if (bestMatchingToken != null)
-            {
-                _autoComplete.SelectedIndex = _autoComplete.Items.IndexOf(bestMatchingToken);
-            }
-        }
-
-        /* Sets the items for the AutoComplete form */
-        private void SetAutoCompleteItems()
-        {
-            _autoComplete.Items.Clear();
-            var filterString = "";
-            if (FilterAutoComplete)
-            {
-                var filterTokenStartIndex = Text.LastIndexOfAny(Seperators.GetAsCharArray(), Math.Min(SelectionStart, Text.Length - 1)) + 1;
-                var filterTokenEndIndex = Text.IndexOfAny(Seperators.GetAsCharArray(), SelectionStart);
-                if (filterTokenEndIndex == -1)
-                {
-                    filterTokenEndIndex = Text.Length;
-                }
-                filterString = Text.Substring(filterTokenStartIndex, filterTokenEndIndex - filterTokenStartIndex).ToUpper();
-            }
-
-            foreach (HighlightDescriptor hd in HighlightDescriptors)
-            {
-                if (hd.Token.ToUpper().StartsWith(filterString) && hd.UseForAutoComplete)
-                {
-                    _autoComplete.Items.Add(hd.Token);
-                }
-            }
-            _autoComplete.UpdateView();
-        }
-
-        private void SetAutoCompleteSize()
-        {
-            _autoComplete.Height = Math.Min(
-                Math.Max(_autoComplete.Items.Count, 1)*_autoComplete.ItemHeight + 4,
-                _autoComplete.MaximumSize.Height);
-        }
-
-        private void HideAutoCompleteForm()
-        {
-            _autoComplete.Visible = false;
-            _autoCompleteShown = false;
-        }
-
-        private void SetAutoCompleteLocation(bool moveHorizontly)
-        {
-            var cursorLocation = GetPositionFromCharIndex(SelectionStart);
-            var screen = Screen.FromPoint(cursorLocation);
-            var optimalLocation = new Point(PointToScreen(cursorLocation).X - 15,
-                                            (int) (PointToScreen(cursorLocation).Y + Font.Size*2 + 2));
-            var desiredPlace = new Rectangle(optimalLocation, _autoComplete.Size)
-                                   {
-                                       Width = 152
-                                   };
-            if (desiredPlace.Left < screen.Bounds.Left)
-            {
-                desiredPlace.X = screen.Bounds.Left;
-            }
-            if (desiredPlace.Right > screen.Bounds.Right)
-            {
-                desiredPlace.X -= (desiredPlace.Right - screen.Bounds.Right);
-            }
-            if (desiredPlace.Bottom > screen.Bounds.Bottom)
-            {
-                desiredPlace.Y = cursorLocation.Y - 2 - desiredPlace.Height;
-            }
-            if (!moveHorizontly)
-            {
-                desiredPlace.X = _autoComplete.Left;
-            }
-            _autoComplete.Bounds = desiredPlace;
-        }
-
-        public void ShowAutoComplete()
-        {
-            SetAutoCompleteItems();
-            SetAutoCompleteSize();
-            SetAutoCompleteLocation(true);
-            _ignoreLostFocus = true;
-            _autoComplete.Visible = true;
-            SetBestSelectedAutoCompleteItem();
-            _autoCompleteShown = true;
-            Focus();
-            _ignoreLostFocus = false;
         }
 
         /* RTF building helper functions */
