@@ -12,7 +12,7 @@ namespace ircScript.Classes
 {
     public class Script
     {
-        /* Main script file */
+        /* Main script file - yes, it has flaws and a few things could be written a little better, but it works */
         private ScriptVariables _localVariables = new  ScriptVariables();
 
         /* Public properties */

@@ -158,6 +158,10 @@ namespace FusionIRC.Helpers
                     client.Send(string.Format("PASS :{0}", args));
                     break;
 
+                case "ECHO":
+                    ParseEcho(client, args);
+                    break;
+
                 default:
                     /* Send command to server */
                     if (!client.IsConnected)
@@ -649,6 +653,25 @@ namespace FusionIRC.Helpers
                 child.AutoClose = true; /* This will stop the child window sending "PART" on closing */
             }
             client.Send(string.Format("PART {0}\r\nJOIN {0}", child.Tag));
+        }
+
+        private static void ParseEcho(ClientConnection client, string args)
+        {
+            /* Echo text to window (currently only supporting active window for now) -
+             * client param not used for now but eventually will be */
+            var w = WindowManager.GetActiveWindow(ConnectionCallbackManager.MainForm);
+            if (w == null)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.EchoText,
+                              TimeStamp = DateTime.Now,
+                              Text = args
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            w.Output.AddLine(pmd.DefaultColor, pmd.Message);
         }
 
         /* Timer callback */

@@ -121,6 +121,7 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.DnsText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * DNS Look-up: $text" });
             Messages.Add(ThemeMessage.DnsLookupReplyText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * DNS Look-up: $dnsip ($dnshost)" });
             Messages.Add(ThemeMessage.InfoText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $text" });
+            Messages.Add(ThemeMessage.EchoText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$text" });
             /* Image list... */
             NicklistImages.Add(ThemeNicklistImage.Owner, Properties.Resources.owner.ToBitmap());
             NicklistImages.Add(ThemeNicklistImage.Protected, Properties.Resources.prot.ToBitmap());

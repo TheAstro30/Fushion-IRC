@@ -48,6 +48,31 @@ namespace ircCore.Utils
             return WriteXyFormat(s.Width, s.Height);
         }
 
+        public static Font ParseFontFormat(string s)
+        {
+            var p = s.Split(',');
+            if (p.Length < 3)
+            {
+                return new Font("Segoe UI", 10, FontStyle.Regular);
+            }
+            float i;
+            if (!float.TryParse(p[1], out i))
+            {
+                i = 12;
+            }
+            int st;
+            if (!int.TryParse(p[2], out st))
+            {
+                st = 0;
+            }
+            return new Font(p[0], i, (FontStyle) st);
+        }
+
+        public static string WriteFontFormat(Font f)
+        {
+            return string.Format("{0},{1},{2}", f.Name, f.Size, (int) f.Style);
+        }
+
         public static Rectangle ParseRectangleFormat(string s)
         {
             var i = ParseXyFormat(s);

@@ -65,12 +65,20 @@ namespace FusionIRC.Forms
             ChannelManager.Load();
             /* DCC File transfers manager */
             DccManager.Load();
-            /* Load aliases */
-            ScriptManager.AliasData.Add(ScriptManager.LoadScript(Functions.MainDir(@"scripts/aliases.xml", false)));
+            /* Load scripts */
+            foreach (var s in SettingsManager.Settings.Scripts.Aliases)
+            {
+                ScriptManager.AliasData.Add(ScriptManager.LoadScript(Functions.MainDir(s.Path, false)));
+            }
+            foreach (var s in SettingsManager.Settings.Scripts.Popups)
+            {
+                ScriptManager.PopupData.Add(ScriptManager.LoadScript(Functions.MainDir(s.Path, false)));
+            }
             /* Build script data */
             ScriptManager.BuildScripts(ScriptManager.AliasData, ScriptManager.Aliases);
+            ScriptManager.BuildScripts(ScriptManager.PopupData, ScriptManager.Popups);
             /* Load variables */
-            ScriptManager.LoadVariables(Functions.MainDir(@"scripts/variables.xml", false));
+            ScriptManager.LoadVariables(Functions.MainDir(@"\scripts\variables.xml", false));
             /* Main form initialization */
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             Text = @"FusionIRC";
@@ -211,11 +219,10 @@ namespace FusionIRC.Forms
             if (!_initialize)
             {
                 var w = SettingsManager.GetWindowByName("application");
-                if (WindowState != FormWindowState.Maximized)
+                if (WindowState == FormWindowState.Normal)
                 {
                     w.Size = Size;
                     w.Position = Location;
-                    System.Diagnostics.Debug.Print("setting location... " + w.Position);
                 }
                 w.Maximized = WindowState == FormWindowState.Maximized;
             }
@@ -279,7 +286,7 @@ namespace FusionIRC.Forms
             /* DCC File transfers manager */
             DccManager.Save();
             /* Save variables */
-            ScriptManager.SaveVariables(Functions.MainDir(@"scripts/variables.xml", false));
+            ScriptManager.SaveVariables(Functions.MainDir(@"\scripts\variables.xml", false));
             base.OnFormClosing(e);
         }
 

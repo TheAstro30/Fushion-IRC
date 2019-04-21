@@ -125,7 +125,7 @@ namespace FusionIRC.Forms.Misc
             if (!_initialize)
             {
                 var w = SettingsManager.GetWindowByName("dcc-manager");
-                if (WindowState != FormWindowState.Maximized)
+                if (WindowState == FormWindowState.Normal)
                 {
                     w.Position = Location;
                 }
@@ -138,7 +138,7 @@ namespace FusionIRC.Forms.Misc
             if (!_initialize)
             {
                 var w = SettingsManager.GetWindowByName("dcc-manager");
-                if (WindowState != FormWindowState.Maximized)
+                if (WindowState == FormWindowState.Normal)
                 {
                     w.Size = Size;
                     w.Position = Location;

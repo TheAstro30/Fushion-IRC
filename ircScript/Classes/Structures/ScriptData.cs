@@ -6,16 +6,30 @@
 using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using ircCore.Utils;
 
 namespace ircScript.Classes.Structures
 {
     [Serializable, XmlRoot("script")]
-    public class ScriptData
+    public class ScriptData : ICloneList<ScriptData>
     {
         [XmlAttribute("name")]
         public string Name { get; set; }
 
         [XmlElement("data")]
         public List<string> RawScriptData = new List<string>();
+
+        [XmlIgnore]
+        public bool ContentsChanged { get; set; }
+
+        public ScriptData Clone()
+        {
+            return (ScriptData) MemberwiseClone();
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}.xml", Name);
+        }
     }
 }

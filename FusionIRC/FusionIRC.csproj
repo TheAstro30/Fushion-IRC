@@ -115,9 +115,6 @@
     <Compile Include="Forms\Misc\FrmScript.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\Misc\FrmScript.Designer.cs">
-      <DependentUpon>FrmScript.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\Settings\Controls\Base\BaseControlRenderer.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -176,9 +173,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\Misc\FrmDccManager.resx">
       <DependentUpon>FrmDccManager.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Misc\FrmScript.resx">
-      <DependentUpon>FrmScript.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\FrmSettings.resx">
       <DependentUpon>FrmSettings.cs</DependentUpon>
@@ -256,6 +250,9 @@
     <None Include="Icons\Toolbar\aliases.ico" />
     <None Include="Icons\Toolbar\autos.ico" />
     <None Include="Icons\Dialog\identify.ico" />
+    <None Include="Icons\Dialog\codeFile.ico" />
+    <None Include="Icons\Dialog\codeHeader.ico" />
+    <None Include="Icons\Dialog\aliasEditor.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

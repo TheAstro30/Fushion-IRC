@@ -83,6 +83,16 @@ namespace FusionIRC.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon aliasEditor {
+            get {
+                object obj = ResourceManager.GetObject("aliasEditor", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon aliases {
             get {
                 object obj = ResourceManager.GetObject("aliases", resourceCulture);
@@ -116,6 +126,26 @@ namespace FusionIRC.Properties {
         internal static System.Drawing.Icon channel {
             get {
                 object obj = ResourceManager.GetObject("channel", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon codeFile {
+            get {
+                object obj = ResourceManager.GetObject("codeFile", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon codeHeader {
+            get {
+                object obj = ResourceManager.GetObject("codeHeader", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

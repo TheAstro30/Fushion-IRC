@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 
 namespace ircScript.Classes.Parsers
 {
-    internal class VariableParser
+    internal class ScriptVariableParser
     {
         private readonly Regex _var = new Regex(@"%[a-zA-Z]+", RegexOptions.Compiled); /* Used to find instances of %[var] */
     }

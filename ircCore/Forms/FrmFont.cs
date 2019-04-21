@@ -29,10 +29,8 @@ namespace ircCore.Forms
         private readonly Button _btnOk;
         private readonly Button _btnCancel;
 
-        private readonly Timer _tmrFocus;
-
         private Font _initialFont = new Font("Tahoma", 9);
-        private int _initialFontSize = 8;
+        private int _initialFontSize = 9;
         private FontStyle _initialFontStyle = FontStyle.Regular;
 
         public FrmFont()
@@ -158,9 +156,6 @@ namespace ircCore.Forms
                                       _pnlSample, _chkDefault, _btnOk, _btnCancel
                                   });
 
-            _tmrFocus = new Timer {Interval = 10};
-            _tmrFocus.Tick += TmrFocusTick;
-
             AcceptButton = _btnOk;
 
             ShowDefaultCheckbox = true;
@@ -177,7 +172,7 @@ namespace ircCore.Forms
             set
             {
                 _initialFontSize = (int) Math.Round(value.Size);
-                _initialFont = new Font(value.Name, _initialFontSize);
+                _initialFont = new Font(value.Name, _initialFontSize, value.Style);
                 _initialFontStyle = value.Style;                
             }
         }
@@ -227,7 +222,6 @@ namespace ircCore.Forms
             _pnlSample.Paint += SampleOnPaint;
             /* Update combos */
             UpdateFontStyles();
-            _tmrFocus.Enabled = true;
         }
 
         /* Callbacks */
@@ -293,13 +287,6 @@ namespace ircCore.Forms
                 e.Graphics.DrawString(sSample, setFont, b, iWidth - (sz.Width/2), iHeight - (sz.Height/2),
                                       StringFormat.GenericTypographic);
             }
-        }
-
-        /* Timer event */
-        private void TmrFocusTick(object sender, EventArgs e)
-        {
-            _tmrFocus.Enabled = false;
-            _cmbFont.Focus();
         }
     }
 }

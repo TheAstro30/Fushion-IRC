@@ -3,7 +3,6 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
-
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -14,37 +13,15 @@ using ircScript.Controls.SyntaxHightlight.Helpers;
 namespace ircScript.Controls
 {
     /* This class MUST be the ONLY class initialized in an editing context */
-
     public sealed class ScriptEditor : UserControl
-    {
-        private readonly SyntaxHighlight _text;
+    {        
         private readonly LineNumberStrip _strip;
 
-        /* Only external properties required by this control to the internal RTB/SyntaxHighlight */
-        public string[] Lines
-        {
-            get { return _text.Lines; }
-            set { _text.Lines = value; }
-        }
-
-        public bool CanUndo
-        {
-            get { return _text.CanUndo; }
-        }
-
-        public bool CanRedo
-        {
-            get { return _text.CanRedo; }
-        }
-
-        public bool CanCopy
-        {
-            get { return _text.CanCopy; }
-        }
-
+        public SyntaxHighlight EditBox;
+       
         public ScriptEditor()
         {
-            _text = new SyntaxHighlight
+            EditBox = new SyntaxHighlight
                         {
                             Dock = DockStyle.Fill,
                             BorderStyle = BorderStyle.None,
@@ -54,9 +31,9 @@ namespace ircScript.Controls
                         };
 
             /* These break up tokens if used between them */
-            _text.Seperators.AddRange(new[] {'\r', '\n', ' ', ',', '.', '-', '+', '(', ')', '{', '}', '<', '>', '=', '!'});
+            EditBox.Seperators.AddRange(new[] {'\r', '\n', ' ', ',', '.', '-', '+', '(', ')', '{', '}', '<', '>', '=', '!'});
             /* Highlighted "words" - note: might have to modify this to only highlight first word in some instances */
-            _text.HighlightDescriptors.AddRange(new[]
+            EditBox.HighlightDescriptors.AddRange(new[]
                                                     {
                                                         new HighlightDescriptor("/*", "*/", Color.Green, null,
                                                                                 DescriptorType.ToCloseToken,
@@ -102,51 +79,23 @@ namespace ircScript.Controls
                                                                                 DescriptorRecognition.StartsWith)
                                                     });          
 
-            _strip = new LineNumberStrip(_text);
-            Controls.AddRange(new Control[] {_text, _strip});
+            _strip = new LineNumberStrip(EditBox);
+            Controls.AddRange(new Control[] {EditBox, _strip});
             BorderStyle = BorderStyle.Fixed3D;
-            BackColor = _text.BackColor;            
-        }
-
-        /* Edting methods - because we can't inherit directly from the SyntaxHighlight class
-         * (line numbering won't align correctly), we expose some methods to do edit operations which
-         * are tied back to the SyntaxHighlight class */
-        public void Undo()
-        {
-            _text.Undo();
-        }
-
-        public void Redo()
-        {
-            _text.Redo();
-        }
-
-        public void Cut()
-        {
-            _text.Cut();
-        }
-
-        public void Copy()
-        {
-            _text.Copy();
-        }
-
-        public void Paste()
-        {
-            _text.Paste();
+            BackColor = EditBox.BackColor;            
         }
 
         /* Text formatting */
         public void Indent()
         {
             /* First get selection start */
-            var sel = _text.SelectionStart;
+            var sel = EditBox.SelectionStart;
             /* Indents text as by { and } */
             var indent = 0;
-            var lines = _text.Lines;
+            var lines = EditBox.Lines;
             for (var i = 0; i < lines.Length; i++)
             {
-                var line = _text.Lines[i].TrimStart(); /* Remove any leading spacing already */
+                var line = EditBox.Lines[i].TrimStart(); /* Remove any leading spacing already */
                 if (line.EndsWith("{"))
                 {
                     lines[i] = string.Format("{0}{1}", new String(' ', indent*4), line);
@@ -164,10 +113,10 @@ namespace ircScript.Controls
                 lines[i] = string.Format("{0}{1}", new String(' ', indent*4), line);             
             }
             /* Re-set lines in RTB */
-            _text.Lines = lines;
+            EditBox.Lines = lines;
             /* Re-set selection start */
-            _text.SelectionStart = sel;
-            _text.SelectionLength = 0;
+            EditBox.SelectionStart = sel;
+            EditBox.SelectionLength = 0;
         }
     }
 }

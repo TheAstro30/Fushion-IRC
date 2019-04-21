@@ -73,7 +73,7 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
             {
                 /* We override the default behaviour of Lines.Set to prevent undo from removing what was
                  * originally added */
-                _bufferSet = true;
+                _bufferSet = true;                
                 base.Lines = value;
             }
         }
@@ -85,9 +85,7 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
             {
                 return;
             }
-            _parsing = true;
-            Win32.LockWindowUpdate(Handle);
-            base.OnTextChanged(e);
+            _parsing = true;            
             if (!_isUndo)
             {
                 _redoStack.Clear();
@@ -95,6 +93,8 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
                 LimitUndo();
                 _lastInfo = new UndoRedoInfo(Text, GetScrollPos(), SelectionStart);
             }
+            Win32.LockWindowUpdate(Handle);
+            base.OnTextChanged(e);
             /* Save scroll bar an cursor position, changeing the RTF moves the cursor and scrollbars to top position */
             var scrollPos = GetScrollPos();
             var cursorLoc = SelectionStart;
@@ -347,6 +347,7 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
             SetColor(sb, ForeColor, colors);
             SetFont(sb, Font, fonts);
             SetFontSize(sb, (int) Font.Size);
+            SetFontStyle(sb, Font.Style);
             EndTags(sb);
         }
 
@@ -357,6 +358,7 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
             {
                 SetFont(sb, hd.Font, fonts);
                 SetFontSize(sb, (int) hd.Font.Size);
+                SetFontStyle(sb, hd.Font.Style);
             }
             EndTags(sb);
         }
@@ -373,13 +375,34 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
 
         private static void SetFont(StringBuilder sb, Font font, Hashtable fonts)
         {
-            if (font == null) return;
+            if (font == null)
+            {
+                return;
+            }
             sb.Append(@"\f").Append(fonts[font.Name]);
         }
 
         private static void SetFontSize(StringBuilder sb, int size)
         {
             sb.Append(@"\fs").Append(size*2);
+        }
+
+        private static void SetFontStyle(StringBuilder sb, FontStyle style)
+        {
+            switch (style)
+            {
+                case FontStyle.Bold:
+                    sb.Append(@"\b");
+                    break;
+
+                case FontStyle.Italic:
+                    sb.Append(@"\i");
+                    break;
+
+                case FontStyle.Bold | FontStyle.Italic:
+                    sb.Append(@"\b\i");
+                    break;
+            }
         }
 
         private static void AddNewLine(StringBuilder sb)

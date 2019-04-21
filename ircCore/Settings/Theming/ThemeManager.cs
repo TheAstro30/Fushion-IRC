@@ -184,7 +184,10 @@ namespace ircCore.Settings.Theming
         DnsLookupReplyText = 41,
 
         [Description("Info Text")]
-        InfoText = 42
+        InfoText = 42,
+
+        [Description("Normal Text")]
+        EchoText = 43
     }
 
     public enum ThemeNicklistImage
@@ -198,7 +201,7 @@ namespace ircCore.Settings.Theming
         [Description("Operator (@)")]
         Operator = 2,
 
-        [Description("Half Operator (&)")]
+        [Description("Half Operator (%)")]
         HalfOperator = 3,
 
         [Description("Voiced (+)")]

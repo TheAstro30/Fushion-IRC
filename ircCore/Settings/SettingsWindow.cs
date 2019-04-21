@@ -30,7 +30,7 @@ namespace ircCore.Settings
         public SettingsCaching Caching = new SettingsCaching();
 
         [XmlElement("window")]
-        public List<WindowData> Window = new List<WindowData>();        
+        public List<WindowData> Window = new List<WindowData>();  
     }
 
     [Serializable]

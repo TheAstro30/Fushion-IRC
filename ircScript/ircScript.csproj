@@ -44,7 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\Parsers\VariableParser.cs" />
+    <Compile Include="Classes\Parsers\ScriptVariableParser.cs" />
+    <Compile Include="Classes\ScriptFileNode.cs" />
     <Compile Include="Classes\Structures\ScriptVariable.cs" />
     <Compile Include="Classes\Structures\ScriptWhile.cs" />
     <Compile Include="Controls\ScriptEditor.cs">

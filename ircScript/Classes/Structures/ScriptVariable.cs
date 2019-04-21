@@ -13,7 +13,6 @@ namespace ircScript.Classes.Structures
     [Serializable]
     public class ScriptVariable
     {
-        //regex %[a-zA-Z]+
         [XmlAttribute("name")]
         public string Name { get; set; }
 
@@ -35,7 +34,7 @@ namespace ircScript.Classes.Structures
         public ScriptVariable GetVariable(string name)
         {
             return Variable.FirstOrDefault(v => v.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-        }
+        }        
 
         public void Increment(ScriptVariable v)
         {

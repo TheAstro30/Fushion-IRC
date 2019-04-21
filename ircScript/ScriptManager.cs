@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ircCore.Settings;
 using ircCore.Utils.Serialization;
 using ircScript.Classes;
 using ircScript.Classes.Structures;
@@ -16,14 +17,16 @@ namespace ircScript
     {
         /* Raw script files */
         public static List<ScriptData> AliasData = new List<ScriptData>();
+        public static List<ScriptData> PopupData = new List<ScriptData>();
 
         /* Stored scritps */
         public static List<Script> Aliases = new List<Script>();
+        public static List<Script> Popups = new List<Script>();
 
         /* Global variables */
         public static ScriptVariables Variables = new ScriptVariables();
 
-        /* Load/Save methods */
+        /* Load/Save methods */        
         public static ScriptData LoadScript(string fileName)
         {
             ScriptData script = null;
@@ -66,6 +69,15 @@ namespace ircScript
             foreach (var d in rawScriptData)
             {
                 BuildScripts(d, scriptList);
+            }
+        }
+
+        public static void BuildFileList(List<SettingsScripts.SettingsScriptPath> scriptList, List<ScriptData> data)
+        {
+            scriptList.Clear();
+            foreach (var s in data)
+            {
+                scriptList.Add(new SettingsScripts.SettingsScriptPath {Path = string.Format(@"\scripts\{0}.xml", s.Name)});
             }
         }
 

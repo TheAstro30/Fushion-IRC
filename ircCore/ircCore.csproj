@@ -106,9 +106,11 @@
     <Compile Include="Settings\SettingsChannel.cs" />
     <Compile Include="Settings\SettingsConfirmation.cs" />
     <Compile Include="Settings\SettingsConnection.cs" />
+    <Compile Include="Settings\SettingsEditor.cs" />
     <Compile Include="Settings\SettingsFind.cs" />
     <Compile Include="Settings\SettingsIdentd.cs" />
     <Compile Include="Settings\SettingsLocalInfo.cs" />
+    <Compile Include="Settings\SettingsScripts.cs" />
     <Compile Include="Settings\SettingsTabs.cs" />
     <Compile Include="Settings\SettingsUserInfo.cs" />
     <Compile Include="Settings\Theming\Forms\Controls\ThemeColors.cs">
@@ -133,6 +135,7 @@
     <Compile Include="Users\UserList.cs" />
     <Compile Include="Utils\DnsResult.cs" />
     <Compile Include="Utils\Functions.cs" />
+    <Compile Include="Utils\ListExtensions.cs" />
     <Compile Include="Utils\Serialization\BinarySerialize.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Settings\SettingsManager.cs" />

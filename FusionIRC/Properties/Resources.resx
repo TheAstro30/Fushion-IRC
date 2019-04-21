@@ -211,4 +211,13 @@
   <data name="identify" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Icons\Dialog\identify.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="codeFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\Dialog\codeFile.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="codeHeader" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\Dialog\codeHeader.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="aliasEditor" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\Dialog\aliasEditor.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

@@ -297,7 +297,7 @@ namespace FusionIRC.Forms.Child
             if (!_initialize)
             {
                 var w = SettingsManager.GetWindowByName(_windowChildName);
-                if (WindowState != FormWindowState.Maximized)
+                if (WindowState == FormWindowState.Normal)
                 {
                     /* I think this is remarked out so I could modify WindowManger to get specific positions for
                      * chat windows named a certain name, eg: #dragonsrealm = this position in the MDI window, all

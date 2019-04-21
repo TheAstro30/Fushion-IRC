@@ -26,7 +26,13 @@ namespace ircCore.Settings
         public SettingsClient Client = new SettingsClient();
 
         [XmlElement("themes")]
-        public SettingsTheme Themes = new SettingsTheme();        
+        public SettingsTheme Themes = new SettingsTheme();
+
+        [XmlElement("editor")]
+        public SettingsEditor Editor = new SettingsEditor();
+
+        [XmlElement("scripts")]
+        public SettingsScripts Scripts = new SettingsScripts(); 
 
         public Settings()
         {
@@ -55,6 +61,9 @@ namespace ircCore.Settings
             Windows.Caching.Output = 500;
             Windows.Caching.Input = 50;
             Windows.Caching.ChatSearch = 25;
+            /* Editor */
+            Editor.SyntaxHighlight = true;
+            Editor.Font = new Font("Segoe UI Semibold", 12, FontStyle.Regular);
             /* Identd */
             Connection.Identd.System = "UNIX";
             Connection.Identd.Port = 113;
