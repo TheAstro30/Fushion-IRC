@@ -19,6 +19,7 @@ using ircCore.Controls.ChildWindows.Nicklist;
 using ircCore.Controls.ChildWindows.OutputDisplay;
 using ircCore.Controls.ChildWindows.OutputDisplay.Helpers;
 using ircCore.Settings;
+using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
 

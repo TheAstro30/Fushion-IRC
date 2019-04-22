@@ -14,6 +14,7 @@ using ircClient.Parsing.Helpers;
 using ircClient.Tcp;
 using ircCore.Settings;
 using ircCore.Settings.Networks;
+using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Utils;
 
 namespace ircClient

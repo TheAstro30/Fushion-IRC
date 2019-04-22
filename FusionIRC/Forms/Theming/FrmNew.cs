@@ -7,7 +7,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using ircCore.Controls;
 
-namespace ircCore.Settings.Theming.Forms
+namespace FusionIRC.Forms.Theming
 {
     public sealed class FrmNew : FormEx
     {

@@ -7,8 +7,9 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using ircCore.Settings.SettingsBase.Structures;
 
-namespace ircCore.Settings
+namespace ircCore.Settings.SettingsBase
 {
     [Serializable, XmlRoot("settings")]
     public class Settings

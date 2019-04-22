@@ -10,6 +10,7 @@ using FusionIRC.Forms.Child;
 using FusionIRC.Helpers;
 using ircCore.Controls;
 using ircCore.Settings;
+using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
 

@@ -4,9 +4,10 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System.Windows.Forms;
+using ircCore.Settings.Theming;
 using ircCore.Utils;
 
-namespace ircCore.Settings.Theming.Forms.Controls
+namespace FusionIRC.Forms.Theming.Controls
 {
     public partial class ThemeColors : UserControl
     {

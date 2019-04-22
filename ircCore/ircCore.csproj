@@ -101,33 +101,18 @@
     <Compile Include="Settings\Networks\ServerManager.cs" />
     <Compile Include="Settings\Networks\Servers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings\SettingsCaching.cs" />
-    <Compile Include="Settings\SettingsClient.cs" />
-    <Compile Include="Settings\SettingsChannel.cs" />
-    <Compile Include="Settings\SettingsConfirmation.cs" />
-    <Compile Include="Settings\SettingsConnection.cs" />
-    <Compile Include="Settings\SettingsEditor.cs" />
-    <Compile Include="Settings\SettingsFind.cs" />
-    <Compile Include="Settings\SettingsIdentd.cs" />
-    <Compile Include="Settings\SettingsLocalInfo.cs" />
-    <Compile Include="Settings\SettingsScripts.cs" />
-    <Compile Include="Settings\SettingsTabs.cs" />
-    <Compile Include="Settings\SettingsUserInfo.cs" />
-    <Compile Include="Settings\Theming\Forms\Controls\ThemeColors.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Settings\Theming\Forms\Controls\ThemeColors.Designer.cs">
-      <DependentUpon>ThemeColors.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Settings\Theming\Forms\Controls\ThemePreview.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Settings\Theming\Forms\FrmNew.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Settings\Theming\Forms\FrmTheme.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Settings\SettingsBase\Structures\SettingsCaching.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsClient.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsChannel.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsConfirmation.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsConnection.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsEditor.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsFind.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsIdentd.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsLocalInfo.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsScripts.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsTabs.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsUserInfo.cs" />
     <Compile Include="Controls\FormEx.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -137,10 +122,10 @@
     <Compile Include="Utils\Functions.cs" />
     <Compile Include="Utils\ListExtensions.cs" />
     <Compile Include="Utils\Serialization\BinarySerialize.cs" />
-    <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Settings\SettingsBase\Settings.cs" />
     <Compile Include="Settings\SettingsManager.cs" />
-    <Compile Include="Settings\SettingsTheme.cs" />
-    <Compile Include="Settings\SettingsWindow.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsTheme.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsWindow.cs" />
     <Compile Include="Settings\Theming\Theme.cs" />
     <Compile Include="Settings\Theming\ThemeManager.cs" />
     <Compile Include="Utils\Speech.cs" />
@@ -155,9 +140,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Settings\Theming\Forms\Controls\ThemeColors.resx">
-      <DependentUpon>ThemeColors.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -180,9 +163,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\owner.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\protected.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\prot.ico" />

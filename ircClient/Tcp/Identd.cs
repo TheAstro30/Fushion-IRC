@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Net.Sockets;
 using System.Windows.Forms;
 using ircCore.Settings;
+using ircCore.Settings.SettingsBase.Structures;
 
 namespace ircClient.Tcp
 {

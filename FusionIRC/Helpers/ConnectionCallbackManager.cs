@@ -14,6 +14,7 @@ using ircClient;
 using ircCore.Autos;
 using ircCore.Settings;
 using ircCore.Settings.Networks;
+using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
 using ircCore.Users;
 using ircCore.Utils;

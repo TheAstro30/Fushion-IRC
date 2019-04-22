@@ -8,7 +8,7 @@ using System.Drawing;
 using System.Xml.Serialization;
 using ircCore.Utils;
 
-namespace ircCore.Settings
+namespace ircCore.Settings.SettingsBase.Structures
 {
     [Serializable]
     public class SettingsEditor
@@ -25,5 +25,8 @@ namespace ircCore.Settings
 
         [XmlIgnore]
         public Font Font { get; set; }
+
+        [XmlAttribute("last")]
+        public string Last { get; set; }
     }
 }

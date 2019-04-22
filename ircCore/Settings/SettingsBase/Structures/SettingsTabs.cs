@@ -6,7 +6,7 @@
 using System;
 using System.Xml.Serialization;
 
-namespace ircCore.Settings
+namespace ircCore.Settings.SettingsBase.Structures
 {
     [Serializable]
     public class SettingsTabs

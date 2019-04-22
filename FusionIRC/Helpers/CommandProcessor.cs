@@ -206,7 +206,6 @@ namespace FusionIRC.Helpers
             {
                 return;
             }
-            System.Diagnostics.Debug.Print("OUTPUT: " + data);
             var i = data.IndexOf(' ');
             string command;
             var args = string.Empty;

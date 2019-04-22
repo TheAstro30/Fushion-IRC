@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using ircCore.Controls;
 using ircCore.Settings;
+using ircCore.Settings.SettingsBase.Structures;
 
 namespace FusionIRC.Forms.Child
 {

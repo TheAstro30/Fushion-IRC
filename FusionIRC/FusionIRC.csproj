@@ -112,7 +112,10 @@
     <Compile Include="Forms\Misc\FrmPart.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\Misc\FrmScript.cs">
+    <Compile Include="Forms\Script\FrmRename.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Script\FrmScript.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Settings\Controls\Base\BaseControlRenderer.cs">
@@ -138,6 +141,21 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Settings\Controls\Base\ISettings.cs" />
+    <Compile Include="Forms\Theming\Controls\ThemeColors.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Theming\Controls\ThemeColors.Designer.cs">
+      <DependentUpon>ThemeColors.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Theming\Controls\ThemePreview.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Theming\FrmNew.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Theming\FrmTheme.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\Users\Controls\UserListView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -176,6 +194,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\FrmSettings.resx">
       <DependentUpon>FrmSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Theming\Controls\ThemeColors.resx">
+      <DependentUpon>ThemeColors.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

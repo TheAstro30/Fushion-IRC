@@ -4,7 +4,9 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Controls.ControlBars;
@@ -18,6 +20,7 @@ using ircCore.Dcc;
 using ircCore.Settings;
 using ircCore.Settings.Channels;
 using ircCore.Settings.Networks;
+using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
 using ircCore.Users;
 using ircCore.Utils;
@@ -66,14 +69,8 @@ namespace FusionIRC.Forms
             /* DCC File transfers manager */
             DccManager.Load();
             /* Load scripts */
-            foreach (var s in SettingsManager.Settings.Scripts.Aliases)
-            {
-                ScriptManager.AliasData.Add(ScriptManager.LoadScript(Functions.MainDir(s.Path, false)));
-            }
-            foreach (var s in SettingsManager.Settings.Scripts.Popups)
-            {
-                ScriptManager.PopupData.Add(ScriptManager.LoadScript(Functions.MainDir(s.Path, false)));
-            }
+            ScriptManager.LoadMultipleScripts(SettingsManager.Settings.Scripts.Aliases, ScriptManager.AliasData);
+            ScriptManager.LoadMultipleScripts(SettingsManager.Settings.Scripts.Popups, ScriptManager.PopupData);
             /* Build script data */
             ScriptManager.BuildScripts(ScriptManager.AliasData, ScriptManager.Aliases);
             ScriptManager.BuildScripts(ScriptManager.PopupData, ScriptManager.Popups);

@@ -9,8 +9,12 @@ using System.IO;
 using System.Windows.Forms;
 using ircCore.Controls.ChildWindows.OutputDisplay;
 using ircCore.Controls.ChildWindows.OutputDisplay.Helpers;
+using ircCore.Settings;
+using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.Theming;
+using ircCore.Utils;
 
-namespace ircCore.Settings.Theming.Forms.Controls
+namespace FusionIRC.Forms.Theming.Controls
 {
     public sealed class ThemePreview : UserControl
     {
@@ -144,14 +148,14 @@ namespace ircCore.Settings.Theming.Forms.Controls
                             t = new SettingsTheme.ThemeListData
                                     {
                                         Name = f.ThemeName,
-                                        Path = string.Format(@"\themes\{0}.thm", Utils.Functions.CleanFileName(f.ThemeName))
+                                        Path = string.Format(@"\themes\{0}.thm", Functions.CleanFileName(f.ThemeName))
                                     };                            
                             SettingsManager.Settings.Themes.Theme.Add(t);
                             _theme = new Theme
                                          {
                                              Name = t.Name
                                          };
-                            ThemeManager.Save(Utils.Functions.MainDir(t.Path, false), _theme);
+                            ThemeManager.Save(Functions.MainDir(t.Path, false), _theme);
                             _cmbThemes.Items.Add(t);
                             _cmbThemes.SelectedIndex = _cmbThemes.Items.Count - 1;
                             BuildTextPreview();
@@ -170,7 +174,7 @@ namespace ircCore.Settings.Theming.Forms.Controls
                     }                    
                     /* Delete theme data */
                     SettingsManager.Settings.Themes.Theme.RemoveAt(_cmbThemes.SelectedIndex);
-                    var path = Utils.Functions.MainDir(deleted.Path, false);
+                    var path = Functions.MainDir(deleted.Path, false);
                     if (File.Exists(path))
                     {
                         File.Delete(path);
@@ -178,7 +182,7 @@ namespace ircCore.Settings.Theming.Forms.Controls
                     _cmbThemes.Items.RemoveAt(_cmbThemes.SelectedIndex);
                     /* Select previous theme and load it */
                     var theme = new Theme();
-                    path = Utils.Functions.MainDir(t.Path, false);
+                    path = Functions.MainDir(t.Path, false);
                     ThemeManager.Load(path, ref theme, true);
                     _theme = theme;                    
                     _cmbThemes.SelectedIndex = sel;
@@ -198,7 +202,7 @@ namespace ircCore.Settings.Theming.Forms.Controls
                 return;
             }
             var theme = new Theme();
-            ThemeManager.Load(Utils.Functions.MainDir(t.Path, false), ref theme, true);
+            ThemeManager.Load(Functions.MainDir(t.Path, false), ref theme, true);
             _theme = theme;
             _preview.Clear();
             _preview.Font = new Font(ThemeManager.GetFont(ChildWindowType.Channel).Name, 10); /* We keep the size static so it fits the preview */

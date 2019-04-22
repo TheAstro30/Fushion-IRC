@@ -17,7 +17,14 @@ namespace ircCore.Utils
     {
         public static List<T> Clone<T>(this List<T> listToClone) where T : ICloneList<T>
         {
-            return listToClone.Select(item => (T)item.Clone()).ToList();
+            return listToClone.Select(item => item.Clone()).ToList();
+        }
+
+        public static void Swap<T>(this IList<T> list, int indexA, int indexB)
+        {
+            var tmp = list[indexA];
+            list[indexA] = list[indexB];
+            list[indexB] = tmp;
         }
     }
 }

@@ -5,8 +5,11 @@
  */
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using ircCore.Settings;
+using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Utils;
 using ircCore.Utils.Serialization;
 using ircScript.Classes;
 using ircScript.Classes.Structures;
@@ -29,12 +32,9 @@ namespace ircScript
         /* Load/Save methods */        
         public static ScriptData LoadScript(string fileName)
         {
+            /* NOTE: This method returns NULL if failed - this is by design, always check for NULL at other end */
             ScriptData script = null;
-            if (!XmlSerialize<ScriptData>.Load(fileName, ref script))
-            {
-                script = new ScriptData();
-            }
-            return script;
+            return !XmlSerialize<ScriptData>.Load(fileName, ref script) ? null : script;
         }
 
         public static void SaveScript(ScriptData script, string fileName)
@@ -53,6 +53,33 @@ namespace ircScript
         public static void SaveVariables(string fileName)
         {
             XmlSerialize<ScriptVariables>.Save(fileName, Variables);
+        }
+
+        public static void LoadMultipleScripts(List<SettingsScripts.SettingsScriptPath> scripts, List<ScriptData> data)
+        {
+            var del = new Stack<SettingsScripts.SettingsScriptPath>();
+            foreach (var s in scripts)
+            {
+                /* Check file even exists.. */
+                var f = Functions.MainDir(s.Path, false);
+                if (!File.Exists(f))
+                {
+                    del.Push(s);
+                    continue;
+                }
+                var sf = LoadScript(Functions.MainDir(s.Path, false));
+                if (sf == null)
+                {
+                    continue;                    
+                }
+                data.Add(sf);
+            }
+            /* Delete any found entries from "scripts" */
+            while (del.Count > 0)
+            {
+                var d = del.Pop();
+                scripts.Remove(d);
+            }
         }
 
         public static Script GetScript(IEnumerable<Script> scripts, string name)
@@ -75,10 +102,9 @@ namespace ircScript
         public static void BuildFileList(List<SettingsScripts.SettingsScriptPath> scriptList, List<ScriptData> data)
         {
             scriptList.Clear();
-            foreach (var s in data)
-            {
-                scriptList.Add(new SettingsScripts.SettingsScriptPath {Path = string.Format(@"\scripts\{0}.xml", s.Name)});
-            }
+            scriptList.AddRange(
+                data.Select(
+                    s => new SettingsScripts.SettingsScriptPath {Path = string.Format(@"\scripts\{0}.xml", s.Name)}));
         }
 
         /* Private methods */

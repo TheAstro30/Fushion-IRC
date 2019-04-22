@@ -9,12 +9,13 @@ using System.Windows.Forms;
 using FusionIRC.Forms.Autos;
 using FusionIRC.Forms.Favorites;
 using FusionIRC.Forms.Misc;
+using FusionIRC.Forms.Script;
 using FusionIRC.Forms.Settings;
+using FusionIRC.Forms.Theming;
 using FusionIRC.Forms.Users;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
 using ircCore.Settings.Networks;
-using ircCore.Settings.Theming.Forms;
 
 namespace FusionIRC.Controls.ControlBars
 {

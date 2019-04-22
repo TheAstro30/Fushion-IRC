@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using FusionIRC.Forms.Settings.Controls.Base;
 using ircCore.Settings;
+using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Utils;
 
 namespace FusionIRC.Forms.Settings.Controls.Connection

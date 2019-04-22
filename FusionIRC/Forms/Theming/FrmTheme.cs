@@ -6,11 +6,13 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using FusionIRC.Forms.Theming.Controls;
 using ircCore.Controls;
-using ircCore.Settings.Theming.Forms.Controls;
+using ircCore.Settings;
+using ircCore.Settings.Theming;
 using ircCore.Utils;
 
-namespace ircCore.Settings.Theming.Forms
+namespace FusionIRC.Forms.Theming
 {
     public sealed class FrmTheme : FormEx
     {

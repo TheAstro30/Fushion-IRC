@@ -1,4 +1,4 @@
-﻿namespace ircCore.Settings.Theming.Forms.Controls
+﻿namespace FusionIRC.Forms.Theming.Controls
 {
     partial class ThemeColors
     {

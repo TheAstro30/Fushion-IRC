@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using System.Xml.Serialization;
 using ircCore.Utils;
 
-namespace ircCore.Settings
+namespace ircCore.Settings.SettingsBase.Structures
 {
     [Serializable]
     public class SettingsClient

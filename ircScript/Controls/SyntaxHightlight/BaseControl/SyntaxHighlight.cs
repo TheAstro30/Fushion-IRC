@@ -43,6 +43,8 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
         }
 
         /* Properties */
+        public bool EnableSyntaxHighlight { get; set; }
+
         public bool CaseSensitive { get; set; } /* Determines if token recognition is case sensitive. */
 
         public int MaxUndoRedoSteps { get; set; }
@@ -93,22 +95,26 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
                 LimitUndo();
                 _lastInfo = new UndoRedoInfo(Text, GetScrollPos(), SelectionStart);
             }
+            if (!EnableSyntaxHighlight)
+            {
+                _parsing = false;
+                base.OnTextChanged(e);
+                return;
+            }
             Win32.LockWindowUpdate(Handle);
             base.OnTextChanged(e);
-            /* Save scroll bar an cursor position, changeing the RTF moves the cursor and scrollbars to top position */
+            /* Save scroll bar and cursor position, changing the RTF moves the cursor and scrollbars to top position */
             var scrollPos = GetScrollPos();
             var cursorLoc = SelectionStart;
-            /* Created with an estimate of how big the stringbuilder has to be... */
-            var sb = new StringBuilder((int) (Text.Length*1.5 + 150));
             /* Add RTF header */
-            sb.Append(@"{\rtf1\fbidis\ansi\ansicpg1255\deff0\deflang1037{\fonttbl{");
+            var sb = new StringBuilder(@"{\rtf1\fbidis\ansi\ansicpg1255\deff0\deflang1037{\fonttbl{");
             /* Font table creation */
             var fontCounter = 0;
             var fonts = new Hashtable();
             AddFontToTable(sb, Font, ref fontCounter, fonts);
             foreach (HighlightDescriptor hd in HighlightDescriptors)
             {
-                if ((hd.Font != null) && !fonts.ContainsKey(hd.Font.Name))
+                if (hd.Font != null && !fonts.ContainsKey(hd.Font.Name))
                 {
                     AddFontToTable(sb, hd.Font, ref fontCounter, fonts);
                 }
@@ -213,7 +219,7 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
                                     break;
 
                                 case DescriptorType.ToCloseToken:
-                                    while ((line.IndexOf(hd.CloseToken, i) == -1) && (lineCounter < lines.Length))
+                                    while (line.IndexOf(hd.CloseToken, i) == -1 && lineCounter < lines.Length)
                                     {
                                         sb.Append(line.Remove(0, i));
                                         lineCounter++;
@@ -284,12 +290,12 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
                     break;
 
                 case Win32.WmKeydown:
-                    if (((Keys) (int) m.WParam == Keys.Z) && ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
+                    if ((Keys) (int) m.WParam == Keys.Z && ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
                     {
                         Undo();
                         return;
                     }
-                    if (((Keys) (int) m.WParam == Keys.Y) && ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
+                    if ((Keys) (int) m.WParam == Keys.Y && ((Win32.GetKeyState(Win32.VkControl) & Win32.KsKeydown) != 0))
                     {
                         Redo();
                         return;
@@ -368,11 +374,6 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
             sb.Append(@"\cf").Append(colors[color]);
         }
 
-        //private void SetBackColor(StringBuilder sb, Color color, IDictionary colors)
-        //{
-        //    sb.Append(@"\cb").Append(colors[color]);
-        //}
-
         private static void SetFont(StringBuilder sb, Font font, Hashtable fonts)
         {
             if (font == null)
@@ -423,8 +424,7 @@ namespace ircScript.Controls.SyntaxHightlight.BaseControl
 
         private static void AddColorToTable(StringBuilder sb, Color color, ref int counter, Hashtable colors)
         {
-            sb.Append(@"\red").Append(color.R).Append(@"\green").Append(color.G).Append(@"\blue")
-                .Append(color.B).Append(";");
+            sb.Append(@"\red").Append(color.R).Append(@"\green").Append(color.G).Append(@"\blue").Append(color.B).Append(";");
             colors.Add(color, counter++);
         }
 
