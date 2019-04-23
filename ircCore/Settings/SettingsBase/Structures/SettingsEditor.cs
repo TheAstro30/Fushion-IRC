@@ -4,9 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
-using System.Drawing;
 using System.Xml.Serialization;
-using ircCore.Utils;
 
 namespace ircCore.Settings.SettingsBase.Structures
 {
@@ -16,15 +14,11 @@ namespace ircCore.Settings.SettingsBase.Structures
         [XmlAttribute("syntaxHighlight")]
         public bool SyntaxHighlight { get; set; }
 
-        [XmlAttribute("font")]
-        public string FontString
-        {
-            get { return XmlFormatting.WriteFontFormat(Font); }
-            set { Font = XmlFormatting.ParseFontFormat(value); }
-        }
+        [XmlAttribute("lineNumbering")]
+        public bool LineNumbering { get; set; }
 
-        [XmlIgnore]
-        public Font Font { get; set; }
+        [XmlAttribute("zoom")]
+        public int Zoom { get; set; }
 
         [XmlAttribute("last")]
         public string Last { get; set; }

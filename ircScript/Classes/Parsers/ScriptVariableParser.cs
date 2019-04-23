@@ -13,6 +13,6 @@ namespace ircScript.Classes.Parsers
 {
     internal class ScriptVariableParser
     {
-        private readonly Regex _var = new Regex(@"%[a-zA-Z]+", RegexOptions.Compiled); /* Used to find instances of %[var] */
+        private readonly Regex _var = new Regex(@"%\w+", RegexOptions.Compiled); /* Used to find instances of %[var] */
     }
 }

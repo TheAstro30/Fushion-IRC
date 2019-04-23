@@ -43,7 +43,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
@@ -235,6 +234,10 @@
     <ProjectReference Include="..\ircScript\ircScript.csproj">
       <Project>{2B1EB033-1A85-4FBA-B7BA-359B364B74CF}</Project>
       <Name>ircScript</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\libDirectX\libDirectX.csproj">
+      <Project>{8F2B6CF8-31ED-4763-AEAB-6A6D36D78128}</Project>
+      <Name>libDirectX</Name>
     </ProjectReference>
     <ProjectReference Include="..\libolv\libolv.csproj">
       <Project>{18FEDA0C-D147-4286-B39A-01204808106A}</Project>

@@ -11,7 +11,7 @@ namespace ircScript.Classes.Parsers
 {
     internal class ScriptIdentifierParser
     {
-        private readonly Regex _tokenIdentifiers = new Regex(@"\$[a-zA-Z]+", RegexOptions.Compiled); /* Replaces $chan, etc */
+        private readonly Regex _tokenIdentifiers = new Regex(@"\$\w+", RegexOptions.Compiled); /* Replaces $chan, etc */
 
         public string Parse(ScriptArgs e, string lineData)
         {

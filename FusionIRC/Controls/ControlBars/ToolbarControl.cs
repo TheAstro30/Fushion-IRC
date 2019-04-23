@@ -242,7 +242,7 @@ namespace FusionIRC.Controls.ControlBars
 
                 case "ALIASES":
                     var edit = new FrmScript();
-                    edit.Show(_owner);
+                    edit.Show();
                     break;
 
                 case "CHANLIST":
@@ -278,7 +278,6 @@ namespace FusionIRC.Controls.ControlBars
                     {
                         if (part.ShowDialog(_owner) == DialogResult.OK)
                         {
-                            System.Diagnostics.Debug.Print(part.Channels);
                             c.Send(part.Channels == "0" ? "JOIN 0" : string.Format("PART {0}", part.Channels));
                         }
                     }

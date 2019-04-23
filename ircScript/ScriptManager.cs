@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Utils;
 using ircCore.Utils.Serialization;
@@ -137,12 +136,16 @@ namespace ircScript
                     script = new Script {Name = lineData.Substring(0, i).TrimEnd().Replace("/", "")};
                     /* Also need to consider checking the end of the line for // or /* */
                     lineData = lineData.Substring(i + 1);
+                    if (lineData.Length == 0)
+                    {
+                        continue;
+                    }
                     if (lineData.Trim() == "{")
                     {
                         /* Multi line, count further closing } */
                         braceCount = 1;
                         continue;
-                    }
+                    }                    
                     /* Check if wasn't formatted "alias <name> { code }" */
                     if (lineData[0] == '{' && lineData.TrimEnd()[lineData.Length - 1] == '}')
                     {                        

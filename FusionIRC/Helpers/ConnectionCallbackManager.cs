@@ -951,7 +951,6 @@ namespace FusionIRC.Helpers
 
         public static void OnUserInfo(ClientConnection client, string info)
         {
-            System.Diagnostics.Debug.Print(info);
             var n = info.Split('=');
             if (n.Length < 2)
             {

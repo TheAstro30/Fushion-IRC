@@ -4,108 +4,109 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using ircScript.Controls.SyntaxHightlight;
-using ircScript.Controls.SyntaxHightlight.BaseControl;
-using ircScript.Controls.SyntaxHightlight.Helpers;
+using ircScript.Controls.SyntaxHighlight;
 
 namespace ircScript.Controls
 {
-    /* This class MUST be the ONLY class initialized in an editing context */
-    public sealed class ScriptEditor : UserControl
-    {        
-        private readonly LineNumberStrip _strip;
+    public sealed class ScriptEditor : FastColoredTextBox
+    {
+        private readonly Regex _commentPrefix = new Regex(@"//.*$", RegexOptions.Multiline | RegexOptions.Compiled);
 
-        public SyntaxHighlight EditBox;
-       
+        private readonly Regex _keywordPrefix = new Regex(@"\b(alias|if|elseif|else|while|on)\b",
+                                                          RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private readonly Regex _commandPrefix = new Regex(@"\b(set|var|inc|dec|unset|echo)\b",
+                                                          RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private readonly Style _comment= new TextStyle(Brushes.Green, null, FontStyle.Regular);
+        private readonly Style _variableStyle= new TextStyle(Brushes.Red, null, FontStyle.Regular);
+        private readonly Style _identifierStyle= new TextStyle(Brushes.DeepPink, null, FontStyle.Regular);
+        private readonly Style _keywordsStyle= new TextStyle(Brushes.Blue, null, FontStyle.Regular);
+        private readonly Style _commandStyle = new TextStyle(Brushes.BlueViolet, null, FontStyle.Regular);
+        private readonly Style _brownStyle = new TextStyle(Brushes.Brown, null, FontStyle.Regular);
+
+        private bool _enableSyntaxHighlight;
+
+        public new event Action<object, EventArgs> TextChanged;
+
+        public bool EnableSyntaxHighlight
+        {
+            get { return _enableSyntaxHighlight; }
+            set
+            {
+                _enableSyntaxHighlight = value;
+                Highlight();
+            }
+        }
+
         public ScriptEditor()
         {
-            EditBox = new SyntaxHighlight
-                        {
-                            Dock = DockStyle.Fill,
-                            BorderStyle = BorderStyle.None,
-                            WordWrap = false,
-                            ScrollBars = RichTextBoxScrollBars.Both,
-                            MaxUndoRedoSteps = 500 /* Should be more than adequate */
-                        };
+            Language = Language.Custom;
 
-            /* These break up tokens if used between them */
-            EditBox.Seperators.AddRange(new[] {'\r', '\n', ' ', ',', '.', '-', '+', '(', ')', '{', '}', '<', '>', '=', '!'});
-            /* Highlighted "words" - note: might have to modify this to only highlight first word in some instances */
-            EditBox.HighlightDescriptors.AddRange(new[]
-                                                      {
-                                                          new HighlightDescriptor("/*", "*/", Color.Green, null,
-                                                                                  DescriptorType.ToCloseToken,
-                                                                                  DescriptorRecognition.StartsWith),
-                                                          new HighlightDescriptor("$", Color.DarkCyan, null,
-                                                                                  DescriptorType.Word,
-                                                                                  DescriptorRecognition.StartsWith),
-                                                          new HighlightDescriptor("%", Color.Red, null,
-                                                                                  DescriptorType.Word,
-                                                                                  DescriptorRecognition.StartsWith),
-                                                          new HighlightDescriptor("//", Color.Green, null,
-                                                                                  DescriptorType.ToEol,
-                                                                                  DescriptorRecognition.StartsWith),
-                                                          new HighlightDescriptor("if", Color.Blue, null,
-                                                                                  DescriptorType.Word,
-                                                                                  DescriptorRecognition.WholeWord),
-                                                          new HighlightDescriptor("elseif", Color.Blue, null,
-                                                                                  DescriptorType.Word,
-                                                                                  DescriptorRecognition.WholeWord),
-                                                          new HighlightDescriptor("else", Color.Blue, null,
-                                                                                  DescriptorType.Word,
-                                                                                  DescriptorRecognition.WholeWord),
-                                                          new HighlightDescriptor("while", Color.Blue, null,
-                                                                                  DescriptorType.Word,
-                                                                                  DescriptorRecognition.WholeWord),
-                                                          new HighlightDescriptor("alias", Color.Purple, null,
-                                                                                  DescriptorType.Word,
-                                                                                  DescriptorRecognition.StartsWith),
-                                                          new HighlightDescriptor("on", Color.Purple, null,
-                                                                                  DescriptorType.Word,
-                                                                                  DescriptorRecognition.StartsWith),
-                                                          new HighlightDescriptor("var", Color.Blue, null,
-                                                                                  DescriptorType.Word,
-                                                                                  DescriptorRecognition.StartsWith),
-                                                          new HighlightDescriptor("inc", Color.Blue, null,
-                                                                                  DescriptorType.Word,
-                                                                                  DescriptorRecognition.StartsWith),
-                                                          new HighlightDescriptor("dec", Color.Blue, null,
-                                                                                  DescriptorType.Word,
-                                                                                  DescriptorRecognition.StartsWith),
-                                                          new HighlightDescriptor("set", Color.Blue, null,
-                                                                                  DescriptorType.Word,
-                                                                                  DescriptorRecognition.StartsWith),
-                                                          new HighlightDescriptor("unset", Color.Blue, null,
-                                                                                  DescriptorType.Word,
-                                                                                  DescriptorRecognition.StartsWith),
-                                                          new HighlightDescriptor("echo", Color.Salmon, null,
-                                                                                  DescriptorType.Word,
-                                                                                  DescriptorRecognition.StartsWith)
-                                                      });
+            SyntaxHighlighter.CommentStyle = new TextStyle(Brushes.Green, null, FontStyle.Italic);
 
-            _strip = new LineNumberStrip(EditBox);
-            Controls.AddRange(new Control[] {EditBox, _strip});
-            BorderStyle = BorderStyle.Fixed3D;
-            BackColor = EditBox.BackColor;            
+            Range.tb.CommentPrefix = "//";
+            Range.tb.LeftBracket = '(';
+            Range.tb.RightBracket = ')';
+            Range.tb.LeftBracket2 = '{';
+            Range.tb.RightBracket2 = '}';
+            Range.tb.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
+            AutoIndent = false;
+            Cursor = Cursors.IBeam;
+            CommentPrefix = "//";
+            HighlightingRangeType = HighlightingRangeType.VisibleRange;
+            DelayedEventsInterval = 1000;
+            DelayedTextChangedInterval = 500;
+            DisabledColor = Color.FromArgb(100, 180, 180, 180);
+            SelectionColor = Color.FromArgb(50, 0, 0, 255);
+            Paddings = new Padding(0);
+            AutoScrollMinSize = new Size(375, 75);
+            BackBrush = null;
+            FoldingIndicatorColor = Color.Green;
+            HighlightFoldingIndicator = true;
+            LineNumberColor = Color.Teal;
+            SelectionHighlightingForLineBreaksEnabled = true;
+            ShowScrollBars = true;
+
+            base.TextChanged += OnTextChanged;
+            TextChangedDelayed += OnTextChangedDelayed;
+        }
+
+        /* Handlers */
+        private void OnTextChanged(object sender, EventArgs e)
+        {
+            if (TextChanged != null)
+            {
+                TextChanged(sender, e);
+            }
+        }
+
+        private void OnTextChangedDelayed(object sender, EventArgs e)
+        {
+            Highlight();
         }
 
         /* Text formatting */
         public void Indent()
         {
-            /* First get selection start */
-            var sel = EditBox.SelectionStart;
+            /* Custom indent, the control's version doesn't quite work correctly and I can't be bothered fixing it -
+             * First get selection start */
+            var sel = SelectionStart;
             /* Indents text as by { and } */
             var indent = 0;
-            var lines = EditBox.Lines;
-            for (var i = 0; i < lines.Length; i++)
+            var lines = new List<string>(Lines);
+            for (var i = 0; i < lines.Count; i++)
             {
-                var line = EditBox.Lines[i].TrimStart(); /* Remove any leading spacing already */
+                var line = lines[i].TrimStart(); /* Remove any leading spacing already */
                 if (line.EndsWith("{"))
                 {
-                    lines[i] = string.Format("{0}{1}", new String(' ', indent*4), line);
-                    indent++;                    
+                    lines[i] = string.Format("{0}{1}", new String(' ', indent * 2), line);
+                    indent++;
                     continue;
                 }
                 if (line.EndsWith("}"))
@@ -116,13 +117,50 @@ namespace ircScript.Controls
                 {
                     indent = 0;
                 }
-                lines[i] = string.Format("{0}{1}", new String(' ', indent*4), line);             
+                lines[i] = string.Format("{0}{1}", new String(' ', indent * 2), line);
             }
             /* Re-set lines in RTB */
-            EditBox.Lines = lines;
+            Text = string.Join(Environment.NewLine, lines);
             /* Re-set selection start */
-            EditBox.SelectionStart = sel;
-            EditBox.SelectionLength = 0;
+            SelectionStart = sel;
+            SelectionLength = 0;
+        }
+
+        /* Private helper method */
+        private void Highlight()
+        {            
+            Range.ClearFoldingMarkers();
+            Range.SetFoldingMarkers("{", "}"); /* Allow to collapse brackets block */
+            if (!_enableSyntaxHighlight)
+            {
+                return;
+            }
+            Range.ClearStyle(_comment, _keywordsStyle, _variableStyle, _identifierStyle, _brownStyle, _commandStyle);
+            Range.SetStyle(_keywordsStyle, _keywordPrefix);
+            Range.SetStyle(_comment, _commentPrefix);
+            Range.SetStyle(_commandStyle, _commandPrefix); 
+            foreach (var found in GetRanges(@"%\w+|\$\w+|:(?<range>\w+):|#"))
+            {
+                switch (found.Text[0])
+                {
+                    case '$':
+                        Range.SetStyle(_identifierStyle, Regex.Escape(found.Text));
+                        break;
+
+                    case '%':
+                        Range.SetStyle(_variableStyle, found.Text);
+                        break;
+
+                    case '#':
+                        Range.SetStyle(_brownStyle, found.Text);
+                        break;
+
+                    default:
+                        /* on *:<x>:*:{ etc */
+                        Range.SetStyle(_keywordsStyle, found.Text);
+                        break;
+                }
+            }
         }
     }
 }

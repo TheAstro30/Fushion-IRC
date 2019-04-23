@@ -64,7 +64,8 @@ namespace ircCore.Settings.SettingsBase
             Windows.Caching.ChatSearch = 25;
             /* Editor */
             Editor.SyntaxHighlight = true;
-            Editor.Font = new Font("Segoe UI Semibold", 12, FontStyle.Regular);
+            Editor.LineNumbering = true;
+            Editor.Zoom = 100;
             /* Identd */
             Connection.Identd.System = "UNIX";
             Connection.Identd.Port = 113;

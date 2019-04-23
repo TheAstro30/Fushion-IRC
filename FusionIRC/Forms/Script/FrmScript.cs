@@ -11,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Properties;
-using ircCore.Forms;
 using ircCore.Settings;
 using ircCore.Utils;
 using ircScript;
@@ -117,8 +116,7 @@ namespace FusionIRC.Forms.Script
                                                 {
                                                     new ToolStripMenuItem("Syntax Highlight", null, MenuItemOnClick,
                                                                           Keys.None),
-                                                    new ToolStripSeparator(),
-                                                    new ToolStripMenuItem("Font", null, MenuItemOnClick,
+                                                    new ToolStripMenuItem("Line Numbering", null, MenuItemOnClick,
                                                                           Keys.None)
                                                 });
 
@@ -165,7 +163,7 @@ namespace FusionIRC.Forms.Script
             /* Root item (network name) */
             _tvFiles.CanExpandGetter = x => x is ScriptFileNode;
 
-            /* Children of each root item (server data) */
+            /* Children of each root item (script data) */
             _tvFiles.ChildrenGetter = delegate(object x)
                                           {
                                               var sd = (ScriptFileNode) x;
@@ -181,12 +179,13 @@ namespace FusionIRC.Forms.Script
                               BackColor = SystemColors.Window,
                               BorderStyle = BorderStyle.FixedSingle,
                               Dock = DockStyle.Fill,
-                              Font = SettingsManager.Settings.Editor.Font,
                               Location = new Point(143, 3),
                               Size = new Size(350, 290),                              
+                              EnableSyntaxHighlight = SettingsManager.Settings.Editor.SyntaxHighlight,
+                              ShowLineNumbers = SettingsManager.Settings.Editor.LineNumbering,
+                              Zoom = SettingsManager.Settings.Editor.Zoom,
                               TabIndex = 0
                           };
-
 
             _btnClose = new Button
                             {
@@ -255,7 +254,6 @@ namespace FusionIRC.Forms.Script
                                     _varNode
                                 });
 
-            _txtEdit.EditBox.EnableSyntaxHighlight = SettingsManager.Settings.Editor.SyntaxHighlight;
             _tvFiles.AddObjects(_files);
             /* Attempt to get last script file and display it (if it's null, or aliases is 0, display variables
              * file, as it's always there, blank or not */
@@ -276,8 +274,8 @@ namespace FusionIRC.Forms.Script
             _mnuView.DropDownOpening += MenuDropDownOpening;
 
             _tvFiles.SelectedIndexChanged += FilesSelectedIndexChanged;
-            _txtEdit.EditBox.TextChanged += TextEditTextChanged;
-
+            _txtEdit.TextChanged += TextEditTextChanged;
+            _txtEdit.ZoomChanged += TextEditZoomChanged;
             _btnClose.Click += ButtonClickHandler;
 
             _initialize = false;
@@ -353,6 +351,11 @@ namespace FusionIRC.Forms.Script
             _currentEditingScript.ContentsChanged = true;
         }
 
+        private void TextEditZoomChanged(object sender, EventArgs e)
+        {
+            SettingsManager.Settings.Editor.Zoom = _txtEdit.Zoom;
+        }
+
         private void MenuDropDownOpening(object sender, EventArgs e)
         {
             var dd = (ToolStripMenuItem) sender;
@@ -377,17 +380,16 @@ namespace FusionIRC.Forms.Script
 
                 case "&EDIT":
                     /* Check ability to undo/redo */
-                    _mnuEdit.DropDownItems[0].Enabled = _txtEdit.EditBox.CanUndo;
-                    _mnuEdit.DropDownItems[1].Enabled = _txtEdit.EditBox.CanRedo;
-                    _mnuEdit.DropDownItems[3].Enabled = _txtEdit.EditBox.CanCopy;
-                    _mnuEdit.DropDownItems[4].Enabled = _txtEdit.EditBox.CanCopy;
-                    _mnuEdit.DropDownItems[5].Enabled = Clipboard.ContainsText();
-                    _mnuEdit.DropDownItems[6].Enabled = _txtEdit.EditBox.CanCopy;
+                    _mnuEdit.DropDownItems[0].Enabled = _txtEdit.UndoEnabled;
+                    _mnuEdit.DropDownItems[1].Enabled = _txtEdit.RedoEnabled;
+                    _mnuEdit.DropDownItems[5].Enabled = Clipboard.ContainsText();                    
                     break;
 
                 case "&VIEW":
                     ((ToolStripMenuItem) _mnuView.DropDownItems[0]).Checked =
                         SettingsManager.Settings.Editor.SyntaxHighlight;
+                    ((ToolStripMenuItem) _mnuView.DropDownItems[1]).Checked =
+                        SettingsManager.Settings.Editor.LineNumbering;
                     break;
             }
         }
@@ -410,6 +412,7 @@ namespace FusionIRC.Forms.Script
             {
                 return;
             }
+            bool enable;
             switch (di.Text.ToUpper())
             {
                 case "NEW...":
@@ -451,30 +454,30 @@ namespace FusionIRC.Forms.Script
                     break;
 
                 case "UNDO":
-                    _txtEdit.EditBox.Undo();
+                    _txtEdit.Undo();
                     break;
 
                 case "REDO":
-                    _txtEdit.EditBox.Redo();
+                    _txtEdit.Redo();
                     break;
 
                 case "CUT":
-                    _txtEdit.EditBox.Cut();
+                    _txtEdit.Cut();
                     break;
 
                 case "COPY":
-                    _txtEdit.EditBox.Copy();
+                    _txtEdit.Copy();
                     break;
 
                 case "PASTE":
-                    _txtEdit.EditBox.Paste();
+                    _txtEdit.Paste();
                     break;
 
                 case "DELETE":
                     /* Copy contents of clipboard */
                     var clipText = Clipboard.GetText();
                     /* Remove selected text */
-                    _txtEdit.EditBox.Cut();
+                    _txtEdit.Cut();
                     /* Reset clipboard contents */
                     if (!string.IsNullOrEmpty(clipText))
                     {
@@ -487,25 +490,19 @@ namespace FusionIRC.Forms.Script
                     break;
 
                 case "SYNTAX HIGHLIGHT":
-                    _currentEditingScript.RawScriptData = new List<string>(_txtEdit.EditBox.Lines);
-                    var en = !SettingsManager.Settings.Editor.SyntaxHighlight;
-                    SettingsManager.Settings.Editor.SyntaxHighlight = en;
-                    _txtEdit.EditBox.EnableSyntaxHighlight = en;
-                    _txtEdit.EditBox.Lines = _currentEditingScript.RawScriptData.ToArray();
+                    enable = !SettingsManager.Settings.Editor.SyntaxHighlight;
+                    SettingsManager.Settings.Editor.SyntaxHighlight = enable;
+                    _txtEdit.EnableSyntaxHighlight = enable;
+                    var sel = _txtEdit.SelectionStart;
+                    SwitchEditingFile(_currentEditingScript);
+                    _txtEdit.SelectionStart = sel;
+                    _txtEdit.SelectionLength = 0;
                     break;
 
-                case "FONT":
-                    _currentEditingScript.RawScriptData = new List<string>(_txtEdit.EditBox.Lines);
-                    using (var f = new FrmFont { SelectedFont = SettingsManager.Settings.Editor.Font, ShowDefaultCheckbox = false })
-                    {
-                        if (f.ShowDialog(this) == DialogResult.OK)
-                        {
-                            var font = f.SelectedFont;
-                            SettingsManager.Settings.Editor.Font = font;
-                            _txtEdit.Font = font;
-                            _txtEdit.EditBox.Lines = _currentEditingScript.RawScriptData.ToArray();
-                        }
-                    }
+                case "LINE NUMBERING":
+                    enable = !SettingsManager.Settings.Editor.LineNumbering;
+                    SettingsManager.Settings.Editor.LineNumbering = enable;
+                    _txtEdit.ShowLineNumbers = enable;
                     break;
             }
         }
@@ -599,7 +596,7 @@ namespace FusionIRC.Forms.Script
             /* Make sure to dump contents of editbox! */
             if (_currentEditingScript.ContentsChanged)
             {
-                _currentEditingScript.RawScriptData = new List<string>(_txtEdit.EditBox.Lines);
+                _currentEditingScript.RawScriptData = new List<string>(_txtEdit.Lines);
             }
             /* Check it doesn't need saving */
             if (script.ContentsChanged)
@@ -626,7 +623,7 @@ namespace FusionIRC.Forms.Script
             }
             else
             {
-                _txtEdit.EditBox.Lines = new string[0];
+                _txtEdit.Clear();//.Lines = new string[0];
             }
             _txtEdit.Focus();
         }
@@ -642,7 +639,7 @@ namespace FusionIRC.Forms.Script
             /* Make sure to dump contents of editbox! */
             if (_currentEditingScript.ContentsChanged)
             {
-                _currentEditingScript.RawScriptData = new List<string>(_txtEdit.EditBox.Lines);
+                _currentEditingScript.RawScriptData = new List<string>(_txtEdit.Lines);
             }
             var oldFile = _currentEditingScript.Name;
             string fileName;
@@ -683,7 +680,7 @@ namespace FusionIRC.Forms.Script
                 return;
             }
             /* Make sure to dump contents of edit window text */
-            _currentEditingScript.RawScriptData = new List<string>(_txtEdit.EditBox.Lines);
+            _currentEditingScript.RawScriptData = new List<string>(_txtEdit.Lines);
             /* Save current editing file */
             switch (_currentEditingScript.Name.ToUpper())
             {
@@ -694,11 +691,11 @@ namespace FusionIRC.Forms.Script
                 default:
                     /* Renaming of scripts happens elsewhere and does not need this flag set to true
                      * nor the file deleted - just rename file and change the Name flag */
-                    ScriptManager.SaveScript(_currentEditingScript, Functions.MainDir(string.Format(@"\scripts\{0}", _currentEditingScript), false));
-                    RebuildAllScripts();
+                    ScriptManager.SaveScript(_currentEditingScript, Functions.MainDir(string.Format(@"\scripts\{0}.xml", _currentEditingScript.Name), false));                    
                     break;
             }
             _currentEditingScript.ContentsChanged = false;
+            RebuildAllScripts();
         }
 
         private void SaveAll()
@@ -706,7 +703,7 @@ namespace FusionIRC.Forms.Script
             /* Make sure to dump contents of edit window text */
             if (_currentEditingScript != null && _currentEditingScript.ContentsChanged)
             {
-                _currentEditingScript.RawScriptData = new List<string>(_txtEdit.EditBox.Lines);
+                _currentEditingScript.RawScriptData = new List<string>(_txtEdit.Lines);
             }            
             foreach (var file in _files)
             {
@@ -721,7 +718,7 @@ namespace FusionIRC.Forms.Script
                         default:
                             /* Renaming of scripts happens elsewhere and does not need this flag set to true
                              * nor the file deleted - just rename file and change the Name flag */
-                            ScriptManager.SaveScript(s, Functions.MainDir(string.Format(@"\scripts\{0}", s), false));
+                            ScriptManager.SaveScript(s, Functions.MainDir(string.Format(@"\scripts\{0}.xml", s.Name), false));
                             break;
                     }
                     s.ContentsChanged = false;
@@ -748,7 +745,7 @@ namespace FusionIRC.Forms.Script
             /* Dump contents of text box */
             if (_currentEditingScript.ContentsChanged)
             {
-                _currentEditingScript.RawScriptData = new List<string>(_txtEdit.EditBox.Lines);
+                _currentEditingScript.RawScriptData = new List<string>(_txtEdit.Lines);
             }
             /* Done! */
             node.Swap(index1, index2);
@@ -825,17 +822,18 @@ namespace FusionIRC.Forms.Script
 
         private void SwitchEditingFile(ScriptData file)
         {
-            if (_currentEditingScript != null && _currentEditingScript.ContentsChanged)
+            if (!_initialize && _currentEditingScript != null && _currentEditingScript.ContentsChanged)
             {
                 /* Make sure to dump contents of edit window text */
-                _currentEditingScript.RawScriptData = new List<string>(_txtEdit.EditBox.Lines);
+                _currentEditingScript.RawScriptData = new List<string>(_txtEdit.Lines);
             }
             if (file == null)
             {
                 return;
             }
             _fileChanged = true;
-            _txtEdit.EditBox.Lines = file.RawScriptData.Select(data => data.ToString()).ToArray();
+            _txtEdit.Clear();
+            _txtEdit.Text = string.Join(Environment.NewLine, file.RawScriptData);
             _currentEditingScript = file;
             _txtEdit.Indent();
             _txtEdit.Focus();
