@@ -53,72 +53,99 @@
     </Compile>
     <Compile Include="Classes\Parsers\ScriptConditionalParser.cs" />
     <Compile Include="Classes\Parsers\ScriptIdentifierParser.cs" />
-    <Compile Include="Controls\SyntaxHighlight\AutocompleteItem.cs" />
-    <Compile Include="Controls\SyntaxHighlight\AutocompleteMenu.cs">
+    <Compile Include="Controls\SyntaxHighlight\Bookmarks\Bookmark.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Bookmarks\BookmarkBase.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Commands\ClearSelectedCommand.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Commands\Command.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Commands\InsertTextCommand.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Commands\MultiRangeCommand.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Commands\RangeInfo.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Commands\RemoveLinesCommand.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Commands\ReplaceMultipleTextCommand.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Commands\ReplaceTextCommand.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Commands\SelectCommand.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Commands\UndoableCommand.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Controls\AutoComplete\AutoCompleteItem.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Controls\AutoCompleteMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\SyntaxHighlight\Bookmarks.cs" />
-    <Compile Include="Controls\SyntaxHighlight\Char.cs" />
-    <Compile Include="Controls\SyntaxHighlight\CommandManager.cs" />
-    <Compile Include="Controls\SyntaxHighlight\Commands.cs" />
-    <Compile Include="Controls\SyntaxHighlight\DocumentMap.cs">
+    <Compile Include="Controls\SyntaxHighlight\Bookmarks\Bookmarks.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Controls\AutoComplete\AutoCompleteListView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\SyntaxHighlight\Controls\AutoComplete\CompareResult.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Controls\AutoComplete\MethodAutoCompleteItem.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Controls\AutoComplete\SelectedEventArgs.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Controls\AutoComplete\SelectingEventArgs.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Controls\AutoComplete\SnippetAutoCompleteItem.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Controls\AutoComplete\SuggestItem.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Forms\Hotkeys\Hotkeys.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Forms\Hotkeys\HotkeysEditorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\SyntaxHighlight\Forms\Hotkeys\HotkeysEditorForm.designer.cs">
+      <DependentUpon>HotkeysEditorForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SyntaxHighlight\Helpers\Char.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Commands\CommandManager.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Commands\Commands.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Controls\DocumentMap.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\SyntaxHighlight\EncodingDetector.cs" />
-    <Compile Include="Controls\SyntaxHighlight\ExportToHtml.cs" />
-    <Compile Include="Controls\SyntaxHighlight\ExportToRtf.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Export\ExportToHtml.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Export\ExportToRtf.cs" />
     <Compile Include="Controls\SyntaxHighlight\FastColoredTextBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\SyntaxHighlight\FileTextSource.cs" />
-    <Compile Include="Controls\SyntaxHighlight\FindForm.cs">
+    <Compile Include="Controls\SyntaxHighlight\Helpers\TypeDescriptors\FctbDescriptionProvider.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\TypeDescriptors\FctbTypeDescriptor.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\TypeDescriptors\FooTextChangedDescriptor.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Highlight\Descriptor\FoldingDesc.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Highlight\Descriptor\RuleDesc.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\TextSource\FileTextSource.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Forms\FindForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Controls\SyntaxHighlight\FindForm.designer.cs">
-      <DependentUpon>FindForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\SyntaxHighlight\GoToForm.cs">
+    <Compile Include="Controls\SyntaxHighlight\Forms\GoToForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Controls\SyntaxHighlight\GoToForm.designer.cs">
-      <DependentUpon>GoToForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\SyntaxHighlight\Hints.cs" />
-    <Compile Include="Controls\SyntaxHighlight\Hotkeys.cs" />
-    <Compile Include="Controls\SyntaxHighlight\HotkeysEditorForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\SyntaxHighlight\HotkeysEditorForm.designer.cs">
-      <DependentUpon>HotkeysEditorForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\SyntaxHighlight\LimitedStack.cs" />
-    <Compile Include="Controls\SyntaxHighlight\Line.cs" />
-    <Compile Include="Controls\SyntaxHighlight\LinesAccessor.cs" />
-    <Compile Include="Controls\SyntaxHighlight\MacrosManager.cs" />
-    <Compile Include="Controls\SyntaxHighlight\Place.cs" />
-    <Compile Include="Controls\SyntaxHighlight\PlatformType.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\Hints\Hint.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\Hints\Hints.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\Lines\LineInfo.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\TextSource\LineNeededEventArgs.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\TextSource\LinePushedEventArgs.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\LimitedStack.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\Lines\Line.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\Lines\LinesAccessor.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\MacrosManager.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\Place.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\PlatformType.cs" />
     <Compile Include="Controls\SyntaxHighlight\Range.cs" />
-    <Compile Include="Controls\SyntaxHighlight\ReplaceForm.cs">
+    <Compile Include="Controls\SyntaxHighlight\Forms\ReplaceForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Controls\SyntaxHighlight\ReplaceForm.designer.cs">
+    <Compile Include="Controls\SyntaxHighlight\Forms\ReplaceForm.designer.cs">
       <DependentUpon>ReplaceForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\SyntaxHighlight\Ruler.cs">
+    <Compile Include="Controls\SyntaxHighlight\Controls\Ruler.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\SyntaxHighlight\Ruler.Designer.cs">
-      <DependentUpon>Ruler.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\SyntaxHighlight\Style.cs" />
-    <Compile Include="Controls\SyntaxHighlight\SyntaxDescriptor.cs" />
-    <Compile Include="Controls\SyntaxHighlight\SyntaxHighlighter.cs" />
-    <Compile Include="Controls\SyntaxHighlight\TextSource.cs" />
-    <Compile Include="Controls\SyntaxHighlight\TypeDescriptor.cs" />
-    <Compile Include="Controls\SyntaxHighlight\UnfocusablePanel.cs">
+    <Compile Include="Controls\SyntaxHighlight\Styles\FoldedBlockStyle.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Styles\MarkerStyle.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Styles\ReadOnlyStyle.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Styles\SelectionStyle.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Styles\ShortcutStyle.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Styles\Style.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Styles\TextStyle.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Styles\WavyLineStyle.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Highlight\Descriptor\SyntaxDescriptor.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Highlight\SyntaxHighlighter.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\TextSource\TextSource.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Controls\UnfocusablePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\SyntaxHighlight\VisualMarker.cs" />
+    <Compile Include="Controls\SyntaxHighlight\Helpers\VisualMarker.cs" />
     <Compile Include="ScriptManager.cs" />
     <Compile Include="Classes\Parsers\ScriptParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -138,16 +165,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <EmbeddedResource Include="Controls\SyntaxHighlight\FindForm.resx">
-      <DependentUpon>FindForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\SyntaxHighlight\GoToForm.resx">
-      <DependentUpon>GoToForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\SyntaxHighlight\HotkeysEditorForm.resx">
+    <EmbeddedResource Include="Controls\SyntaxHighlight\Forms\Hotkeys\HotkeysEditorForm.resx">
       <DependentUpon>HotkeysEditorForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\SyntaxHighlight\ReplaceForm.resx">
+    <EmbeddedResource Include="Controls\SyntaxHighlight\Forms\ReplaceForm.resx">
       <DependentUpon>ReplaceForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>

@@ -870,7 +870,7 @@ namespace FusionIRC.Forms.Script
 
         private ScriptData GetScriptFileByName(string name)
         {
-            return _files.SelectMany(f => f.Data).FirstOrDefault(s => s.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            return _files.SelectMany(f => f.Data).FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));            
         }
 
         private List<ScriptData> GetScriptNodeListData(ScriptData data)

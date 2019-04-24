@@ -178,7 +178,7 @@ namespace ircClient
         /* Sockwrite */
         public void Send(string data)
         {
-            _sock.SendData(string.Format("{0}\r\n", data));
+            _sock.SendData(string.Format("{0}\r\n", Utf8.ConvertFromUtf8(data, true)));
         }
 
         /* DNS Methods */

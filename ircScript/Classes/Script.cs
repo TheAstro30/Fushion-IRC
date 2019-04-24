@@ -5,6 +5,7 @@
  */
 using System;
 using System.Collections.Generic;
+using ircCore.Utils;
 using ircScript.Classes.Parsers;
 using ircScript.Classes.Structures;
 

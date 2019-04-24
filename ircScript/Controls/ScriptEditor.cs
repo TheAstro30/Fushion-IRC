@@ -6,10 +6,11 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using ircScript.Controls.SyntaxHighlight;
+using ircScript.Controls.SyntaxHighlight.Highlight;
+using ircScript.Controls.SyntaxHighlight.Styles;
 
 namespace ircScript.Controls
 {
@@ -60,8 +61,8 @@ namespace ircScript.Controls
             Cursor = Cursors.IBeam;
             CommentPrefix = "//";
             HighlightingRangeType = HighlightingRangeType.VisibleRange;
-            DelayedEventsInterval = 1000;
-            DelayedTextChangedInterval = 500;
+            DelayedEventsInterval = 500;
+            DelayedTextChangedInterval = 200;
             DisabledColor = Color.FromArgb(100, 180, 180, 180);
             SelectionColor = Color.FromArgb(50, 0, 0, 255);
             Paddings = new Padding(0);

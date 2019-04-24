@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ircClient", "ircClient\ircC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libolv", "libolv\libolv.csproj", "{18FEDA0C-D147-4286-B39A-01204808106A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libDirectX", "libDirectX\libDirectX.csproj", "{8F2B6CF8-31ED-4763-AEAB-6A6D36D78128}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ircScript", "ircScript\ircScript.csproj", "{2B1EB033-1A85-4FBA-B7BA-359B364B74CF}"
 EndProject
 Global
@@ -63,16 +61,6 @@ Global
 		{18FEDA0C-D147-4286-B39A-01204808106A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{18FEDA0C-D147-4286-B39A-01204808106A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{18FEDA0C-D147-4286-B39A-01204808106A}.Release|x86.ActiveCfg = Release|Any CPU
-		{8F2B6CF8-31ED-4763-AEAB-6A6D36D78128}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F2B6CF8-31ED-4763-AEAB-6A6D36D78128}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8F2B6CF8-31ED-4763-AEAB-6A6D36D78128}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{8F2B6CF8-31ED-4763-AEAB-6A6D36D78128}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{8F2B6CF8-31ED-4763-AEAB-6A6D36D78128}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8F2B6CF8-31ED-4763-AEAB-6A6D36D78128}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F2B6CF8-31ED-4763-AEAB-6A6D36D78128}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8F2B6CF8-31ED-4763-AEAB-6A6D36D78128}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{8F2B6CF8-31ED-4763-AEAB-6A6D36D78128}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{8F2B6CF8-31ED-4763-AEAB-6A6D36D78128}.Release|x86.ActiveCfg = Release|Any CPU
 		{2B1EB033-1A85-4FBA-B7BA-359B364B74CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2B1EB033-1A85-4FBA-B7BA-359B364B74CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B1EB033-1A85-4FBA-B7BA-359B364B74CF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

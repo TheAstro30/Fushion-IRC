@@ -460,7 +460,7 @@ namespace FusionIRC.Forms.Child
                         SystemSounds.Beep.Play();
                         return;
                     }
-                    var s = Utf8.ConvertToUtf8(Input.Text, true);
+                    var s = Input.Text;
                     Input.Text = string.Empty;                    
                     /* Send text to server */
                     if (WindowType != ChildWindowType.Console)

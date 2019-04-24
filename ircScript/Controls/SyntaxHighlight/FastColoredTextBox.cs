@@ -35,7 +35,19 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using Microsoft.Win32;
-using Char = ircScript.Controls.SyntaxHighlight.Char;
+using ircScript.Controls.SyntaxHighlight.Bookmarks;
+using ircScript.Controls.SyntaxHighlight.Commands;
+using ircScript.Controls.SyntaxHighlight.Export;
+using ircScript.Controls.SyntaxHighlight.Forms;
+using ircScript.Controls.SyntaxHighlight.Forms.Hotkeys;
+using ircScript.Controls.SyntaxHighlight.Helpers;
+using ircScript.Controls.SyntaxHighlight.Helpers.Hints;
+using ircScript.Controls.SyntaxHighlight.Helpers.Lines;
+using ircScript.Controls.SyntaxHighlight.Helpers.TextSource;
+using ircScript.Controls.SyntaxHighlight.Helpers.TypeDescriptors;
+using ircScript.Controls.SyntaxHighlight.Highlight;
+using ircScript.Controls.SyntaxHighlight.Styles;
+using Char = ircScript.Controls.SyntaxHighlight.Helpers.Char;
 using Timer = System.Windows.Forms.Timer;
 
 namespace ircScript.Controls.SyntaxHighlight
@@ -60,7 +72,7 @@ namespace ircScript.Controls.SyntaxHighlight
         public int TextHeight;
         public bool AllowInsertRemoveLines = true;
         private Brush backBrush;
-        private BaseBookmarks bookmarks;
+        private BookmarkBase bookmarks;
         private bool caretVisible;
         private Color changedLineColor;
         private int charHeight;
@@ -131,8 +143,8 @@ namespace ircScript.Controls.SyntaxHighlight
             TypeDescriptionProvider prov = TypeDescriptor.GetProvider(GetType());
             object theProvider =
                 prov.GetType().GetField("Provider", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(prov);
-            if (theProvider.GetType() != typeof (FCTBDescriptionProvider))
-                TypeDescriptor.AddProvider(new FCTBDescriptionProvider(GetType()), GetType());
+            if (theProvider.GetType() != typeof (FctbDescriptionProvider))
+                TypeDescriptor.AddProvider(new FctbDescriptionProvider(GetType()), GetType());
             //drawing optimization
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
             //append monospace font
@@ -188,7 +200,7 @@ namespace ircScript.Controls.SyntaxHighlight
             AllowDrop = true;
             FindEndOfFoldingBlockStrategy = FindEndOfFoldingBlockStrategy.Strategy1;
             VirtualSpace = false;
-            bookmarks = new Bookmarks(this);
+            bookmarks = new Bookmarks.Bookmarks(this);
             BookmarkColor = Color.PowderBlue;
             ToolTip = new ToolTip();
             timer3.Interval = 500;
@@ -329,7 +341,7 @@ namespace ircScript.Controls.SyntaxHighlight
         /// </summary>
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
          EditorBrowsable(EditorBrowsableState.Never)]
-        public BaseBookmarks Bookmarks
+        public BookmarkBase Bookmarks
         {
             get { return bookmarks; }
             set { bookmarks = value; }
@@ -909,7 +921,7 @@ namespace ircScript.Controls.SyntaxHighlight
                 return isReplaceMode && 
                        Selection.IsEmpty &&
                        (!Selection.ColumnSelectionMode) &&
-                       Selection.Start.iChar < lines[Selection.Start.iLine].Count;
+                       Selection.Start.Char < lines[Selection.Start.Line].Count;
             }
             set { isReplaceMode = value; }
         }
@@ -1329,8 +1341,8 @@ namespace ircScript.Controls.SyntaxHighlight
         /// </summary>
         public Char this[Place place]
         {
-            get { return lines[place.iLine][place.iChar]; }
-            set { lines[place.iLine][place.iChar] = value; }
+            get { return lines[place.Line][place.Char]; }
+            set { lines[place.Line][place.Char] = value; }
         }
 
         /// <summary>
@@ -1998,7 +2010,7 @@ namespace ircScript.Controls.SyntaxHighlight
         public List<Style> GetStylesOfChar(Place place)
         {
             var result = new List<Style>();
-            if (place.iLine < LinesCount && place.iChar < this[place.iLine].Count)
+            if (place.Line < LinesCount && place.Char < this[place.Line].Count)
             {
 #if Styles32
                 var s = (uint) this[place].style;
@@ -2006,7 +2018,7 @@ namespace ircScript.Controls.SyntaxHighlight
                     if ((s & ((uint) 1) << i) != 0)
                         result.Add(Styles[i]);
 #else
-                var s = (ushort)this[place].style;
+                var s = (ushort)this[place].Style;
                 for (int i = 0; i < 16; i++)
                     if ((s & ((ushort) 1) << i) != 0)
                         result.Add(Styles[i]);
@@ -2023,7 +2035,7 @@ namespace ircScript.Controls.SyntaxHighlight
 
         private void SetAsCurrentTB()
         {
-            TextSource.CurrentTB = this;
+            TextSource.CurrentTextBox = this;
         }
 
         protected virtual void InitTextSource(TextSource ts)
@@ -2066,12 +2078,12 @@ namespace ircScript.Controls.SyntaxHighlight
 
         private void ts_RecalcWordWrap(object sender, TextSource.TextChangedEventArgs e)
         {
-            RecalcWordWrap(e.iFromLine, e.iToLine);
+            RecalcWordWrap(e.FromLine, e.ToLine);
         }
 
         private void ts_TextChanging(object sender, TextChangingEventArgs e)
         {
-            if (TextSource.CurrentTB == this)
+            if (TextSource.CurrentTextBox == this)
             {
                 string text = e.InsertingText;
                 OnTextChanging(ref text);
@@ -2081,8 +2093,8 @@ namespace ircScript.Controls.SyntaxHighlight
 
         private void ts_RecalcNeeded(object sender, TextSource.TextChangedEventArgs e)
         {
-            if (e.iFromLine == e.iToLine && !WordWrap && lines.Count > MinLinesForAccuracy)
-                RecalcScrollByOneLine(e.iFromLine);
+            if (e.FromLine == e.ToLine && !WordWrap && lines.Count > MinLinesForAccuracy)
+                RecalcScrollByOneLine(e.FromLine);
             else
             {
                 NeedRecalc(false, WordWrap);
@@ -2125,14 +2137,14 @@ namespace ircScript.Controls.SyntaxHighlight
 
         private void ts_TextChanged(object sender, TextSource.TextChangedEventArgs e)
         {
-            if (e.iFromLine == e.iToLine && !WordWrap)
-                RecalcScrollByOneLine(e.iFromLine);
+            if (e.FromLine == e.ToLine && !WordWrap)
+                RecalcScrollByOneLine(e.FromLine);
             else
                 needRecalc = true;
 
             Invalidate();
-            if (TextSource.CurrentTB == this)
-                OnTextChanged(e.iFromLine, e.iToLine);
+            if (TextSource.CurrentTextBox == this)
+                OnTextChanged(e.FromLine, e.ToLine);
         }
 
         private void ts_LineRemoved(object sender, LineRemovedEventArgs e)
@@ -2153,7 +2165,7 @@ namespace ircScript.Controls.SyntaxHighlight
             var temp = new LineInfo[e.Count];
             for (int i = 0; i < e.Count; i++)
             {
-                temp[i].startY = -1;
+                temp[i].StartY = -1;
                 temp[i].VisibleState = newState;
             }
             LineInfos.InsertRange(e.Index, temp);
@@ -2278,7 +2290,7 @@ namespace ircScript.Controls.SyntaxHighlight
 
         public virtual void OnSelectionChangedDelayed()
         {
-            RecalcScrollByOneLine(Selection.Start.iLine);
+            RecalcScrollByOneLine(Selection.Start.Line);
             //highlight brackets
             ClearBracketsPositions();
             if (LeftBracket != '\x0' && RightBracket != '\x0')
@@ -2286,12 +2298,12 @@ namespace ircScript.Controls.SyntaxHighlight
             if (LeftBracket2 != '\x0' && RightBracket2 != '\x0')
                 HighlightBrackets(LeftBracket2, RightBracket2, ref leftBracketPosition2, ref rightBracketPosition2);
             //remember last visit time
-            if (Selection.IsEmpty && Selection.Start.iLine < LinesCount)
+            if (Selection.IsEmpty && Selection.Start.Line < LinesCount)
             {
-                if (lastNavigatedDateTime != lines[Selection.Start.iLine].LastVisit)
+                if (lastNavigatedDateTime != lines[Selection.Start.Line].LastVisit)
                 {
-                    lines[Selection.Start.iLine].LastVisit = DateTime.Now;
-                    lastNavigatedDateTime = lines[Selection.Start.iLine].LastVisit;
+                    lines[Selection.Start.Line].LastVisit = DateTime.Now;
+                    lastNavigatedDateTime = lines[Selection.Start.Line].LastVisit;
                 }
             }
 
@@ -2385,11 +2397,11 @@ namespace ircScript.Controls.SyntaxHighlight
                 findForm = new FindForm(this);
 
             if (findText != null)
-                findForm.tbFind.Text = findText;
-            else if (!Selection.IsEmpty && Selection.Start.iLine == Selection.End.iLine)
-                findForm.tbFind.Text = Selection.Text;
+                findForm.FindText.Text = findText;
+            else if (!Selection.IsEmpty && Selection.Start.Line == Selection.End.Line)
+                findForm.FindText.Text = Selection.Text;
 
-            findForm.tbFind.SelectAll();
+            findForm.FindText.SelectAll();
             findForm.Show();
             findForm.Focus();
         }
@@ -2414,7 +2426,7 @@ namespace ircScript.Controls.SyntaxHighlight
 
             if (findText != null)
                 replaceForm.tbFind.Text = findText;
-            else if (!Selection.IsEmpty && Selection.Start.iLine == Selection.End.iLine)
+            else if (!Selection.IsEmpty && Selection.Start.Line == Selection.End.Line)
                 replaceForm.tbFind.Text = Selection.Text;
 
             replaceForm.tbFind.SelectAll();
@@ -2567,9 +2579,9 @@ namespace ircScript.Controls.SyntaxHighlight
                 thread.Join();
 
                 //remove current line
-                if (Selection.Start.iLine >= 0 && Selection.Start.iLine < LinesCount)
+                if (Selection.Start.Line >= 0 && Selection.Start.Line < LinesCount)
                 {
-                    int iLine = Selection.Start.iLine;
+                    int iLine = Selection.Start.Line;
                     RemoveLines(new List<int> {iLine});
                     Selection.Start = new Place(0, Math.Max(0, Math.Min(iLine, LinesCount - 1)));
                 }
@@ -2722,7 +2734,7 @@ namespace ircScript.Controls.SyntaxHighlight
 
                 //insert virtual spaces
                 if(this.TextSource.Count > 0)
-                if (Selection.IsEmpty && Selection.Start.iChar > GetLineLength(Selection.Start.iLine) && VirtualSpace)
+                if (Selection.IsEmpty && Selection.Start.Char > GetLineLength(Selection.Start.Line) && VirtualSpace)
                     InsertVirtualSpaces();
 
                 lines.Manager.ExecuteCommand(new InsertTextCommand(TextSource, text));
@@ -2980,7 +2992,7 @@ namespace ircScript.Controls.SyntaxHighlight
                     lines.Manager.ExecuteCommand(new ClearSelectedCommand(TextSource));
 
                 //insert virtual spaces
-                if (Selection.IsEmpty && Selection.Start.iChar > GetLineLength(Selection.Start.iLine) && VirtualSpace)
+                if (Selection.IsEmpty && Selection.Start.Char > GetLineLength(Selection.Start.Line) && VirtualSpace)
                     InsertVirtualSpaces();
 
                 //insert char
@@ -2996,12 +3008,12 @@ namespace ircScript.Controls.SyntaxHighlight
 
         private void InsertVirtualSpaces()
         {
-            int lineLength = GetLineLength(Selection.Start.iLine);
-            int count = Selection.Start.iChar - lineLength;
+            int lineLength = GetLineLength(Selection.Start.Line);
+            int count = Selection.Start.Char - lineLength;
             Selection.BeginUpdate();
             try
             {
-                Selection.Start = new Place(lineLength, Selection.Start.iLine);
+                Selection.Start = new Place(lineLength, Selection.Start.Line);
                 lines.Manager.ExecuteCommand(new InsertTextCommand(TextSource, new string(' ', count)));
             }
             finally
@@ -3030,9 +3042,9 @@ namespace ircScript.Controls.SyntaxHighlight
             Selection.Expand();
 
             lines.Manager.ExecuteCommand(new ClearSelectedCommand(TextSource));
-            if (Selection.Start.iLine == 0)
+            if (Selection.Start.Line == 0)
                 if (!Selection.GoRightThroughFolded()) return;
-            if (Selection.Start.iLine > 0)
+            if (Selection.Start.Line > 0)
                 lines.Manager.ExecuteCommand(new InsertCharCommand(TextSource, '\b')); //backspace
             Invalidate();
         }
@@ -3141,8 +3153,8 @@ namespace ircScript.Controls.SyntaxHighlight
                 LineInfo lineInfo = LineInfos[i];
                 if (lineLength > maxLineLength && lineInfo.VisibleState == VisibleState.Visible)
                     maxLineLength = lineLength;
-                lineInfo.startY = TextHeight;
-                TextHeight += lineInfo.WordWrapStringsCount*charHeight + lineInfo.bottomPadding;
+                lineInfo.StartY = TextHeight;
+                TextHeight += lineInfo.WordWrapStringsCount*charHeight + lineInfo.BottomPadding;
                 LineInfos[i] = lineInfo;
             }
 
@@ -3201,7 +3213,7 @@ namespace ircScript.Controls.SyntaxHighlight
                     {
                         LineInfo li = LineInfos[iLine];
 
-                        li.wordWrapIndent = WordWrapAutoIndent ? lines[iLine].StartSpacesCount + WordWrapIndent : WordWrapIndent;
+                        li.WordWrapIndent = WordWrapAutoIndent ? lines[iLine].StartSpacesCount + WordWrapIndent : WordWrapIndent;
 
                         if (WordWrapMode == WordWrapMode.Custom)
                         {
@@ -3209,7 +3221,7 @@ namespace ircScript.Controls.SyntaxHighlight
                                 WordWrapNeeded(this, new WordWrapNeededEventArgs(li.CutOffPositions, ImeAllowed, lines[iLine]));
                         }
                         else
-                            CalcCutOffs(li.CutOffPositions, maxCharsPerLine, maxCharsPerLine - li.wordWrapIndent, ImeAllowed, charWrap, lines[iLine]);
+                            CalcCutOffs(li.CutOffPositions, maxCharsPerLine, maxCharsPerLine - li.WordWrapIndent, ImeAllowed, charWrap, lines[iLine]);
 
                         LineInfos[iLine] = li;
                     }
@@ -3231,7 +3243,7 @@ namespace ircScript.Controls.SyntaxHighlight
 
             for (int i = 0; i < line.Count - 1; i++)
             {
-                char c = line[i].c;
+                char c = line[i].C;
                 if (charWrap)
                 {
                     //char wrapping
@@ -3246,7 +3258,7 @@ namespace ircScript.Controls.SyntaxHighlight
                     }
                     else
                     if (!char.IsLetterOrDigit(c) && c != '_' && c != '\'' && c != '\xa0' 
-                        && ((c != '.' && c!= ',') || !char.IsDigit(line[i + 1].c)))//dot before digit
+                        && ((c != '.' && c!= ',') || !char.IsDigit(line[i + 1].C)))//dot before digit
                         cutOff = Math.Min(i + 1, line.Count - 1);
                 }
 
@@ -3405,14 +3417,14 @@ namespace ircScript.Controls.SyntaxHighlight
         /// </summary>
         public void DoSelectionVisible()
         {
-            if (LineInfos[Selection.End.iLine].VisibleState != VisibleState.Visible)
-                ExpandBlock(Selection.End.iLine);
+            if (LineInfos[Selection.End.Line].VisibleState != VisibleState.Visible)
+                ExpandBlock(Selection.End.Line);
 
-            if (LineInfos[Selection.Start.iLine].VisibleState != VisibleState.Visible)
-                ExpandBlock(Selection.Start.iLine);
+            if (LineInfos[Selection.Start.Line].VisibleState != VisibleState.Visible)
+                ExpandBlock(Selection.Start.Line);
 
             Recalc();
-            DoVisibleRectangle(new Rectangle(PlaceToPoint(new Place(0, Selection.End.iLine)),
+            DoVisibleRectangle(new Rectangle(PlaceToPoint(new Place(0, Selection.End.Line)),
                                              new Size(2*CharWidth, 2*CharHeight)));
 
             Point car = PlaceToPoint(Selection.Start);
@@ -3439,18 +3451,18 @@ namespace ircScript.Controls.SyntaxHighlight
         {
             range = range.Clone();
             range.Normalize();
-            range.End = new Place(range.End.iChar,
-                                  Math.Min(range.End.iLine, range.Start.iLine + ClientSize.Height/CharHeight));
+            range.End = new Place(range.End.Char,
+                                  Math.Min(range.End.Line, range.Start.Line + ClientSize.Height/CharHeight));
 
-            if (LineInfos[range.End.iLine].VisibleState != VisibleState.Visible)
-                ExpandBlock(range.End.iLine);
+            if (LineInfos[range.End.Line].VisibleState != VisibleState.Visible)
+                ExpandBlock(range.End.Line);
 
-            if (LineInfos[range.Start.iLine].VisibleState != VisibleState.Visible)
-                ExpandBlock(range.Start.iLine);
+            if (LineInfos[range.Start.Line].VisibleState != VisibleState.Visible)
+                ExpandBlock(range.Start.Line);
 
             Recalc();
-            int h = (1 + range.End.iLine - range.Start.iLine)*CharHeight;
-            Point p = PlaceToPoint(new Place(0, range.Start.iLine));
+            int h = (1 + range.End.Line - range.Start.Line)*CharHeight;
+            Point p = PlaceToPoint(new Place(0, range.Start.Line));
             if (tryToCentre)
             {
                 p.Offset(0, -ClientSize.Height/2);
@@ -3518,7 +3530,7 @@ namespace ircScript.Controls.SyntaxHighlight
             return base.ProcessDialogKey(keyData);
         }
 
-        static Dictionary<FCTBAction, bool> scrollActions = new Dictionary<FCTBAction, bool>() { { FCTBAction.ScrollDown, true }, { FCTBAction.ScrollUp, true }, { FCTBAction.ZoomOut, true }, { FCTBAction.ZoomIn, true }, { FCTBAction.ZoomNormal, true } };
+        static Dictionary<FctbAction, bool> scrollActions = new Dictionary<FctbAction, bool>() { { FctbAction.ScrollDown, true }, { FctbAction.ScrollUp, true }, { FctbAction.ZoomOut, true }, { FctbAction.ZoomIn, true }, { FctbAction.ZoomNormal, true } };
 
         /// <summary>
         /// Process control keys
@@ -3532,7 +3544,7 @@ namespace ircScript.Controls.SyntaxHighlight
 
 
             if (macrosManager != null)
-            if (!HotkeysMapping.ContainsKey(keyData) || (HotkeysMapping[keyData] != FCTBAction.MacroExecute && HotkeysMapping[keyData] != FCTBAction.MacroRecord))
+            if (!HotkeysMapping.ContainsKey(keyData) || (HotkeysMapping[keyData] != FctbAction.MacroExecute && HotkeysMapping[keyData] != FctbAction.MacroRecord))
                 macrosManager.ProcessKey(keyData);
 
             if (HotkeysMapping.ContainsKey(keyData))
@@ -3570,104 +3582,104 @@ namespace ircScript.Controls.SyntaxHighlight
             return false;
         }
 
-        private void DoAction(FCTBAction action)
+        private void DoAction(FctbAction action)
         {
             switch (action)
             {
-                case FCTBAction.ZoomIn:
+                case FctbAction.ZoomIn:
                     ChangeFontSize(2);
                     break;
-                case FCTBAction.ZoomOut:
+                case FctbAction.ZoomOut:
                     ChangeFontSize(-2);
                     break;
-                case FCTBAction.ZoomNormal:
+                case FctbAction.ZoomNormal:
                     RestoreFontSize();
                     break;
-                case FCTBAction.ScrollDown:
+                case FctbAction.ScrollDown:
                     DoScrollVertical(1, -1);
                     break;
 
-                case FCTBAction.ScrollUp:
+                case FctbAction.ScrollUp:
                     DoScrollVertical(1, 1);
                     break;
 
-                case FCTBAction.GoToDialog:
+                case FctbAction.GoToDialog:
                     ShowGoToDialog();
                     break;
 
-                case FCTBAction.FindDialog:
+                case FctbAction.FindDialog:
                     ShowFindDialog();
                     break;
 
-                case FCTBAction.FindChar:
+                case FctbAction.FindChar:
                     findCharMode = true;
                     break;
 
-                case FCTBAction.FindNext:
-                    if (findForm == null || findForm.tbFind.Text == "")
+                case FctbAction.FindNext:
+                    if (findForm == null || findForm.FindText.Text == "")
                         ShowFindDialog();
                     else
-                        findForm.FindNext(findForm.tbFind.Text);
+                        findForm.FindNext(findForm.FindText.Text);
                     break;
 
-                case FCTBAction.ReplaceDialog:
+                case FctbAction.ReplaceDialog:
                     ShowReplaceDialog();
                     break;
 
-                case FCTBAction.Copy:
+                case FctbAction.Copy:
                     Copy();
                     break;
 
-                case FCTBAction.CommentSelected:
+                case FctbAction.CommentSelected:
                     CommentSelected();
                     break;
 
-                case FCTBAction.Cut:
+                case FctbAction.Cut:
                     if (!Selection.ReadOnly)
                         Cut();
                     break;
 
-                case FCTBAction.Paste:
+                case FctbAction.Paste:
                     if (!Selection.ReadOnly)
                         Paste();
                     break;
 
-                case FCTBAction.SelectAll:
+                case FctbAction.SelectAll:
                     Selection.SelectAll();
                     break;
 
-                case FCTBAction.Undo:
+                case FctbAction.Undo:
                     if (!ReadOnly)
                         Undo();
                     break;
 
-                case FCTBAction.Redo:
+                case FctbAction.Redo:
                     if (!ReadOnly)
                         Redo();
                     break;
 
-                case FCTBAction.LowerCase:
+                case FctbAction.LowerCase:
                     if (!Selection.ReadOnly)
                         LowerCase();
                     break;
 
-                case FCTBAction.UpperCase:
+                case FctbAction.UpperCase:
                     if (!Selection.ReadOnly)
                         UpperCase();
                     break;
 
-                case FCTBAction.IndentDecrease:
+                case FctbAction.IndentDecrease:
                     if (!Selection.ReadOnly)
                     {
                         var sel = Selection.Clone();
-                        if(sel.Start.iLine == sel.End.iLine)
+                        if(sel.Start.Line == sel.End.Line)
                         {
-                            var line = this[sel.Start.iLine];
-                            if (sel.Start.iChar == 0 && sel.End.iChar == line.Count)
-                                Selection = new Range(this, line.StartSpacesCount, sel.Start.iLine, line.Count, sel.Start.iLine);
+                            var line = this[sel.Start.Line];
+                            if (sel.Start.Char == 0 && sel.End.Char == line.Count)
+                                Selection = new Range(this, line.StartSpacesCount, sel.Start.Line, line.Count, sel.Start.Line);
                             else
-                            if (sel.Start.iChar == line.Count && sel.End.iChar == 0)
-                                Selection = new Range(this, line.Count, sel.Start.iLine, line.StartSpacesCount, sel.Start.iLine);
+                            if (sel.Start.Char == line.Count && sel.End.Char == 0)
+                                Selection = new Range(this, line.Count, sel.Start.Line, line.StartSpacesCount, sel.Start.Line);
                         }
 
 
@@ -3675,21 +3687,21 @@ namespace ircScript.Controls.SyntaxHighlight
                     }
                     break;
 
-                case FCTBAction.IndentIncrease:
+                case FctbAction.IndentIncrease:
                     if (!Selection.ReadOnly)
                     {
                         var sel = Selection.Clone();
                         var inverted = sel.Start > sel.End;
                         sel.Normalize();
-                        var spaces = this[sel.Start.iLine].StartSpacesCount;
-                        if (sel.Start.iLine != sel.End.iLine || //selected several lines
-                           (sel.Start.iChar <= spaces && sel.End.iChar == this[sel.Start.iLine].Count) || //selected whole line
-                           sel.End.iChar <= spaces)//selected space prefix
+                        var spaces = this[sel.Start.Line].StartSpacesCount;
+                        if (sel.Start.Line != sel.End.Line || //selected several lines
+                           (sel.Start.Char <= spaces && sel.End.Char == this[sel.Start.Line].Count) || //selected whole line
+                           sel.End.Char <= spaces)//selected space prefix
                         {
                             IncreaseIndent();
-                            if (sel.Start.iLine == sel.End.iLine && !sel.IsEmpty)
+                            if (sel.Start.Line == sel.End.Line && !sel.IsEmpty)
                             {
-                                Selection = new Range(this, this[sel.Start.iLine].StartSpacesCount, sel.End.iLine, this[sel.Start.iLine].Count, sel.End.iLine); //select whole line
+                                Selection = new Range(this, this[sel.Start.Line].StartSpacesCount, sel.End.Line, this[sel.Start.Line].Count, sel.End.Line); //select whole line
                                 if (inverted)
                                     Selection.Inverse();
                             }
@@ -3699,36 +3711,36 @@ namespace ircScript.Controls.SyntaxHighlight
                     }
                     break;
 
-                case FCTBAction.AutoIndentChars:
+                case FctbAction.AutoIndentChars:
                     if (!Selection.ReadOnly)
-                        DoAutoIndentChars(Selection.Start.iLine);
+                        DoAutoIndentChars(Selection.Start.Line);
                     break;
 
-                case FCTBAction.NavigateBackward:
+                case FctbAction.NavigateBackward:
                     NavigateBackward();
                     break;
 
-                case FCTBAction.NavigateForward:
+                case FctbAction.NavigateForward:
                     NavigateForward();
                     break;
 
-                case FCTBAction.UnbookmarkLine:
-                    UnbookmarkLine(Selection.Start.iLine);
+                case FctbAction.UnbookmarkLine:
+                    UnbookmarkLine(Selection.Start.Line);
                     break;
 
-                case FCTBAction.BookmarkLine:
-                    BookmarkLine(Selection.Start.iLine);
+                case FctbAction.BookmarkLine:
+                    BookmarkLine(Selection.Start.Line);
                     break;
 
-                case FCTBAction.GoNextBookmark:
-                    GotoNextBookmark(Selection.Start.iLine);
+                case FctbAction.GoNextBookmark:
+                    GotoNextBookmark(Selection.Start.Line);
                     break;
 
-                case FCTBAction.GoPrevBookmark:
-                    GotoPrevBookmark(Selection.Start.iLine);
+                case FctbAction.GoPrevBookmark:
+                    GotoPrevBookmark(Selection.Start.Line);
                     break;
 
-                case FCTBAction.ClearWordLeft:
+                case FctbAction.ClearWordLeft:
                     if (OnKeyPressing('\b')) //KeyPress event processed key
                         break;
                     if (!Selection.ReadOnly)
@@ -3742,12 +3754,12 @@ namespace ircScript.Controls.SyntaxHighlight
                     OnKeyPressed('\b');
                     break;
 
-                case FCTBAction.ReplaceMode:
+                case FctbAction.ReplaceMode:
                     if (!ReadOnly)
                         isReplaceMode = !isReplaceMode;
                     break;
 
-                case FCTBAction.DeleteCharRight:
+                case FctbAction.DeleteCharRight:
                     if (!Selection.ReadOnly)
                     {
                         if (OnKeyPressing((char) 0xff)) //KeyPress event processed key
@@ -3757,31 +3769,31 @@ namespace ircScript.Controls.SyntaxHighlight
                         else
                         {
                             //if line contains only spaces then delete line
-                            if (this[Selection.Start.iLine].StartSpacesCount == this[Selection.Start.iLine].Count)
+                            if (this[Selection.Start.Line].StartSpacesCount == this[Selection.Start.Line].Count)
                                 RemoveSpacesAfterCaret();
 
                             if (!Selection.IsReadOnlyRightChar())
                                 if (Selection.GoRightThroughFolded())
                                 {
-                                    int iLine = Selection.Start.iLine;
+                                    int iLine = Selection.Start.Line;
 
                                     InsertChar('\b');
 
                                     //if removed \n then trim spaces
-                                    if (iLine != Selection.Start.iLine && AutoIndent)
-                                        if (Selection.Start.iChar > 0)
+                                    if (iLine != Selection.Start.Line && AutoIndent)
+                                        if (Selection.Start.Char > 0)
                                             RemoveSpacesAfterCaret();
                                 }
                         }
 
                         if (AutoIndentChars)
-                            DoAutoIndentChars(Selection.Start.iLine);
+                            DoAutoIndentChars(Selection.Start.Line);
 
                         OnKeyPressed((char) 0xff);
                     }
                     break;
 
-                case FCTBAction.ClearWordRight:
+                case FctbAction.ClearWordRight:
                     if (OnKeyPressing((char) 0xff)) //KeyPress event processed key
                         break;
                     if (!Selection.ReadOnly)
@@ -3795,156 +3807,156 @@ namespace ircScript.Controls.SyntaxHighlight
                     OnKeyPressed((char) 0xff);
                     break;
 
-                case FCTBAction.GoWordLeft:
+                case FctbAction.GoWordLeft:
                     Selection.GoWordLeft(false);
                     break;
 
-                case FCTBAction.GoWordLeftWithSelection:
+                case FctbAction.GoWordLeftWithSelection:
                     Selection.GoWordLeft(true);
                     break;
 
-                case FCTBAction.GoLeft:
+                case FctbAction.GoLeft:
                     Selection.GoLeft(false);
                     break;
 
-                case FCTBAction.GoLeftWithSelection:
+                case FctbAction.GoLeftWithSelection:
                     Selection.GoLeft(true);
                     break;
 
-                case FCTBAction.GoLeft_ColumnSelectionMode:
+                case FctbAction.GoLeft_ColumnSelectionMode:
                     CheckAndChangeSelectionType();
                     if (Selection.ColumnSelectionMode)
                         Selection.GoLeft_ColumnSelectionMode();
                     Invalidate();
                     break;
 
-                case FCTBAction.GoWordRight:
+                case FctbAction.GoWordRight:
                     Selection.GoWordRight(false, true);
                     break;
 
-                case FCTBAction.GoWordRightWithSelection:
+                case FctbAction.GoWordRightWithSelection:
                     Selection.GoWordRight(true, true);
                     break;
 
-                case FCTBAction.GoRight:
+                case FctbAction.GoRight:
                     Selection.GoRight(false);
                     break;
 
-                case FCTBAction.GoRightWithSelection:
+                case FctbAction.GoRightWithSelection:
                     Selection.GoRight(true);
                     break;
 
-                case FCTBAction.GoRight_ColumnSelectionMode:
+                case FctbAction.GoRight_ColumnSelectionMode:
                     CheckAndChangeSelectionType();
                     if (Selection.ColumnSelectionMode)
                         Selection.GoRight_ColumnSelectionMode();
                     Invalidate();
                     break;
 
-                case FCTBAction.GoUp:
+                case FctbAction.GoUp:
                     Selection.GoUp(false);
                     ScrollLeft();
                     break;
 
-                case FCTBAction.GoUpWithSelection:
+                case FctbAction.GoUpWithSelection:
                     Selection.GoUp(true);
                     ScrollLeft();
                     break;
 
-                case FCTBAction.GoUp_ColumnSelectionMode:
+                case FctbAction.GoUp_ColumnSelectionMode:
                     CheckAndChangeSelectionType();
                     if (Selection.ColumnSelectionMode)
                         Selection.GoUp_ColumnSelectionMode();
                     Invalidate();
                     break;
 
-                case FCTBAction.MoveSelectedLinesUp:
+                case FctbAction.MoveSelectedLinesUp:
                     if (!Selection.ColumnSelectionMode)
                         MoveSelectedLinesUp();
                     break;
 
-                case FCTBAction.GoDown:
+                case FctbAction.GoDown:
                     Selection.GoDown(false);
                     ScrollLeft();
                     break;
 
-                case FCTBAction.GoDownWithSelection:
+                case FctbAction.GoDownWithSelection:
                     Selection.GoDown(true);
                     ScrollLeft();
                     break;
 
-                case FCTBAction.GoDown_ColumnSelectionMode:
+                case FctbAction.GoDown_ColumnSelectionMode:
                     CheckAndChangeSelectionType();
                     if (Selection.ColumnSelectionMode)
                         Selection.GoDown_ColumnSelectionMode();
                     Invalidate();
                     break;
 
-                case FCTBAction.MoveSelectedLinesDown:
+                case FctbAction.MoveSelectedLinesDown:
                     if (!Selection.ColumnSelectionMode)
                         MoveSelectedLinesDown();
                     break;
-                case FCTBAction.GoPageUp:
+                case FctbAction.GoPageUp:
                     Selection.GoPageUp(false);
                     ScrollLeft();
                     break;
 
-                case FCTBAction.GoPageUpWithSelection:
+                case FctbAction.GoPageUpWithSelection:
                     Selection.GoPageUp(true);
                     ScrollLeft();
                     break;
 
-                case FCTBAction.GoPageDown:
+                case FctbAction.GoPageDown:
                     Selection.GoPageDown(false);
                     ScrollLeft();
                     break;
 
-                case FCTBAction.GoPageDownWithSelection:
+                case FctbAction.GoPageDownWithSelection:
                     Selection.GoPageDown(true);
                     ScrollLeft();
                     break;
 
-                case FCTBAction.GoFirstLine:
+                case FctbAction.GoFirstLine:
                     Selection.GoFirst(false);
                     break;
 
-                case FCTBAction.GoFirstLineWithSelection:
+                case FctbAction.GoFirstLineWithSelection:
                     Selection.GoFirst(true);
                     break;
 
-                case FCTBAction.GoHome:
+                case FctbAction.GoHome:
                     GoHome(false);
                     ScrollLeft();
                     break;
 
-                case FCTBAction.GoHomeWithSelection:
+                case FctbAction.GoHomeWithSelection:
                     GoHome(true);
                     ScrollLeft();
                     break;
 
-                case FCTBAction.GoLastLine:
+                case FctbAction.GoLastLine:
                     Selection.GoLast(false);
                     break;
 
-                case FCTBAction.GoLastLineWithSelection:
+                case FctbAction.GoLastLineWithSelection:
                     Selection.GoLast(true);
                     break;
 
-                case FCTBAction.GoEnd:
+                case FctbAction.GoEnd:
                     Selection.GoEnd(false);
                     break;
 
-                case FCTBAction.GoEndWithSelection:
+                case FctbAction.GoEndWithSelection:
                     Selection.GoEnd(true);
                     break;
 
-                case FCTBAction.ClearHints:
+                case FctbAction.ClearHints:
                     ClearHints();
                     if(MacrosManager != null)
                         MacrosManager.IsRecording = false;
                     break;
 
-                case FCTBAction.MacroRecord:
+                case FctbAction.MacroRecord:
                     if(MacrosManager != null)
                     {
                         if (MacrosManager.AllowMacroRecordingByUser)
@@ -3954,33 +3966,33 @@ namespace ircScript.Controls.SyntaxHighlight
                     }
                     break;
 
-                case FCTBAction.MacroExecute:
+                case FctbAction.MacroExecute:
                     if (MacrosManager != null)
                     {
                         MacrosManager.IsRecording = false;
                         MacrosManager.ExecuteMacros();
                     }
                     break;
-                case FCTBAction.CustomAction1 :
-                case FCTBAction.CustomAction2 :
-                case FCTBAction.CustomAction3 :
-                case FCTBAction.CustomAction4 :
-                case FCTBAction.CustomAction5 :
-                case FCTBAction.CustomAction6 :
-                case FCTBAction.CustomAction7 :
-                case FCTBAction.CustomAction8 :
-                case FCTBAction.CustomAction9 :
-                case FCTBAction.CustomAction10:
-                case FCTBAction.CustomAction11:
-                case FCTBAction.CustomAction12:
-                case FCTBAction.CustomAction13:
-                case FCTBAction.CustomAction14:
-                case FCTBAction.CustomAction15:
-                case FCTBAction.CustomAction16:
-                case FCTBAction.CustomAction17:
-                case FCTBAction.CustomAction18:
-                case FCTBAction.CustomAction19:
-                case FCTBAction.CustomAction20:
+                case FctbAction.CustomAction1 :
+                case FctbAction.CustomAction2 :
+                case FctbAction.CustomAction3 :
+                case FctbAction.CustomAction4 :
+                case FctbAction.CustomAction5 :
+                case FctbAction.CustomAction6 :
+                case FctbAction.CustomAction7 :
+                case FctbAction.CustomAction8 :
+                case FctbAction.CustomAction9 :
+                case FctbAction.CustomAction10:
+                case FctbAction.CustomAction11:
+                case FctbAction.CustomAction12:
+                case FctbAction.CustomAction13:
+                case FctbAction.CustomAction14:
+                case FctbAction.CustomAction15:
+                case FctbAction.CustomAction16:
+                case FctbAction.CustomAction17:
+                case FctbAction.CustomAction18:
+                case FctbAction.CustomAction19:
+                case FctbAction.CustomAction20:
                     OnCustomAction(new CustomActionEventArgs(action));
                     break;
             }
@@ -4103,21 +4115,21 @@ namespace ircScript.Controls.SyntaxHighlight
             Selection.Expand();
             if (!Selection.ReadOnly)
             {
-                int iLine = Selection.Start.iLine;
-                if (Selection.End.iLine >= LinesCount - 1)
+                int iLine = Selection.Start.Line;
+                if (Selection.End.Line >= LinesCount - 1)
                 {
                     Selection = prevSelection;
                     return;
                 }
                 string text = SelectedText;
                 var temp = new List<int>();
-                for (int i = Selection.Start.iLine; i <= Selection.End.iLine; i++)
+                for (int i = Selection.Start.Line; i <= Selection.End.Line; i++)
                     temp.Add(i);
                 RemoveLines(temp);
                 Selection.Start = new Place(GetLineLength(iLine), iLine);
                 SelectedText = "\n" + text;
-                Selection.Start = new Place(prevSelection.Start.iChar, prevSelection.Start.iLine + 1);
-                Selection.End = new Place(prevSelection.End.iChar, prevSelection.End.iLine + 1);
+                Selection.Start = new Place(prevSelection.Start.Char, prevSelection.Start.Line + 1);
+                Selection.End = new Place(prevSelection.End.Char, prevSelection.End.Line + 1);
             }else
                 Selection = prevSelection;
         }
@@ -4131,7 +4143,7 @@ namespace ircScript.Controls.SyntaxHighlight
             Selection.Expand();
             if (!Selection.ReadOnly)
             {
-                int iLine = Selection.Start.iLine;
+                int iLine = Selection.Start.Line;
                 if (iLine == 0)
                 {
                     Selection = prevSelection;
@@ -4139,13 +4151,13 @@ namespace ircScript.Controls.SyntaxHighlight
                 }
                 string text = SelectedText;
                 var temp = new List<int>();
-                for (int i = Selection.Start.iLine; i <= Selection.End.iLine; i++)
+                for (int i = Selection.Start.Line; i <= Selection.End.Line; i++)
                     temp.Add(i);
                 RemoveLines(temp);
                 Selection.Start = new Place(0, iLine - 1);
                 SelectedText = text + "\n";
-                Selection.Start = new Place(prevSelection.Start.iChar, prevSelection.Start.iLine - 1);
-                Selection.End = new Place(prevSelection.End.iChar, prevSelection.End.iLine - 1);
+                Selection.Start = new Place(prevSelection.Start.Char, prevSelection.Start.Line - 1);
+                Selection.End = new Place(prevSelection.End.Char, prevSelection.End.Line - 1);
             }else
                 Selection = prevSelection;
         }
@@ -4155,9 +4167,9 @@ namespace ircScript.Controls.SyntaxHighlight
             Selection.BeginUpdate();
             try
             {
-                int iLine = Selection.Start.iLine;
+                int iLine = Selection.Start.Line;
                 int spaces = this[iLine].StartSpacesCount;
-                if (Selection.Start.iChar <= spaces)
+                if (Selection.Start.Char <= spaces)
                     Selection.GoHome(shift);
                 else
                 {
@@ -4234,7 +4246,7 @@ namespace ircScript.Controls.SyntaxHighlight
             if (string.IsNullOrEmpty(commentPrefix))
                 return;
             Selection.Normalize();
-            bool isCommented = lines[Selection.Start.iLine].Text.TrimStart().StartsWith(commentPrefix);
+            bool isCommented = lines[Selection.Start.Line].Text.TrimStart().StartsWith(commentPrefix);
             if (isCommented)
                 RemoveLinePrefix(commentPrefix);
             else
@@ -4321,7 +4333,7 @@ namespace ircScript.Controls.SyntaxHighlight
                         InsertChar('\b');
 
                 if (AutoIndentChars)
-                    DoAutoIndentChars(Selection.Start.iLine);
+                    DoAutoIndentChars(Selection.Start.Line);
 
                 OnKeyPressed('\b');
                 return true;
@@ -4378,7 +4390,7 @@ namespace ircScript.Controls.SyntaxHighlight
                 DoAutoIndentIfNeed();
 
             if (AutoIndentChars)
-                DoAutoIndentChars(Selection.Start.iLine);
+                DoAutoIndentChars(Selection.Start.Line);
 
             DoCaretVisible();
             Invalidate();
@@ -4520,8 +4532,8 @@ namespace ircScript.Controls.SyntaxHighlight
                     if (addSpaces == 0)
                         continue;
 
-                    if (oldSel.Start.iLine == i && oldSel.Start.iChar > cap.Index)
-                        oldSel.Start = new Place(oldSel.Start.iChar + addSpaces, i);
+                    if (oldSel.Start.Line == i && oldSel.Start.Char > cap.Index)
+                        oldSel.Start = new Place(oldSel.Start.Char + addSpaces, i);
 
                     if (addSpaces > 0)
                         texts[i] = texts[i].Insert(cap.Index, new string(' ', addSpaces));
@@ -4590,12 +4602,12 @@ namespace ircScript.Controls.SyntaxHighlight
                 range.Normalize();
                 Selection.BeginUpdate();
                 BeginAutoUndo();
-                Selection = new Range(this, range.Start.iChar, range.Start.iLine, range.Start.iChar, range.End.iLine) { ColumnSelectionMode = true };
+                Selection = new Range(this, range.Start.Char, range.Start.Line, range.Start.Char, range.End.Line) { ColumnSelectionMode = true };
                 InsertChar(left);
-                Selection = new Range(this, range.End.iChar + 1, range.Start.iLine, range.End.iChar + 1, range.End.iLine) { ColumnSelectionMode = true };
+                Selection = new Range(this, range.End.Char + 1, range.Start.Line, range.End.Char + 1, range.End.Line) { ColumnSelectionMode = true };
                 InsertChar(right);
                 if (range.IsEmpty)
-                    Selection = new Range(this, range.End.iChar + 1, range.Start.iLine, range.End.iChar + 1, range.End.iLine) { ColumnSelectionMode = true };
+                    Selection = new Range(this, range.End.Char + 1, range.Start.Line, range.End.Char + 1, range.End.Line) { ColumnSelectionMode = true };
                 EndAutoUndo();
                 Selection.EndUpdate();
             }
@@ -4639,11 +4651,11 @@ namespace ircScript.Controls.SyntaxHighlight
             if (AutoIndent)
             {
                 DoCaretVisible();
-                int needSpaces = CalcAutoIndent(Selection.Start.iLine);
-                if (this[Selection.Start.iLine].AutoIndentSpacesNeededCount != needSpaces)
+                int needSpaces = CalcAutoIndent(Selection.Start.Line);
+                if (this[Selection.Start.Line].AutoIndentSpacesNeededCount != needSpaces)
                 {
-                    DoAutoIndent(Selection.Start.iLine);
-                    this[Selection.Start.iLine].AutoIndentSpacesNeededCount = needSpaces;
+                    DoAutoIndent(Selection.Start.Line);
+                    this[Selection.Start.Line].AutoIndentSpacesNeededCount = needSpaces;
                 }
             }
         }
@@ -4686,7 +4698,7 @@ namespace ircScript.Controls.SyntaxHighlight
                 ClearSelected();
             }
 
-            Selection.Start = new Place(Math.Min(lines[iLine].Count, Math.Max(0, oldStart.iChar + needToInsert)), iLine);
+            Selection.Start = new Place(Math.Min(lines[iLine].Count, Math.Max(0, oldStart.Char + needToInsert)), iLine);
         }
 
         /// <summary>
@@ -4885,24 +4897,24 @@ namespace ircScript.Controls.SyntaxHighlight
             var startPoint = PlaceToPoint(start);
             var startY = startPoint.Y + VerticalScroll.Value;
             var startX = startPoint.X + HorizontalScroll.Value - LeftIndent - Paddings.Left;
-            int firstChar = start.iChar;
+            int firstChar = start.Char;
             int lastChar = (startX + size.Width) / CharWidth;
 
-            var startLine = start.iLine;
+            var startLine = start.Line;
             //draw text
             for (int iLine = startLine; iLine < lines.Count; iLine++)
             {
                 Line line = lines[iLine];
                 LineInfo lineInfo = LineInfos[iLine];
                 //
-                if (lineInfo.startY > startY + size.Height)
+                if (lineInfo.StartY > startY + size.Height)
                     break;
-                if (lineInfo.startY + lineInfo.WordWrapStringsCount * CharHeight < startY)
+                if (lineInfo.StartY + lineInfo.WordWrapStringsCount * CharHeight < startY)
                     continue;
                 if (lineInfo.VisibleState == VisibleState.Hidden)
                     continue;
 
-                int y = lineInfo.startY - startY;
+                int y = lineInfo.StartY - startY;
                 //
                 gr.SmoothingMode = SmoothingMode.None;
                 //draw line background
@@ -4915,9 +4927,9 @@ namespace ircScript.Controls.SyntaxHighlight
                 //draw wordwrap strings of line
                 for (int iWordWrapLine = 0; iWordWrapLine < lineInfo.WordWrapStringsCount; iWordWrapLine++)
                 {
-                    y = lineInfo.startY + iWordWrapLine * CharHeight - startY;
+                    y = lineInfo.StartY + iWordWrapLine * CharHeight - startY;
                     //indent 
-                    var indent = iWordWrapLine == 0 ? 0 : lineInfo.wordWrapIndent * CharWidth;
+                    var indent = iWordWrapLine == 0 ? 0 : lineInfo.WordWrapIndent * CharWidth;
                     //draw chars
                     DrawLineChars(gr, firstChar, lastChar, iLine, iWordWrapLine, -startX + indent, y);
                 }
@@ -5001,14 +5013,14 @@ namespace ircScript.Controls.SyntaxHighlight
                 Line line = lines[iLine];
                 LineInfo lineInfo = LineInfos[iLine];
                 //
-                if (lineInfo.startY > VerticalScroll.Value + ClientSize.Height)
+                if (lineInfo.StartY > VerticalScroll.Value + ClientSize.Height)
                     break;
-                if (lineInfo.startY + lineInfo.WordWrapStringsCount*CharHeight < VerticalScroll.Value)
+                if (lineInfo.StartY + lineInfo.WordWrapStringsCount*CharHeight < VerticalScroll.Value)
                     continue;
                 if (lineInfo.VisibleState == VisibleState.Hidden)
                     continue;
 
-                int y = lineInfo.startY - VerticalScroll.Value;
+                int y = lineInfo.StartY - VerticalScroll.Value;
                 //
                 e.Graphics.SmoothingMode = SmoothingMode.None;
                 //draw line background
@@ -5018,7 +5030,7 @@ namespace ircScript.Controls.SyntaxHighlight
                                                  new Rectangle(textAreaRect.Left, y, textAreaRect.Width,
                                                                CharHeight*lineInfo.WordWrapStringsCount));
                 //draw current line background
-                if (CurrentLineColor != Color.Transparent && iLine == Selection.Start.iLine)
+                if (CurrentLineColor != Color.Transparent && iLine == Selection.Start.Line)
                     if (Selection.IsEmpty)
                         e.Graphics.FillRectangle(currentLineBrush,
                                                  new Rectangle(textAreaRect.Left, y, textAreaRect.Width, CharHeight));
@@ -5062,16 +5074,16 @@ namespace ircScript.Controls.SyntaxHighlight
                 //draw wordwrap strings of line
                 for (int iWordWrapLine = 0; iWordWrapLine < lineInfo.WordWrapStringsCount; iWordWrapLine++)
                 {
-                    y = lineInfo.startY + iWordWrapLine*CharHeight - VerticalScroll.Value;
+                    y = lineInfo.StartY + iWordWrapLine*CharHeight - VerticalScroll.Value;
                     // break if too long line (important for extremly big lines)
                     if (y > VerticalScroll.Value + ClientSize.Height)
                         break;
                     // continue if wordWrapLine isn't seen yet (important for extremly big lines)
-                    if (lineInfo.startY + iWordWrapLine * CharHeight < VerticalScroll.Value)
+                    if (lineInfo.StartY + iWordWrapLine * CharHeight < VerticalScroll.Value)
                         continue;
 
                     //indent
-                    var indent = iWordWrapLine == 0 ? 0 : lineInfo.wordWrapIndent * CharWidth;
+                    var indent = iWordWrapLine == 0 ? 0 : lineInfo.WordWrapIndent * CharWidth;
                     //draw chars
                     DrawLineChars(e.Graphics, firstChar, lastChar, iLine, iWordWrapLine, x + indent, y);
                 }
@@ -5114,10 +5126,10 @@ namespace ircScript.Controls.SyntaxHighlight
                 if (endFoldingLine < LineInfos.Count)
                 {
                     //folding indicator
-                    int startFoldingY = (startFoldingLine >= 0 ? LineInfos[startFoldingLine].startY : 0) -
+                    int startFoldingY = (startFoldingLine >= 0 ? LineInfos[startFoldingLine].StartY : 0) -
                                         VerticalScroll.Value + CharHeight/2;
                     int endFoldingY = (endFoldingLine >= 0
-                                           ? LineInfos[endFoldingLine].startY +
+                                           ? LineInfos[endFoldingLine].StartY +
                                              (LineInfos[endFoldingLine].WordWrapStringsCount - 1)*CharHeight
                                            : TextHeight + CharHeight) - VerticalScroll.Value + CharHeight;
 
@@ -5273,8 +5285,8 @@ namespace ircScript.Controls.SyntaxHighlight
                 r.Normalize();
                 Point p1 = PlaceToPoint(r.Start);
                 Point p2 = PlaceToPoint(r.End);
-                if (GetVisibleState(r.Start.iLine) != VisibleState.Visible ||
-                    GetVisibleState(r.End.iLine) != VisibleState.Visible)
+                if (GetVisibleState(r.Start.Line) != VisibleState.Visible ||
+                    GetVisibleState(r.End.Line) != VisibleState.Visible)
                     continue;
 
                 using (var pen = new Pen(hint.BorderColor))
@@ -5316,20 +5328,20 @@ namespace ircScript.Controls.SyntaxHighlight
                     if (iLine.Key < endLine && iLine.Value > startLine)
                     {
                         Line line = lines[iLine.Key];
-                        int y = LineInfos[iLine.Key].startY - VerticalScroll.Value + CharHeight;
+                        int y = LineInfos[iLine.Key].StartY - VerticalScroll.Value + CharHeight;
                         y += y%2;
 
                         int y2;
 
                         if (iLine.Value >= LinesCount)
-                            y2 = LineInfos[LinesCount - 1].startY + CharHeight - VerticalScroll.Value;
+                            y2 = LineInfos[LinesCount - 1].StartY + CharHeight - VerticalScroll.Value;
                         else if (LineInfos[iLine.Value].VisibleState == VisibleState.Visible)
                         {
                             int d = 0;
                             int spaceCount = line.StartSpacesCount;
-                            if (lines[iLine.Value].Count <= spaceCount || lines[iLine.Value][spaceCount].c == ' ')
+                            if (lines[iLine.Value].Count <= spaceCount || lines[iLine.Value][spaceCount].C == ' ')
                                 d = CharHeight;
-                            y2 = LineInfos[iLine.Value].startY - VerticalScroll.Value + d;
+                            y2 = LineInfos[iLine.Value].StartY - VerticalScroll.Value + d;
                         }
                         else
                             continue;
@@ -5368,7 +5380,7 @@ namespace ircScript.Controls.SyntaxHighlight
 
                 for (int iChar = firstChar; iChar <= lastChar; iChar++)
                 {
-                    StyleIndex style = line[from + iChar].style;
+                    StyleIndex style = line[from + iChar].Style;
                     if (currentStyleIndex != style)
                     {
                         FlushRendering(gr, currentStyleIndex,
@@ -5391,7 +5403,7 @@ namespace ircScript.Controls.SyntaxHighlight
                 textRange = Selection.GetIntersectionWith(textRange);
                 if (textRange != null && SelectionStyle != null)
                 {
-                    SelectionStyle.Draw(gr, new Point(startX + (textRange.Start.iChar - from)*CharWidth, 1 + y),
+                    SelectionStyle.Draw(gr, new Point(startX + (textRange.Start.Char - from)*CharWidth, 1 + y),
                                         textRange);
                 }
             }
@@ -5492,7 +5504,7 @@ namespace ircScript.Controls.SyntaxHighlight
                         return;
                     }
 
-                    if (Selection.IsEmpty || !Selection.Contains(p) || this[p.iLine].Count <= p.iChar || ReadOnly)
+                    if (Selection.IsEmpty || !Selection.Contains(p) || this[p.Line].Count <= p.Char || ReadOnly)
                         OnMouseClickText(e);
                     else
                     {
@@ -5506,7 +5518,7 @@ namespace ircScript.Controls.SyntaxHighlight
 
                     Selection.BeginUpdate();
                     //select whole line
-                    int iLine = PointToPlaceSimple(e.Location).iLine;
+                    int iLine = PointToPlaceSimple(e.Location).Line;
                     lineSelectFrom = iLine;
                     Selection.Start = new Place(0, iLine);
                     Selection.End = new Place(GetLineLength(iLine), iLine);
@@ -5693,7 +5705,7 @@ namespace ircScript.Controls.SyntaxHighlight
 
             //restore first displayed line
             if (iLine < LinesCount)
-                VerticalScroll.Value = Math.Min(VerticalScroll.Maximum, LineInfos[iLine].startY - Paddings.Top);
+                VerticalScroll.Value = Math.Min(VerticalScroll.Maximum, LineInfos[iLine].StartY - Paddings.Top);
             UpdateScrollbars();
             //
             Invalidate();
@@ -5744,7 +5756,7 @@ namespace ircScript.Controls.SyntaxHighlight
                 {
                     Selection.BeginUpdate();
 
-                    int iLine = place.iLine;
+                    int iLine = place.Line;
                     if (iLine < lineSelectFrom)
                     {
                         Selection.Start = new Place(0, iLine);
@@ -5814,28 +5826,28 @@ namespace ircScript.Controls.SyntaxHighlight
 
         private void SelectWord(Place p)
         {
-            int fromX = p.iChar;
-            int toX = p.iChar;
+            int fromX = p.Char;
+            int toX = p.Char;
 
-            for (int i = p.iChar; i < lines[p.iLine].Count; i++)
+            for (int i = p.Char; i < lines[p.Line].Count; i++)
             {
-                char c = lines[p.iLine][i].c;
+                char c = lines[p.Line][i].C;
                 if (char.IsLetterOrDigit(c) || c == '_')
                     toX = i + 1;
                 else
                     break;
             }
 
-            for (int i = p.iChar - 1; i >= 0; i--)
+            for (int i = p.Char - 1; i >= 0; i--)
             {
-                char c = lines[p.iLine][i].c;
+                char c = lines[p.Line][i].C;
                 if (char.IsLetterOrDigit(c) || c == '_')
                     fromX = i;
                 else
                     break;
             }
 
-            Selection = new Range(this, toX, p.iLine, fromX, p.iLine);
+            Selection = new Range(this, toX, p.Line, fromX, p.Line);
         }
 
         public int YtoLineIndex(int y)
@@ -5867,7 +5879,7 @@ namespace ircScript.Controls.SyntaxHighlight
 
             for (; iLine < lines.Count; iLine++)
             {
-                y = LineInfos[iLine].startY + LineInfos[iLine].WordWrapStringsCount*CharHeight;
+                y = LineInfos[iLine].StartY + LineInfos[iLine].WordWrapStringsCount*CharHeight;
                 if (y > point.Y && LineInfos[iLine].VisibleState == VisibleState.Visible)
                     break;
             }
@@ -5897,7 +5909,7 @@ namespace ircScript.Controls.SyntaxHighlight
             int finish = LineInfos[iLine].GetWordWrapStringFinishPosition(iWordWrapLine, lines[iLine]);
             var x = (int) Math.Round((float) point.X/CharWidth);
             if (iWordWrapLine > 0)
-                x -= LineInfos[iLine].wordWrapIndent;
+                x -= LineInfos[iLine].WordWrapIndent;
 
             x = x < 0 ? start : start + x;
             if (x > finish)
@@ -6023,11 +6035,11 @@ namespace ircScript.Controls.SyntaxHighlight
                     updatingRange = args.ChangedRange.Clone();
                 else
                 {
-                    if (updatingRange.Start.iLine > args.ChangedRange.Start.iLine)
-                        updatingRange.Start = new Place(0, args.ChangedRange.Start.iLine);
-                    if (updatingRange.End.iLine < args.ChangedRange.End.iLine)
-                        updatingRange.End = new Place(lines[args.ChangedRange.End.iLine].Count,
-                                                      args.ChangedRange.End.iLine);
+                    if (updatingRange.Start.Line > args.ChangedRange.Start.Line)
+                        updatingRange.Start = new Place(0, args.ChangedRange.Start.Line);
+                    if (updatingRange.End.Line < args.ChangedRange.End.Line)
+                        updatingRange.End = new Place(lines[args.ChangedRange.End.Line].Count,
+                                                      args.ChangedRange.End.Line);
                     updatingRange = updatingRange.GetIntersectionWith(Range);
                 }
                 return;
@@ -6044,7 +6056,7 @@ namespace ircScript.Controls.SyntaxHighlight
             ClearFoldingState(args.ChangedRange);
             //
             if (wordWrap)
-                RecalcWordWrap(args.ChangedRange.Start.iLine, args.ChangedRange.End.iLine);
+                RecalcWordWrap(args.ChangedRange.Start.Line, args.ChangedRange.End.Line);
             //
             base.OnTextChanged(args);
 
@@ -6079,7 +6091,7 @@ namespace ircScript.Controls.SyntaxHighlight
         /// </summary>
         private void ClearFoldingState(Range range)
         {
-            for (int iLine = range.Start.iLine; iLine <= range.End.iLine; iLine++)
+            for (int iLine = range.Start.Line; iLine <= range.End.Line; iLine++)
                 if (iLine >= 0 && iLine < lines.Count)
                     FoldedBlocks.Remove(this[iLine].UniqueId);
         }
@@ -6087,7 +6099,7 @@ namespace ircScript.Controls.SyntaxHighlight
 
         private void MarkLinesAsChanged(Range range)
         {
-            for (int iLine = range.Start.iLine; iLine <= range.End.iLine; iLine++)
+            for (int iLine = range.Start.Line; iLine <= range.End.Line; iLine++)
                 if (iLine >= 0 && iLine < lines.Count)
                     lines[iLine].IsChanged = true;
         }
@@ -6127,7 +6139,7 @@ namespace ircScript.Controls.SyntaxHighlight
             startFoldingLine = -1;
             endFoldingLine = -1;
             int counter = 0;
-            for (int i = Selection.Start.iLine; i >= Math.Max(Selection.Start.iLine - MaxLinesForFolding, 0); i--)
+            for (int i = Selection.Start.Line; i >= Math.Max(Selection.Start.Line - MaxLinesForFolding, 0); i--)
             {
                 bool hasStartMarker = lines.LineHasFoldingStartMarker(i);
                 bool hasEndMarker = lines.LineHasFoldingEndMarker(i);
@@ -6144,7 +6156,7 @@ namespace ircScript.Controls.SyntaxHighlight
                         break;
                     }
                 }
-                if (hasEndMarker && i != Selection.Start.iLine)
+                if (hasEndMarker && i != Selection.Start.Line)
                     counter++;
             }
             if (startFoldingLine >= 0)
@@ -6187,14 +6199,14 @@ namespace ircScript.Controls.SyntaxHighlight
         /// <returns>Point of char</returns>
         public int PlaceToPosition(Place point)
         {
-            if (point.iLine < 0 || point.iLine >= lines.Count ||
-                point.iChar >= lines[point.iLine].Count + Environment.NewLine.Length)
+            if (point.Line < 0 || point.Line >= lines.Count ||
+                point.Char >= lines[point.Line].Count + Environment.NewLine.Length)
                 return -1;
 
             int result = 0;
-            for (int i = 0; i < point.iLine; i++)
+            for (int i = 0; i < point.Line; i++)
                 result += lines[i].Count + Environment.NewLine.Length;
-            result += point.iChar;
+            result += point.Char;
 
             return result;
         }
@@ -6240,15 +6252,15 @@ namespace ircScript.Controls.SyntaxHighlight
         /// <returns>Coordiantes</returns>
         public Point PlaceToPoint(Place place)
         {
-            if (place.iLine >= LineInfos.Count)
+            if (place.Line >= LineInfos.Count)
                 return new Point();
-            int y = LineInfos[place.iLine].startY;
+            int y = LineInfos[place.Line].StartY;
             //
-            int iWordWrapIndex = LineInfos[place.iLine].GetWordWrapStringIndex(place.iChar);
+            int iWordWrapIndex = LineInfos[place.Line].GetWordWrapStringIndex(place.Char);
             y += iWordWrapIndex*CharHeight;
-            int x = (place.iChar - LineInfos[place.iLine].GetWordWrapStringStartPosition(iWordWrapIndex))*CharWidth;
+            int x = (place.Char - LineInfos[place.Line].GetWordWrapStringStartPosition(iWordWrapIndex))*CharWidth;
             if(iWordWrapIndex > 0 )
-                x += LineInfos[place.iLine].wordWrapIndent * CharWidth;
+                x += LineInfos[place.Line].WordWrapIndent * CharWidth;
             //
             y = y - VerticalScroll.Value;
             x = LeftIndent + Paddings.Left + x - HorizontalScroll.Value;
@@ -6320,7 +6332,7 @@ namespace ircScript.Controls.SyntaxHighlight
                 throw new ArgumentOutOfRangeException("Line index out of range");
             var sb = new StringBuilder(lines[iLine].Count);
             foreach (Char c in lines[iLine])
-                sb.Append(c.c);
+                sb.Append(c.C);
             return sb.ToString();
         }
 
@@ -6552,8 +6564,8 @@ namespace ircScript.Controls.SyntaxHighlight
             foldingPairs.Clear();
             //
             Range range = VisibleRange;
-            int startLine = Math.Max(range.Start.iLine - MaxLinesForFolding, 0);
-            int endLine = Math.Min(range.End.iLine + MaxLinesForFolding, Math.Max(range.End.iLine, LinesCount - 1));
+            int startLine = Math.Max(range.Start.Line - MaxLinesForFolding, 0);
+            int endLine = Math.Min(range.End.Line + MaxLinesForFolding, Math.Max(range.End.Line, LinesCount - 1));
             var stack = new Stack<int>();
             for (int i = startLine; i <= endLine; i++)
             {
@@ -6651,7 +6663,7 @@ namespace ircScript.Controls.SyntaxHighlight
         private VisualMarker FindVisualMarkerForPoint(Point p)
         {
             foreach (VisualMarker m in visibleMarkers)
-                if (m.rectangle.Contains(p))
+                if (m.Rectangle.Contains(p))
                     return m;
             return null;
         }
@@ -6665,9 +6677,9 @@ namespace ircScript.Controls.SyntaxHighlight
             {
                 if (!Selection.ReadOnly)
                 {
-                    Selection.Start = new Place(this[Selection.Start.iLine].StartSpacesCount, Selection.Start.iLine);
+                    Selection.Start = new Place(this[Selection.Start.Line].StartSpacesCount, Selection.Start.Line);
                     //insert tab as spaces
-                    int spaces = TabLength - (Selection.Start.iChar % TabLength);
+                    int spaces = TabLength - (Selection.Start.Char % TabLength);
                     //replace mode? select forward chars
                     if (IsReplaceMode)
                     {
@@ -6685,7 +6697,7 @@ namespace ircScript.Controls.SyntaxHighlight
 
             int startChar = 0; // Only move selection when in 'ColumnSelectionMode'
             if (Selection.ColumnSelectionMode)
-                startChar = Math.Min(Selection.End.iChar, Selection.Start.iChar);
+                startChar = Math.Min(Selection.End.Char, Selection.Start.Char);
 
             BeginUpdate();
             Selection.BeginUpdate();
@@ -6697,11 +6709,11 @@ namespace ircScript.Controls.SyntaxHighlight
             //
             Selection.Normalize();
             Range currentSelection = this.Selection.Clone();
-            int from = Selection.Start.iLine;
-            int to = Selection.End.iLine;
+            int from = Selection.Start.Line;
+            int to = Selection.End.Line;
 
             if (!Selection.ColumnSelectionMode)
-                if (Selection.End.iChar == 0) to--;
+                if (Selection.End.Char == 0) to--;
 
             for (int i = from; i <= to; i++)
             {
@@ -6713,10 +6725,10 @@ namespace ircScript.Controls.SyntaxHighlight
             // Restore selection
             if (Selection.ColumnSelectionMode == false)
             {
-                int newSelectionStartCharacterIndex = currentSelection.Start.iChar + this.TabLength;
-                int newSelectionEndCharacterIndex = currentSelection.End.iChar + (currentSelection.End.iLine == to?this.TabLength : 0);
-                this.Selection.Start = new Place(newSelectionStartCharacterIndex, currentSelection.Start.iLine);
-                this.Selection.End = new Place(newSelectionEndCharacterIndex, currentSelection.End.iLine);
+                int newSelectionStartCharacterIndex = currentSelection.Start.Char + this.TabLength;
+                int newSelectionEndCharacterIndex = currentSelection.End.Char + (currentSelection.End.Line == to?this.TabLength : 0);
+                this.Selection.Start = new Place(newSelectionStartCharacterIndex, currentSelection.Start.Line);
+                this.Selection.End = new Place(newSelectionEndCharacterIndex, currentSelection.End.Line);
             }
             else
             {
@@ -6738,7 +6750,7 @@ namespace ircScript.Controls.SyntaxHighlight
         /// </summary>
         public virtual void DecreaseIndent()
         {
-            if (Selection.Start.iLine == Selection.End.iLine)
+            if (Selection.Start.Line == Selection.End.Line)
             {
                 DecreaseIndentOfSingleLine();
                 return;
@@ -6746,7 +6758,7 @@ namespace ircScript.Controls.SyntaxHighlight
 
             int startCharIndex = 0;
             if (Selection.ColumnSelectionMode)
-                startCharIndex = Math.Min(Selection.End.iChar, Selection.Start.iChar);
+                startCharIndex = Math.Min(Selection.End.Char, Selection.Start.Char);
 
             BeginUpdate();
             Selection.BeginUpdate();
@@ -6757,11 +6769,11 @@ namespace ircScript.Controls.SyntaxHighlight
             // Remember current selection infos
             Range currentSelection = this.Selection.Clone();
             Selection.Normalize();
-            int from = Selection.Start.iLine;
-            int to = Selection.End.iLine;
+            int from = Selection.Start.Line;
+            int to = Selection.End.Line;
 
             if (!Selection.ColumnSelectionMode)
-                if (Selection.End.iChar == 0) to--;
+                if (Selection.End.Char == 0) to--;
 
             int numberOfDeletedWhitespacesOfFirstLine = 0;
             int numberOfDeletetWhitespacesOfLastLine = 0;
@@ -6782,11 +6794,11 @@ namespace ircScript.Controls.SyntaxHighlight
 
                 // Remember characters to remove for first and last line
                 int numberOfWhitespacesToRemove = endIndex - startCharIndex;
-                if (i == currentSelection.Start.iLine)
+                if (i == currentSelection.Start.Line)
                 {
                     numberOfDeletedWhitespacesOfFirstLine = numberOfWhitespacesToRemove;
                 }
-                if (i == currentSelection.End.iLine)
+                if (i == currentSelection.End.Line)
                 {
                     numberOfDeletetWhitespacesOfLastLine = numberOfWhitespacesToRemove;
                 }
@@ -6799,10 +6811,10 @@ namespace ircScript.Controls.SyntaxHighlight
             // Restore selection
             if (Selection.ColumnSelectionMode == false)
             {
-                int newSelectionStartCharacterIndex = Math.Max(0, currentSelection.Start.iChar - numberOfDeletedWhitespacesOfFirstLine);
-                int newSelectionEndCharacterIndex = Math.Max(0, currentSelection.End.iChar - numberOfDeletetWhitespacesOfLastLine);
-                this.Selection.Start = new Place(newSelectionStartCharacterIndex, currentSelection.Start.iLine);
-                this.Selection.End = new Place(newSelectionEndCharacterIndex, currentSelection.End.iLine);
+                int newSelectionStartCharacterIndex = Math.Max(0, currentSelection.Start.Char - numberOfDeletedWhitespacesOfFirstLine);
+                int newSelectionEndCharacterIndex = Math.Max(0, currentSelection.End.Char - numberOfDeletetWhitespacesOfLastLine);
+                this.Selection.Start = new Place(newSelectionStartCharacterIndex, currentSelection.Start.Line);
+                this.Selection.End = new Place(newSelectionEndCharacterIndex, currentSelection.End.Line);
             }
             else
             {
@@ -6821,13 +6833,13 @@ namespace ircScript.Controls.SyntaxHighlight
         /// </summary>
         protected virtual void DecreaseIndentOfSingleLine()
         {
-            if (this.Selection.Start.iLine != this.Selection.End.iLine)
+            if (this.Selection.Start.Line != this.Selection.End.Line)
                 return;
 
             // Remeber current selection infos
             Range currentSelection = this.Selection.Clone();
-            int currentLineIndex = this.Selection.Start.iLine;
-            int currentLeftSelectionStartIndex = Math.Min(this.Selection.Start.iChar, this.Selection.End.iChar);
+            int currentLineIndex = this.Selection.Start.Line;
+            int currentLeftSelectionStartIndex = Math.Min(this.Selection.Start.Char, this.Selection.End.Char);
 
             // Determine number of whitespaces to remove
             string lineText = this.lines[currentLineIndex].Text;
@@ -6860,8 +6872,8 @@ namespace ircScript.Controls.SyntaxHighlight
                 ClearSelected();
 
                 // Restore selection
-                int newSelectionStartCharacterIndex = currentSelection.Start.iChar - numberOfCharactersToRemove;
-                int newSelectionEndCharacterIndex = currentSelection.End.iChar - numberOfCharactersToRemove;
+                int newSelectionStartCharacterIndex = currentSelection.Start.Char - numberOfCharactersToRemove;
+                int newSelectionEndCharacterIndex = currentSelection.End.Char - numberOfCharactersToRemove;
                 this.Selection.Start = new Place(newSelectionStartCharacterIndex, currentLineIndex);
                 this.Selection.End = new Place(newSelectionEndCharacterIndex, currentLineIndex);
 
@@ -6890,7 +6902,7 @@ namespace ircScript.Controls.SyntaxHighlight
             Selection.BeginUpdate();
             lines.Manager.BeginAutoUndoCommands();
             //
-            for (int i = r.Start.iLine; i <= r.End.iLine; i++)
+            for (int i = r.Start.Line; i <= r.End.Line; i++)
                 DoAutoIndent(i);
             //
             lines.Manager.EndAutoUndoCommands();
@@ -6908,8 +6920,8 @@ namespace ircScript.Controls.SyntaxHighlight
         public virtual void InsertLinePrefix(string prefix)
         {
             Range old = Selection.Clone();
-            int from = Math.Min(Selection.Start.iLine, Selection.End.iLine);
-            int to = Math.Max(Selection.Start.iLine, Selection.End.iLine);
+            int from = Math.Min(Selection.Start.Line, Selection.End.Line);
+            int to = Math.Max(Selection.Start.Line, Selection.End.Line);
             BeginUpdate();
             Selection.BeginUpdate();
             lines.Manager.BeginAutoUndoCommands();
@@ -6936,8 +6948,8 @@ namespace ircScript.Controls.SyntaxHighlight
         public virtual void RemoveLinePrefix(string prefix)
         {
             Range old = Selection.Clone();
-            int from = Math.Min(Selection.Start.iLine, Selection.End.iLine);
-            int to = Math.Max(Selection.Start.iLine, Selection.End.iLine);
+            int from = Math.Min(Selection.Start.Line, Selection.End.Line);
+            int to = Math.Max(Selection.Start.Line, Selection.End.Line);
             BeginUpdate();
             Selection.BeginUpdate();
             lines.Manager.BeginAutoUndoCommands();
@@ -6996,20 +7008,20 @@ namespace ircScript.Controls.SyntaxHighlight
             }
             if (marker is CollapseFoldingMarker)
             {
-                CollapseFoldingBlock((marker as CollapseFoldingMarker).iLine);
+                CollapseFoldingBlock((marker as CollapseFoldingMarker).Line);
                 return;
             }
 
             if (marker is ExpandFoldingMarker)
             {
-                ExpandFoldedBlock((marker as ExpandFoldingMarker).iLine);
+                ExpandFoldedBlock((marker as ExpandFoldingMarker).Line);
                 return;
             }
 
             if (marker is FoldedAreaMarker)
             {
                 //select folded block
-                int iStart = (marker as FoldedAreaMarker).iLine;
+                int iStart = (marker as FoldedAreaMarker).Line;
                 int iEnd = FindEndOfFoldingBlock(iStart);
                 if (iEnd < 0)
                     return;
@@ -7026,7 +7038,7 @@ namespace ircScript.Controls.SyntaxHighlight
         {
             if (marker is FoldedAreaMarker)
             {
-                ExpandFoldedBlock((marker as FoldedAreaMarker).iLine);
+                ExpandFoldedBlock((marker as FoldedAreaMarker).Line);
                 Invalidate();
                 return;
             }
@@ -7065,8 +7077,8 @@ namespace ircScript.Controls.SyntaxHighlight
 
             if(range != null)
             {
-                leftBracketPosition = new Range(this, range.Start, new Place(range.Start.iChar + 1, range.Start.iLine));
-                rightBracketPosition = new Range(this, new Place(range.End.iChar - 1, range.End.iLine), range.End);
+                leftBracketPosition = new Range(this, range.Start, new Place(range.Start.Char + 1, range.Start.Line));
+                rightBracketPosition = new Range(this, new Place(range.End.Char - 1, range.End.Line), range.End);
             }
 
             if (oldLeftBracketPosition != leftBracketPosition ||
@@ -7093,7 +7105,7 @@ namespace ircScript.Controls.SyntaxHighlight
                 if (range.CharAfterStart == rightBracket) counter--;
                 if (counter == 1)
                 {
-                    range.Start = new Place(range.Start.iChar + (!includeBrackets ? 1 : 0), range.Start.iLine);
+                    range.Start = new Place(range.Start.Char + (!includeBrackets ? 1 : 0), range.Start.Line);
                     leftBracketPosition = range;
                     break;
                 }
@@ -7111,7 +7123,7 @@ namespace ircScript.Controls.SyntaxHighlight
                 if (range.CharAfterStart == rightBracket) counter--;
                 if (counter == -1)
                 {
-                    range.End = new Place(range.Start.iChar + (includeBrackets ? 1 : 0 ), range.Start.iLine);
+                    range.End = new Place(range.Start.Char + (includeBrackets ? 1 : 0 ), range.Start.Line);
                     rightBracketPosition = range;
                     break;
                 }
@@ -7142,7 +7154,7 @@ namespace ircScript.Controls.SyntaxHighlight
             int maxIterations = MaxBracketSearchIterations;
             if (range.CharBeforeStart == RightBracket)
             {
-                rightBracketPosition = new Range(this, range.Start.iChar - 1, range.Start.iLine, range.Start.iChar, range.Start.iLine);
+                rightBracketPosition = new Range(this, range.Start.Char - 1, range.Start.Line, range.Start.Char, range.Start.Line);
                 while (range.GoLeftThroughFolded()) //move caret left
                 {
                     if (range.CharAfterStart == LeftBracket) counter++;
@@ -7150,7 +7162,7 @@ namespace ircScript.Controls.SyntaxHighlight
                     if (counter == 0)
                     {
                         //highlighting
-                        range.End = new Place(range.Start.iChar + 1, range.Start.iLine);
+                        range.End = new Place(range.Start.Char + 1, range.Start.Line);
                         leftBracketPosition = range;
                         found = true;
                         break;
@@ -7167,7 +7179,7 @@ namespace ircScript.Controls.SyntaxHighlight
             if(!found)
             if (range.CharAfterStart == LeftBracket)
             {
-                leftBracketPosition = new Range(this, range.Start.iChar, range.Start.iLine, range.Start.iChar + 1, range.Start.iLine);
+                leftBracketPosition = new Range(this, range.Start.Char, range.Start.Line, range.Start.Char + 1, range.Start.Line);
                 do
                 {
                     if (range.CharAfterStart == LeftBracket) counter++;
@@ -7175,7 +7187,7 @@ namespace ircScript.Controls.SyntaxHighlight
                     if (counter == 0)
                     {
                         //highlighting
-                        range.End = new Place(range.Start.iChar + 1, range.Start.iLine);
+                        range.End = new Place(range.Start.Char + 1, range.Start.Line);
                         rightBracketPosition = range;
                         found = true;
                         break;
@@ -7369,8 +7381,8 @@ namespace ircScript.Controls.SyntaxHighlight
         {
             Range sel = Selection.Clone();
             sel.Normalize();
-            int start = PlaceToPosition(sel.Start) - sel.Start.iLine;
-            int len = sel.Text.Length - (sel.End.iLine - sel.Start.iLine);
+            int start = PlaceToPosition(sel.Start) - sel.Start.Line;
+            int len = sel.Text.Length - (sel.End.Line - sel.Start.Line);
             return string.Format(
                 @"<script type=""text/javascript"">
 try{{
@@ -7572,18 +7584,15 @@ window.status = ""#print"";
             return LineInfos[iLine].VisibleState;
         }
 
-        /// <summary>
-        /// Shows Goto dialog form
-        /// </summary>
         public void ShowGoToDialog()
         {
-            var form = new GoToForm();
-            form.TotalLineCount = LinesCount;
-            form.SelectedLineNumber = Selection.Start.iLine + 1;
-
-            if (form.ShowDialog() == DialogResult.OK)
+            using (var form = new GoToForm(Selection.Start.Line + 1, LinesCount))
             {
-                int line = Math.Min(LinesCount - 1, Math.Max(0, form.SelectedLineNumber - 1));
+                if (form.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+                var line = Math.Min(LinesCount - 1, Math.Max(0, form.SelectedLineNumber - 1));
                 Selection = new Range(this, 0, line, 0, line);
                 DoSelectionVisible();
             }
@@ -7605,7 +7614,7 @@ window.status = ""#print"";
         {
             var iLines = new List<int>();
             foreach (Range r in Range.GetRangesByLines(searchPattern, options))
-                iLines.Add(r.Start.iLine);
+                iLines.Add(r.Start.Line);
 
             return iLines;
         }
@@ -7718,8 +7727,8 @@ window.status = ""#print"";
             if (draggedRange.ColumnSelectionMode)
             {
                 draggedRange.Normalize();
-                insertRange = new Range(this, place, new Place(place.iChar, place.iLine + draggedRange.End.iLine - draggedRange.Start.iLine)) { ColumnSelectionMode = true };
-                for (int i = LinesCount; i <= insertRange.End.iLine; i++)
+                insertRange = new Range(this, place, new Place(place.Char, place.Line + draggedRange.End.Line - draggedRange.Start.Line)) { ColumnSelectionMode = true };
+                for (int i = LinesCount; i <= insertRange.End.Line; i++)
                 {
                     Selection.GoLast(false);
                     InsertChar('\n');
@@ -7750,7 +7759,7 @@ window.status = ""#print"";
                     Selection.ColumnSelectionMode = insertRange.ColumnSelectionMode;
                     InsertText(text);
                     caretPositionAfterInserting = Selection.Start;
-                    var lineLength = this[caretPositionAfterInserting.iLine].Count;
+                    var lineLength = this[caretPositionAfterInserting.Line].Count;
 
                     // Delete dragged range if not in copy mode
                     if (copyMode == false)
@@ -7759,9 +7768,9 @@ window.status = ""#print"";
                         ClearSelected();
                     }
 
-                    var shift = lineLength - this[caretPositionAfterInserting.iLine].Count;
-                    caretPositionAfterInserting.iChar = caretPositionAfterInserting.iChar - shift;
-                    place.iChar = place.iChar - shift;
+                    var shift = lineLength - this[caretPositionAfterInserting.Line].Count;
+                    caretPositionAfterInserting.Char = caretPositionAfterInserting.Char - shift;
+                    place.Char = place.Char - shift;
                 }
 
                 // Select inserted text
@@ -7773,8 +7782,8 @@ window.status = ""#print"";
                 {
                     draggedRange.Normalize();
                     Selection = new Range(this, place,
-                                            new Place(place.iChar + draggedRange.End.iChar - draggedRange.Start.iChar,
-                                                    place.iLine + draggedRange.End.iLine - draggedRange.Start.iLine)) { ColumnSelectionMode = true };
+                                            new Place(place.Char + draggedRange.End.Char - draggedRange.Start.Char,
+                                                    place.Line + draggedRange.End.Line - draggedRange.Start.Line)) { ColumnSelectionMode = true };
                 }
             }
 
@@ -7824,8 +7833,8 @@ window.status = ""#print"";
                     if (draggedRange.ColumnSelectionMode)
                     {
                         draggedRange.Normalize();
-                        insertRange = new Range(this, place, new Place(place.iChar, place.iLine + draggedRange.End.iLine - draggedRange.Start.iLine)) { ColumnSelectionMode = true };
-                        for (int i = LinesCount; i <= insertRange.End.iLine; i++)
+                        insertRange = new Range(this, place, new Place(place.Char, place.Line + draggedRange.End.Line - draggedRange.Start.Line)) { ColumnSelectionMode = true };
+                        for (int i = LinesCount; i <= insertRange.End.Line; i++)
                         {
                             Selection.GoLast(false);
                             InsertChar('\n');
@@ -7884,37 +7893,37 @@ window.status = ""#print"";
                             // Normal selection mode:
 
                             // Determine character/column position of target selection
-                            if (dR.Start.iLine != dR.End.iLine) // If more then one line was selected/dragged ...
+                            if (dR.Start.Line != dR.End.Line) // If more then one line was selected/dragged ...
                             {
-                                tS_S_Char = (dR.End.iLine != tP.iLine)
-                                    ? tP.iChar
-                                    : dR.Start.iChar + (tP.iChar - dR.End.iChar);
-                                tS_E_Char = dR.End.iChar;
+                                tS_S_Char = (dR.End.Line != tP.Line)
+                                    ? tP.Char
+                                    : dR.Start.Char + (tP.Char - dR.End.Char);
+                                tS_E_Char = dR.End.Char;
                             }
                             else // only one line was selected/dragged
                             {
-                                if (dR.End.iLine == tP.iLine)
+                                if (dR.End.Line == tP.Line)
                                 {
-                                    tS_S_Char = tP.iChar - dR.Text.Length;
-                                    tS_E_Char = tP.iChar;
+                                    tS_S_Char = tP.Char - dR.Text.Length;
+                                    tS_E_Char = tP.Char;
                                 }
                                 else
                                 {
-                                    tS_S_Char = tP.iChar;
-                                    tS_E_Char = tP.iChar + dR.Text.Length;
+                                    tS_S_Char = tP.Char;
+                                    tS_E_Char = tP.Char + dR.Text.Length;
                                 }
                             }
 
                             // Determine line/row of target selection
-                            if (dR.End.iLine != tP.iLine)
+                            if (dR.End.Line != tP.Line)
                             {
-                                tS_S_Line = tP.iLine - (dR.End.iLine - dR.Start.iLine);
-                                tS_E_Line = tP.iLine;
+                                tS_S_Line = tP.Line - (dR.End.Line - dR.Start.Line);
+                                tS_E_Line = tP.Line;
                             }
                             else
                             {
-                                tS_S_Line = dR.Start.iLine;
-                                tS_E_Line = dR.End.iLine;
+                                tS_S_Line = dR.Start.Line;
+                                tS_E_Line = dR.End.Line;
                             }
 
                             startPosition = new Place(tS_S_Char, tS_S_Line);
@@ -7929,19 +7938,19 @@ window.status = ""#print"";
                     else
                     {
                         if ((copyMode == false) &&
-                            (place.iLine >= dR.Start.iLine) && (place.iLine <= dR.End.iLine) &&
-                            (place.iChar >= dR.End.iChar))
+                            (place.Line >= dR.Start.Line) && (place.Line <= dR.End.Line) &&
+                            (place.Char >= dR.End.Char))
                         {
-                            tS_S_Char = tP.iChar - (dR.End.iChar - dR.Start.iChar);
-                            tS_E_Char = tP.iChar;
+                            tS_S_Char = tP.Char - (dR.End.Char - dR.Start.Char);
+                            tS_E_Char = tP.Char;
                         }
                         else
                         {
-                            tS_S_Char = tP.iChar;
-                            tS_E_Char = tP.iChar + (dR.End.iChar - dR.Start.iChar);
+                            tS_S_Char = tP.Char;
+                            tS_E_Char = tP.Char + (dR.End.Char - dR.Start.Char);
                         }
-                        tS_S_Line = tP.iLine;
-                        tS_E_Line = tP.iLine + (dR.End.iLine - dR.Start.iLine);
+                        tS_S_Line = tP.Line;
+                        tS_E_Line = tP.Line + (dR.End.Line - dR.Start.Line);
 
                         startPosition = new Place(tS_S_Char, tS_S_Line);
                         endPosition = new Place(tS_E_Char, tS_E_Line);
@@ -8198,10 +8207,10 @@ window.status = ""#print"";
 
             public int Compare(LineInfo x, LineInfo y)
             {
-                if (x.startY == -10)
-                    return -y.startY.CompareTo(Y);
+                if (x.StartY == -10)
+                    return -y.StartY.CompareTo(Y);
                 else
-                    return x.startY.CompareTo(Y);
+                    return x.StartY.CompareTo(Y);
             }
 
             #endregion
@@ -8483,9 +8492,9 @@ window.status = ""#print"";
     /// </summary>
     public class CustomActionEventArgs : EventArgs
     {
-        public FCTBAction Action { get; private set; }
+        public FctbAction Action { get; private set; }
 
-        public CustomActionEventArgs(FCTBAction action)
+        public CustomActionEventArgs(FctbAction action)
         {
             Action = action;
         }
