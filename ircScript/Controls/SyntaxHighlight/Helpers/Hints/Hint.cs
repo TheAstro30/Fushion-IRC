@@ -13,6 +13,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using ircScript.Controls.SyntaxHighlight.Controls;
+using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 
 namespace ircScript.Controls.SyntaxHighlight.Helpers.Hints
 {
@@ -130,9 +131,9 @@ namespace ircScript.Controls.SyntaxHighlight.Helpers.Hints
 
         public void DoVisible()
         {
-            Range.tb.DoRangeVisible(Range, true);
-            Range.tb.DoVisibleRectangle(HostPanel.Bounds);
-            Range.tb.Invalidate();
+            Range.TextBox.DoRangeVisible(Range, true);
+            Range.TextBox.DoVisibleRectangle(HostPanel.Bounds);
+            Range.TextBox.Invalidate();
         }
 
         private void Init()
@@ -145,7 +146,7 @@ namespace ircScript.Controls.SyntaxHighlight.Helpers.Hints
             BackColor = InnerControl == null ? Color.Silver : SystemColors.Control;
             ForeColor = Color.Black;
             TextAlignment = StringAlignment.Near;
-            Font = Range.tb.Parent == null ? Range.tb.Font : Range.tb.Parent.Font;
+            Font = Range.TextBox.Parent == null ? Range.TextBox.Font : Range.TextBox.Parent.Font;
 
             if (InnerControl != null)
             {
@@ -159,13 +160,13 @@ namespace ircScript.Controls.SyntaxHighlight.Helpers.Hints
             }
             else
             {
-                HostPanel.Height = Range.tb.CharHeight + 5;
+                HostPanel.Height = Range.TextBox.CharHeight + 5;
             }
         }
 
         private void OnClick(object sender, EventArgs e)
         {
-            Range.tb.OnHintClick(this);
+            Range.TextBox.OnHintClick(this);
         }
     }
 }

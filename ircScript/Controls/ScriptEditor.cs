@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using ircScript.Controls.SyntaxHighlight;
+using ircScript.Controls.SyntaxHighlight.Controls;
 using ircScript.Controls.SyntaxHighlight.Highlight;
 using ircScript.Controls.SyntaxHighlight.Styles;
 
@@ -51,12 +52,12 @@ namespace ircScript.Controls
 
             SyntaxHighlighter.CommentStyle = new TextStyle(Brushes.Green, null, FontStyle.Italic);
 
-            Range.tb.CommentPrefix = "//";
-            Range.tb.LeftBracket = '(';
-            Range.tb.RightBracket = ')';
-            Range.tb.LeftBracket2 = '{';
-            Range.tb.RightBracket2 = '}';
-            Range.tb.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
+            Range.TextBox.CommentPrefix = "//";
+            Range.TextBox.LeftBracket = '(';
+            Range.TextBox.RightBracket = ')';
+            Range.TextBox.LeftBracket2 = '{';
+            Range.TextBox.RightBracket2 = '}';
+            Range.TextBox.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
             AutoIndent = false;
             Cursor = Cursors.IBeam;
             CommentPrefix = "//";
@@ -162,6 +163,7 @@ namespace ircScript.Controls
                         break;
                 }
             }
+            
         }
     }
 }

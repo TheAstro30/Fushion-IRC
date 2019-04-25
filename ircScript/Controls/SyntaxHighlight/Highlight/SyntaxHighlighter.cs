@@ -17,8 +17,10 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml;
 using ircScript.Controls.SyntaxHighlight.Helpers;
+using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 using ircScript.Controls.SyntaxHighlight.Highlight.Descriptor;
 using ircScript.Controls.SyntaxHighlight.Styles;
+using ircScript.Controls.SyntaxHighlight.TextBoxEventArgs;
 
 namespace ircScript.Controls.SyntaxHighlight.Highlight
 {
@@ -633,23 +635,23 @@ namespace ircScript.Controls.SyntaxHighlight.Highlight
         public void HighlightSyntax(SyntaxDescriptor desc, Range range)
         {
             /* Set style order */
-            range.tb.ClearStylesBuffer();
+            range.TextBox.ClearStylesBuffer();
             for (var i = 0; i < desc.Styles.Count; i++)
             {
-                range.tb.Styles[i] = desc.Styles[i];
+                range.TextBox.Styles[i] = desc.Styles[i];
             }
             /* Add resilient styles */
             var l = desc.Styles.Count;
             for (var i = 0; i < ResilientStyles.Count; i++)
             {
-                range.tb.Styles[l + i] = ResilientStyles[i];
+                range.TextBox.Styles[l + i] = ResilientStyles[i];
             }
             /* Brackets */
-            char[] oldBrackets = RememberBrackets(range.tb);
-            range.tb.LeftBracket = desc.LeftBracket;
-            range.tb.RightBracket = desc.RightBracket;
-            range.tb.LeftBracket2 = desc.LeftBracket2;
-            range.tb.RightBracket2 = desc.RightBracket2;
+            char[] oldBrackets = RememberBrackets(range.TextBox);
+            range.TextBox.LeftBracket = desc.LeftBracket;
+            range.TextBox.RightBracket = desc.RightBracket;
+            range.TextBox.LeftBracket2 = desc.LeftBracket2;
+            range.TextBox.RightBracket2 = desc.RightBracket2;
             /* Clear styles of range */
             range.ClearStyle(desc.Styles.ToArray());
             /* Highlight syntax */
@@ -664,7 +666,7 @@ namespace ircScript.Controls.SyntaxHighlight.Highlight
             {
                 range.SetFoldingMarkers(folding.StartMarkerRegex, folding.FinishMarkerRegex, folding.Options);
             }
-            RestoreBrackets(range.tb, oldBrackets);
+            RestoreBrackets(range.TextBox, oldBrackets);
         }
 
         protected void RestoreBrackets(FastColoredTextBox tb, char[] oldBrackets)
@@ -812,13 +814,13 @@ namespace ircScript.Controls.SyntaxHighlight.Highlight
 
         public virtual void CSharpSyntaxHighlight(Range range)
         {
-            range.tb.CommentPrefix = "//";
-            range.tb.LeftBracket = '(';
-            range.tb.RightBracket = ')';
-            range.tb.LeftBracket2 = '{';
-            range.tb.RightBracket2 = '}';
-            range.tb.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
-            range.tb.AutoIndentCharsPatterns = @"^\s*[\w\.]+(\s\w+)?\s*(?<range>=)\s*(?<range>[^;]+);^\s*(case|default)\s*[^:]*(?<range>:)\s*(?<range>[^;]+);";
+            range.TextBox.CommentPrefix = "//";
+            range.TextBox.LeftBracket = '(';
+            range.TextBox.RightBracket = ')';
+            range.TextBox.LeftBracket2 = '{';
+            range.TextBox.RightBracket2 = '}';
+            range.TextBox.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
+            range.TextBox.AutoIndentCharsPatterns = @"^\s*[\w\.]+(\s\w+)?\s*(?<range>=)\s*(?<range>[^;]+);^\s*(case|default)\s*[^:]*(?<range>:)\s*(?<range>[^;]+);";
             /* Clear style of changed range */
             range.ClearStyle(StringStyle, CommentStyle, NumberStyle, AttributeStyle, ClassNameStyle, KeywordStyle);
             if (CSharpStringRegex == null)
@@ -885,12 +887,12 @@ namespace ircScript.Controls.SyntaxHighlight.Highlight
 
         public virtual void VbSyntaxHighlight(Range range)
         {
-            range.tb.CommentPrefix = "'";
-            range.tb.LeftBracket = '(';
-            range.tb.RightBracket = ')';
-            range.tb.LeftBracket2 = '\x0';
-            range.tb.RightBracket2 = '\x0';
-            range.tb.AutoIndentCharsPatterns = @"^\s*[\w\.\(\)]+\s*(?<range>=)\s*(?<range>.+)";
+            range.TextBox.CommentPrefix = "'";
+            range.TextBox.LeftBracket = '(';
+            range.TextBox.RightBracket = ')';
+            range.TextBox.LeftBracket2 = '\x0';
+            range.TextBox.RightBracket2 = '\x0';
+            range.TextBox.AutoIndentCharsPatterns = @"^\s*[\w\.\(\)]+\s*(?<range>=)\s*(?<range>.+)";
             /* Clear style of changed range */
             range.ClearStyle(StringStyle, CommentStyle, NumberStyle, ClassNameStyle, KeywordStyle);
             if (VbStringRegex == null)
@@ -948,12 +950,12 @@ namespace ircScript.Controls.SyntaxHighlight.Highlight
 
         public virtual void HtmlSyntaxHighlight(Range range)
         {
-            range.tb.CommentPrefix = null;
-            range.tb.LeftBracket = '<';
-            range.tb.RightBracket = '>';
-            range.tb.LeftBracket2 = '(';
-            range.tb.RightBracket2 = ')';
-            range.tb.AutoIndentCharsPatterns = @"";
+            range.TextBox.CommentPrefix = null;
+            range.TextBox.LeftBracket = '<';
+            range.TextBox.RightBracket = '>';
+            range.TextBox.LeftBracket2 = '(';
+            range.TextBox.RightBracket2 = ')';
+            range.TextBox.AutoIndentCharsPatterns = @"";
             /* Clear style of changed range */
             range.ClearStyle(CommentStyle, TagBracketStyle, TagNameStyle, AttributeStyle, AttributeValueStyle,
                              HtmlEntityStyle);
@@ -1016,12 +1018,12 @@ namespace ircScript.Controls.SyntaxHighlight.Highlight
 
         public virtual void XmlSyntaxHighlight(Range range)
         {
-            range.tb.CommentPrefix = null;
-            range.tb.LeftBracket = '<';
-            range.tb.RightBracket = '>';
-            range.tb.LeftBracket2 = '(';
-            range.tb.RightBracket2 = ')';
-            range.tb.AutoIndentCharsPatterns = @"";
+            range.TextBox.CommentPrefix = null;
+            range.TextBox.LeftBracket = '<';
+            range.TextBox.RightBracket = '>';
+            range.TextBox.LeftBracket2 = '(';
+            range.TextBox.RightBracket2 = ')';
+            range.TextBox.AutoIndentCharsPatterns = @"";
             /* Clear style of changed range */
             range.ClearStyle(CommentStyle, XmlTagBracketStyle, XmlTagNameStyle, XmlAttributeStyle,
                              XmlAttributeValueStyle,
@@ -1057,7 +1059,7 @@ namespace ircScript.Controls.SyntaxHighlight.Highlight
         {
             var stack = new Stack<XmlFoldingTag>();
             var id = 0;
-            var fctb = range.tb;
+            var fctb = range.TextBox;
             /* extract opening and closing tags (exclude open-close tags: <TAG/>) */
             foreach (var r in range.GetRanges(XmlFoldingRegex))
             {
@@ -1133,12 +1135,12 @@ namespace ircScript.Controls.SyntaxHighlight.Highlight
 
         public virtual void SqlSyntaxHighlight(Range range)
         {
-            range.tb.CommentPrefix = "--";
-            range.tb.LeftBracket = '(';
-            range.tb.RightBracket = ')';
-            range.tb.LeftBracket2 = '\x0';
-            range.tb.RightBracket2 = '\x0';
-            range.tb.AutoIndentCharsPatterns = @"";
+            range.TextBox.CommentPrefix = "--";
+            range.TextBox.LeftBracket = '(';
+            range.TextBox.RightBracket = ')';
+            range.TextBox.LeftBracket2 = '\x0';
+            range.TextBox.RightBracket2 = '\x0';
+            range.TextBox.AutoIndentCharsPatterns = @"";
             /* clear style of changed range */
             range.ClearStyle(CommentStyle, StringStyle, NumberStyle, VariableStyle, StatementsStyle, KeywordStyle,
                              FunctionsStyle, TypesStyle);
@@ -1196,16 +1198,16 @@ namespace ircScript.Controls.SyntaxHighlight.Highlight
 
         public virtual void PhpSyntaxHighlight(Range range)
         {
-            range.tb.CommentPrefix = "//";
-            range.tb.LeftBracket = '(';
-            range.tb.RightBracket = ')';
-            range.tb.LeftBracket2 = '{';
-            range.tb.RightBracket2 = '}';
-            range.tb.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
+            range.TextBox.CommentPrefix = "//";
+            range.TextBox.LeftBracket = '(';
+            range.TextBox.RightBracket = ')';
+            range.TextBox.LeftBracket2 = '{';
+            range.TextBox.RightBracket2 = '}';
+            range.TextBox.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
             /* clear style of changed range */
             range.ClearStyle(StringStyle, CommentStyle, NumberStyle, VariableStyle, KeywordStyle, KeywordStyle2,
                              KeywordStyle3);
-            range.tb.AutoIndentCharsPatterns = @"^\s*\$[\w\.\[\]\'\""]+\s*(?<range>=)\s*(?<range>[^;]+);";
+            range.TextBox.AutoIndentCharsPatterns = @"^\s*\$[\w\.\[\]\'\""]+\s*(?<range>=)\s*(?<range>[^;]+);";
             if (PhpStringRegex == null)
             {
                 InitPhpRegex();
@@ -1248,13 +1250,13 @@ namespace ircScript.Controls.SyntaxHighlight.Highlight
 
         public virtual void JScriptSyntaxHighlight(Range range)
         {
-            range.tb.CommentPrefix = "//";
-            range.tb.LeftBracket = '(';
-            range.tb.RightBracket = ')';
-            range.tb.LeftBracket2 = '{';
-            range.tb.RightBracket2 = '}';
-            range.tb.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
-            range.tb.AutoIndentCharsPatterns = @"^\s*[\w\.]+(\s\w+)?\s*(?<range>=)\s*(?<range>[^;]+);";
+            range.TextBox.CommentPrefix = "//";
+            range.TextBox.LeftBracket = '(';
+            range.TextBox.RightBracket = ')';
+            range.TextBox.LeftBracket2 = '{';
+            range.TextBox.RightBracket2 = '}';
+            range.TextBox.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
+            range.TextBox.AutoIndentCharsPatterns = @"^\s*[\w\.]+(\s\w+)?\s*(?<range>=)\s*(?<range>[^;]+);";
             /* clear style of changed range */
             range.ClearStyle(StringStyle, CommentStyle, NumberStyle, KeywordStyle);
             if (JScriptStringRegex == null)
@@ -1300,13 +1302,13 @@ namespace ircScript.Controls.SyntaxHighlight.Highlight
 
         public virtual void LuaSyntaxHighlight(Range range)
         {
-            range.tb.CommentPrefix = "--";
-            range.tb.LeftBracket = '(';
-            range.tb.RightBracket = ')';
-            range.tb.LeftBracket2 = '{';
-            range.tb.RightBracket2 = '}';
-            range.tb.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
-            range.tb.AutoIndentCharsPatterns = @"^\s*[\w\.]+(\s\w+)?\s*(?<range>=)\s*(?<range>.+)";
+            range.TextBox.CommentPrefix = "--";
+            range.TextBox.LeftBracket = '(';
+            range.TextBox.RightBracket = ')';
+            range.TextBox.LeftBracket2 = '{';
+            range.TextBox.RightBracket2 = '}';
+            range.TextBox.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
+            range.TextBox.AutoIndentCharsPatterns = @"^\s*[\w\.]+(\s\w+)?\s*(?<range>=)\s*(?<range>.+)";
             /* clear style of changed range */
             range.ClearStyle(StringStyle, CommentStyle, NumberStyle, KeywordStyle, FunctionsStyle);
             if (LuaStringRegex == null)

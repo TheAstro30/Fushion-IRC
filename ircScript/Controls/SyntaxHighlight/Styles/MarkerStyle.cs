@@ -11,6 +11,7 @@
 //  Copyright (C) Pavel Torgashov, 2011-2016.
 using System.Drawing;
 using ircScript.Controls.SyntaxHighlight.Export;
+using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 
 namespace ircScript.Controls.SyntaxHighlight.Styles
 {
@@ -32,7 +33,7 @@ namespace ircScript.Controls.SyntaxHighlight.Styles
                 return;
             }
             var rect = new Rectangle(position.X, position.Y,
-                                     (range.End.Char - range.Start.Char)*range.tb.CharWidth, range.tb.CharHeight);
+                                     (range.End.Char - range.Start.Char)*range.TextBox.CharWidth, range.TextBox.CharHeight);
             if (rect.Width == 0)
             {
                 return;

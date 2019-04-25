@@ -11,6 +11,7 @@
 //  Copyright (C) Pavel Torgashov, 2011-2016.
 using System.Collections.Generic;
 using System.Drawing;
+using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 
 namespace ircScript.Controls.SyntaxHighlight.Styles
 {

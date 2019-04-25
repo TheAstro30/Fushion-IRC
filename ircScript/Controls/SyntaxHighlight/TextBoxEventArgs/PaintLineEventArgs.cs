@@ -10,20 +10,19 @@
 //
 //  Copyright (C) Pavel Torgashov, 2011-2016.
 using System.Drawing;
-using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
+using System.Windows.Forms;
 
-namespace ircScript.Controls.SyntaxHighlight.Styles
+namespace ircScript.Controls.SyntaxHighlight.TextBoxEventArgs
 {
-    public sealed class ReadOnlyStyle : Style
+    public class PaintLineEventArgs : PaintEventArgs
     {
-        public ReadOnlyStyle()
-        {
-            IsExportable = false;
-        }
+        public int LineIndex { get; private set; }
+        public Rectangle LineRect { get; private set; }
 
-        public override void Draw(Graphics gr, Point position, Range range)
+        public PaintLineEventArgs(int iLine, Rectangle rect, Graphics gr, Rectangle clipRect) : base(gr, clipRect)
         {
-            /* Empty */
+            LineIndex = iLine;
+            LineRect = rect;
         }
     }
 }

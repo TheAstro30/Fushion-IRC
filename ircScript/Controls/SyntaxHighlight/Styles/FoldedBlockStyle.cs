@@ -11,6 +11,7 @@
 //  Copyright (C) Pavel Torgashov, 2011-2016.
 using System.Drawing;
 using ircScript.Controls.SyntaxHighlight.Helpers;
+using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 
 namespace ircScript.Controls.SyntaxHighlight.Styles
 {
@@ -31,24 +32,24 @@ namespace ircScript.Controls.SyntaxHighlight.Styles
                 /* Find first non space symbol */
                 for (var i = range.Start.Char; i < range.End.Char; i++)
                 {
-                    if (range.tb[range.Start.Line][i].C != ' ')
+                    if (range.TextBox[range.Start.Line][i].C != ' ')
                     {
                         break;
                     }
-                    firstNonSpaceSymbolX += range.tb.CharWidth;
+                    firstNonSpaceSymbolX += range.TextBox.CharWidth;
                 }
                 /* Create marker */
-                range.tb.AddVisualMarker(new FoldedAreaMarker(range.Start.Line, new Rectangle(firstNonSpaceSymbolX, position.Y, position.X + (range.End.Char - range.Start.Char) * range.tb.CharWidth - firstNonSpaceSymbolX, range.tb.CharHeight)));
+                range.TextBox.AddVisualMarker(new FoldedAreaMarker(range.Start.Line, new Rectangle(firstNonSpaceSymbolX, position.Y, position.X + (range.End.Char - range.Start.Char) * range.TextBox.CharWidth - firstNonSpaceSymbolX, range.TextBox.CharHeight)));
             }
             else
             {
                 /* Draw '...' */
-                using (var f = new Font(range.tb.Font, FontStyle))
+                using (var f = new Font(range.TextBox.Font, FontStyle))
                 {
-                    gr.DrawString("...", f, ForeBrush, range.tb.LeftIndent, position.Y - 2);
+                    gr.DrawString("...", f, ForeBrush, range.TextBox.LeftIndent, position.Y - 2);
                 }
                 /* Create marker */
-                range.tb.AddVisualMarker(new FoldedAreaMarker(range.Start.Line, new Rectangle(range.tb.LeftIndent + 2, position.Y, 2 * range.tb.CharHeight, range.tb.CharHeight)));
+                range.TextBox.AddVisualMarker(new FoldedAreaMarker(range.Start.Line, new Rectangle(range.TextBox.LeftIndent + 2, position.Y, 2 * range.TextBox.CharHeight, range.TextBox.CharHeight)));
             }
         }
     }

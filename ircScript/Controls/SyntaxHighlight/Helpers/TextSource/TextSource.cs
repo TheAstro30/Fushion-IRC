@@ -18,6 +18,7 @@ using System.Text;
 using ircScript.Controls.SyntaxHighlight.Commands;
 using ircScript.Controls.SyntaxHighlight.Helpers.Lines;
 using ircScript.Controls.SyntaxHighlight.Styles;
+using ircScript.Controls.SyntaxHighlight.TextBoxEventArgs;
 
 namespace ircScript.Controls.SyntaxHighlight.Helpers.TextSource
 {

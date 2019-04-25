@@ -12,6 +12,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using ircScript.Controls.SyntaxHighlight.Helpers;
+using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 using ircScript.Controls.SyntaxHighlight.Styles;
 
 namespace ircScript.Controls.SyntaxHighlight.Export
@@ -48,7 +50,7 @@ namespace ircScript.Controls.SyntaxHighlight.Export
 
         public string GetRtf(Range r)
         {
-            TextBox = r.tb;
+            TextBox = r.TextBox;
             var styles = new Dictionary<StyleIndex, object>();
             var sb = new StringBuilder();
             var tempSb = new StringBuilder();
@@ -57,14 +59,14 @@ namespace ircScript.Controls.SyntaxHighlight.Export
             var currentLine = r.Start.Line;
             styles[currentStyleId] = null;
             _colorTable.Clear();
-            var lineNumberColor = GetColorTableNumber(r.tb.LineNumberColor);
+            var lineNumberColor = GetColorTableNumber(r.TextBox.LineNumberColor);
             if (IncludeLineNumbers)
             {
                 tempSb.AppendFormat(@"{{\cf{1} {0}}}\tab", currentLine + 1, lineNumberColor);
             }
             foreach (var p in r)
             {
-                var c = r.tb[p.Line][p.Char];
+                var c = r.TextBox[p.Line][p.Char];
                 if (c.Style != currentStyleId)
                 {
                     Flush(sb, tempSb, currentStyleId);

@@ -12,6 +12,7 @@
 using System;
 using System.Collections.Generic;
 using ircScript.Controls.SyntaxHighlight.Helpers;
+using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 using ircScript.Controls.SyntaxHighlight.Helpers.TextSource;
 
 namespace ircScript.Controls.SyntaxHighlight.Commands

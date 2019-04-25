@@ -11,6 +11,7 @@
 //  Copyright (C) Pavel Torgashov, 2011-2016.
 using System.Drawing;
 using ircScript.Controls.SyntaxHighlight.Helpers;
+using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 
 namespace ircScript.Controls.SyntaxHighlight.Styles
 {
@@ -26,13 +27,13 @@ namespace ircScript.Controls.SyntaxHighlight.Styles
         public override void Draw(Graphics gr, Point position, Range range)
         {
             /* Get last char coordinates */
-            var p = range.tb.PlaceToPoint(range.End);
+            var p = range.TextBox.PlaceToPoint(range.End);
             /* Draw small square under char */
-            var rect = new Rectangle(p.X - 5, p.Y + range.tb.CharHeight - 2, 4, 3);
+            var rect = new Rectangle(p.X - 5, p.Y + range.TextBox.CharHeight - 2, 4, 3);
             gr.FillPath(Brushes.White, GetRoundedRectangle(rect, 1));
             gr.DrawPath(BorderPen, GetRoundedRectangle(rect, 1));
             /* Add visual marker for handle mouse events */
-            AddVisualMarker(range.tb, new StyleVisualMarker(new Rectangle(p.X - range.tb.CharWidth, p.Y, range.tb.CharWidth, range.tb.CharHeight), this));
+            AddVisualMarker(range.TextBox, new StyleVisualMarker(new Rectangle(p.X - range.TextBox.CharWidth, p.Y, range.TextBox.CharWidth, range.TextBox.CharHeight), this));
         }
     }
 }

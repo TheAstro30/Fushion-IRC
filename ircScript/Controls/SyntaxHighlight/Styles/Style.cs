@@ -14,6 +14,7 @@ using System;
 using System.Drawing.Drawing2D;
 using ircScript.Controls.SyntaxHighlight.Export;
 using ircScript.Controls.SyntaxHighlight.Helpers;
+using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 
 namespace ircScript.Controls.SyntaxHighlight.Styles
 {
@@ -45,7 +46,7 @@ namespace ircScript.Controls.SyntaxHighlight.Styles
 
         public static Size GetSizeOfRange(Range range)
         {
-            return new Size((range.End.Char - range.Start.Char) * range.tb.CharWidth, range.tb.CharHeight);
+            return new Size((range.End.Char - range.Start.Char) * range.TextBox.CharWidth, range.TextBox.CharHeight);
         }
 
         public static GraphicsPath GetRoundedRectangle(Rectangle rect, int d)

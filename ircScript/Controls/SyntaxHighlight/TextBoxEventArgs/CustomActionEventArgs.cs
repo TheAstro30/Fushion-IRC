@@ -9,21 +9,18 @@
 //  Email: pavel_torgashov@ukr.net
 //
 //  Copyright (C) Pavel Torgashov, 2011-2016.
-using System.Drawing;
-using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
+using System;
+using ircScript.Controls.SyntaxHighlight.Forms.Hotkeys;
 
-namespace ircScript.Controls.SyntaxHighlight.Styles
+namespace ircScript.Controls.SyntaxHighlight.TextBoxEventArgs
 {
-    public sealed class ReadOnlyStyle : Style
+    public class CustomActionEventArgs : EventArgs
     {
-        public ReadOnlyStyle()
-        {
-            IsExportable = false;
-        }
+        public FctbAction Action { get; private set; }
 
-        public override void Draw(Graphics gr, Point position, Range range)
+        public CustomActionEventArgs(FctbAction action)
         {
-            /* Empty */
+            Action = action;
         }
     }
 }

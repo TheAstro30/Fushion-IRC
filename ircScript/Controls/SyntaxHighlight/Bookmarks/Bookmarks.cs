@@ -11,6 +11,7 @@
 //  Copyright (C) Pavel Torgashov, 2011-2016. 
 using System.Collections.Generic;
 using System.Linq;
+using ircScript.Controls.SyntaxHighlight.TextBoxEventArgs;
 
 namespace ircScript.Controls.SyntaxHighlight.Bookmarks
 {

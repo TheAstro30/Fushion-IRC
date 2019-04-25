@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using ircScript.Controls.SyntaxHighlight.Controls.AutoComplete;
+using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 
 namespace ircScript.Controls.SyntaxHighlight.Controls
 {

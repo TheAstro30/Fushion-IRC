@@ -9,21 +9,21 @@
 //  Email: pavel_torgashov@ukr.net
 //
 //  Copyright (C) Pavel Torgashov, 2011-2016.
-using System.Drawing;
-using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
-
-namespace ircScript.Controls.SyntaxHighlight.Styles
+namespace ircScript.Controls.SyntaxHighlight.Helpers.TextRange
 {
-    public sealed class ReadOnlyStyle : Style
+    public struct RangeRect
     {
-        public ReadOnlyStyle()
+        public RangeRect(int startLine, int startChar, int endLine, int endChar)
         {
-            IsExportable = false;
+            StartLine = startLine;
+            StartChar = startChar;
+            EndLine = endLine;
+            EndChar = endChar;
         }
 
-        public override void Draw(Graphics gr, Point position, Range range)
-        {
-            /* Empty */
-        }
+        public int StartLine;
+        public int StartChar;
+        public int EndLine;
+        public int EndChar;
     }
 }

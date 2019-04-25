@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using ircScript.Controls.SyntaxHighlight.Commands;
 using ircScript.Controls.SyntaxHighlight.Forms.Hotkeys;
+using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 
 namespace ircScript.Controls.SyntaxHighlight.Controls.AutoComplete
 {
@@ -486,7 +487,7 @@ namespace ircScript.Controls.SyntaxHighlight.Controls.AutoComplete
                 var args2 = new SelectedEventArgs
                                 {
                                     Item = item,
-                                    Tb = Menu.Fragment.tb
+                                    Tb = Menu.Fragment.TextBox
                                 };
                 item.OnSelected(Menu, args2);
                 Menu.OnSelected(args2);
@@ -501,7 +502,7 @@ namespace ircScript.Controls.SyntaxHighlight.Controls.AutoComplete
         {
             var newText = item.GetTextForReplace();
             /* Replace text of fragment */
-            var tb = fragment.tb;
+            var tb = fragment.TextBox;
             tb.BeginAutoUndo();
             tb.TextSource.Manager.ExecuteCommand(new SelectCommand(tb.TextSource));
             if (tb.Selection.ColumnSelectionMode)

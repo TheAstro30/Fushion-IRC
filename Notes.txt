@@ -1,5 +1,5 @@
 April 23, 2019
 - Need to test libDirectX and make changes to depreciated methods (third party code)
-- Need to refactor/fix up all code/re-organize "SyntaxHighlight" folder for FastColoredTextBox (third party code)
+- Need to refactor/fix up all code/re-organize "SyntaxHighlight" folder for FastColoredTextBox (third party code) - complete 25/04/19
 - Need to fix paths in script editor for files (hard coded to \scripts\ <- needs to change)
 - Need to add a "Save As" option to script editor

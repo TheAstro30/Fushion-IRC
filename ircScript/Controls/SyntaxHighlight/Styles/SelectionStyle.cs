@@ -12,6 +12,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 
 namespace ircScript.Controls.SyntaxHighlight.Styles
 {
@@ -44,7 +45,7 @@ namespace ircScript.Controls.SyntaxHighlight.Styles
             }
             gr.SmoothingMode = SmoothingMode.None;
             var rect = new Rectangle(position.X, position.Y,
-                                     (range.End.Char - range.Start.Char)*range.tb.CharWidth, range.tb.CharHeight);
+                                     (range.End.Char - range.Start.Char)*range.TextBox.CharWidth, range.TextBox.CharHeight);
             if (rect.Width == 0)
             {
                 return;
@@ -56,8 +57,8 @@ namespace ircScript.Controls.SyntaxHighlight.Styles
             }
             /* Draw text */
             gr.SmoothingMode = SmoothingMode.AntiAlias;
-            var r = new Range(range.tb, range.Start.Char, range.Start.Line,
-                              Math.Min(range.tb[range.End.Line].Count, range.End.Char), range.End.Line);
+            var r = new Range(range.TextBox, range.Start.Char, range.Start.Line,
+                              Math.Min(range.TextBox[range.End.Line].Count, range.End.Char), range.End.Line);
             using (var style = new TextStyle(ForegroundBrush, null, FontStyle.Regular))
             {
                 style.Draw(gr, new Point(position.X, position.Y - 1), r);

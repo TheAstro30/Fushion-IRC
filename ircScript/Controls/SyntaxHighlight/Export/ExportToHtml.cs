@@ -13,6 +13,8 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Collections.Generic;
+using ircScript.Controls.SyntaxHighlight.Helpers;
+using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 using ircScript.Controls.SyntaxHighlight.Styles;
 
 namespace ircScript.Controls.SyntaxHighlight.Export
@@ -53,7 +55,7 @@ namespace ircScript.Controls.SyntaxHighlight.Export
         
         public string GetHtml(Range r)
         {
-            TextBox = r.tb;
+            TextBox = r.TextBox;
             var styles = new Dictionary<StyleIndex, object>();
             var sb = new StringBuilder();
             var tempSb = new StringBuilder();
@@ -64,7 +66,7 @@ namespace ircScript.Controls.SyntaxHighlight.Export
             if (UseOriginalFont)
             {
                 sb.AppendFormat("<font style=\"font-family: {0}, monospace; font-size: {1}pt; line-height: {2}px;\">",
-                                                r.tb.Font.Name, r.tb.Font.SizeInPoints, r.tb.CharHeight);
+                                                r.TextBox.Font.Name, r.TextBox.Font.SizeInPoints, r.TextBox.CharHeight);
             }
             if (IncludeLineNumbers)
             {
@@ -73,7 +75,7 @@ namespace ircScript.Controls.SyntaxHighlight.Export
             var hasNonSpace = false;
             foreach (var p in r)
             {
-                var c = r.tb[p.Line][p.Char];
+                var c = r.TextBox[p.Line][p.Char];
                 if (c.Style != currentStyleId)
                 {
                     Flush(sb, tempSb, currentStyleId);
