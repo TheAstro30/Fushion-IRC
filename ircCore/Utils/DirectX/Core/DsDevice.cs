@@ -7,8 +7,9 @@
 using System;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 
-namespace ircCore.Utils.DirectX
+namespace ircCore.Utils.DirectX.Core
 {
     [ComVisible(false)]
     public class DsDev
@@ -17,9 +18,8 @@ namespace ircCore.Utils.DirectX
         {
             devs = null;
             object comObj = null;
-            ICreateDevEnum enumDev = null;
-            UCOMIEnumMoniker enumMon = null;
-            var mon = new UCOMIMoniker[1];
+            IEnumMoniker enumMon = null;
+            var mon = new IMoniker[1];
             try
             {
                 var srvType = Type.GetTypeFromCLSID(Clsid.SystemDeviceEnum);
@@ -28,7 +28,7 @@ namespace ircCore.Utils.DirectX
                     throw new NotImplementedException("System Device Enumerator");
                 }
                 comObj = Activator.CreateInstance(srvType);
-                enumDev = (ICreateDevEnum) comObj;
+                var enumDev = (ICreateDevEnum) comObj;
                 var hr = enumDev.CreateClassEnumerator(ref cat, out enumMon, 0);
                 if (hr != 0)
                 {
@@ -37,8 +37,7 @@ namespace ircCore.Utils.DirectX
                 var count = 0;
                 do
                 {
-                    int f;
-                    hr = enumMon.Next(1, mon, out f);
+                    hr = enumMon.Next(1, mon, IntPtr.Zero);
                     if ((hr != 0) || (mon[0] == null))
                     {
                         break;
@@ -87,15 +86,14 @@ namespace ircCore.Utils.DirectX
             }
         }
 
-        private static string GetFriendlyName(UCOMIMoniker mon)
+        private static string GetFriendlyName(IMoniker mon)
         {
             object bagObj = null;
-            IPropertyBag bag;
             try
             {
                 var bagId = typeof (IPropertyBag).GUID;
                 mon.BindToStorage(null, null, ref bagId, out bagObj);
-                bag = (IPropertyBag) bagObj;
+                var bag = (IPropertyBag) bagObj;
                 object val = "";
                 var hr = bag.Read("FriendlyName", ref val, IntPtr.Zero);
                 if (hr != 0)
@@ -124,7 +122,7 @@ namespace ircCore.Utils.DirectX
     [ComVisible(false)]
     public class DsDevice : IDisposable
     {
-        public UCOMIMoniker Mon;
+        public IMoniker Mon;
         public string Name;
 
         public void Dispose()
@@ -143,7 +141,7 @@ namespace ircCore.Utils.DirectX
         [PreserveSig]
         int CreateClassEnumerator(
             [In] ref Guid pType,
-            [Out] out UCOMIEnumMoniker ppEnumMoniker,
+            [Out] out IEnumMoniker ppEnumMoniker,
             [In] int dwFlags);
     }
 

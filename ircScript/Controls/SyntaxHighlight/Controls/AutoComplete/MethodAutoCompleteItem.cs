@@ -15,13 +15,13 @@ namespace ircScript.Controls.SyntaxHighlight.Controls.AutoComplete
 {
     public class MethodAutoCompleteItem : AutoCompleteItem
     {
-        private readonly string lowercaseText;
-        private string firstPart;
+        private readonly string _lowercaseText;
+        private string _firstPart;
 
         public MethodAutoCompleteItem(string text)
             : base(text)
         {
-            lowercaseText = Text.ToLower();
+            _lowercaseText = Text.ToLower();
         }
 
         public override CompareResult Compare(string fragmentText)
@@ -30,12 +30,12 @@ namespace ircScript.Controls.SyntaxHighlight.Controls.AutoComplete
             if (i < 0)
                 return CompareResult.Hidden;
             string lastPart = fragmentText.Substring(i + 1);
-            firstPart = fragmentText.Substring(0, i);
+            _firstPart = fragmentText.Substring(0, i);
 
             if (lastPart == "") return CompareResult.Visible;
             if (Text.StartsWith(lastPart, StringComparison.InvariantCultureIgnoreCase))
                 return CompareResult.VisibleAndSelected;
-            if (lowercaseText.Contains(lastPart.ToLower()))
+            if (_lowercaseText.Contains(lastPart.ToLower()))
                 return CompareResult.Visible;
 
             return CompareResult.Hidden;
@@ -43,7 +43,7 @@ namespace ircScript.Controls.SyntaxHighlight.Controls.AutoComplete
 
         public override string GetTextForReplace()
         {
-            return firstPart + "." + Text;
+            return _firstPart + "." + Text;
         }
     }
 }

@@ -15,6 +15,7 @@ using FusionIRC.Forms.Theming;
 using FusionIRC.Forms.Users;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
+using ircCore.Controls.Rendering;
 using ircCore.Settings.Networks;
 
 namespace FusionIRC.Controls.ControlBars
@@ -51,7 +52,9 @@ namespace FusionIRC.Controls.ControlBars
             Stretch = true;
             AutoSize = false;
             ImageScalingSize = new Size(32, 32);
-            RenderMode = ToolStripRenderMode.Professional;            
+            var renderer = new CustomRenderer(new Renderer());
+            RenderMode = ToolStripRenderMode.Professional;
+            Renderer = renderer;           
             GripStyle = ToolStripGripStyle.Visible;
             ShowItemToolTips = true;
             LayoutStyle = ToolStripLayoutStyle.StackWithOverflow;
@@ -241,7 +244,13 @@ namespace FusionIRC.Controls.ControlBars
                     break;
 
                 case "ALIASES":
-                    var edit = new FrmScript();
+                    var edit = WindowManager.FindClientWindow(@"FusionIRC - Script Editor");
+                    if (edit != null)
+                    {
+                        edit.BringToFront();
+                        return;
+                    }
+                    edit = new FrmScript();
                     edit.Show();
                     break;
 

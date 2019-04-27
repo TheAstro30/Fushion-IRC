@@ -7,7 +7,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace ircCore.Utils.DirectX
+namespace ircCore.Utils.DirectX.Core
 {
     public enum DsEvCode
     {
@@ -95,11 +95,11 @@ namespace ircCore.Utils.DirectX
             [Out, MarshalAs(UnmanagedType.IDispatch)] out object ppUnk);
 
         [PreserveSig]
-        int get_FilterCollection(
+        int GetFilterCollection(
             [Out, MarshalAs(UnmanagedType.IDispatch)] out object ppUnk);
 
         [PreserveSig]
-        int get_RegFilterCollection(
+        int GetRegFilterCollection(
             [Out, MarshalAs(UnmanagedType.IDispatch)] out object ppUnk);
 
         [PreserveSig]
@@ -183,54 +183,53 @@ namespace ircCore.Utils.DirectX
         [PreserveSig]
         int VideoHeight(out int pVideoHeight);
 
+        [PreserveSig]
+        int SetSourceLeft(int sourceLeft);
 
         [PreserveSig]
-        int put_SourceLeft(int sourceLeft);
+        int GetSourceLeft(out int pSourceLeft);
 
         [PreserveSig]
-        int get_SourceLeft(out int pSourceLeft);
+        int SetSourceWidth(int sourceWidth);
 
         [PreserveSig]
-        int put_SourceWidth(int sourceWidth);
+        int GetSourceWidth(out int pSourceWidth);
 
         [PreserveSig]
-        int get_SourceWidth(out int pSourceWidth);
+        int SetSourceTop(int sourceTop);
 
         [PreserveSig]
-        int put_SourceTop(int sourceTop);
+        int GetSourceTop(out int pSourceTop);
 
         [PreserveSig]
-        int get_SourceTop(out int pSourceTop);
+        int SetSourceHeight(int sourceHeight);
 
         [PreserveSig]
-        int put_SourceHeight(int sourceHeight);
+        int GetSourceHeight(out int pSourceHeight);
 
         [PreserveSig]
-        int get_SourceHeight(out int pSourceHeight);
+        int SetDestinationLeft(int destinationLeft);
 
         [PreserveSig]
-        int put_DestinationLeft(int destinationLeft);
+        int GetDestinationLeft(out int pDestinationLeft);
 
         [PreserveSig]
-        int get_DestinationLeft(out int pDestinationLeft);
+        int SetDestinationWidth(int destinationWidth);
 
         [PreserveSig]
-        int put_DestinationWidth(int destinationWidth);
+        int GetDestinationWidth(out int pDestinationWidth);
 
         [PreserveSig]
-        int get_DestinationWidth(out int pDestinationWidth);
+        int SetDestinationTop(int destinationTop);
 
         [PreserveSig]
-        int put_DestinationTop(int destinationTop);
+        int GetDestinationTop(out int pDestinationTop);
 
         [PreserveSig]
-        int get_DestinationTop(out int pDestinationTop);
+        int SetDestinationHeight(int destinationHeight);
 
         [PreserveSig]
-        int put_DestinationHeight(int destinationHeight);
-
-        [PreserveSig]
-        int get_DestinationHeight(out int pDestinationHeight);
+        int GetDestinationHeight(out int pDestinationHeight);
 
         [PreserveSig]
         int SetSourcePosition(int left, int top, int width, int height);
@@ -275,94 +274,94 @@ namespace ircCore.Utils.DirectX
     public interface IVideoWindow
     {
         [PreserveSig]
-        int put_Caption(string caption);
+        int SetCaption(string caption);
 
         [PreserveSig]
-        int get_Caption([Out] out string caption);
+        int GetCaption([Out] out string caption);
 
         [PreserveSig]
-        int put_WindowStyle(int windowStyle);
+        int SetWindowStyle(int windowStyle);
 
         [PreserveSig]
-        int get_WindowStyle(out int windowStyle);
+        int GetWindowStyle(out int windowStyle);
 
         [PreserveSig]
-        int put_WindowStyleEx(int windowStyleEx);
+        int SetWindowStyleEx(int windowStyleEx);
 
         [PreserveSig]
-        int get_WindowStyleEx(out int windowStyleEx);
+        int GetWindowStyleEx(out int windowStyleEx);
 
         [PreserveSig]
-        int put_AutoShow(int autoShow);
+        int SetAutoShow(int autoShow);
 
         [PreserveSig]
-        int get_AutoShow(out int autoShow);
+        int GetAutoShow(out int autoShow);
 
         [PreserveSig]
-        int put_WindowState(int windowState);
+        int SetWindowState(int windowState);
 
         [PreserveSig]
-        int get_WindowState(out int windowState);
+        int GetWindowState(out int windowState);
 
         [PreserveSig]
-        int put_BackgroundPalette(int backgroundPalette);
+        int SetBackgroundPalette(int backgroundPalette);
 
         [PreserveSig]
-        int get_BackgroundPalette(out int backgroundPalette);
+        int GetBackgroundPalette(out int backgroundPalette);
 
         [PreserveSig]
-        int put_Visible(int visible);
+        int SetVisible(int visible);
 
         [PreserveSig]
-        int get_Visible(out int visible);
+        int GetVisible(out int visible);
 
         [PreserveSig]
-        int put_Left(int left);
+        int SetLeft(int left);
 
         [PreserveSig]
-        int get_Left(out int left);
+        int GetLeft(out int left);
 
         [PreserveSig]
-        int put_Width(int width);
+        int SetWidth(int width);
 
         [PreserveSig]
-        int get_Width(out int width);
+        int GetWidth(out int width);
 
         [PreserveSig]
-        int put_Top(int top);
+        int SetTop(int top);
 
         [PreserveSig]
-        int get_Top(out int top);
+        int GetTop(out int top);
 
         [PreserveSig]
-        int put_Height(int height);
+        int SetHeight(int height);
 
         [PreserveSig]
-        int get_Height(out int height);
+        int GetHeight(out int height);
 
         [PreserveSig]
-        int put_Owner(IntPtr owner);
+        int SetOwner(IntPtr owner);
 
         [PreserveSig]
-        int get_Owner(out IntPtr owner);
+        int GetOwner(out IntPtr owner);
 
         [PreserveSig]
-        int put_MessageDrain(IntPtr drain);
+        int SetMessageDrain(IntPtr drain);
 
         [PreserveSig]
-        int get_MessageDrain(out IntPtr drain);
+        int GetMessageDrain(out IntPtr drain);
 
         [PreserveSig]
-        int get_BorderColor(out int color);
+        int GetBorderColor(out int color);
 
         [PreserveSig]
-        int put_BorderColor(int color);
+        int SetBorderColor(int color);
 
         [PreserveSig]
-        int get_FullScreenMode(out int fullScreenMode);
+        int GetFullScreenMode(out int fullScreenMode);
 
         [PreserveSig]
-        int put_FullScreenMode(int fullScreenMode);
+        int SetFullScreenMode(int fullScreenMode);
 
         [PreserveSig]
         int SetWindowForeground(int focus);
@@ -398,31 +397,31 @@ namespace ircCore.Utils.DirectX
     public interface IMediaPosition
     {
         [PreserveSig]
-        int get_Duration(out double pLength);
+        int GetDuration(out double pLength);
 
         [PreserveSig]
-        int put_CurrentPosition(double llTime);
+        int SetCurrentPosition(double llTime);
 
         [PreserveSig]
-        int get_CurrentPosition(out double pllTime);
+        int GetCurrentPosition(out double pllTime);
 
         [PreserveSig]
-        int get_StopTime(out double pllTime);
+        int GetStopTime(out double pllTime);
 
         [PreserveSig]
-        int put_StopTime(double llTime);
+        int SetStopTime(double llTime);
 
         [PreserveSig]
-        int get_PrerollTime(out double pllTime);
+        int GetPrerollTime(out double pllTime);
 
         [PreserveSig]
-        int put_PrerollTime(double llTime);
+        int SetPrerollTime(double llTime);
 
         [PreserveSig]
-        int put_Rate(double dRate);
+        int SetRate(double dRate);
 
         [PreserveSig]
-        int get_Rate(out double pdRate);
+        int GetRate(out double pdRate);
 
         [PreserveSig]
         int CanSeekForward(out int pCanSeekForward);
@@ -437,16 +436,16 @@ namespace ircCore.Utils.DirectX
     public interface IBasicAudio
     {
         [PreserveSig]
-        int put_Volume(int lVolume);
+        int SetVolume(int lVolume);
 
         [PreserveSig]
-        int get_Volume(out int plVolume);
+        int GetVolume(out int plVolume);
 
         [PreserveSig]
-        int put_Balance(int lBalance);
+        int SetBalance(int lBalance);
 
         [PreserveSig]
-        int get_Balance(out int plBalance);
+        int GetBalance(out int plBalance);
     }
 
     [ComVisible(true), ComImport,
@@ -455,14 +454,14 @@ namespace ircCore.Utils.DirectX
     public interface IAMCollection
     {
         [PreserveSig]
-        int get_Count(out int plCount);
+        int GetCount(out int plCount);
 
         [PreserveSig]
         int Item(int lItem,
                  [Out, MarshalAs(UnmanagedType.IUnknown)] out object ppUnk);
 
         [PreserveSig]
-        int get_NewEnum(
+        int GetNewEnum(
             [Out, MarshalAs(UnmanagedType.IUnknown)] out object ppUnk);
     }
 }

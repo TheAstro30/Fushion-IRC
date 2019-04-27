@@ -11,7 +11,6 @@
 //  Copyright (C) Pavel Torgashov, 2011-2016.
 using System;
 using System.Collections.Generic;
-using ircScript.Controls.SyntaxHighlight.Helpers;
 using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 using ircScript.Controls.SyntaxHighlight.Helpers.TextSource;
 
@@ -45,9 +44,11 @@ namespace ircScript.Controls.SyntaxHighlight.Commands
             for (var i = 0; i < _ranges.Count; i++)
             {
                 tb.Selection.Start = _ranges[i].Start;
-                for (var j = 0; j < _insertedText.Length; j++)
+                var j = 0;
+                while (j < _insertedText.Length)
                 {
                     tb.Selection.GoRight(true);
+                    j++;
                 } 
                 ClearSelected(TextSource);
                 InsertTextCommand.InsertText(_prevText[_prevText.Count - i - 1], TextSource);

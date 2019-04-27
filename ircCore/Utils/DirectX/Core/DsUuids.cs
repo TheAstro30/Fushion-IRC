@@ -6,7 +6,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace ircCore.Utils.DirectX
+namespace ircCore.Utils.DirectX.Core
 {
     [ComVisible(false)]
     public class FilterCategory // uuids.h  :  CLSID_*

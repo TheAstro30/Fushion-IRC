@@ -63,6 +63,7 @@ namespace ircCore.Settings.SettingsBase
             Windows.Caching.Input = 50;
             Windows.Caching.ChatSearch = 25;
             /* Editor */
+            Editor.SplitSize = 120;
             Editor.SyntaxHighlight = true;
             Editor.LineNumbering = true;
             Editor.Zoom = 100;

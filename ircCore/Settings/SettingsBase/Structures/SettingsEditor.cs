@@ -11,6 +11,9 @@ namespace ircCore.Settings.SettingsBase.Structures
     [Serializable]
     public class SettingsEditor
     {
+        [XmlAttribute("splitSize")]
+        public int SplitSize { get; set; }
+
         [XmlAttribute("syntaxHighlight")]
         public bool SyntaxHighlight { get; set; }
 

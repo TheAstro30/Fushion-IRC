@@ -13,7 +13,6 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Collections.Generic;
-using ircScript.Controls.SyntaxHighlight.Helpers;
 using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 using ircScript.Controls.SyntaxHighlight.Styles;
 

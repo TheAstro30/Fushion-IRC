@@ -73,7 +73,7 @@ namespace ircScript.Classes.Parsers
                         }
                         if (_processCode)
                         {
-                            _processCode = false; ;
+                            _processCode = false;
                             _ifResumeProcess = _if.Count;
                         }
                         _if.Push(false);

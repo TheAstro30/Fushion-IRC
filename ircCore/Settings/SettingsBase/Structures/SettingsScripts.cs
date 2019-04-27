@@ -21,7 +21,7 @@ namespace ircCore.Settings.SettingsBase.Structures
         [XmlElement("alias")]
         public List<SettingsScriptPath> Aliases = new List<SettingsScriptPath>();
 
-        [XmlElement("popup")]
-        public List<SettingsScriptPath> Popups = new List<SettingsScriptPath>();
+        [XmlElement("event")]
+        public List<SettingsScriptPath> Events = new List<SettingsScriptPath>();
     }
 }

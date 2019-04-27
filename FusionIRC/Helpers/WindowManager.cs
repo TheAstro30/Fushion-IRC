@@ -188,6 +188,12 @@ namespace FusionIRC.Helpers
             }
         }
 
+        public static Form FindClientWindow(string text)
+        {
+            /* This will search for an instance of a form that's already open by its title (.Text) */
+            return Application.OpenForms.Cast<Form>().FirstOrDefault(of => of.Text.Equals(text, StringComparison.InvariantCultureIgnoreCase));
+        }
+
         /* Theme loaded callback */
         public static void OnThemeLoaded()
         {

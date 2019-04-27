@@ -12,7 +12,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
-using ircScript.Controls.SyntaxHighlight.Helpers;
 using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 using ircScript.Controls.SyntaxHighlight.Styles;
 

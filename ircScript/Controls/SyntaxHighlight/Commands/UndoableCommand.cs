@@ -9,8 +9,6 @@
 //  Email: pavel_torgashov@ukr.net
 //
 //  Copyright (C) Pavel Torgashov, 2011-2016.
-
-using ircScript.Controls.SyntaxHighlight.Helpers;
 using ircScript.Controls.SyntaxHighlight.Helpers.TextSource;
 
 namespace ircScript.Controls.SyntaxHighlight.Commands

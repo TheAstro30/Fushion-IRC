@@ -7,7 +7,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace ircCore.Utils.DirectX
+namespace ircCore.Utils.DirectX.Core
 {
 // =================================================================================================
 //											DVD GRAPH

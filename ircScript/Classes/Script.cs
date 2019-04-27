@@ -5,7 +5,7 @@
  */
 using System;
 using System.Collections.Generic;
-using ircCore.Utils;
+using System.Linq;
 using ircScript.Classes.Parsers;
 using ircScript.Classes.Structures;
 
@@ -17,6 +17,8 @@ namespace ircScript.Classes
         private ScriptVariables _localVariables = new  ScriptVariables();
 
         /* Public properties */
+        public ScriptEventParams EventParams = new ScriptEventParams();
+
         public string Name { get; set; }
 
         public List<string> LineData = new List<string>();
@@ -32,18 +34,52 @@ namespace ircScript.Classes
             _localVariables = new ScriptVariables();
             var parser = new ScriptParser(_localVariables);
             var conditional = new ScriptConditionalParser();
-            /* Parse each line */
-            foreach (var line in LineData)
+            var br = false;
+            /* Parse each line - conditions then finally check for return/break */
+            foreach (var line in from line in LineData let parsed = parser.Parse(e, line, args) where conditional.Parse(parsed) select line)
             {
-                var parsed = parser.Parse(e, line, args);
-                /* Now parse everything else (if, etc) */
-                if (conditional.Parse(parsed))
-                {                    
-                    if (LineParsed != null)
-                    {
-                        LineParsed(this, e, parser.Parse(e, line, args));
-                    }
-                }                                
+                string com;
+                var l = parser.Parse(e, line, args);
+                var arg = string.Empty;
+                var i = l.IndexOf(' ');
+                if (i != -1)
+                {
+                    com = l.Substring(0, i);
+                    arg = l.Substring(i + 1);                        
+                }
+                else
+                {
+                    com = l;
+                }                
+                switch (com.ToUpper())
+                {
+                    case "RETURN":                    
+                        /* Execution of this script stops here */   
+                        br = true;
+                        break;
+
+                    case "BREAK":
+                        /* Break is treated differently, ALL execution stops here and LineParsed is NOT raised */
+                        if (ParseCompleted != null)
+                        {
+                            ParseCompleted(this);
+                        }
+                        return;
+
+                    default:
+                        arg = l; /* Set line back to original parsed line to continue processing */
+                        break;
+                }
+                /* Raise event with resultant output */
+                if (LineParsed != null)
+                {
+                    LineParsed(this, e, arg);
+                }
+                if (br)
+                {
+                    /* Return or break detected, exit execution of this loop */
+                    break;
+                }
             }
             if (ParseCompleted != null)
             {

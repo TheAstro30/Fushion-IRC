@@ -977,8 +977,9 @@ namespace ircScript.Controls.SyntaxHighlight
                 { 
                     using (var lineNumberBrush = new SolidBrush(LineNumberColor))
                     {
+                        /* Added y + 3 instead of just y to add a bit of vertical padding so numbers lined up a bit better with line text */
                         e.Graphics.DrawString((iLine + _lineNumberStartValue).ToString(), Font, lineNumberBrush,
-                                    new RectangleF(-10, y, LeftIndent - MinLeftIndent - 2 + 10, CharHeight + (int)(_lineInterval * 0.5f)),
+                                    new RectangleF(-10, y + 3, LeftIndent - MinLeftIndent - 2 + 10, CharHeight + (int)(_lineInterval * 0.5f)),
                                     new StringFormat(StringFormatFlags.DirectionRightToLeft) { LineAlignment = StringAlignment.Center });
                     }
                 }

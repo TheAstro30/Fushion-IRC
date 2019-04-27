@@ -4,20 +4,12 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System.Collections.Generic;
-using ircScript.Classes.Structures;
 
-namespace ircScript.Classes
+namespace ircScript.Classes.Structures
 {
-    public enum ScriptFileNodeType
-    {
-        Aliases = 0,
-        Popups = 1,
-        Variables = 2
-    }
-
     public class ScriptFileNode
     {
-        public ScriptFileNodeType Type { get; set; }
+        public ScriptType Type { get; set; }
 
         public string Name { get; set; }
 

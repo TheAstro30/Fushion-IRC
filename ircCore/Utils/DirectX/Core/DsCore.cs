@@ -8,7 +8,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace ircCore.Utils.DirectX
+namespace ircCore.Utils.DirectX.Core
 {
     [ComVisible(false)]
     public enum PinDirection // PIN_DIRECTION

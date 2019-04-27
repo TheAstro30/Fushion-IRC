@@ -11,10 +11,10 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Properties;
+using ircCore.Controls.Rendering;
 using ircCore.Settings;
 using ircCore.Utils;
 using ircScript;
-using ircScript.Classes;
 using ircScript.Classes.Structures;
 using ircScript.Controls;
 using libolv;
@@ -27,21 +27,27 @@ namespace FusionIRC.Forms.Script
         private readonly ToolStripMenuItem _mnuFile;
         private readonly ToolStripMenuItem _mnuEdit;
         private readonly ToolStripMenuItem _mnuView;
-        private readonly TableLayoutPanel _tbButtons;
-        private readonly TableLayoutPanel _tbLayout;
         private readonly TreeListView _tvFiles;
         private readonly OlvColumn _colFiles;
         private readonly ScriptEditor _txtEdit;
-        private readonly Button _btnClose;
+
+        private readonly SplitContainer _splitter;
+        private readonly StatusStrip _status;
+        private readonly ToolStripStatusLabel _label;
+        private readonly ToolStripStatusLabel _fileName;
+        private readonly ToolStripStatusLabel _lineInfo;
+        private readonly ToolStripStatusLabel _editMode;
 
         private readonly List<ScriptData> _aliases = new List<ScriptData>();
-        private readonly List<ScriptData> _popups = new List<ScriptData>();
+        private readonly List<ScriptData> _events = new List<ScriptData>();
         
         private readonly List<ScriptFileNode> _files = new List<ScriptFileNode>();
         private readonly bool _initialize;
         private readonly ScriptFileNode _varNode;
         private readonly ScriptData _variables;                
         private ScriptData _currentEditingScript;
+
+        private readonly Timer _timer;
 
         private bool _fileChanged;
 
@@ -58,12 +64,15 @@ namespace FusionIRC.Forms.Script
             MinimumSize = new Size(512, 395);
             StartPosition = FormStartPosition.Manual;
             Text = @"FusionIRC - Script Editor";
-
+            /* Main menu bar */
+            var renderer = new CustomRenderer(new Renderer());
             _menu = new MenuStrip
                        {
                            Location = new Point(0, 0),
                            RenderMode = ToolStripRenderMode.Professional,
+                           Renderer = renderer,
                            Size = new Size(496, 24),
+                           GripStyle = ToolStripGripStyle.Visible,
                            TabIndex = 3
                        };
             /* File menu */
@@ -77,8 +86,7 @@ namespace FusionIRC.Forms.Script
                                                     new ToolStripMenuItem("Unload", null, MenuItemOnClick,
                                                                           Keys.Control | Keys.Shift | Keys.U),
                                                     new ToolStripSeparator(),
-                                                    new ToolStripMenuItem("Rename...", null, MenuItemOnClick, Keys.None)
-                                                    ,
+                                                    new ToolStripMenuItem("Rename...", null, MenuItemOnClick, Keys.None),
                                                     new ToolStripSeparator(),
                                                     new ToolStripMenuItem("Save", null, MenuItemOnClick,
                                                                           Keys.Control | Keys.S),
@@ -126,10 +134,53 @@ namespace FusionIRC.Forms.Script
                                         _mnuEdit,
                                         _mnuView
                                     });
-
+            /* Status bar - order components are added to the control array is IMPORTANT */
+            _status = new StatusStrip
+                          {
+                              Dock = DockStyle.Bottom,
+                              GripStyle = ToolStripGripStyle.Visible,
+                              RenderMode = ToolStripRenderMode.Professional,
+                              Renderer = renderer                              
+                          };
+            _label = new ToolStripStatusLabel
+                         {
+                             Alignment = ToolStripItemAlignment.Left,
+                             TextAlign = ContentAlignment.MiddleLeft,
+                             Image = Resources.editFile.ToBitmap(),
+                             TextImageRelation = TextImageRelation.ImageBeforeText,
+                             Text = @"File:"
+                         };
+            _fileName = new ToolStripStatusLabel
+                            {
+                                Spring = true,
+                                Alignment = ToolStripItemAlignment.Left,
+                                TextAlign = ContentAlignment.MiddleLeft,
+                                AutoSize = true
+                            };
+            _lineInfo = new ToolStripStatusLabel
+                            {
+                                Alignment = ToolStripItemAlignment.Left,
+                                TextAlign = ContentAlignment.MiddleLeft,
+                                Image = Resources.editLines.ToBitmap(),
+                                TextImageRelation = TextImageRelation.ImageBeforeText
+                            };
+            _editMode = new ToolStripStatusLabel
+                            {
+                                TextAlign = ContentAlignment.MiddleLeft,
+                                Image = Resources.editReplace.ToBitmap(),
+                                TextImageRelation = TextImageRelation.ImageBeforeText
+                            };
+            _status.Items.AddRange(new ToolStripItem[]
+                                       {
+                                           _label,
+                                           _fileName, new ToolStripSeparator(),
+                                           _lineInfo, new ToolStripSeparator(),
+                                           _editMode
+                                       });
+            /* Treeview */
             _tvFiles = new TreeListView
                           {
-                              BorderStyle = BorderStyle.FixedSingle,
+                              BorderStyle = BorderStyle.None,
                               Dock = DockStyle.Fill,
                               FullRowSelect = true,
                               HideSelection = false,
@@ -137,6 +188,7 @@ namespace FusionIRC.Forms.Script
                               Location = new Point(3, 3),
                               OwnerDraw = true,
                               ShowGroups = false,
+                              MultiSelect = false,
                               Size = new Size(134, 290),
                               TabIndex = 1,
                               UseCompatibleStateImageBehavior = false,
@@ -162,13 +214,12 @@ namespace FusionIRC.Forms.Script
                                                       };
             /* Root item (network name) */
             _tvFiles.CanExpandGetter = x => x is ScriptFileNode;
-
             /* Children of each root item (script data) */
             _tvFiles.ChildrenGetter = delegate(object x)
                                           {
                                               var sd = (ScriptFileNode) x;
                                               return sd.Data;
-                                          };
+                                          };            
 
             _colFiles.ImageGetter = x => x is ScriptFileNode
                                              ? Resources.codeHeader.ToBitmap()
@@ -177,7 +228,7 @@ namespace FusionIRC.Forms.Script
             _txtEdit = new ScriptEditor
                           {
                               BackColor = SystemColors.Window,
-                              BorderStyle = BorderStyle.FixedSingle,
+                              BorderStyle = BorderStyle.None,
                               Dock = DockStyle.Fill,
                               Location = new Point(143, 3),
                               Size = new Size(350, 290),                              
@@ -187,54 +238,28 @@ namespace FusionIRC.Forms.Script
                               TabIndex = 0
                           };
 
-            _btnClose = new Button
+            /* Splitter */
+            _splitter = new SplitContainer
                             {
-                                Location = new Point(119, 3),
-                                Size = new Size(75, 23),
-                                TabIndex = 2,
-                                Text = @"Close",
-                                UseVisualStyleBackColor = true
+                                Dock = DockStyle.Fill,
+                                BorderStyle = BorderStyle.FixedSingle,                               
+                                Panel1MinSize = 120,
+                                SplitterWidth = 2,                                
+                                FixedPanel = FixedPanel.Panel1
                             };
-            /* Button layout table */
-            _tbButtons = new TableLayoutPanel
-                             {
-                                 ColumnCount = 2,
-                                 Dock = DockStyle.Right,
-                                 Location = new Point(293, 299),
-                                 RowCount = 1
-                             };
+            _splitter.SplitterMoved += SplitterMoved;
 
-            _tbButtons.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            _tbButtons.Size = new Size(200, 30);
+            _splitter.Panel1.Controls.Add(_tvFiles);
+            _splitter.Panel2.Controls.Add(_txtEdit);
 
-            _tbButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 58.24742F));
-            _tbButtons.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 41.75258F));
-            _tbButtons.Controls.Add(_btnClose, 1, 0);
-            /* Main layout table */
-            _tbLayout = new TableLayoutPanel
-                           {
-                               ColumnCount = 2,
-                               Dock = DockStyle.Fill,
-                               Location = new Point(0, 24),
-                               RowCount = 2,
-                               Size = new Size(496, 332)
-                           };
-            
-            _tbLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 140F));
-            _tbLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 356F));
+            Controls.AddRange(new Control[] {_splitter, _status, _menu});
 
-            _tbLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            _tbLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
+            _timer = new Timer { Interval = 10 };
 
-            _tbLayout.Controls.Add(_txtEdit, 1, 0);
-            _tbLayout.Controls.Add(_tvFiles, 0, 0);
-            _tbLayout.Controls.Add(_tbButtons, 1, 1);
-
-            Controls.AddRange(new Control[] {_tbLayout, _menu});
             MainMenuStrip = _menu;            
             /* Copy scripts to temporary arrays */
             _aliases = ScriptManager.AliasData.Clone();
-            _popups = ScriptManager.PopupData.Clone();
+            _events = ScriptManager.EventData.Clone();
             /* Here we can cheat with displaying variables by creating them as new script file */
             _variables = new ScriptData
                              {
@@ -244,13 +269,13 @@ namespace FusionIRC.Forms.Script
             _varNode = new ScriptFileNode
                            {
                                Name = "Variables",
-                               Type = ScriptFileNodeType.Variables
+                               Type = ScriptType.Variables
                            };
             _varNode.Data.Add(_variables);
             _files.AddRange(new[]
                                 {
-                                    new ScriptFileNode {Name = "Aliases", Data = _aliases, Type = ScriptFileNodeType.Aliases},
-                                    new ScriptFileNode {Name = "Popups", Data = _popups, Type = ScriptFileNodeType.Popups},
+                                    new ScriptFileNode {Name = "Aliases", Data = _aliases, Type = ScriptType.Aliases},
+                                    new ScriptFileNode {Name = "Events", Data = _events, Type = ScriptType.Events},
                                     _varNode
                                 });
 
@@ -273,15 +298,24 @@ namespace FusionIRC.Forms.Script
             _mnuEdit.DropDownOpening += MenuDropDownOpening;
             _mnuView.DropDownOpening += MenuDropDownOpening;
 
+            _tvFiles.SelectionChanged += FileSelectionChanged;
             _tvFiles.SelectedIndexChanged += FilesSelectedIndexChanged;
             _txtEdit.TextChanged += TextEditTextChanged;
+            _txtEdit.KeyUp += TextEditKeyUp;
+            _txtEdit.MouseUp += TextEditMouseUp;
             _txtEdit.ZoomChanged += TextEditZoomChanged;
-            _btnClose.Click += ButtonClickHandler;
-
+            _timer.Tick += TimerFocusTick;
+            
             _initialize = false;
         }
 
         /* Overrides */
+        protected override void OnLoad(EventArgs e)
+        {
+            _splitter.SplitterDistance = SettingsManager.Settings.Editor.SplitSize;
+            base.OnLoad(e);
+        }
+
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             /* Check if any files need saving */
@@ -331,6 +365,24 @@ namespace FusionIRC.Forms.Script
         }
 
         /* Handler callbacks */
+        private void SplitterMoved(object sender, SplitterEventArgs e)
+        {
+            System.Diagnostics.Debug.Print("Moved " + _splitter.SplitterDistance); 
+            SettingsManager.Settings.Editor.SplitSize = _splitter.SplitterDistance;
+        }
+
+        private void TimerFocusTick(object sender, EventArgs e)
+        {
+            _timer.Enabled = false;
+            _txtEdit.Focus();
+            UpdateStatusInfo();
+        }
+
+        private void FileSelectionChanged(object sender, EventArgs e)
+        {
+            _timer.Enabled = true;
+        }
+
         private void FilesSelectedIndexChanged(object sender, EventArgs e)
         {
             var node = _tvFiles.SelectedObject;
@@ -343,12 +395,22 @@ namespace FusionIRC.Forms.Script
         }
 
         private void TextEditTextChanged(object sender, EventArgs e)
-        {
+        {            
             if (_fileChanged)
             {
                 return;
             }
             _currentEditingScript.ContentsChanged = true;
+        }
+
+        private void TextEditKeyUp(object sender, KeyEventArgs e)
+        {
+            UpdateStatusInfo();
+        }
+
+        private void TextEditMouseUp(object sender, MouseEventArgs e)
+        {
+            UpdateStatusInfo();
         }
 
         private void TextEditZoomChanged(object sender, EventArgs e)
@@ -366,8 +428,8 @@ namespace FusionIRC.Forms.Script
             switch (dd.Text.ToUpper())
             {
                 case "&FILE":
-                    var node = GetNodeType() != ScriptFileNodeType.Variables;
-                    var type = _tvFiles.SelectedObject.GetType() != typeof(ScriptFileNode);
+                    var node = GetNodeType() != ScriptType.Variables;
+                    var type = _tvFiles.SelectedObject != null && _tvFiles.SelectedObject.GetType() != typeof(ScriptFileNode);
                     _mnuFile.DropDownItems[0].Enabled = node;
                     _mnuFile.DropDownItems[2].Enabled = node;
                     /* Cannot unload/rename the root item! */
@@ -507,11 +569,6 @@ namespace FusionIRC.Forms.Script
             }
         }
 
-        private void ButtonClickHandler(object sender, EventArgs e)
-        {
-            Close();
-        }
-
         /* Private methods - script adding/deleting/renaming */
         private void NewScript()
         {
@@ -523,12 +580,12 @@ namespace FusionIRC.Forms.Script
             var list = GetScriptListByType(type);
             switch (type)
             {
-                case ScriptFileNodeType.Aliases:
+                case ScriptType.Aliases:
                     name = "aliases";
                     break;
 
                 default:
-                    name = "popups";
+                    name = "events";
                     break;
             }
             var script = new ScriptData {Name = string.Format("{0}{1}", name, list.Count + 1), ContentsChanged = true};
@@ -538,14 +595,13 @@ namespace FusionIRC.Forms.Script
             SaveAll();
             _tvFiles.RefreshObjects(_files);
             _tvFiles.Expand(script);
-            _tvFiles.SelectObject(script);            
-            _txtEdit.Focus();
+            _tvFiles.SelectObject(script);
         }
 
         private void LoadScript()
         {
             var nodeType = GetNodeType();
-            if (nodeType == ScriptFileNodeType.Variables)
+            if (nodeType == ScriptType.Variables)
             {
                 return; /* Don't do anything! */
             }
@@ -571,7 +627,6 @@ namespace FusionIRC.Forms.Script
             if (s != null)
             {
                 _tvFiles.SelectObject(s);
-                _txtEdit.Focus();
                 return;
             }
             /* We have a script file, add it to file list and treeview */
@@ -581,7 +636,6 @@ namespace FusionIRC.Forms.Script
             _tvFiles.RefreshObjects(_files);
             _tvFiles.Expand(script);
             _tvFiles.SelectObject(script);            
-            _txtEdit.Focus();
         }
 
         private void UnloadScript()
@@ -625,7 +679,6 @@ namespace FusionIRC.Forms.Script
             {
                 _txtEdit.Clear();//.Lines = new string[0];
             }
-            _txtEdit.Focus();
         }
 
         private void RenameScript()
@@ -670,7 +723,6 @@ namespace FusionIRC.Forms.Script
             RebuildAllScripts();
             _tvFiles.SetObjects(_files);
             _tvFiles.SelectObject(_currentEditingScript);
-            _txtEdit.Focus();
         }
 
         private void Save()
@@ -711,7 +763,7 @@ namespace FusionIRC.Forms.Script
                 {
                     switch (file.Type)
                     {
-                        case ScriptFileNodeType.Variables:
+                        case ScriptType.Variables:
                             RebuildVariables(s);
                             break;
 
@@ -752,7 +804,6 @@ namespace FusionIRC.Forms.Script
             RebuildAllScripts();
             _tvFiles.RefreshObjects(_files);
             _tvFiles.SelectObject(_currentEditingScript);
-            _txtEdit.Focus();
         }
 
         private bool GetScriptFileIndexes(IList<ScriptData> list, ScriptData script, bool moveDown, out int index1, out int index2)
@@ -776,13 +827,14 @@ namespace FusionIRC.Forms.Script
         {
             /* Make sure to clone these lists back to master lists (adding of new files/renaming) */
             ScriptManager.AliasData = _aliases.Clone();
-            ScriptManager.PopupData = _popups.Clone();
+            ScriptManager.EventData = _events.Clone();
             /* Build script data */
-            ScriptManager.BuildScripts(ScriptManager.AliasData, ScriptManager.Aliases);
-            ScriptManager.BuildScripts(ScriptManager.PopupData, ScriptManager.Popups);
+            ScriptManager.BuildScripts(ScriptType.Aliases, ScriptManager.AliasData, ScriptManager.Aliases);
+            ScriptManager.BuildScripts(ScriptType.Events, ScriptManager.EventData, ScriptManager.Events);
             /* Update filesnames in settings */
             ScriptManager.BuildFileList(SettingsManager.Settings.Scripts.Aliases, ScriptManager.AliasData);
-            ScriptManager.BuildFileList(SettingsManager.Settings.Scripts.Popups, ScriptManager.PopupData);
+            ScriptManager.BuildFileList(SettingsManager.Settings.Scripts.Events, ScriptManager.EventData);
+            UpdateStatusInfo();
         }
 
         private static void RebuildVariables(ScriptData s)
@@ -808,42 +860,68 @@ namespace FusionIRC.Forms.Script
         }
 
         /* Helper methods */
-        private List<ScriptData> GetScriptListByType(ScriptFileNodeType type)
+        private void UpdateStatusInfo()
+        {
+            var r = _txtEdit.Selection;
+            var path = Functions.MainDir(string.Format(@"\scripts\{0}.xml", _currentEditingScript.Name), false);
+            _fileName.Text = string.Format("{0}", _currentEditingScript.ContentsChanged
+                                                      ? string.Format("* {0}",
+                                                                      path)
+                                                      : string.Format("{0}",
+                                                                      path));
+            _lineInfo.Text = string.Format("Line: {0}/{1}    Col: {2}", r.Start.Line + 1, _txtEdit.LinesCount, r.Start.Char);            
+            _editMode.Text = _txtEdit.IsReplaceMode ? "Overwrite" : "Insert";
+        }
+
+        private List<ScriptData> GetScriptListByType(ScriptType type)
         {
             switch (type)
             {
-                case ScriptFileNodeType.Aliases:
+                case ScriptType.Aliases:
                     return _aliases;
 
                 default:
-                    return _popups;
+                    return _events;
             }
         }
 
         private void SwitchEditingFile(ScriptData file)
         {
-            if (!_initialize && _currentEditingScript != null && _currentEditingScript.ContentsChanged)
+            if (!_initialize && _currentEditingScript != null)
             {
-                /* Make sure to dump contents of edit window text */
-                _currentEditingScript.RawScriptData = new List<string>(_txtEdit.Lines);
+                if (_currentEditingScript.ContentsChanged)
+                {
+                    /* Make sure to dump contents of edit window text */
+                    _currentEditingScript.RawScriptData = new List<string>(_txtEdit.Lines);
+                }
+                _currentEditingScript.TextRange = _txtEdit.Range.TextBox.VisibleRange;// new Range(_txtEdit, _txtEdit.VisibleRange.Start, _txtEdit.VisibleRange.End);
+                _currentEditingScript.SelectionStart = _txtEdit.SelectionStart;
             }
             if (file == null)
             {
                 return;
             }
             _fileChanged = true;
+            
             _txtEdit.Clear();
             _txtEdit.Text = string.Join(Environment.NewLine, file.RawScriptData);
             _currentEditingScript = file;
+            
             _txtEdit.Indent();
-            _txtEdit.Focus();
+            if (_currentEditingScript.TextRange != null)
+            {
+                System.Diagnostics.Debug.Print("here");
+                _txtEdit.Range.TextBox.DoRangeVisible(_currentEditingScript.TextRange);
+            }
+            _txtEdit.SelectionStart = _currentEditingScript.SelectionStart;
             SettingsManager.Settings.Editor.Last = file.Name;
             _fileChanged = false;
+
         }
 
-        private ScriptFileNodeType GetNodeType()
+        private ScriptType GetNodeType()
         {
-            var type = ScriptFileNodeType.Aliases;
+            var type = ScriptType.Aliases;
             var node = _tvFiles.SelectedObject;
             if (node != null)
             {
@@ -863,7 +941,7 @@ namespace FusionIRC.Forms.Script
             return type;
         }
 
-        private ScriptFileNodeType GetNodeTypeFromScript(ScriptData script)
+        private ScriptType GetNodeTypeFromScript(ScriptData script)
         {
             return (from file in _files from s in file.Data where s == script select file.Type).FirstOrDefault();
         }

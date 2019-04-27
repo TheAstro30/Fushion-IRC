@@ -4,9 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Controls.ControlBars;
@@ -70,10 +68,10 @@ namespace FusionIRC.Forms
             DccManager.Load();
             /* Load scripts */
             ScriptManager.LoadMultipleScripts(SettingsManager.Settings.Scripts.Aliases, ScriptManager.AliasData);
-            ScriptManager.LoadMultipleScripts(SettingsManager.Settings.Scripts.Popups, ScriptManager.PopupData);
+            ScriptManager.LoadMultipleScripts(SettingsManager.Settings.Scripts.Events, ScriptManager.EventData);
             /* Build script data */
-            ScriptManager.BuildScripts(ScriptManager.AliasData, ScriptManager.Aliases);
-            ScriptManager.BuildScripts(ScriptManager.PopupData, ScriptManager.Popups);
+            ScriptManager.BuildScripts(ScriptType.Aliases, ScriptManager.AliasData, ScriptManager.Aliases);
+            ScriptManager.BuildScripts(ScriptType.Events, ScriptManager.EventData, ScriptManager.Events);
             /* Load variables */
             ScriptManager.LoadVariables(Functions.MainDir(@"\scripts\variables.xml", false));
             /* Main form initialization */
@@ -176,7 +174,7 @@ namespace FusionIRC.Forms
             WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
             /* Create DCC file manager window */
             WindowManager.DccManagerWindow = new FrmDccManager();
-            _initialize = false;         
+            _initialize = false;
         }
 
         /* Overrides */

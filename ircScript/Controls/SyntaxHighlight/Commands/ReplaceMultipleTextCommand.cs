@@ -11,7 +11,6 @@
 //  Copyright (C) Pavel Torgashov, 2011-2016.
 using System;
 using System.Collections.Generic;
-using ircScript.Controls.SyntaxHighlight.Helpers;
 using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 using ircScript.Controls.SyntaxHighlight.Helpers.TextSource;
 
@@ -49,9 +48,11 @@ namespace ircScript.Controls.SyntaxHighlight.Commands
             for (var i = 0; i < _ranges.Count; i++)
             {
                 tb.Selection.Start = _ranges[i].ReplacedRange.Start;
-                for (var j = 0; j < _ranges[i].ReplaceText.Length; j++)
+                var j = 0;
+                while (j < _ranges[i].ReplaceText.Length)
                 {
                     tb.Selection.GoRight(true);
+                    j++;
                 }
                 ClearSelectedCommand.ClearSelected(TextSource);
                 var prevTextIndex = _ranges.Count - 1 - i;

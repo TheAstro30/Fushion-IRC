@@ -7,9 +7,9 @@ using System;
 using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Services;
 
-namespace ircCore.Utils.DirectX
+namespace ircCore.Utils.DirectX.Core
 {
-    public class DsBugWo
+    public class DsBugFix
     {
         /*
 	works:
@@ -19,7 +19,7 @@ namespace ircCore.Utils.DirectX
 	thus .NET 'Activator.CreateInstance' fails
 	*/
         [Flags]
-        internal enum CLSCTX
+        internal enum Clsctx
         {
             Inproc = 0x03,
             Server = 0x15,
@@ -29,7 +29,7 @@ namespace ircCore.Utils.DirectX
         public static object CreateDsInstance(ref Guid clsid, ref Guid riid)
         {
             IntPtr ptrIf;
-            var hr = CoCreateInstance(ref clsid, IntPtr.Zero, CLSCTX.Inproc, ref riid, out ptrIf);
+            var hr = CoCreateInstance(ref clsid, IntPtr.Zero, Clsctx.Inproc, ref riid, out ptrIf);
             if ((hr != 0) || (ptrIf == IntPtr.Zero))
             {
                 Marshal.ThrowExceptionForHR(hr);
@@ -43,7 +43,7 @@ namespace ircCore.Utils.DirectX
         }
 
         [DllImport("ole32.dll")]
-        private static extern int CoCreateInstance(ref Guid clsid, IntPtr pUnkOuter, CLSCTX dwClsContext, ref Guid iid,
+        private static extern int CoCreateInstance(ref Guid clsid, IntPtr pUnkOuter, Clsctx dwClsContext, ref Guid iid,
                                                    out IntPtr ptrIf);
     }
 }

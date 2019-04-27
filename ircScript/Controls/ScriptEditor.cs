@@ -9,7 +9,6 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using ircScript.Controls.SyntaxHighlight;
-using ircScript.Controls.SyntaxHighlight.Controls;
 using ircScript.Controls.SyntaxHighlight.Highlight;
 using ircScript.Controls.SyntaxHighlight.Styles;
 
@@ -19,7 +18,7 @@ namespace ircScript.Controls
     {
         private readonly Regex _commentPrefix = new Regex(@"//.*$", RegexOptions.Multiline | RegexOptions.Compiled);
 
-        private readonly Regex _keywordPrefix = new Regex(@"\b(alias|if|elseif|else|while|on)\b",
+        private readonly Regex _keywordPrefix = new Regex(@"\b(alias|if|elseif|else|while|on|return|break)\b",
                                                           RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private readonly Regex _commandPrefix = new Regex(@"\b(set|var|inc|dec|unset|echo)\b",
@@ -49,32 +48,13 @@ namespace ircScript.Controls
         public ScriptEditor()
         {
             Language = Language.Custom;
-
-            SyntaxHighlighter.CommentStyle = new TextStyle(Brushes.Green, null, FontStyle.Italic);
-
             Range.TextBox.CommentPrefix = "//";
-            Range.TextBox.LeftBracket = '(';
-            Range.TextBox.RightBracket = ')';
-            Range.TextBox.LeftBracket2 = '{';
-            Range.TextBox.RightBracket2 = '}';
-            Range.TextBox.BracketsHighlightStrategy = BracketsHighlightStrategy.Strategy2;
-            AutoIndent = false;
-            Cursor = Cursors.IBeam;
-            CommentPrefix = "//";
             HighlightingRangeType = HighlightingRangeType.VisibleRange;
             DelayedEventsInterval = 500;
             DelayedTextChangedInterval = 200;
-            DisabledColor = Color.FromArgb(100, 180, 180, 180);
-            SelectionColor = Color.FromArgb(50, 0, 0, 255);
-            Paddings = new Padding(0);
-            AutoScrollMinSize = new Size(375, 75);
-            BackBrush = null;
-            FoldingIndicatorColor = Color.Green;
-            HighlightFoldingIndicator = true;
-            LineNumberColor = Color.Teal;
-            SelectionHighlightingForLineBreaksEnabled = true;
             ShowScrollBars = true;
-
+            AutoIndent = false;
+            TabLength = 2;
             base.TextChanged += OnTextChanged;
             TextChangedDelayed += OnTextChangedDelayed;
         }
@@ -141,7 +121,7 @@ namespace ircScript.Controls
             Range.SetStyle(_keywordsStyle, _keywordPrefix);
             Range.SetStyle(_comment, _commentPrefix);
             Range.SetStyle(_commandStyle, _commandPrefix); 
-            foreach (var found in GetRanges(@"%\w+|\$\w+|:(?<range>\w+):|#"))
+            foreach (var found in GetRanges(@"%\w+|\$\w+|(?<range>\w+):|#"))
             {
                 switch (found.Text[0])
                 {
@@ -158,7 +138,7 @@ namespace ircScript.Controls
                         break;
 
                     default:
-                        /* on *:<x>:*:{ etc */
+                        /* on <x>:*:{ etc */
                         Range.SetStyle(_keywordsStyle, found.Text);
                         break;
                 }

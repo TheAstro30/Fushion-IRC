@@ -220,9 +220,8 @@ namespace ircScript.Controls.SyntaxHighlight.Helpers.TextSource
                     {
                         newLinePos.Add((int) tempFs.Length);
                         var sourceLine = ReadLine(sr, i); /* Read line from source file */
-                        string line;
                         var lineIsChanged = Lines[i] != null && Lines[i].IsChanged;
-                        line = lineIsChanged ? Lines[i].Text : sourceLine;
+                        string line = lineIsChanged ? Lines[i].Text : sourceLine;
                         /* Call event handler */
                         if (LinePushed != null)
                         {

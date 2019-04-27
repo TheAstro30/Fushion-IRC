@@ -15,11 +15,18 @@ namespace ircScript.Controls.SyntaxHighlight.Helpers
 {
     public struct Place : IEquatable<Place>
     {
-        public int Char;
-        public int Line ;
+        /* These fields changed to auto-properties as GetHashCode() will be
+         * returning hash codes of mutable objects instead of imutable. Changing
+         * to properties fixes this issue so GetHashCode will always return a
+         * unique hash code - Jason James Newland*/
+        public int Char { get; set; }
+        public int Line { get; set; }
 
-        public Place(int iChar, int iLine)
+        public Place(int iChar, int iLine) : this()
         {
+            /* Constructor changed to call default constructor [this()] first as
+             * you cannot set the following property values until all of it's fields
+             * are assigned to first (calling the default constructor) */
             Char = iChar;
             Line = iLine;
         }
@@ -41,7 +48,7 @@ namespace ircScript.Controls.SyntaxHighlight.Helpers
             {
                 return false;
             }
-            return obj is Place && Equals((Place) obj);
+            return obj is Place && Equals((Place)obj);
         }
 
         public override int GetHashCode()

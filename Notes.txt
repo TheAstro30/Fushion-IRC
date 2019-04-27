@@ -1,5 +1,14 @@
 April 23, 2019
 - Need to test libDirectX and make changes to depreciated methods (third party code)
-- Need to refactor/fix up all code/re-organize "SyntaxHighlight" folder for FastColoredTextBox (third party code) - complete 25/04/19
+- Need to refactor/fix up all code/re-organize "SyntaxHighlight" folder for FastColoredTextBox
+  (third party code) - complete 25/04/19
 - Need to fix paths in script editor for files (hard coded to \scripts\ <- needs to change)
 - Need to add a "Save As" option to script editor
+- Need to modify the "live" script data from two separate lists (Popups (which will
+  probably be changed now to "Events") and Aliases) to a single list (not using a Dictionary<Key, T>
+  as this only allows ONE unique key) referenced by ScriptFileNodeType (renamed to ScriptType). This will
+  mean that all scripts/aliases are in one location which will simply the editor code and script building code.
+  GetScript(string name) would be changed to GetScript(ScriptType type, name) when called. The only problem I'm going 
+  to have, is multiple scripts with the same "signature" (name). Eg: ON *:CONNECT:. All scripts would have to be executed
+  on that event, so would mean a loop ... aliases are a different matter.
+- Aliases also need to be checked as $identifiers with return values (TO DO) - that has been done, to a point 27/04/2019

@@ -7,7 +7,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace ircCore.Utils.DirectX
+namespace ircCore.Utils.DirectX.Core
 {
     [ComVisible(true), ComImport,
      Guid("6B652FFF-11FE-4fce-92AD-0266B5D7C78F"),

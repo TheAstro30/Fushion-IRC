@@ -83,6 +83,8 @@
     <Compile Include="Controls\FontComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\Rendering\CustomRenderer.cs" />
+    <Compile Include="Controls\Rendering\Renderer.cs" />
     <Compile Include="Dcc\DccManager.cs" />
     <Compile Include="Forms\FrmColorIndex.cs">
       <SubType>Form</SubType>
@@ -117,15 +119,16 @@
     </Compile>
     <Compile Include="Users\UserManager.cs" />
     <Compile Include="Users\UserList.cs" />
-    <Compile Include="Utils\DirectX\DsBugWo.cs" />
-    <Compile Include="Utils\DirectX\DsControl.cs" />
-    <Compile Include="Utils\DirectX\DsCore.cs" />
-    <Compile Include="Utils\DirectX\DsDevice.cs" />
-    <Compile Include="Utils\DirectX\DsDvd.cs" />
-    <Compile Include="Utils\DirectX\DsExtend.cs" />
-    <Compile Include="Utils\DirectX\DsUtils.cs" />
-    <Compile Include="Utils\DirectX\DsUuids.cs" />
-    <Compile Include="Utils\DirectX\QEdit.cs" />
+    <Compile Include="Utils\DirectX\Sound.cs" />
+    <Compile Include="Utils\DirectX\Core\DsBugFix.cs" />
+    <Compile Include="Utils\DirectX\Core\DsControl.cs" />
+    <Compile Include="Utils\DirectX\Core\DsCore.cs" />
+    <Compile Include="Utils\DirectX\Core\DsDevice.cs" />
+    <Compile Include="Utils\DirectX\Core\DsDvd.cs" />
+    <Compile Include="Utils\DirectX\Core\DsExtend.cs" />
+    <Compile Include="Utils\DirectX\Core\DsUtils.cs" />
+    <Compile Include="Utils\DirectX\Core\DsUuids.cs" />
+    <Compile Include="Utils\DirectX\Core\QEdit.cs" />
     <Compile Include="Utils\DnsResult.cs" />
     <Compile Include="Utils\Functions.cs" />
     <Compile Include="Utils\ListExtensions.cs" />

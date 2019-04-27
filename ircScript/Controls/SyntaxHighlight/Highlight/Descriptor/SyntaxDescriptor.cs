@@ -11,7 +11,6 @@
 //  Copyright (C) Pavel Torgashov, 2011-2016.
 using System.Collections.Generic;
 using System;
-using ircScript.Controls.SyntaxHighlight.Helpers;
 using ircScript.Controls.SyntaxHighlight.Styles;
 
 namespace ircScript.Controls.SyntaxHighlight.Highlight.Descriptor

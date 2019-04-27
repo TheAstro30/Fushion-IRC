@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using FusionIRC.Forms.Child;
 using FusionIRC.Helpers;
+using ircCore.Controls.Rendering;
 using ircCore.Forms;
 using ircCore.Settings.Networks;
 using ircCore.Settings.Theming;
@@ -25,7 +26,9 @@ namespace FusionIRC.Controls.ControlBars
         public MenubarControl(Form owner)
         {
             _owner = owner;
+            var renderer = new CustomRenderer(new Renderer());
             RenderMode = ToolStripRenderMode.Professional;
+            Renderer = renderer;
             GripStyle = ToolStripGripStyle.Visible;
             Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Tag = "MENUBAR";

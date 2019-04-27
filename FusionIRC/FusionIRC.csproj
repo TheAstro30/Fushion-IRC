@@ -273,6 +273,9 @@
     <None Include="Icons\Dialog\codeFile.ico" />
     <None Include="Icons\Dialog\codeHeader.ico" />
     <None Include="Icons\Dialog\aliasEditor.ico" />
+    <None Include="Icons\Dialog\editFile.ico" />
+    <None Include="Icons\Dialog\editLines.ico" />
+    <None Include="Icons\Dialog\editReplace.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

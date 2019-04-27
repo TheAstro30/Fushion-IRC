@@ -8,8 +8,9 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 
-namespace ircCore.Utils.DirectX
+namespace ircCore.Utils.DirectX.Core
 {
     [ComVisible(false)]
     public class DsUtils
@@ -22,7 +23,6 @@ namespace ircCore.Utils.DirectX
         public static bool ShowCapPinDialog(ICaptureGraphBuilder2 bld, IBaseFilter flt, IntPtr hwnd)
         {
             object comObj = null;
-            ISpecifyPropertyPages spec;
             var cauuid = new DsCauuid();
             try
             {
@@ -39,7 +39,7 @@ namespace ircCore.Utils.DirectX
                         return false;
                     }
                 }
-                spec = comObj as ISpecifyPropertyPages;
+                var spec = comObj as ISpecifyPropertyPages;
                 if (spec == null)
                     return false;
 
@@ -69,7 +69,6 @@ namespace ircCore.Utils.DirectX
         public static bool ShowTunerPinDialog(ICaptureGraphBuilder2 bld, IBaseFilter flt, IntPtr hwnd)
         {
             object comObj = null;
-            ISpecifyPropertyPages spec;
             var cauuid = new DsCauuid();
             try
             {
@@ -86,7 +85,7 @@ namespace ircCore.Utils.DirectX
                         return false;
                     }
                 }
-                spec = comObj as ISpecifyPropertyPages;
+                var spec = comObj as ISpecifyPropertyPages;
                 if (spec == null)
                 {
                     return false;
@@ -201,8 +200,8 @@ namespace ircCore.Utils.DirectX
         public static bool AddGraphToRot(object graph, out int cookie)
         {
             cookie = 0;
-            UCOMIRunningObjectTable rot = null;
-            UCOMIMoniker mk = null;
+            IRunningObjectTable rot = null;
+            IMoniker mk = null;
             try
             {
                 var hr = GetRunningObjectTable(0, out rot);
@@ -220,7 +219,7 @@ namespace ircCore.Utils.DirectX
                 {
                     Marshal.ThrowExceptionForHR(hr);
                 }
-                rot.Register(RotflagsRegistrationkeepsalive, graph, mk, out cookie);
+                rot.Register(RotflagsRegistrationkeepsalive, graph, mk);
                 return true;
             }
             catch (Exception)
@@ -242,7 +241,7 @@ namespace ircCore.Utils.DirectX
 
         public static bool RemoveGraphFromRot(ref int cookie)
         {
-            UCOMIRunningObjectTable rot = null;
+            IRunningObjectTable rot = null;
             try
             {
                 var hr = GetRunningObjectTable(0, out rot);
@@ -268,10 +267,10 @@ namespace ircCore.Utils.DirectX
         }
 
         [DllImport("ole32.dll", ExactSpelling = true)]
-        private static extern int GetRunningObjectTable(int r, out UCOMIRunningObjectTable pprot);
+        private static extern int GetRunningObjectTable(int r, out IRunningObjectTable pprot);
 
         [DllImport("ole32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        private static extern int CreateItemMoniker(string delim, string item, out UCOMIMoniker ppmk);
+        private static extern int CreateItemMoniker(string delim, string item, out IMoniker ppmk);
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
         private static extern int GetCurrentProcessId();
@@ -298,7 +297,7 @@ namespace ircCore.Utils.DirectX
     {
         public DsOptInt64(long value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         public long Value;

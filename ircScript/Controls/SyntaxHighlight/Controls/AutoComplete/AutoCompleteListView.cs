@@ -378,11 +378,10 @@ namespace ircScript.Controls.SyntaxHighlight.Controls.AutoComplete
             var finishI = (VerticalScroll.Value + ClientSize.Height)/itemHeight + 1;
             startI = Math.Max(startI, 0);
             finishI = Math.Min(finishI, VisibleItems.Count);
-            int y;
             const int leftPadding = 18;
             for (var i = startI; i < finishI; i++)
             {
-                y = i*itemHeight - VerticalScroll.Value;
+                int y = i*itemHeight - VerticalScroll.Value;
                 var item = VisibleItems[i];
                 if (item.BackColor != Color.Transparent)
                 {

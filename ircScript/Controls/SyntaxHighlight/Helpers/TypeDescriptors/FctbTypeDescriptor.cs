@@ -9,7 +9,10 @@
 //  Email: pavel_torgashov@ukr.net
 //
 //  Copyright (C) Pavel Torgashov, 2011-2016.
+
+using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace ircScript.Controls.SyntaxHighlight.Helpers.TypeDescriptors
@@ -32,10 +35,14 @@ namespace ircScript.Controls.SyntaxHighlight.Helpers.TypeDescriptors
         public override EventDescriptorCollection GetEvents()
         {
             var coll = base.GetEvents();
+            if (coll == null)
+            {
+                throw new NullReferenceException();
+            }
             var list = new EventDescriptor[coll.Count];
             for (var i = 0; i < coll.Count; i++)
             {
-                if (coll[i].Name == "TextChanged")//instead of TextChanged slip BindingTextChanged for binding
+                if (coll[i].Name == "TextChanged") /* instead of TextChanged slip BindingTextChanged for binding */
                 {
                     list[i] = new FooTextChangedDescriptor(coll[i]);
                 }

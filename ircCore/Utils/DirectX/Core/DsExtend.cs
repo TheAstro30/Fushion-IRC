@@ -7,7 +7,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace ircCore.Utils.DirectX
+namespace ircCore.Utils.DirectX.Core
 {
     [ComVisible(true), ComImport,
      Guid("93E5A4E0-2D50-11d2-ABFA-00A0C9C6E38D"),
@@ -242,25 +242,25 @@ namespace ircCore.Utils.DirectX
     public interface IAMTuner
     {
         [PreserveSig]
-        int put_Channel(int lChannel, AmTunerSubChannel lVideoSubChannel, AmTunerSubChannel lAudioSubChannel);
+        int SetChannel(int lChannel, AmTunerSubChannel lVideoSubChannel, AmTunerSubChannel lAudioSubChannel);
 
         [PreserveSig]
-        int get_Channel(out int plChannel, out int plVideoSubChannel, out int plAudioSubChannel);
+        int GetChannel(out int plChannel, out int plVideoSubChannel, out int plAudioSubChannel);
 
         [PreserveSig]
         int ChannelMinMax(out int lChannelMin, out int lChannelMax);
 
         [PreserveSig]
-        int put_CountryCode(int lCountryCode);
+        int SetCountryCode(int lCountryCode);
 
         [PreserveSig]
-        int get_CountryCode(out int plCountryCode);
+        int GetCountryCode(out int plCountryCode);
 
         [PreserveSig]
-        int put_TuningSpace(int lTuningSpace);
+        int SetTuningSpace(int lTuningSpace);
 
         [PreserveSig]
-        int get_TuningSpace(out int plTuningSpace);
+        int GetTuningSpace(out int plTuningSpace);
 
         [PreserveSig]
         int Logon(IntPtr hCurrentUser);
@@ -272,10 +272,10 @@ namespace ircCore.Utils.DirectX
         int SignalPresent(out AmTunerSignalStrength plSignalStrength);
 
         [PreserveSig]
-        int put_Mode(AmTunerModeType lMode);
+        int SetMode(AmTunerModeType lMode);
 
         [PreserveSig]
-        int get_Mode(out AmTunerModeType plMode);
+        int GetMode(out AmTunerModeType plMode);
 
         [PreserveSig]
         int GetAvailableModes(out AmTunerModeType plModes);
@@ -335,25 +335,25 @@ namespace ircCore.Utils.DirectX
     public interface IAMTVTuner
     {
         [PreserveSig]
-        int put_Channel(int lChannel, AmTunerSubChannel lVideoSubChannel, AmTunerSubChannel lAudioSubChannel);
+        int SetChannel(int lChannel, AmTunerSubChannel lVideoSubChannel, AmTunerSubChannel lAudioSubChannel);
 
         [PreserveSig]
-        int get_Channel(out int plChannel, out int plVideoSubChannel, out int plAudioSubChannel);
+        int GetChannel(out int plChannel, out int plVideoSubChannel, out int plAudioSubChannel);
 
         [PreserveSig]
         int ChannelMinMax(out int lChannelMin, out int lChannelMax);
 
         [PreserveSig]
-        int put_CountryCode(int lCountryCode);
+        int SetCountryCode(int lCountryCode);
 
         [PreserveSig]
-        int get_CountryCode(out int plCountryCode);
+        int GetCountryCode(out int plCountryCode);
 
         [PreserveSig]
-        int put_TuningSpace(int lTuningSpace);
+        int SetTuningSpace(int lTuningSpace);
 
         [PreserveSig]
-        int get_TuningSpace(out int plTuningSpace);
+        int GetTuningSpace(out int plTuningSpace);
 
         [PreserveSig]
         int Logon(IntPtr hCurrentUser);
@@ -365,10 +365,10 @@ namespace ircCore.Utils.DirectX
         int SignalPresent(out AmTunerSignalStrength plSignalStrength);
 
         [PreserveSig]
-        int put_Mode(AmTunerModeType lMode);
+        int SetMode(AmTunerModeType lMode);
 
         [PreserveSig]
-        int get_Mode(out AmTunerModeType plMode);
+        int GetMode(out AmTunerModeType plMode);
 
         [PreserveSig]
         int GetAvailableModes(out AmTunerModeType plModes);
@@ -380,10 +380,10 @@ namespace ircCore.Utils.DirectX
         int UnRegisterNotificationCallBack(IAMTunerNotification pNotify);
 
         [PreserveSig]
-        int get_AvailableTVFormats(out AnalogVideoStandard lAnalogVideoStandard);
+        int GetAvailableTVFormats(out AnalogVideoStandard lAnalogVideoStandard);
 
         [PreserveSig]
-        int get_TVFormat(out AnalogVideoStandard lAnalogVideoStandard);
+        int GetTVFormat(out AnalogVideoStandard lAnalogVideoStandard);
 
         [PreserveSig]
         int AutoTune(int lChannel, out int plFoundSignal);
@@ -392,24 +392,24 @@ namespace ircCore.Utils.DirectX
         int StoreAutoTune();
 
         [PreserveSig]
-        int get_NumInputConnections(out int plNumInputConnections);
+        int GetNumInputConnections(out int plNumInputConnections);
 
         [PreserveSig]
-        int put_InputType(int lIndex, TunerInputType inputType);
+        int SetInputType(int lIndex, TunerInputType inputType);
 
         [PreserveSig]
-        int get_InputType(int lIndex, out TunerInputType inputType);
+        int GetInputType(int lIndex, out TunerInputType inputType);
 
         [PreserveSig]
-        int put_ConnectInput(int lIndex);
+        int SetConnectInput(int lIndex);
 
         [PreserveSig]
-        int get_ConnectInput(out int lIndex);
+        int GetConnectInput(out int lIndex);
 
         [PreserveSig]
-        int get_VideoFrequency(out int lFreq);
+        int GetVideoFrequency(out int lFreq);
 
         [PreserveSig]
-        int get_AudioFrequency(out int lFreq);
+        int GetAudioFrequency(out int lFreq);
     }
 }
