@@ -145,10 +145,11 @@ namespace ircScript
                                 /* Look for next space */
                                 i = lineData.IndexOf(' ');
                                 if (i == -1)
-                                {                                    
+                                {                 
                                     continue; /* Ignore this line as it's invalid */
                                 }
                                 name = lineData.Substring(0, i).TrimEnd().Replace("/", "");
+                                lineData = lineData.Substring(i + 1);
                             }
                             break;
 

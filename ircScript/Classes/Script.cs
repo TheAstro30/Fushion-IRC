@@ -28,28 +28,40 @@ namespace ircScript.Classes
         public event Action<Script> ParseCompleted;
 
         /* Main entry point */
-        public void Parse(ScriptArgs e, string[] args)
+        public string Parse(ScriptArgs e, string[] args)
         {
             /* Make sure local variables are empty on each call of this script */
             _localVariables = new ScriptVariables();
             var parser = new ScriptParser(_localVariables);
             var conditional = new ScriptConditionalParser();
             var br = false;
+            var finalResult = string.Empty;
             /* Parse each line - conditions then finally check for return/break */
-            foreach (var line in from line in LineData let parsed = parser.Parse(e, line, args) where conditional.Parse(parsed) select line)
+            //foreach (var line in from line in LineData let parsed = parser.Parse(e, line, args) where conditional.Parse(parsed) select line)
+            //{
+            foreach (var line in LineData)
             {
+                var parsed = parser.Parse(e, line, args);
+                /* Now parse everything else (if, etc) */
+                if (conditional.Parse(parsed))
+                {
+                    if (LineParsed != null)
+                    {
+                        LineParsed(this, e, parsed);
+                    }
+                }
                 string com;
-                var l = parser.Parse(e, line, args);
+                //var l = parser.Parse(e, line, args);
                 var arg = string.Empty;
-                var i = l.IndexOf(' ');
+                var i = parsed.IndexOf(' ');
                 if (i != -1)
                 {
-                    com = l.Substring(0, i);
-                    arg = l.Substring(i + 1);                        
+                    com = parsed.Substring(0, i);
+                    arg = parsed.Substring(i + 1);                        
                 }
                 else
                 {
-                    com = l;
+                    com = parsed;
                 }                
                 switch (com.ToUpper())
                 {
@@ -64,14 +76,15 @@ namespace ircScript.Classes
                         {
                             ParseCompleted(this);
                         }
-                        return;
+                        return string.Empty;
 
                     default:
-                        arg = l; /* Set line back to original parsed line to continue processing */
+                        arg = parsed; /* Set line back to original parsed line to continue processing */
                         break;
                 }
                 /* Raise event with resultant output */
-                if (LineParsed != null)
+                finalResult = arg;
+                if (LineParsed != null && !string.IsNullOrEmpty(arg))
                 {
                     LineParsed(this, e, arg);
                 }
@@ -86,6 +99,7 @@ namespace ircScript.Classes
                 ParseCompleted(this);
             }
             /* Short, but sweet :P */
+            return finalResult;
         }
     }
 }

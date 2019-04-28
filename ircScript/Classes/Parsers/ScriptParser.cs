@@ -16,8 +16,9 @@ namespace ircScript.Classes.Parsers
         private readonly Regex _multiArgs = new Regex(@"\$\d+-", RegexOptions.Compiled); /* Replaces $[N]- */
 
         private readonly ScriptIdentifierParser _identifier = new ScriptIdentifierParser();
+        private readonly ScriptVariableParser _variables = new ScriptVariableParser();
 
-        private ScriptVariables _localVariables;
+        private readonly ScriptVariables _localVariables;
 
         internal ScriptParser(ScriptVariables localVariables)
         {
@@ -25,14 +26,16 @@ namespace ircScript.Classes.Parsers
         }
         
         internal string Parse(ScriptArgs e, string lineData, string[] args)
-        {            
-            /* Main script "parser" - mainly for parsing arguments - first check ScriptArgs */
-            lineData = _identifier.Parse(e, lineData);
-            /* Replace $[N]- tokens first */
+        {
+            System.Diagnostics.Debug.Print("CURRENT LINE PARSING: " + lineData);
+            /* Main script "parser" - mainly for parsing arguments - replace $[N]- tokens first */
             lineData = ReplaceTokens(_multiArgs, lineData, args, true);
             /* Replace $1, $2 etc */
             lineData = ReplaceTokens(_singleArgs, lineData, args, false);
             /* Next thing to do would be to process local and global variables... */
+            lineData = _variables.Parse(_localVariables, lineData);
+            /* Parse $id (like $chan, $nick via ScriptArgs including looking for $alias */
+            lineData = _identifier.Parse(e, lineData);            
             return lineData;
         }
 
@@ -54,7 +57,7 @@ namespace ircScript.Classes.Parsers
                             index = 0;
                         }
                         sb.Replace(m[i].Value,
-                                   args.Length > 0 && args.Length - (index - 1) > 0
+                                   args != null && args.Length > 0 && args.Length - (index - 1) > 0
                                        ? string.Join(" ", args, index - 1, args.Length - (index - 1))
                                        : "");
                     }
@@ -65,7 +68,7 @@ namespace ircScript.Classes.Parsers
                         {
                             index = 0;
                         }
-                        sb.Replace(m[i].Value, index - 1 < args.Length ? args[index - 1] : "");
+                        sb.Replace(m[i].Value, args != null && index - 1 < args.Length ? args[index - 1] : "");                        
                     }
                 }                
                 return sb.ToString();

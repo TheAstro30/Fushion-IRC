@@ -264,7 +264,7 @@ namespace FusionIRC.Forms.Script
             _variables = new ScriptData
                              {
                                  Name = "%variables",
-                                 RawScriptData = ScriptManager.Variables.Variable.Select(data => data.ToString()).ToList()
+                                 //RawScriptData = ScriptManager.Variables.Variable.Select(data => data.ToString()).ToList()
                              };
             _varNode = new ScriptFileNode
                            {
@@ -902,11 +902,15 @@ namespace FusionIRC.Forms.Script
                 return;
             }
             _fileChanged = true;
-            
-            _txtEdit.Clear();
-            _txtEdit.Text = string.Join(Environment.NewLine, file.RawScriptData);
             _currentEditingScript = file;
-            
+            if (_currentEditingScript.Name == "%variables")
+            {
+                /* Make sure to get an updated version of this list */
+                _currentEditingScript.RawScriptData =
+                    ScriptManager.Variables.Variable.Select(data => data.ToString()).ToList();
+            }
+            _txtEdit.Clear();
+            _txtEdit.Text = string.Join(Environment.NewLine, file.RawScriptData);                        
             _txtEdit.Indent();
             if (_currentEditingScript.TextRange != null)
             {

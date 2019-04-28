@@ -922,7 +922,7 @@ namespace ircScript.Controls.SyntaxHighlight
                 var line = _lines[iLine];
                 var lineInfo = LineInfos[iLine];
                 if (lineInfo.StartY > VerticalScroll.Value + ClientSize.Height)
-                {
+                {                    
                     break;
                 }
                 if (lineInfo.StartY + lineInfo.WordWrapStringsCount * CharHeight < VerticalScroll.Value || lineInfo.VisibleState == VisibleState.Hidden)
@@ -3326,7 +3326,7 @@ namespace ircScript.Controls.SyntaxHighlight
             range.Normalize();
             range.End = new Place(range.End.Char,
                                   Math.Min(range.End.Line, range.Start.Line + ClientSize.Height / CharHeight));
-            if (LineInfos[range.End.Line].VisibleState != VisibleState.Visible)
+            if (range.End.Line <= LineInfos.Count - 1 && LineInfos[range.End.Line].VisibleState != VisibleState.Visible)
             {
                 ExpandBlock(range.End.Line);
             }
@@ -3335,6 +3335,7 @@ namespace ircScript.Controls.SyntaxHighlight
                 ExpandBlock(range.Start.Line);
             }
             Recalc();
+            
             var h = (1 + range.End.Line - range.Start.Line) * CharHeight;
             var p = PlaceToPoint(new Place(0, range.Start.Line));
             if (tryToCentre)
