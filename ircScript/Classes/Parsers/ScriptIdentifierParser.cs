@@ -4,9 +4,12 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using ircCore.Utils;
+using ircScript.Classes.ScriptFunctions;
 using ircScript.Classes.Structures;
 
 namespace ircScript.Classes.Parsers
@@ -44,35 +47,42 @@ namespace ircScript.Classes.Parsers
                     else
                     {
                         /* Replace identifiers from the values in ScriptArgs */
-                        switch (m[i].Value.ToUpper())
-                        {
-                            case "$ME":
-                                sb.Replace(m[i].Value, e.ClientConnection.UserInfo.Nick, m[i].Index, m[i].Value.Length);
-                                break;
-
-                            case "$CHAN":
-                                sb.Replace(m[i].Value, e.Channel, m[i].Index, m[i].Value.Length);
-                                break;
-
-                            case "$NICK":
-                                sb.Replace(m[i].Value, e.Nick, m[i].Index, m[i].Value.Length);
-                                break;
-
-                            default:
-                                /* Check if it's an alias */
-                                var script = ScriptManager.GetScript(ScriptManager.Aliases, m[i].Value.Replace("$", ""));
-                                var rec = string.Empty;
-                                if (script != null)
-                                {
-                                   rec = script.Parse(e, null); /* Args aren't required here */
-                                }
-                                sb.Replace(m[i].Value, rec);
-                                break;
-                        }
+                        sb.Replace(m[i].Value, ParseSingleIdentifier(e, m[i].Value));
                     }
                 }
             }
             return sb.ToString(); 
+        }
+
+        private string ParseSingleIdentifier(ScriptArgs e, string value)
+        {
+            switch (value.ToUpper())
+            {
+                case "$ME":
+                    return e.ClientConnection.UserInfo.Nick;
+
+                case "$CHAN":
+                    return e.Channel;
+
+                case "$NICK":
+                    return e.Nick;
+
+                default:
+                    /* Check if it's an alias */
+                    var id = value.Replace("$", "");
+                    var script = ScriptManager.GetScript(ScriptManager.Aliases, id);
+                    string rec;
+                    if (script != null)
+                    {
+                        rec = script.Parse(e, null); /* Args aren't required here */
+                    }
+                    else
+                    {
+                        /* Internal identifier? */
+                        rec = ParseInternalIdentifier(e, id.ToUpper(), null);
+                    }
+                    return rec;
+            }
         }
 
         private string ParseParenthisis(ScriptArgs e, string line)
@@ -82,7 +92,7 @@ namespace ircScript.Classes.Parsers
             if (part.Count > 0)
             {
                 foreach (Match pt in part)
-                {
+                {                    
                     sb.Replace(pt.Value, ParseIdentifierArgs(e, pt.Value));
                 }
             }
@@ -114,15 +124,63 @@ namespace ircScript.Classes.Parsers
                 }
                 /* Check if it's an alias */
                 var script = ScriptManager.GetScript(ScriptManager.Aliases, p.Id);
-                rec = script != null ? script.Parse(e, rec.Split(new[] {','})) : ParseInternalIdentifier(p.Id, rec);
+                rec = script != null ? script.Parse(e, rec.Split(new[] {','})) : ParseInternalIdentifier(e, p.Id.ToUpper(), rec);
             }
             /* Return final result */
             return rec;
         }
 
-        private string ParseInternalIdentifier(string id, string args)
+        private string ParseInternalIdentifier(ScriptArgs e, string id, string args)
         {
-            return "N/A";
+            var argList = new string[1]; /* At least ONE argument */
+            int i;
+            if (!string.IsNullOrEmpty(args))
+            {
+                argList = args.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+                if (args.Length > 0)
+                {
+                    for (i = 0; i <= argList.Length - 1; i++)
+                    {
+                        if (argList[i][0] == '$')
+                        {
+                            /* Unfortunately, this is how regex works ... need to call this "twice" (once from main
+                             * parse routine of this file, and once here */
+                            argList[i] = ParseSingleIdentifier(e, argList[i].Replace("$", ""));
+                            
+                        }
+                        argList[i] = argList[i];
+                    }
+                }
+            }
+            switch (id)
+            {
+                case "ASCTIME":
+                    return TimeFunctions.FormatAsciiTime(argList[0], argList.Length > 1 ? argList[1] : null);
+
+                case "CTIME":
+                    return TimeFunctions.CTime();
+
+                case "DURATION":
+                    int.TryParse(argList[0], out i);
+                    return TimeFunctions.GetDuration(i, false);
+
+                case "CHR":
+                    /* Not sure yet if this is desired behaviour */
+                    return int.TryParse(argList[0], out i) ? ((char) i).ToString() : string.Empty;
+
+                case "GETTOK":
+                    /* $gettok(string,position,char) */
+                    return argList.Length == 3 ? Tokens.ScriptGetToken(argList) : string.Empty;
+
+                case "ADDTOK":
+                    /* $addtok(string,newtoken,char) */
+                    return argList.Length == 3 ? Tokens.ScriptAddToken(argList) : string.Empty;
+
+                case "DELTOK":
+                    /* $deltok(string,[N-N2],char) */
+                    return argList.Length == 3 ? Tokens.ScriptDelToken(argList) : argList[0];
+            }
+            return string.Empty;
         }
     }
 }

@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using ircCore.Utils;
-using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 
 namespace ircScript.Classes.Structures
 {
@@ -21,13 +20,10 @@ namespace ircScript.Classes.Structures
         public List<string> RawScriptData = new List<string>();
 
         [XmlIgnore]
-        public bool ContentsChanged { get; set; }
+        public bool ContentsChanged { get; set; } /* Used for editor display purposes only */
 
         [XmlIgnore]
-        public Range TextRange { get; set; }
-
-        [XmlIgnore]
-        public int SelectionStart { get; set; }
+        public int SelectionStart { get; set; } /* Used for editor display purposes only */
 
         public ScriptData Clone()
         {

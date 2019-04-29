@@ -193,7 +193,7 @@ namespace ircScript.Classes.Parsers
                 args[1] = ((char)0).ToString(CultureInfo.InvariantCulture);
             }
             /* Process operands */
-            return ParseOperand(operAnd, args[0].Replace((char)7, (char)32), args[1].Replace((char)7, (char)32));
+            return ParseOperand(operAnd, args[0], args[1]);
         }
 
         private bool ParseAndOr(string andOr, string scriptLine)

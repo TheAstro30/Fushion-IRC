@@ -21,7 +21,9 @@ namespace ircScript.Classes.Structures
 
         public override string ToString()
         {
-            return string.Format("{0}={1}", Name, Value);
+            return !string.IsNullOrEmpty(Name)
+                       ? string.Format("{0}={1}", Name, Value)
+                       : string.Empty;
         }
     }
 
@@ -36,7 +38,7 @@ namespace ircScript.Classes.Structures
             return Variable.FirstOrDefault(v => v.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         }        
 
-        public void Increment(ScriptVariable v)
+        public void Increment(ScriptVariable v, int value)
         {
             if (v == null)
             {
@@ -48,11 +50,11 @@ namespace ircScript.Classes.Structures
             {
                 return;
             }
-            i++;
+            i += value;
             v.Value = i.ToString();
         }
 
-        public void Decrement(ScriptVariable v)
+        public void Decrement(ScriptVariable v, int value)
         {
             if (v == null)
             {
@@ -64,7 +66,7 @@ namespace ircScript.Classes.Structures
             {
                 return;
             }
-            i--;
+            i -= value;
             v.Value = i.ToString();
         }
     }

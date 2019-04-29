@@ -23,13 +23,6 @@ namespace ircCore.Utils
             return Epoch(DateTime.Now).ToString(CultureInfo.InvariantCulture);
         }
 
-        private static uint Epoch(DateTime fromDate)
-        {
-            var baseDate = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-            var span = fromDate.ToUniversalTime() - baseDate;
-            return (uint)span.TotalSeconds;
-        }
-
         public static string FormatTimeStamp(DateTime date, string timeStamp)
         {
             /* Replace invalid chars (fixed again 9 July, 2010 : refactored 2017) */
@@ -75,6 +68,13 @@ namespace ircCore.Utils
         {
             int i;
             return int.TryParse(value, out i) ? i : 0;
+        }
+
+        private static uint Epoch(DateTime fromDate)
+        {
+            var baseDate = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            var span = fromDate.ToUniversalTime() - baseDate;
+            return (uint)span.TotalSeconds;
         }
     }
 }

@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\ScriptFunctions\Tokens.cs" />
     <Compile Include="Classes\Parsers\ScriptVariableParser.cs" />
     <Compile Include="Classes\Structures\ScriptEventParams.cs" />
     <Compile Include="Classes\Structures\ScriptFileNode.cs" />

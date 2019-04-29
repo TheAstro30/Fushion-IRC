@@ -27,7 +27,16 @@ namespace ircScript.Classes
         public event Action<Script, ScriptArgs, string> LineParsed;
         public event Action<Script> ParseCompleted;
 
-        /* Main entry point */
+        /* Main entry point - this method can be used 2 ways
+         * 1) Directly to return a value, or
+         * 2) Event based.
+         * The reason for this design was so the CommandProcessor of the main client didn't look huge 
+         * with a shit load of code for "is this an alias, OK, get return value, pass it back to
+         * CommandProcessor...", it just looks more tidy if this method raised events.
+         * However, calling this as a $alias, for instance, events won't work (well, they will
+         * but the code looks messy as SHIT) - so, having a direct return value option is a better
+         * solution in that instance.
+         */
         public string Parse(ScriptArgs e, string[] args)
         {
             /* Make sure local variables are empty on each call of this script */
@@ -37,36 +46,25 @@ namespace ircScript.Classes
             var br = false;
             var finalResult = string.Empty;
             /* Parse each line - conditions then finally check for return/break */
-            //foreach (var line in from line in LineData let parsed = parser.Parse(e, line, args) where conditional.Parse(parsed) select line)
-            //{
-            foreach (var line in LineData)
+            foreach (var parsed in LineData.Select(line => parser.Parse(e, line, args)).Where(conditional.Parse))
             {
-                var parsed = parser.Parse(e, line, args);
                 /* Now parse everything else (if, etc) */
-                if (conditional.Parse(parsed))
-                {
-                    if (LineParsed != null)
-                    {
-                        LineParsed(this, e, parsed);
-                    }
-                }
                 string com;
-                //var l = parser.Parse(e, line, args);
                 var arg = string.Empty;
                 var i = parsed.IndexOf(' ');
                 if (i != -1)
                 {
                     com = parsed.Substring(0, i);
-                    arg = parsed.Substring(i + 1);                        
+                    arg = parsed.Substring(i + 1);
                 }
                 else
                 {
                     com = parsed;
-                }                
+                }
                 switch (com.ToUpper())
                 {
-                    case "RETURN":                    
-                        /* Execution of this script stops here */   
+                    case "RETURN":
+                        /* Execution of this script stops here */
                         br = true;
                         break;
 

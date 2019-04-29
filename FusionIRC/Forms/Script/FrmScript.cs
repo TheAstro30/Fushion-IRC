@@ -73,6 +73,7 @@ namespace FusionIRC.Forms.Script
                            Renderer = renderer,
                            Size = new Size(496, 24),
                            GripStyle = ToolStripGripStyle.Visible,
+                           ShowItemToolTips = true,
                            TabIndex = 3
                        };
             /* File menu */
@@ -104,20 +105,27 @@ namespace FusionIRC.Forms.Script
             /* Edit menu */
             _mnuEdit = new ToolStripMenuItem { Size = new Size(39, 20), Text = @"&Edit" };
             _mnuEdit.DropDownItems.AddRange(new ToolStripItem[]
-                                               {
-                                                   new ToolStripMenuItem("Undo", null, MenuItemOnClick,
-                                                                         Keys.Control | Keys.Z),
-                                                   new ToolStripMenuItem("Redo", null, MenuItemOnClick,
-                                                                         Keys.Control | Keys.Y),
-                                                   new ToolStripSeparator(),
-                                                   new ToolStripMenuItem("Cut", null, MenuItemOnClick,
-                                                                         Keys.Control | Keys.X),
-                                                   new ToolStripMenuItem("Copy", null, MenuItemOnClick,
-                                                                         Keys.Control | Keys.C),
-                                                   new ToolStripMenuItem("Paste", null, MenuItemOnClick,
-                                                                         Keys.Control | Keys.V),
-                                                   new ToolStripMenuItem("Delete", null, MenuItemOnClick, Keys.None)
-                                               });
+                                                {
+                                                    new ToolStripMenuItem("Undo", null, MenuItemOnClick,
+                                                                          Keys.Control | Keys.Z),
+                                                    new ToolStripMenuItem("Redo", null, MenuItemOnClick,
+                                                                          Keys.Control | Keys.Y),
+                                                    new ToolStripSeparator(),
+                                                    new ToolStripMenuItem("Cut", null, MenuItemOnClick,
+                                                                          Keys.Control | Keys.X),
+                                                    new ToolStripMenuItem("Copy", null, MenuItemOnClick,
+                                                                          Keys.Control | Keys.C),
+                                                    new ToolStripMenuItem("Paste", null, MenuItemOnClick,
+                                                                          Keys.Control | Keys.V),
+                                                    new ToolStripMenuItem("Delete", null, MenuItemOnClick, Keys.None),
+                                                    new ToolStripSeparator(),
+                                                    new ToolStripMenuItem("Find", null, MenuItemOnClick,
+                                                                          Keys.Control | Keys.F),
+                                                    new ToolStripMenuItem("Replace", null, MenuItemOnClick,
+                                                                          Keys.Control | Keys.H),
+                                                    new ToolStripMenuItem("Go To Line", null, MenuItemOnClick,
+                                                                          Keys.Control | Keys.G)
+                                                });
             /* View menu */
             _mnuView = new ToolStripMenuItem { Size = new Size(39, 20), Text = @"&View" };
             _mnuView.DropDownItems.AddRange(new ToolStripItem[]
@@ -260,11 +268,11 @@ namespace FusionIRC.Forms.Script
             /* Copy scripts to temporary arrays */
             _aliases = ScriptManager.AliasData.Clone();
             _events = ScriptManager.EventData.Clone();
-            /* Here we can cheat with displaying variables by creating them as new script file */
+            /* Here we can cheat with displaying variables by creating them as new script file -
+             * we leave the data blank as this gets "imported" when the viewing file is switched to %variables */
             _variables = new ScriptData
                              {
-                                 Name = "%variables",
-                                 //RawScriptData = ScriptManager.Variables.Variable.Select(data => data.ToString()).ToList()
+                                 Name = "%variables"                                 
                              };
             _varNode = new ScriptFileNode
                            {
@@ -291,7 +299,8 @@ namespace FusionIRC.Forms.Script
             /* Script formatting "corrector" */
             _menu.Items.Add(new ToolStripButton("{ }", null, MenuButtonClick)
                                {
-                                   Alignment = ToolStripItemAlignment.Right
+                                   Alignment = ToolStripItemAlignment.Right,
+                                   ToolTipText = @"Fix formatting"
                                });
 
             _mnuFile.DropDownOpening += MenuDropDownOpening;
@@ -366,8 +375,7 @@ namespace FusionIRC.Forms.Script
 
         /* Handler callbacks */
         private void SplitterMoved(object sender, SplitterEventArgs e)
-        {
-            System.Diagnostics.Debug.Print("Moved " + _splitter.SplitterDistance); 
+        { 
             SettingsManager.Settings.Editor.SplitSize = _splitter.SplitterDistance;
         }
 
@@ -549,6 +557,18 @@ namespace FusionIRC.Forms.Script
                     {
                         Clipboard.Clear();
                     }
+                    break;
+
+                case "FIND":
+                    _txtEdit.ShowFindDialog();
+                    break;
+
+                case "REPLACE":
+                    _txtEdit.ShowReplaceDialog();
+                    break;
+
+                case "GO TO LINE":
+                    _txtEdit.ShowGoToDialog();
                     break;
 
                 case "SYNTAX HIGHLIGHT":
@@ -842,7 +862,7 @@ namespace FusionIRC.Forms.Script
             /* A little more involved... */
             ScriptManager.Variables.Variable.Clear();
             foreach (var v in s.RawScriptData)
-            {
+            {               
                 var globalVar = new ScriptVariable();
                 var i = v.IndexOf('=');
                 if (i != -1)
@@ -893,8 +913,13 @@ namespace FusionIRC.Forms.Script
                 {
                     /* Make sure to dump contents of edit window text */
                     _currentEditingScript.RawScriptData = new List<string>(_txtEdit.Lines);
-                }
-                _currentEditingScript.TextRange = _txtEdit.Range.TextBox.VisibleRange;// new Range(_txtEdit, _txtEdit.VisibleRange.Start, _txtEdit.VisibleRange.End);
+                    if (_currentEditingScript.Name == "%variables")
+                    {
+                        /* Dump out variables list to main file */
+                        RebuildVariables(_currentEditingScript);
+                        _currentEditingScript.ContentsChanged = false;
+                    }
+                }                
                 _currentEditingScript.SelectionStart = _txtEdit.SelectionStart;
             }
             if (file == null)
@@ -912,12 +937,8 @@ namespace FusionIRC.Forms.Script
             _txtEdit.Clear();
             _txtEdit.Text = string.Join(Environment.NewLine, file.RawScriptData);                        
             _txtEdit.Indent();
-            if (_currentEditingScript.TextRange != null)
-            {
-                System.Diagnostics.Debug.Print("here");
-                _txtEdit.Range.TextBox.DoRangeVisible(_currentEditingScript.TextRange);
-            }
             _txtEdit.SelectionStart = _currentEditingScript.SelectionStart;
+            _txtEdit.DoSelectionVisible();
             SettingsManager.Settings.Editor.Last = file.Name;
             _fileChanged = false;
 
