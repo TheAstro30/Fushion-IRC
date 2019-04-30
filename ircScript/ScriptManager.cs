@@ -192,7 +192,7 @@ namespace ircScript
                     {
                         braceCount++;
                     }
-                    else if (lineData[0] == '}')
+                    else if (lineData.Length > 0 && lineData.Trim()[0] == '}')
                     {
                         braceCount--;
                         if (braceCount == 0)

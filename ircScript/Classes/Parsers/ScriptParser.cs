@@ -15,26 +15,22 @@ namespace ircScript.Classes.Parsers
         private readonly Regex _singleArgs = new Regex(@"\$\d+", RegexOptions.Compiled); /* Replaces $[N] */
         private readonly Regex _multiArgs = new Regex(@"\$\d+-", RegexOptions.Compiled); /* Replaces $[N]- */
 
-        private readonly ScriptIdentifierParser _identifier = new ScriptIdentifierParser();
-        private readonly ScriptVariableParser _variables = new ScriptVariableParser();
-
+        private readonly ScriptVariableParser _variables;
         private readonly ScriptVariables _localVariables;
 
         internal ScriptParser(ScriptVariables localVariables)
         {
             _localVariables = localVariables;
+            _variables = new ScriptVariableParser(_localVariables);
         }
         
         internal string Parse(ScriptArgs e, string lineData, string[] args)
         {
-            /* Main script "parser" - mainly for parsing arguments - replace $[N]- tokens first */
-            lineData = ReplaceTokens(_multiArgs, lineData, args, true);
-            /* Replace $1, $2 etc */
-            lineData = ReplaceTokens(_singleArgs, lineData, args, false);
-            /* Next thing to do would be to process local and global variables... */
-            lineData = _variables.Parse(e, _localVariables, lineData);
-            /* Parse $id (like $chan, $nick via ScriptArgs including looking for $alias) */
-            return lineData;
+            /* Main script "parser" - mainly for parsing arguments - replace $[N]- tokens first, single $[N]
+             * tokens second then variables and internal identifiers last */
+            return _variables.Parse(e, ReplaceTokens(_singleArgs,
+                                                     ReplaceTokens(_multiArgs, lineData, args,
+                                                     true), args, false));
         }
 
         /* Private parsing methods */

@@ -232,19 +232,26 @@ namespace FusionIRC.Forms.Script
             _colFiles.ImageGetter = x => x is ScriptFileNode
                                              ? Resources.codeHeader.ToBitmap()
                                              : Resources.codeFile.ToBitmap();
-            
+
             _txtEdit = new ScriptEditor
-                          {
-                              BackColor = SystemColors.Window,
-                              BorderStyle = BorderStyle.None,
-                              Dock = DockStyle.Fill,
-                              Location = new Point(143, 3),
-                              Size = new Size(350, 290),                              
-                              EnableSyntaxHighlight = SettingsManager.Settings.Editor.SyntaxHighlight,
-                              ShowLineNumbers = SettingsManager.Settings.Editor.LineNumbering,
-                              Zoom = SettingsManager.Settings.Editor.Zoom,
-                              TabIndex = 0
-                          };
+                           {
+                               BackColor = SystemColors.Window,
+                               BorderStyle = BorderStyle.None,
+                               Dock = DockStyle.Fill,
+                               Location = new Point(143, 3),
+                               Size = new Size(350, 290),
+                               EnableSyntaxHighlight = SettingsManager.Settings.Editor.SyntaxHighlight,
+                               ShowLineNumbers = SettingsManager.Settings.Editor.LineNumbering,
+                               Zoom = SettingsManager.Settings.Editor.Zoom,
+                               CommentColor = SettingsManager.Settings.Editor.Colors.CommentColor,
+                               CommandColor = SettingsManager.Settings.Editor.Colors.CommandColor,
+                               KeywordColor = SettingsManager.Settings.Editor.Colors.KeyWordColor,
+                               VariableColor = SettingsManager.Settings.Editor.Colors.VariableColor,
+                               IdentifierColor = SettingsManager.Settings.Editor.Colors.IdentifierColor,
+                               CustomIdentifierColor = SettingsManager.Settings.Editor.Colors.CustomIdentifierColor,
+                               MiscColor = SettingsManager.Settings.Editor.Colors.MiscColor,
+                               TabIndex = 0
+                           };
 
             /* Splitter */
             _splitter = new SplitContainer
@@ -467,12 +474,15 @@ namespace FusionIRC.Forms.Script
         private void MenuButtonClick(object sender, EventArgs e)
         {
             var btn = (ToolStripButton) sender;
-            if (btn == null)
+            if (btn == null || _currentEditingScript == null)
             {
                 return;
             }
             /* Reformat text */
+            _currentEditingScript.SelectionStart = _txtEdit.SelectionStart;
             _txtEdit.Indent();
+            _txtEdit.SelectionStart = _currentEditingScript.SelectionStart;
+            _txtEdit.DoSelectionVisible();
         }
 
         private void MenuItemOnClick(object sender, EventArgs e)

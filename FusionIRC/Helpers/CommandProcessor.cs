@@ -202,7 +202,7 @@ namespace FusionIRC.Helpers
         /* Script callbacks */
         private static void ScriptLineParsed(Script script, ScriptArgs e, string data)
         {           
-            System.Diagnostics.Debug.Print(">> DATA " +data);
+            //System.Diagnostics.Debug.Print(">> DATA " +data);
             if (string.IsNullOrEmpty(data))
             {
                 return;

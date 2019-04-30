@@ -3,7 +3,6 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
-
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -31,9 +30,16 @@ namespace ircScript.Classes.Parsers
 
         public string Parse(ScriptArgs e, string lineData)
         {
-            /* Parse parenthisised $id(args) first */            
+            /* Parse parenthisised $id(args) first */
             lineData = ParseParenthisis(e, lineData);
-            var sb = new StringBuilder(lineData);
+            /* Process $+ */
+            var con = lineData.Split(new[] {"$+"}, StringSplitOptions.RemoveEmptyEntries);
+            var sb = new StringBuilder();
+            /* Always will be one element */
+            foreach (var s in con)
+            {
+                sb.Append(s.Trim());
+            }
             var m = _tokenIdentifiers.Matches(lineData);
             if (m.Count > 0)
             {
@@ -68,7 +74,7 @@ namespace ircScript.Classes.Parsers
                     return e.Nick;
 
                 default:
-                    /* Check if it's an alias */
+                    /* Check if it's an alias */                    
                     var id = value.Replace("$", "");
                     var script = ScriptManager.GetScript(ScriptManager.Aliases, id);
                     string rec;
@@ -145,8 +151,7 @@ namespace ircScript.Classes.Parsers
                         {
                             /* Unfortunately, this is how regex works ... need to call this "twice" (once from main
                              * parse routine of this file, and once here */
-                            argList[i] = ParseSingleIdentifier(e, argList[i].Replace("$", ""));
-                            
+                            argList[i] = ParseSingleIdentifier(e, argList[i].Replace("$", ""));                            
                         }
                         argList[i] = argList[i];
                     }
@@ -154,6 +159,15 @@ namespace ircScript.Classes.Parsers
             }
             switch (id)
             {
+                case "IIF":
+                    /* $iif(condition,true part,false part) */
+                    if (argList.Length == 3)
+                    {
+                        var con = new ScriptConditionalParser();                        
+                        return con.ParseConditional(argList[0]) ? argList[1] : argList[2];
+                    }
+                    return string.Empty;
+
                 case "ASCTIME":
                     return TimeFunctions.FormatAsciiTime(argList[0], argList.Length > 1 ? argList[1] : null);
 
@@ -164,13 +178,18 @@ namespace ircScript.Classes.Parsers
                     int.TryParse(argList[0], out i);
                     return TimeFunctions.GetDuration(i, false);
 
+                case "CALC":
+                    var calc = new Calc();
+                    var d = calc.Evaluate(argList[0]);
+                    return double.IsNaN(d) ? string.Empty : d.ToString();
+
                 case "CHR":
                     /* Not sure yet if this is desired behaviour */
                     return int.TryParse(argList[0], out i) ? ((char) i).ToString() : string.Empty;
 
                 case "GETTOK":
                     /* $gettok(string,position,char) */
-                    return argList.Length == 3 ? Tokens.ScriptGetToken(argList) : string.Empty;
+                    return argList.Length == 3 ? Tokens.ScriptGetDelToken(argList, true) : string.Empty;
 
                 case "ADDTOK":
                     /* $addtok(string,newtoken,char) */
@@ -178,7 +197,13 @@ namespace ircScript.Classes.Parsers
 
                 case "DELTOK":
                     /* $deltok(string,[N-N2],char) */
-                    return argList.Length == 3 ? Tokens.ScriptDelToken(argList) : argList[0];
+                    return argList.Length == 3 ? Tokens.ScriptGetDelToken(argList, false) : argList[0];
+
+                case "ENCODE":
+                    return System.Text.Encoding.UTF8.Base64Encode(argList[0]);
+
+                case "DECODE":
+                    return Encoding.UTF8.Base64Decode(argList[0]);
             }
             return string.Empty;
         }

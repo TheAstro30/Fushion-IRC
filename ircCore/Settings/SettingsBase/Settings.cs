@@ -67,6 +67,13 @@ namespace ircCore.Settings.SettingsBase
             Editor.SyntaxHighlight = true;
             Editor.LineNumbering = true;
             Editor.Zoom = 100;
+            Editor.Colors.KeyWordColor = Color.Blue;
+            Editor.Colors.IdentifierColor = Color.DarkCyan;
+            Editor.Colors.CustomIdentifierColor = Color.DeepPink;
+            Editor.Colors.VariableColor = Color.Red;
+            Editor.Colors.CommandColor = Color.BlueViolet;
+            Editor.Colors.CommentColor = Color.Green;
+            Editor.Colors.MiscColor = Color.Brown;
             /* Identd */
             Connection.Identd.System = "UNIX";
             Connection.Identd.Port = 113;

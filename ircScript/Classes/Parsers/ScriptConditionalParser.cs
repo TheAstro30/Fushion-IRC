@@ -115,9 +115,8 @@ namespace ircScript.Classes.Parsers
             }
             return _processCode;
         }
-
-        /* Private parsing methods */
-        private bool ParseConditional(string s)
+        
+        public bool ParseConditional(string s)
         {
             /* Written with the help of sexist (Ryan Alexander) */
             var args = new string[2];
@@ -196,6 +195,7 @@ namespace ircScript.Classes.Parsers
             return ParseOperand(operAnd, args[0], args[1]);
         }
 
+        /* Private parsing methods */
         private bool ParseAndOr(string andOr, string scriptLine)
         {
             var orConditionTrue = false;
