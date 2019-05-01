@@ -13,7 +13,6 @@ namespace ircScript.Classes.Parsers
     /* Variable parser - this has to be used in conjunction with ScriptIdentifierParser in-line
      * or it WILL NOT function correctly. This is about the 5th refactoring of code, until I ended
      * up with a more succint, logical flowing code structure. */
-    //TODO: need to fix chr(44) issue yet...
     internal class ScriptVariableParser
     {
         private readonly Regex _var = new Regex(@"%\w+", RegexOptions.Compiled); /* Used to find instances of %[var] */
@@ -48,7 +47,7 @@ namespace ircScript.Classes.Parsers
                 }
             }
             /* Now we parse the line and replace %<var> with the actual values including $id(<n>) identifiers */
-            return _id.Parse(e, ReplaceVariables(line));
+            return _id.Parse(e, ReplaceVariables(line)).Replace((char) 7, (char) 44);
         }
 
         private bool GetVariableAssignment(string line, ref string command, ref string name, ref string value)
@@ -60,7 +59,9 @@ namespace ircScript.Classes.Parsers
                 name = string.Format("%{0}", m.Groups[2].Value);
                 var tmp = line.Substring(m.Groups[0].Length);
                 var i = tmp.IndexOf('=');
-                value = i != -1 ? tmp.Substring(i + 1).Trim() : tmp.Trim();                
+                value = i != -1
+                            ? tmp.Substring(i + 1).Trim()
+                            : tmp.Trim();
                 return true;
             }
             if (line[0] == '%')
@@ -100,7 +101,7 @@ namespace ircScript.Classes.Parsers
                             var = new ScriptVariable
                                       {
                                           Name = name,
-                                          Value = value
+                                          Value = value.Replace((char) 7, (char) 44)
                                       };
                             s.Variable.Add(var);                       
                         }
@@ -108,7 +109,7 @@ namespace ircScript.Classes.Parsers
                         {
                             if (com == "VAR" || com == "SET")
                             {
-                                var.Value = value;
+                                var.Value = value.Replace((char) 7, (char) 44);
                             }
                             else
                             {
@@ -150,7 +151,8 @@ namespace ircScript.Classes.Parsers
                     /* Push as a new variable to globals */
                     var = new ScriptVariable { Name = name };
                     ScriptManager.Variables.Variable.Add(var);
-                }
+                }                
+                var.Value = value.Replace((char) 7, (char) 44); /* Forgot to set the value for %var = value, lol */
                 process = true;
             }
             if (m.Success && var != null)
@@ -174,7 +176,7 @@ namespace ircScript.Classes.Parsers
                 foreach (Match m in vars)
                 {
                     var var = _local.GetVariable(m.Value) ?? ScriptManager.Variables.GetVariable(m.Value);
-                    sb.Replace(m.Value, var != null ? var.Value : string.Empty);
+                    sb.Replace(m.Value, var != null ? var.Value.Replace((char)44,(char)7) : string.Empty);
                 }
                 return sb.ToString();
             }

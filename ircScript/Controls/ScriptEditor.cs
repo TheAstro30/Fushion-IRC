@@ -52,7 +52,16 @@ namespace ircScript.Controls
             set
             {
                 _enableSyntaxHighlight = value;
-                Highlight();
+                switch (value)
+                {
+                    case true:
+                        SetStyles();
+                        break;
+
+                    case false:
+                        ClearStyles();
+                        break;
+                }
             }
         }
 
@@ -123,7 +132,7 @@ namespace ircScript.Controls
 
         private void OnTextChangedDelayed(object sender, EventArgs e)
         {
-            Highlight();
+            SetStyles();
         }
 
         /* Text formatting - Indents text as by { and } */
@@ -156,18 +165,13 @@ namespace ircScript.Controls
             TextSource.CurrentTextBox.Text = string.Join(Environment.NewLine, lines);
         }
 
-        /* Private helper method */
-        private void Highlight()
-        {            
-            Range.ClearFoldingMarkers();
-            Range.SetFoldingMarkers("{", "}"); /* Allow to collapse brackets block */
+        public void SetStyles()
+        {                        
             if (!_enableSyntaxHighlight)
             {
                 return;
             }
-            Range.ClearStyle(_comment, _keywordsStyle,
-                             _variableStyle, _customIdentifierStyle,
-                             _identifierStyle, _miscStyle, _commandStyle);
+            ClearStyles();
             Range.SetStyle(_keywordsStyle, _keywordPrefix);
             Range.SetStyle(_comment, _commentPrefix);
             Range.SetStyle(_commandStyle, _commandPrefix);
@@ -193,8 +197,16 @@ namespace ircScript.Controls
                         Range.SetStyle(_keywordsStyle, found.Text);
                         break;
                 }
-            }
-            
+            }            
+        }
+
+        private void ClearStyles()
+        {
+            Range.ClearFoldingMarkers();
+            Range.SetFoldingMarkers("{", "}"); /* Allow to collapse brackets block */
+            Range.ClearStyle(_comment, _keywordsStyle,
+                             _variableStyle, _customIdentifierStyle,
+                             _identifierStyle, _miscStyle, _commandStyle);
         }
     }
 }

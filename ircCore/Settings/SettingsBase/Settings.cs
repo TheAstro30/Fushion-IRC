@@ -99,6 +99,9 @@ namespace ircCore.Settings.SettingsBase
             Client.Confirmation.Url = true;
             /* Channel seetings */
             Client.Channels.ShowFavoritesDialogOnConnect = true;
+            /* Logging */
+            Client.Logging.LogPath = @"\logs";
+            Client.Logging.TruncateBytes = 1024;
             /* Create a blank theme */
             Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = @"\themes\default.thm"});            
         }

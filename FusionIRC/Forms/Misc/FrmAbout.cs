@@ -42,7 +42,7 @@ namespace FusionIRC.Forms.Misc
                                BorderStyle = BorderStyle.Fixed3D,
                                Location = new Point(12, 12),
                                Size = new Size(68, 68),
-                               BackgroundImage = Properties.Resources.about_dialog
+                               BackgroundImage = Properties.Resources.about_dialog_1
                            };
 
             _lblFusion = new Label
@@ -126,7 +126,7 @@ namespace FusionIRC.Forms.Misc
 
         private static void PanelClick(object sender, EventArgs e)
         {
-            var player = new SoundPlayer(Properties.Resources.penguin);
+            var player = new SoundPlayer(Properties.Resources.cork);
             player.Play();
         }
     }

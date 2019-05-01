@@ -147,6 +147,11 @@ namespace ircScript.Classes.Parsers
                 {
                     for (i = 0; i <= argList.Length - 1; i++)
                     {
+                        if (i == 0)
+                        {
+                            /* Make sure to replace chr 7 back to 44 here before sending to parse the ID */
+                            argList[0] = argList[0].Replace((char) 7, (char) 44);
+                        }
                         if (argList[i][0] == '$')
                         {
                             /* Unfortunately, this is how regex works ... need to call this "twice" (once from main

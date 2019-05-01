@@ -80,6 +80,9 @@
     <Compile Include="Controls\ChildWindows\Input\ColorBox\ColorTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\ColorPickerComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\FontComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -111,6 +114,7 @@
     <Compile Include="Settings\SettingsBase\Structures\SettingsFind.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsIdentd.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsLocalInfo.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsLog.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsScripts.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsTabs.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsUserInfo.cs" />
@@ -129,9 +133,11 @@
     <Compile Include="Utils\DirectX\Core\DsUtils.cs" />
     <Compile Include="Utils\DirectX\Core\DsUuids.cs" />
     <Compile Include="Utils\DirectX\Core\QEdit.cs" />
+    <Compile Include="Utils\DirectX\SoundAsync.cs" />
     <Compile Include="Utils\DnsResult.cs" />
     <Compile Include="Utils\Functions.cs" />
     <Compile Include="Utils\ListExtensions.cs" />
+    <Compile Include="Utils\Logging.cs" />
     <Compile Include="Utils\Serialization\BinarySerialize.cs" />
     <Compile Include="Settings\SettingsBase\Settings.cs" />
     <Compile Include="Settings\SettingsManager.cs" />

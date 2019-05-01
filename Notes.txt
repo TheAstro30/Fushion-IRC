@@ -10,5 +10,5 @@ April 23, 2019
   mean that all scripts/aliases are in one location which will simply the editor code and script building code.
   GetScript(string name) would be changed to GetScript(ScriptType type, name) when called. The only problem I'm going 
   to have, is multiple scripts with the same "signature" (name). Eg: ON *:CONNECT:. All scripts would have to be executed
-  on that event, so would mean a loop ... aliases are a different matter.
+  on that event, so would mean a loop ... aliases are a different matter. - not possible without redesign
 - Aliases also need to be checked as $identifiers with return values (TO DO) - that has been done, to a point 27/04/2019

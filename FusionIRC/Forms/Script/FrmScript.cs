@@ -133,7 +133,10 @@ namespace FusionIRC.Forms.Script
                                                     new ToolStripMenuItem("Syntax Highlight", null, MenuItemOnClick,
                                                                           Keys.None),
                                                     new ToolStripMenuItem("Line Numbering", null, MenuItemOnClick,
-                                                                          Keys.None)
+                                                                          Keys.None),
+                                                    new ToolStripSeparator(),
+                                                    new ToolStripMenuItem("Highlight Colors", null, MenuItemOnClick,
+                                                                          Keys.None),
                                                 });
 
             _menu.Items.AddRange(new ToolStripItem[]
@@ -585,16 +588,29 @@ namespace FusionIRC.Forms.Script
                     enable = !SettingsManager.Settings.Editor.SyntaxHighlight;
                     SettingsManager.Settings.Editor.SyntaxHighlight = enable;
                     _txtEdit.EnableSyntaxHighlight = enable;
-                    var sel = _txtEdit.SelectionStart;
-                    SwitchEditingFile(_currentEditingScript);
-                    _txtEdit.SelectionStart = sel;
-                    _txtEdit.SelectionLength = 0;
                     break;
 
                 case "LINE NUMBERING":
                     enable = !SettingsManager.Settings.Editor.LineNumbering;
                     SettingsManager.Settings.Editor.LineNumbering = enable;
                     _txtEdit.ShowLineNumbers = enable;
+                    break;
+
+                case "HIGHLIGHT COLORS":
+                    using (var d = new FrmEditorColors())
+                    {
+                        if (d.ShowDialog(this) == DialogResult.OK)
+                        {
+                            _txtEdit.CommentColor = SettingsManager.Settings.Editor.Colors.CommentColor;
+                            _txtEdit.CommandColor = SettingsManager.Settings.Editor.Colors.CommandColor;
+                            _txtEdit.KeywordColor = SettingsManager.Settings.Editor.Colors.KeyWordColor;
+                            _txtEdit.VariableColor = SettingsManager.Settings.Editor.Colors.VariableColor;
+                            _txtEdit.IdentifierColor = SettingsManager.Settings.Editor.Colors.IdentifierColor;
+                            _txtEdit.CustomIdentifierColor = SettingsManager.Settings.Editor.Colors.CustomIdentifierColor;
+                            _txtEdit.MiscColor = SettingsManager.Settings.Editor.Colors.MiscColor;
+                            _txtEdit.SetStyles();
+                        }
+                    }
                     break;
             }
         }

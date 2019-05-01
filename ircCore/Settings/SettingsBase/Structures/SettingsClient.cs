@@ -26,6 +26,9 @@ namespace ircCore.Settings.SettingsBase.Structures
 
         [XmlElement("channels")]
         public SettingsChannel Channels = new SettingsChannel();
+
+        [XmlElement("logging")]
+        public SettingsLog Logging = new SettingsLog();
     }
 
     [Serializable]

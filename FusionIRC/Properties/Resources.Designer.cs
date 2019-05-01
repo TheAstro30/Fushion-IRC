@@ -73,9 +73,9 @@ namespace FusionIRC.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap about_dialog {
+        internal static System.Drawing.Bitmap about_dialog_1 {
             get {
-                object obj = ResourceManager.GetObject("about_dialog", resourceCulture);
+                object obj = ResourceManager.GetObject("about_dialog_1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -167,6 +167,15 @@ namespace FusionIRC.Properties {
             get {
                 object obj = ResourceManager.GetObject("connect_to_location", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream cork {
+            get {
+                return ResourceManager.GetStream("cork", resourceCulture);
             }
         }
         
@@ -337,15 +346,6 @@ namespace FusionIRC.Properties {
             get {
                 object obj = ResourceManager.GetObject("partChan", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
-        /// </summary>
-        internal static System.IO.UnmanagedMemoryStream penguin {
-            get {
-                return ResourceManager.GetStream("penguin", resourceCulture);
             }
         }
         
