@@ -35,7 +35,27 @@ namespace FusionIRC.Helpers
         public static void OnNetworkNameChanged(ClientConnection client, string network)
         {
             client.Network = network;
-            System.Diagnostics.Debug.Print("Network changed to " + network);
+            /* Update console window title associated with this event */
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
+            {
+                return;
+            }
+            c.Text = string.Format("{0}: {1} ({2}:{3})",
+                                   !string.IsNullOrEmpty(client.Network) ? client.Network : client.Server.Address,
+                                   client.UserInfo.Nick, client.Server.Address, client.Server.Port);
+            c.DisplayNode.Text = string.Format("{0}: {1} ({2})", network, client.UserInfo.Nick,
+                                               client.Server.Address);
+        }
+
+        public static void OnChannelModes(ClientConnection client, string channel, string modes)
+        {
+            System.Diagnostics.Debug.Print(channel + " " + modes);
+            var w = WindowManager.GetWindow(client, channel);
+            if (w != null)
+            {
+                w.Modes.SetModes(modes);
+            }
         }
 
         public static void OnClientBeginConnect(ClientConnection client)
@@ -54,6 +74,11 @@ namespace FusionIRC.Helpers
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update title bar of this console window */
+            var net = !string.IsNullOrEmpty(client.Network) ? client.Network : client.Server.Address;
+            c.Text = string.Format("{0}: {1} ({2}:{3})", net, client.UserInfo.Nick, client.Server.Address,
+                                   client.Server.Port);
+            c.DisplayNode.Text = string.Format("{0}: {1} ({2})", net, client.UserInfo.Nick, client.Server.Address);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -642,7 +667,7 @@ namespace FusionIRC.Helpers
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Send /WHO to get user addresses */
-            client.Send(string.Format("WHO {0}", channel));
+            client.Send(string.Format("WHO {0}{1}MODE {0}", channel, Environment.NewLine));
         }
 
         public static void OnPartSelf(ClientConnection client, string channel)
@@ -725,6 +750,14 @@ namespace FusionIRC.Helpers
                               };
                 var pmd = ThemeManager.ParseMessage(tmd);
                 console.Output.AddLine(pmd.DefaultColor, pmd.Message);
+                /* Update title bar */
+                var net = !string.IsNullOrEmpty(client.Network)
+                              ? client.Network
+                              : client.Server.Address;
+                console.Text = string.Format("{0}: {1} ({2}:{3}) {4}", net, client.UserInfo.Nick, client.Server.Address,
+                                             client.Server.Port, console.Modes);
+                console.DisplayNode.Text = string.Format("{0}: {1} ({2})", net, client.UserInfo.Nick,
+                                                         client.Server.Address);
                 /* Update treenode color */
                 WindowManager.SetWindowEvent(console, MainForm, WindowEvent.EventReceived);
             }
@@ -862,6 +895,8 @@ namespace FusionIRC.Helpers
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update user modes in title bar */
+            c.Modes.SetModes(modes);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -883,6 +918,8 @@ namespace FusionIRC.Helpers
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update channel modes */            
+            c.Modes.SetModes(string.Format("{0} {1}", modes, modeData), client.Parser.ChannelModes);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
             /* We need to parse the mode data */

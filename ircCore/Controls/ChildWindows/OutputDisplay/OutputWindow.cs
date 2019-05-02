@@ -592,7 +592,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 return; /* It's unlikely ... */
             }            
             TextData.Wrapped.Add(w);            
-            /* Set scrolled to bottom value */              
+            /* Set scrolled to bottom value */
             if (_scrollValue == currentLines)
             {
                 _scrolledToBottom = true;
@@ -604,13 +604,13 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                         /* Only trim the buffer if the window isn't scrolled above bottom (or marking) - or else lines appear to move up */
                         TrimBuffer();
                     }
-                }                
+                }
             }
-            else
+            else if (text != ((char)0).ToString())
             {
                 _scrolledToBottom = false;
                 SystemSounds.Beep.Play();
-            }            
+            }
             if (OnLineAdded != null)
             {
                 OnLineAdded(text); /* This can be used to output to a log file */
@@ -646,7 +646,8 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             }
             TextData = tmp;
             /* Add a separator line at the bottom */
-            AddLine(1, "-");            
+            //AddLine(1, "-", true);
+            AddLine(1,((char)0).ToString());
             /* Reset scrollbar */
             _scrollValue = TextData.WrappedLinesCount - 1;
             if (_scrollValue < 0) { _scrollValue = 0; }

@@ -9,7 +9,10 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
+using ircCore.Controls.ChildWindows.Helpers;
+using ircCore.Settings;
 
 namespace ircCore.Utils
 {
@@ -30,6 +33,16 @@ namespace ircCore.Utils
         private static string _mainFolder;
 
         private static readonly Regex AddressValidate = new Regex(@"(?<nick>[^ ]+?)\!(?<user>[^ ]+?)@(?<host>[^ ]+?)$", RegexOptions.Compiled);
+
+        private const string CodePattern = "\u0003[0-9]{1,2}(,[0-9]{1,2})|\u0003[0-9]{1,2}|\u0003";
+
+        private static readonly Regex RFileObj = new Regex("[\\\\\\/:\\*\\?\"'<>|]", RegexOptions.Compiled);
+
+        private static readonly Regex RegExAllCodes =
+            new Regex(
+                string.Format(@"{0}|{1}|{2}|{3}|{4}|{5}|{6}", CodePattern, (char) ControlByte.Bold, (char) ControlByte.Underline,
+                              (char) ControlByte.Italic, (char) ControlByte.Reverse, (char) ControlByte.Normal,
+                              (char) ControlByte.Reverse), RegexOptions.Compiled);
 
         public sealed class EnumUtils
         {
@@ -183,6 +196,43 @@ namespace ircCore.Utils
                 return decimal.TryParse(s, out d);
             }
             return false;
+        }
+
+        public static string GetLogFileName(string network, string name)
+        {
+            var p = SettingsManager.Settings.Client.Logging.LogPath;
+            if (string.IsNullOrEmpty(p))
+            {
+                p = @"\logs";
+                SettingsManager.Settings.Client.Logging.LogPath = p;
+            }
+            var path = Functions.MainDir(p, false);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            var b = new StringBuilder(path);
+            /* Build log file name based on logging settings */
+            if (SettingsManager.Settings.Client.Logging.CreateFolder)
+            {
+                b.Append(string.Format(@"\{0}", network));
+                p = string.Format(@"{0}\{1}", path, network);
+                if (!Directory.Exists(p))
+                {
+                    Directory.CreateDirectory(p);
+                }
+            }
+            b.Append(string.Format(@"\{0}", RFileObj.Replace(name, "_")));
+            if (SettingsManager.Settings.Client.Logging.DateByDay)
+            {
+                b.Append(string.Format("-{0}", DateTime.Now.ToString("ddMMyyyy")));
+            }
+            return b.ToString();
+        }
+
+        public static string StripControlCodes(string text)
+        {
+            return string.IsNullOrEmpty(text) ? string.Empty : RegExAllCodes.Replace(text, "");
         }
 
         /* Private methods */

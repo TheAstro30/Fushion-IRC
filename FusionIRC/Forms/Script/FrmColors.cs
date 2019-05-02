@@ -11,7 +11,7 @@ using ircCore.Settings;
 
 namespace FusionIRC.Forms.Script
 {
-    public sealed class FrmEditorColors : FormEx
+    public sealed class FrmColors : FormEx
     {
         private readonly Label _lblInfo;
         private readonly Label _lblComment;
@@ -31,7 +31,7 @@ namespace FusionIRC.Forms.Script
         private readonly Button _btnOk;
         private readonly Button _btnCancel;
 
-        public FrmEditorColors()
+        public FrmColors()
         {
             ClientSize = new Size(309, 331);
             Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, ((0)));

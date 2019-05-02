@@ -6,35 +6,20 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using ircCore.Settings.SettingsBase.Structures;
 
-namespace ircCore.Utils
+namespace ircCore.Controls.ChildWindows.Classes
 {
-    public enum LogType
-    {
-        Channel = 0,
-        Chat = 1
-    }
-
-    public class Logging
+    public class Logger
     {
         /* Log provider for chat windows - the aim of this class is to provide a modular way to handle various
          * options in logging (dating by day, making new folders per network, truncating the file, etc.) */
-        private readonly SettingsLog _settings;
-
         private FileStream _stream;
         private StreamWriter _writer;
 
-        public LogType Type { get; set; }
+        public string FilePath { get; set; } /* The name (channel name, etc) of the window being logged */
 
-        public string Name { get; set; } /* The name (channel name, etc) of the window being logged */
-
-        public Logging(SettingsLog settings)
-        {
-            _settings = settings;
-        }
-
-        ~Logging()
+        /* Destructor */
+        ~Logger()
         {
             if (_stream != null && _writer != null)
             {
@@ -44,30 +29,14 @@ namespace ircCore.Utils
 
         public void CreateLog()
         {
-            var doNotLog = false;
-            switch (Type)
-            {
-                case LogType.Channel:
-                    doNotLog = !_settings.LogChannels;
-                    break;
-
-                case LogType.Chat:
-                    doNotLog = !_settings.LogChats;
-                    break;
-            }
-            if (doNotLog)
-            {
-                if (_writer != null)
-                {
-                    /* If it was logging and in settings we turned it off... close it */
-                    CloseLog();
-                }
-                return;
-            }
             try
             {
+                if (string.IsNullOrEmpty(FilePath))
+                {
+                    return;
+                }
                 /* Remember to dispose of this later */
-                _stream = new FileStream(CreateLogFileName(), FileMode.Append, FileAccess.Write);
+                _stream = new FileStream(FilePath, FileMode.Append, FileAccess.Write);
                 /* And this... */
                 _writer = new StreamWriter(_stream);
                 WriteLog(string.Format(@"*** {0} {1} ***", "Log file created:", DateTime.Now));
@@ -103,27 +72,14 @@ namespace ircCore.Utils
                 if (_stream != null && _writer != null)
                 {
                     _writer.WriteLine(line);
+                    _writer.Flush();
+                    _stream.Flush();
                 }
             }
             catch
             {
                 Debug.Assert(true);
             }
-        }
-
-        /* Private helpers */
-        private string CreateLogFileName()
-        {
-            /* Based on settings, we format our log file name */
-            var logPath = Functions.MainDir(_settings.LogPath, false);
-            if (!Directory.Exists(logPath))
-            {
-                /* Create it */
-                Directory.CreateDirectory(logPath);
-            }
-            /* We also have to be aware of illegal characters in file names... */
-            //for now, return basic file name
-            return string.Format(@"{0}\{1}.txt", logPath, Name);
         }
     }
 }

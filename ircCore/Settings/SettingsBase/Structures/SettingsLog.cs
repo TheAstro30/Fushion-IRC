@@ -4,38 +4,45 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.ComponentModel;
 using System.Xml.Serialization;
 
 namespace ircCore.Settings.SettingsBase.Structures
 {
+    public enum LoggingType
+    {
+        [Description("None")]
+        None= 0,
+
+        [Description("Channels")]
+        Channels = 1,
+
+        [Description("Private chats")]
+        Chats = 2,
+
+        [Description("Both")]
+        Both = 3
+    }
+
     [Serializable]
     public class SettingsLog
     {
         [XmlAttribute("path")]
         public string LogPath { get; set; }
 
-        [XmlAttribute("logChannels")]
-        public bool LogChannels { get; set; }
+        [XmlAttribute("loggingType")]
+        public LoggingType KeepLogsType { get; set; }
 
-        [XmlAttribute("logChats")]
-        public bool LogChats { get; set; }
-
-        [XmlAttribute("reloadChannels")]
-        public bool ReloadChannelLogs { get; set; }
-
-        [XmlAttribute("reloadChats")]
-        public bool ReloadChatLogs { get; set; }
-
-        [XmlAttribute("truncate")]
-        public bool Truncate { get; set; }
-
-        [XmlAttribute("truncateBytes")]
-        public int TruncateBytes { get; set; } /* NOTE: This is KB, not bytes */
+        [XmlAttribute("reloadType")]
+        public LoggingType ReloadLogsType { get; set; }
 
         [XmlAttribute("createFolder")]
         public bool CreateFolder { get; set; }
 
         [XmlAttribute("dateByDay")]
         public bool DateByDay { get; set; }
+
+        [XmlAttribute("stripCodes")]
+        public bool StripCodes { get; set; }
     }
 }

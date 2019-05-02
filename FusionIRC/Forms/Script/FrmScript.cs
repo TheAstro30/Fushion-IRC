@@ -597,7 +597,7 @@ namespace FusionIRC.Forms.Script
                     break;
 
                 case "HIGHLIGHT COLORS":
-                    using (var d = new FrmEditorColors())
+                    using (var d = new FrmColors())
                     {
                         if (d.ShowDialog(this) == DialogResult.OK)
                         {

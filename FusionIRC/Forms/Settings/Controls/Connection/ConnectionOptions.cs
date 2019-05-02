@@ -10,7 +10,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
 {
     public partial class ConnectionOptions : BaseControlRenderer, ISettings
     {
-        public event Action OnSettingsChanged; /* Ignore warning in IDE for "never used", will be eventually */
+        public event Action OnSettingsChanged;
 
         public bool SettingsChanged { get; set; }
 
@@ -24,6 +24,16 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
         public void SaveSettings()
         {
             /* Not implemented */
+        }
+
+        /* Callback */
+        private void ControlsChanged(object sender, EventArgs e)
+        {
+            SettingsChanged = true;
+            if (OnSettingsChanged != null)
+            {
+                OnSettingsChanged();
+            }
         }
     }
 }

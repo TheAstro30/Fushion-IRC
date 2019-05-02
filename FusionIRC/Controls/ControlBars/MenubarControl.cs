@@ -5,9 +5,12 @@
  */
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
+using FusionIRC.Forms;
 using FusionIRC.Forms.Child;
 using FusionIRC.Helpers;
+using ircCore.Controls;
 using ircCore.Controls.Rendering;
 using ircCore.Forms;
 using ircCore.Settings.Networks;
@@ -54,15 +57,7 @@ namespace FusionIRC.Controls.ControlBars
                              {
                                  Text = @"&Window"
                              };
-            _mnuWindow.DropDownItems.AddRange(new ToolStripItem[]
-                                                  {                                                       
-                                                      new ToolStripMenuItem("Find Text...", null, OnMenuWindowClick, Keys.Control | Keys.F),
-                                                      new ToolStripMenuItem("Font...", null, OnMenuWindowClick), 
-                                                      new ToolStripSeparator(), 
-                                                      new ToolStripMenuItem("Cascade", null, OnMenuWindowClick),
-                                                      new ToolStripMenuItem("Tile Vertically", null, OnMenuWindowClick),
-                                                      new ToolStripMenuItem("Tile Horizontally", null, OnMenuWindowClick)
-                                                  });
+            BuildWindowsMenu();
             _mnuWindow.DropDownOpening += OnMenuWindowDropDownOpening;
             /* Add all menus */
             Items.AddRange(new[] { _mnuFile, _mnuWindow });           
@@ -103,8 +98,10 @@ namespace FusionIRC.Controls.ControlBars
 
         private void OnMenuWindowDropDownOpening(object sender, EventArgs e)
         {
-            /* We would list all open windows here (up to a certain amount), then provide a separate dialog showing
-             * all the rest */
+            /* This would seem strange to do, but as we already have a treeview displaying all open windows of the client,
+             * it makes sense to iterate that and get the objects we need to display in the window list */
+            _mnuWindow.DropDownItems.Clear();
+            BuildWindowsMenu();
         }
 
         private void OnMenuFileClick(object sender, EventArgs e)
@@ -123,7 +120,11 @@ namespace FusionIRC.Controls.ControlBars
             switch (item.Text.ToUpper())
             {
                 case "NEW WINDOW":
-                    WindowManager.AddWindow(null, ChildWindowType.Console, _owner, "Console", "Console", true);
+                    var w = WindowManager.AddWindow(null, ChildWindowType.Console, _owner, "Console", "Console", true);
+                    if (w != null)
+                    {
+                        w.DisplayNode.Text = string.Format("{0}: {1}", "Console", w.Client.UserInfo.Nick);
+                    }
                     break;
 
                 case "CONNECT TO LOCATION...":
@@ -153,6 +154,65 @@ namespace FusionIRC.Controls.ControlBars
                 return;
             }
             ConnectToRecentServer(c, item);
+        }
+
+        private void BuildWindowsMenu()
+        {
+            _mnuWindow.DropDownItems.AddRange(new ToolStripItem[]
+                                                  {                                                       
+                                                      new ToolStripMenuItem("Find Text...", null, OnMenuWindowClick, Keys.Control | Keys.F),
+                                                      new ToolStripMenuItem("Font...", null, OnMenuWindowClick), 
+                                                      new ToolStripSeparator(), 
+                                                      new ToolStripMenuItem("Cascade", null, OnMenuWindowClick),
+                                                      new ToolStripMenuItem("Tile Vertically", null, OnMenuWindowClick),
+                                                      new ToolStripMenuItem("Tile Horizontally", null, OnMenuWindowClick)
+                                                  });
+            var count = 0;
+            var active = (FrmChildWindow)_owner.ActiveMdiChild;
+            foreach (TreeNode n in ((FrmClientWindow)_owner).SwitchView.Nodes)
+            {
+                count++;
+                var child = (FrmChildWindow)n.Tag;
+                if (child == null)
+                {
+                    continue;
+                }
+                if (count > 25)
+                {
+                    _mnuWindow.DropDownItems.AddRange(new ToolStripItem[]
+                                                          {
+                                                              new ToolStripSeparator(),
+                                                              new ToolStripMenuItem("More windows...", null,
+                                                                                    OnMenuWindowClick)
+                                                          });
+                    return;
+                }
+                _mnuWindow.DropDownItems.AddRange(new ToolStripItem[]
+                                                      {
+                                                          new ToolStripSeparator(),
+                                                          new ToolStripMenuItem(child.Text, null, OnMenuWindowClick)
+                                                              {
+                                                                  Tag = child, 
+                                                                  Checked = child == active
+                                                              }
+                                                      });
+                foreach (var c in from TreeNode w in n.Nodes from TreeNode c in w.Nodes select c)
+                {
+                    child = (FrmChildWindow)c.Tag;
+                    if (child == null)
+                    {
+                        continue;
+                    }
+                    if (c.Tag is FrmChildWindow)
+                    {
+                        _mnuWindow.DropDownItems.Add(new ToolStripMenuItem(child.Text, null, OnMenuWindowClick)
+                        {
+                            Tag = child,
+                            Checked = child == active
+                        });
+                    }
+                }
+            }
         }
 
         private void OnMenuWindowClick(object sender, EventArgs e)
@@ -186,6 +246,18 @@ namespace FusionIRC.Controls.ControlBars
 
                 case "TILE HORIZONTALLY":
                     _owner.LayoutMdi(MdiLayout.TileHorizontal);
+                    break;
+
+                case "MORE WINDOWS...":
+                    break;
+
+                default:
+                    /* Open windows */
+                    c = (FrmChildWindow) item.Tag;
+                    if (c != null)
+                    {
+                        c.Activate();
+                    }
                     break;
             }
         }

@@ -61,13 +61,16 @@ namespace ircClient.Parsing
         public event Action<ClientConnection, string> OnOther; //probably deleting this
 
         public event Action<ClientConnection, string> OnNetworkNameChanged;
+        
+        public event Action<ClientConnection, string, string> OnChannelModes;
        
         /* Public properties */
         public string JoinChannelsOnConnect { get; set; }
 
         public string UserModeCharacters { get; set; }
         public string UserModes { get; set; }
-        public ChannelTypes ChannelPrefixTypes { get; set; } 
+        public ChannelTypes ChannelPrefixTypes { get; set; }
+        public string ChannelModes { get; set; }
 
         public WhoisInfo Whois = new WhoisInfo();
 
@@ -338,6 +341,14 @@ namespace ircClient.Parsing
                     if (i > -1)
                     {
                         Whois.Channels = RemoveColon(fourth.Substring(i).Trim()).Replace(" ", ", ");
+                    }
+                    break;
+
+                case "324":
+                    i = fourth.IndexOf(' ');
+                    if (i > -1 && OnChannelModes != null)
+                    {
+                        OnChannelModes(_client, RemoveColon(fourth.Substring(0, i)), fourth.Substring(i).Trim());
                     }
                     break;
 
@@ -795,6 +806,10 @@ namespace ircClient.Parsing
                     case "CHANTYPES":
                         /* Fill out channel prefix types */
                         ChannelPrefixTypes = new ChannelTypes(sections[0].ToCharArray());
+                        break;
+
+                    case "CHANMODES":
+                        ChannelModes = sections[0];
                         break;
                 }
             }

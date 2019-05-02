@@ -22,7 +22,6 @@ using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
 using ircCore.Users;
 using ircCore.Utils;
-using ircCore.Utils.DirectX;
 using ircScript;
 
 namespace FusionIRC.Forms
@@ -176,20 +175,17 @@ namespace FusionIRC.Forms
             /* Create DCC file manager window */
             WindowManager.DccManagerWindow = new FrmDccManager();
             _initialize = false;
-
-            //var log = new Logging(SettingsManager.Settings.Client.Logging);
-            //log.Type = LogType.Channel;
-            //log.Name = "#test";
-            //log.CreateLog();
-            //log.WriteLog("this is a test");
-            //log.CloseLog();
         }
 
         /* Overrides */
         protected override void OnLoad(EventArgs e)
         {
             /* Create our first connection */
-            WindowManager.AddWindow(null, ChildWindowType.Console, this, "Console", "Console", true);
+            var w = WindowManager.AddWindow(null, ChildWindowType.Console, this, "Console", "Console", true);
+            if (w != null)
+            {
+                w.DisplayNode.Text = string.Format("{0}: {1}", "Console", w.Client.UserInfo.Nick);
+            }
             base.OnLoad(e);
         }
 

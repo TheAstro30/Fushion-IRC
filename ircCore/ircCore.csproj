@@ -49,6 +49,7 @@
     <Compile Include="Controls\ChildWindow.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Controls\ChildWindows\Classes\ChannelModes.cs" />
     <Compile Include="Controls\ChildWindows\Helpers\ControlByte.cs" />
     <Compile Include="Controls\ChildWindows\Input\InputWindow.cs">
       <SubType>UserControl</SubType>
@@ -133,11 +134,10 @@
     <Compile Include="Utils\DirectX\Core\DsUtils.cs" />
     <Compile Include="Utils\DirectX\Core\DsUuids.cs" />
     <Compile Include="Utils\DirectX\Core\QEdit.cs" />
-    <Compile Include="Utils\DirectX\SoundAsync.cs" />
     <Compile Include="Utils\DnsResult.cs" />
     <Compile Include="Utils\Functions.cs" />
     <Compile Include="Utils\ListExtensions.cs" />
-    <Compile Include="Utils\Logging.cs" />
+    <Compile Include="Controls\ChildWindows\Classes\Logger.cs" />
     <Compile Include="Utils\Serialization\BinarySerialize.cs" />
     <Compile Include="Settings\SettingsBase\Settings.cs" />
     <Compile Include="Settings\SettingsManager.cs" />
@@ -183,6 +183,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\prot.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Logging\Core\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

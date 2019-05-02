@@ -14,6 +14,7 @@ using FusionIRC.Helpers;
 using FusionIRC.Properties;
 using ircClient;
 using ircCore.Controls;
+using ircCore.Controls.ChildWindows.Classes;
 using ircCore.Controls.ChildWindows.Input;
 using ircCore.Controls.ChildWindows.Nicklist;
 using ircCore.Controls.ChildWindows.OutputDisplay;
@@ -37,6 +38,10 @@ namespace FusionIRC.Forms.Child
 
         private readonly bool _initialize;
         private readonly string _windowChildName;
+
+        public Logger Logger = new Logger();
+
+        public ChannelModes Modes = new ChannelModes();
 
         /* Public properties */
         public ChildWindowType WindowType { get; private set; }
@@ -164,9 +169,11 @@ namespace FusionIRC.Forms.Child
             Output.OnSpecialWordDoubleClicked += OutputSpecialWordDoubleClicked;
             Output.MouseUp += OutputMouseUp;
             Output.OnWordUnderMouse += OutputWordUnderMouse;
+            Output.OnLineAdded += OutputOnLineAdded;
             Input.TabKeyPress += InputTabKeyPress;
             Input.KeyDown += InputKeyDown;
             Input.MouseWheel += InputMouseWheel;
+            Modes.OnModesChanged += ChannelModesChanged;
             /* Window properties */
             BackColor = Color.FromArgb(190, 190, 190);            
             ShowInTaskbar = false;
@@ -203,6 +210,15 @@ namespace FusionIRC.Forms.Child
 
         protected override void OnLoad(EventArgs e)
         {
+            var type = LoggingType.None;
+            var file = string.Empty;
+            if (WindowType != ChildWindowType.Console)
+            {
+                var name = Tag.ToString();
+                Logger.FilePath = string.Format("{0}.log", Functions.GetLogFileName(Client.Network, name));
+                type = SettingsManager.Settings.Client.Logging.ReloadLogsType;
+                file = string.Format("{0}.buf", Functions.GetLogFileName(Client.Network, name));
+            }
             /* Set window icon */
             switch (WindowType)
             {
@@ -212,14 +228,23 @@ namespace FusionIRC.Forms.Child
 
                 case ChildWindowType.Channel:
                     Icon = Resources.channel;
+                    /* Check logging */
+                    if (type == LoggingType.Channels || type == LoggingType.Both)
+                    {
+                        Output.LoadBuffer(file);
+                        Logger.CreateLog();
+                    }
                     break;
 
                 case ChildWindowType.Private:
-                    Icon = Resources.query;
-                    break;
-
                 case ChildWindowType.DccChat:
-                    Icon = Resources.dcc_chat;
+                    Icon = WindowType == ChildWindowType.Private ? Resources.query : Resources.dcc_chat;
+                    /* Check logging */
+                    if (type == LoggingType.Chats || type == LoggingType.Both)
+                    {
+                        Output.LoadBuffer(file);
+                        Logger.CreateLog();
+                    }
                     break;
             }
             OnResize(new EventArgs());            
@@ -233,6 +258,27 @@ namespace FusionIRC.Forms.Child
                 KeepOpen = false;
                 e.Cancel = true;
                 return;
+            }            
+            Logger.CloseLog();
+            /* Dump log buffer */
+            var type = SettingsManager.Settings.Client.Logging.KeepLogsType;
+            var file = string.Format("{0}.buf", Functions.GetLogFileName(Client.Network, Tag.ToString()));
+            switch (WindowType)
+            {
+                case ChildWindowType.Channel:
+                    if (type == LoggingType.Channels || type == LoggingType.Both)
+                    {
+                        Output.SaveBuffer(file);
+                    }
+                    break;
+
+                case ChildWindowType.Private:
+                case ChildWindowType.DccChat:
+                    if (type == LoggingType.Chats || type == LoggingType.Both)
+                    {
+                        Output.SaveBuffer(file);
+                    }
+                    break;
             }
             /* Update window position in settings ... */
             switch (e.CloseReason)
@@ -372,6 +418,19 @@ namespace FusionIRC.Forms.Child
             return Tag.ToString();
         }
 
+        /* Channel modes class */
+        private void ChannelModesChanged(ChannelModes modes)
+        {
+            if (WindowType == ChildWindowType.Console)
+            {
+                Text = string.Format("{0}: {1} ({2}:{3}) {4}",
+                                     !string.IsNullOrEmpty(Client.Network) ? Client.Network : Client.Server.Address,
+                                     Client.UserInfo.Nick, Client.Server.Address, Client.Server.Port, modes);
+                return;
+            }
+            Text = string.Format("{0} {1}", Tag, modes);
+        }
+
         /* Control callbacks */
         private void OutputUrlDoubleClicked(string url)
         {            
@@ -448,6 +507,45 @@ namespace FusionIRC.Forms.Child
         private void OutputMouseUp(object sender, MouseEventArgs e)
         {
             Input.Focus();
+        }
+
+        private void OutputOnLineAdded(string text)
+        {
+            var type = SettingsManager.Settings.Client.Logging.KeepLogsType;
+            switch (WindowType)
+            {
+                case ChildWindowType.Console:
+                    return;
+
+                case ChildWindowType.Channel:
+                    if (type != LoggingType.Channels && type != LoggingType.Both)
+                    {
+                        System.Diagnostics.Debug.Print("return");
+                        return;
+                    }
+                    break;
+
+                case ChildWindowType.Private:
+                case ChildWindowType.DccChat:
+                    if (type != LoggingType.Chats && type != LoggingType.Both)
+                    {
+                        return;
+                    }
+                    break;
+            }
+            if (SettingsManager.Settings.Client.Logging.DateByDay)
+            {
+                var name = string.Format("{0}.log", Functions.GetLogFileName(Client.Network, Tag.ToString()));
+                if (!name.Equals(Logger.FilePath))
+                {
+                    Logger.CloseLog();
+                    Logger.FilePath = name;
+                    Logger.CreateLog();
+                }
+            }
+            Logger.WriteLog(SettingsManager.Settings.Client.Logging.StripCodes
+                                ? Functions.StripControlCodes(text)
+                                : text);
         }
 
         private void InputKeyDown(object sender, KeyEventArgs e)

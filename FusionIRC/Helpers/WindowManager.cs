@@ -40,7 +40,7 @@ namespace FusionIRC.Helpers
                 var connection = new ClientConnection(mdiOwner, SettingsManager.Settings.UserInfo);
                 win = new FrmChildWindow(connection, type, mdiOwner)
                           {
-                              Text = text,
+                              Text = string.Format("{0}: {1}", text, connection.UserInfo.Nick),
                               Tag = tag
                           };
                 var wins = new List<FrmChildWindow>
@@ -207,6 +207,7 @@ namespace FusionIRC.Helpers
             /* Add the callback handlers to ConnectionCallbackManager */
             client.Parser.OnOther += ConnectionCallbackManager.OnOther;
             client.Parser.OnNetworkNameChanged += ConnectionCallbackManager.OnNetworkNameChanged;
+            client.Parser.OnChannelModes += ConnectionCallbackManager.OnChannelModes;
             client.OnClientBeginConnect += ConnectionCallbackManager.OnClientBeginConnect;
             client.OnClientCancelConnection += ConnectionCallbackManager.OnClientCancelConnection;
             client.OnClientConnected += ConnectionCallbackManager.OnClientConnected;
@@ -258,6 +259,7 @@ namespace FusionIRC.Helpers
             /* Add the callback handlers to ConnectionCallbackManager */
             client.Parser.OnOther -= ConnectionCallbackManager.OnOther;
             client.Parser.OnNetworkNameChanged -= ConnectionCallbackManager.OnNetworkNameChanged;
+            client.Parser.OnChannelModes -= ConnectionCallbackManager.OnChannelModes;
             client.OnClientBeginConnect -= ConnectionCallbackManager.OnClientBeginConnect;
             client.OnClientCancelConnection -= ConnectionCallbackManager.OnClientCancelConnection;
             client.OnClientConnected -= ConnectionCallbackManager.OnClientConnected;
