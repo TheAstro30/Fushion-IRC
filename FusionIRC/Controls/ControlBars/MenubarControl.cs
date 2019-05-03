@@ -190,7 +190,7 @@ namespace FusionIRC.Controls.ControlBars
                 _mnuWindow.DropDownItems.AddRange(new ToolStripItem[]
                                                       {
                                                           new ToolStripSeparator(),
-                                                          new ToolStripMenuItem(child.Text, null, OnMenuWindowClick)
+                                                          new ToolStripMenuItem(Functions.TruncateString(child.Text, 100), null, OnMenuWindowClick)
                                                               {
                                                                   Tag = child, 
                                                                   Checked = child == active
@@ -205,7 +205,7 @@ namespace FusionIRC.Controls.ControlBars
                     }
                     if (c.Tag is FrmChildWindow)
                     {
-                        _mnuWindow.DropDownItems.Add(new ToolStripMenuItem(child.Text, null, OnMenuWindowClick)
+                        _mnuWindow.DropDownItems.Add(new ToolStripMenuItem(Functions.TruncateString(child.Text, 100), null, OnMenuWindowClick)
                         {
                             Tag = child,
                             Checked = child == active

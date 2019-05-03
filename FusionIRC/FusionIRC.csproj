@@ -189,6 +189,10 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Helpers\CommandProcessor.cs" />
+    <Compile Include="Helpers\Commands\CommandAlias.cs" />
+    <Compile Include="Helpers\Commands\CommandServer.cs" />
+    <Compile Include="Helpers\Commands\CommandSoundPlay.cs" />
+    <Compile Include="Helpers\Commands\CommandText.cs" />
     <Compile Include="Helpers\ConnectionCallbackManager.cs" />
     <Compile Include="Helpers\MdiHelper.cs" />
     <Compile Include="Helpers\WindowManager.cs" />

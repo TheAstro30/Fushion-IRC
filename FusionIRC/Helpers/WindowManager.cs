@@ -10,6 +10,7 @@ using System.Linq;
 using FusionIRC.Forms;
 using FusionIRC.Forms.Child;
 using FusionIRC.Forms.Misc;
+using FusionIRC.Helpers.Commands;
 using ircClient;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
@@ -213,7 +214,7 @@ namespace FusionIRC.Helpers
             client.OnClientConnected += ConnectionCallbackManager.OnClientConnected;
             client.OnClientDisconnected += ConnectionCallbackManager.OnClientDisconnected;
             client.OnClientConnectionError += ConnectionCallbackManager.OnClientConnectionError;
-            client.OnClientConnectionClosed += CommandProcessor.OnClientWaitToReconnect;
+            client.OnClientConnectionClosed += CommandServer.OnClientWaitToReconnect;
             client.Parser.OnServerPingPong += ConnectionCallbackManager.OnServerPingPong;
             client.Parser.OnErrorLink += ConnectionCallbackManager.OnErrorLink;
             client.OnClientSslInvalidCertificate += ConnectionCallbackManager.OnClientSslInvalidCertificate;
@@ -265,7 +266,7 @@ namespace FusionIRC.Helpers
             client.OnClientConnected -= ConnectionCallbackManager.OnClientConnected;
             client.OnClientDisconnected -= ConnectionCallbackManager.OnClientDisconnected;
             client.OnClientConnectionError -= ConnectionCallbackManager.OnClientConnectionError;
-            client.OnClientConnectionClosed -= CommandProcessor.OnClientWaitToReconnect;
+            client.OnClientConnectionClosed -= CommandServer.OnClientWaitToReconnect;
             client.OnClientSslInvalidCertificate -= ConnectionCallbackManager.OnClientSslInvalidCertificate;
             client.OnClientLocalInfoResolved -= ConnectionCallbackManager.OnClientLocalInfoResolved;
             client.OnClientLocalInfoFailed -= ConnectionCallbackManager.OnClientLocalInfoFailed;

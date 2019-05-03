@@ -70,7 +70,6 @@ namespace ircClient.Parsing
         public string UserModeCharacters { get; set; }
         public string UserModes { get; set; }
         public ChannelTypes ChannelPrefixTypes { get; set; }
-        public string ChannelModes { get; set; }
 
         public WhoisInfo Whois = new WhoisInfo();
 
@@ -806,10 +805,6 @@ namespace ircClient.Parsing
                     case "CHANTYPES":
                         /* Fill out channel prefix types */
                         ChannelPrefixTypes = new ChannelTypes(sections[0].ToCharArray());
-                        break;
-
-                    case "CHANMODES":
-                        ChannelModes = sections[0];
                         break;
                 }
             }

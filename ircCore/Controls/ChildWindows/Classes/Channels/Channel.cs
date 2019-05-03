@@ -5,53 +5,22 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace ircCore.Controls.ChildWindows.Classes
+namespace ircCore.Controls.ChildWindows.Classes.Channels
 {
-    public class CurrentModes
+    public class Channel : ChannelBase
     {
-        internal List<string> Modes = new List<string>();
+        /* The idea of this class is to provide a way of parsing +ntrR channel modes and sorting them including when
+         * the modes are changed or limit and key is set/unset and provide a topic string for each channel
+         * title bar. #<channame> [+nt]: <topic> */
+        private readonly ModeComparer _comparer = new ModeComparer();
 
-        public string Key { get; set; }
-
-        public int Limit { get; set; }
-        
-        public override string ToString()
-        {
-            if (Modes.Count > 0)
-            {
-                var modes = string.Join(string.Empty, Modes.ToList());
-                if (Limit > 0 && !string.IsNullOrEmpty(Key))
-                {
-                    return string.Format("[+{0} {1} {2}]", modes, Limit, Key);
-                }
-                if (Limit > 0)
-                {
-                    return string.Format("[+{0} {1}]", modes, Limit);
-                }
-                return !string.IsNullOrEmpty(Key) ? string.Format("[+{0} {1}]", modes, Key) : string.Format("[+{0}]", modes);
-            }
-            return string.Empty;
-        }
-    }
-
-    public class ChannelModes : CurrentModes
-    {
-        public event Action<ChannelModes> OnModesChanged;
+        public event Action<Channel> OnSettingsChanged;
 
         public void SetModes(string modes)
         {
-            SetModes(modes, string.Empty);
-        }
-
-        public void SetModes(string modes, string acceptableModes)
-        {
-            char[] c = null;
-            if (!string.IsNullOrEmpty(acceptableModes))
-            {
-                c = acceptableModes.ToCharArray();
-            }
+            /* This is only called when setting bulk modes (+ntris) from the server, call add/remove method for mode
+             * changes on a channel */
             var add = false;
             var hasKey = false;
             var hasLimit = false;
@@ -62,7 +31,6 @@ namespace ircCore.Controls.ChildWindows.Classes
                 {
                     break;
                 }
-                var m = modes[i].ToString();
                 switch (modes[i])
                 {
                     case '+':
@@ -77,9 +45,9 @@ namespace ircCore.Controls.ChildWindows.Classes
                         if (add)
                         {
                             hasKey = true;
-                            if (!Modes.Contains(m))
+                            if (!Modes.Contains(modes[i]))
                             {
-                                Modes.Add(m);
+                                Modes.Add(modes[i]);
                             }
                         }
                         break;
@@ -88,9 +56,9 @@ namespace ircCore.Controls.ChildWindows.Classes
                         if (add)
                         {
                             hasLimit = true;
-                            if (!Modes.Contains(m))
+                            if (!Modes.Contains(modes[i]))
                             {
-                                Modes.Add(m);
+                                Modes.Add(modes[i]);
                             }
                         }
                         else
@@ -103,40 +71,78 @@ namespace ircCore.Controls.ChildWindows.Classes
                         b = true;
                         break;
 
-                    default:                                               
+                    default:
                         if (add)
                         {
-                            if (c != null)
+                            if (!Modes.Contains(modes[i]))
                             {
-                                /* Verify the mode is a legal channel mode and not a user mode (+v/b, etc) */
-                                if (c.Contains(modes[i]) && !Modes.Contains(m))
-                                {
-                                    Modes.Add(m);
-                                }
-                            }
-                            else
-                            {
-                                /* Just add it */
-                                if (!Modes.Contains(m))
-                                {
-                                    Modes.Add(m);
-                                }
+                                Modes.Add(modes[i]);
                             }
                         }
                         else
                         {
-                            Modes.Remove(m);
+                            if (Modes.Contains(modes[i]))
+                            {
+                                Modes.Remove(modes[i]);
+                            }
                         }
                         break;
                 }
             }
             Key = string.Empty;
-            Modes.Sort();
-            var p = modes.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+            Modes.Sort(_comparer);
+            ProcessKeyLimit(hasLimit, hasKey, modes.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+            /* Raise event */
+            if (OnSettingsChanged != null)
+            {
+                OnSettingsChanged(this);
+            }
+        }
+
+        public void SetTopic(string topic)
+        {
+            Topic = topic;
+            if (OnSettingsChanged != null)
+            {
+                OnSettingsChanged(this);
+            }
+        }
+
+        public void AddMode(char m, string text)
+        {
+            ProcessKeyLimit(text);
+            if (Modes.Contains(m))
+            {
+                return;
+            }
+            Modes.Add(m);
+            Modes.Sort(_comparer);
+            if (OnSettingsChanged != null)
+            {
+                OnSettingsChanged(this);
+            }
+        }
+
+        public void RemoveMode(char m)
+        {
+            if (!Modes.Contains(m))
+            {
+                return;
+            }
+            Modes.Remove(m);
+            if (OnSettingsChanged != null)
+            {
+                OnSettingsChanged(this);
+            }
+        }
+
+        /* Private helper methods */
+        private void ProcessKeyLimit(bool hasLimit, bool hasKey, IList<string> p)
+        {
             if (hasKey && hasLimit)
             {
                 /* Needs to be three parts to 'p' */
-                if (p.Length == 3)
+                if (p.Count == 3)
                 {
                     ProcessKeyLimit(p[1]);
                     ProcessKeyLimit(p[2]);
@@ -146,11 +152,6 @@ namespace ircCore.Controls.ChildWindows.Classes
             {
                 /* Just two parts */
                 ProcessKeyLimit(p[1]);
-            }
-            /* Raise event */
-            if (OnModesChanged != null)
-            {
-                OnModesChanged(this);
             }
         }
 

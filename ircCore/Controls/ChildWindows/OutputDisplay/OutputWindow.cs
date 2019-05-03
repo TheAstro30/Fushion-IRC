@@ -51,6 +51,8 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
 
         private readonly bool _initialized;
 
+        private int _lineMarkerPos;
+
         /* Public events */
         public event Action<string> OnLineAdded;
         public event Action<string> OnUrlDoubleClicked;
@@ -566,6 +568,17 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         }
 
         /* Methods */
+        public void AddLineMarker()
+        {
+            if (_lineMarkerPos > 0)
+            {
+                /* Really shouldn't add a line marker at line 0 ... */
+                TextData.Lines.RemoveAt(_lineMarkerPos);                
+            }
+            AddLine(1, ((char) 0).ToString());
+            _lineMarkerPos = TextData.Lines.Count - 1;
+        }
+
         public void AddLine(int defaultColor, string text)
         {
             if (string.IsNullOrEmpty(text))
@@ -646,8 +659,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             }
             TextData = tmp;
             /* Add a separator line at the bottom */
-            //AddLine(1, "-", true);
-            AddLine(1,((char)0).ToString());
+            AddLineMarker();
             /* Reset scrollbar */
             _scrollValue = TextData.WrappedLinesCount - 1;
             if (_scrollValue < 0) { _scrollValue = 0; }
@@ -660,6 +672,10 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
 
         public void SaveBuffer(string file)
         {
+            if (_lineMarkerPos > 0)
+            {
+                TextData.Lines.RemoveAt(_lineMarkerPos);
+            }
             /* Save the buffer output to file */
             BinarySerialize<TextData>.Save(file, TextData);
         }

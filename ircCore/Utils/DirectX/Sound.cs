@@ -6,14 +6,15 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
+using System.Threading;
 using ircCore.Utils.DirectX.Core;
+using Timer = System.Windows.Forms.Timer;
 
 namespace ircCore.Utils.DirectX
 {
     public class Sound
     {
-        private readonly Timer _play;
+        private Timer _play;
         private IBasicAudio _audio;
         private IGraphBuilder _graph;
         private IMediaControl _media;
@@ -24,7 +25,7 @@ namespace ircCore.Utils.DirectX
         public event Action<Sound> OnMediaEnded;
         public event Action<Sound, double> OnMediaPositionChanged;
 
-        public string Clip { get; private set; }
+        public string Clip { get; set; }
 
         /* Public properties */
         public int Volume
@@ -99,16 +100,15 @@ namespace ircCore.Utils.DirectX
         }
 
         /* Constructor/destuctor */
+        public Sound()
+        {
+            Init();
+        }
+
         public Sound(string fileName)
         {
             Clip = fileName;
-            _pan = 50;
-            var timer = new Timer
-                            {
-                                Interval = 200
-                            };
-            _play = timer;
-            _play.Tick += TimerTick;
+            Init();
         }
 
         ~Sound()
@@ -117,6 +117,14 @@ namespace ircCore.Utils.DirectX
         }
 
         /* Public methods */
+        public void PlayAsync()
+        {
+            /* This does NOT check for cross-threading, so if events are raised, it's up to the code at the other
+             * end to do Invoke/BeginInvoke */
+            var t = new Thread(Play) {IsBackground = true};
+            t.Start();
+        }
+
         public void Play()
         {
             Close();
@@ -138,7 +146,39 @@ namespace ircCore.Utils.DirectX
             _play.Enabled = false;
         }
 
-        /* Private helper methods */
+        public void Pause()
+        {
+           if (_media != null)
+           {
+               _media.Pause();
+           }
+            _play.Enabled = false;
+        }
+
+        public void Resume()
+        {
+            if (_media != null)
+            {
+                if (_media.Run() < 0)
+                {
+                    return;
+                }
+            }
+            _play.Enabled = true;
+        }
+
+        /* Private helper methods */    
+        private void Init()
+        {
+            _pan = 50;
+            var timer = new Timer
+                            {
+                                Interval = 200
+                            };
+            _play = timer;
+            _play.Tick += TimerTick;
+        }
+
         private bool Open()
         {
             bool flag;

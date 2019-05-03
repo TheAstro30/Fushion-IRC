@@ -4,51 +4,18 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
-using System.Linq;
-using System.Windows.Forms;
 using FusionIRC.Forms.Child;
+using FusionIRC.Helpers.Commands;
 using ircClient;
 using ircClient.Parsing.Helpers;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
-using ircScript;
-using ircScript.Classes;
-using ircScript.Classes.Structures;
 
 namespace FusionIRC.Helpers
 {
     public static class CommandProcessor
     {
-        private static readonly Timer TmrWaitToReconnectTimeOut;
-
-        /* Constructor */
-        static CommandProcessor()
-        {
-            /* Wait at least N number of seconds for socket to disconenct when issuing a new /server connection on a connected socket */
-            TmrWaitToReconnectTimeOut = new Timer
-                                             {
-                                                 Interval = 4000
-                                             };
-            TmrWaitToReconnectTimeOut.Tick += TimerWaitToReconnectTimeOut;
-        }
-
-        /* Client waiting to reconnect after a disconnect */
-        public static void OnClientWaitToReconnect(ClientConnection client)
-        {
-            /* This is called when the server command is issued on a currently connected server */
-            if (TmrWaitToReconnectTimeOut.Enabled)
-            {
-                /* Event raised by connection class before time out timer fired */
-                TmrWaitToReconnectTimeOut.Enabled = false;
-            }
-            ParseServerConnection(client,
-                                  string.Format("{0}:{1}", client.Server.Address,
-                                                client.Server.IsSsl
-                                                    ? string.Format("+{0}", client.Server.Port.ToString())
-                                                    : client.Server.Port.ToString()));
-        }
-
         /* Main parsing entry point */
         public static void Parse(ClientConnection client, FrmChildWindow child, string data)
         {
@@ -67,49 +34,48 @@ namespace FusionIRC.Helpers
             ParseCommand(client, child, com, args);
         }
 
-        /* Private parsing methods */
-        private static void ParseCommand(ClientConnection client, FrmChildWindow child, string command, string args)
+        public static void ParseCommand(ClientConnection client, FrmChildWindow child, string command, string args)
         {
             /* First check it's not an alias */
-            if (ParseAlias(client, child, command, args))
+            if (CommandAlias.ParseAlias(client, child, command, args))
             {
                 return; /* Process no further */
             }
             switch (command)
             {
                 case "SERVER":
-                    ParseServerConnection(client, args);
+                    CommandServer.ParseServerConnection(client, args);
                     break;
 
                 case "DISCONNECT":
-                    ParseServerDisconnection(client);
+                    CommandServer.ParseServerDisconnection(client);
                     break;
 
                 case "ME":
                 case "ACTION":
                 case "DESCRIBE":
                     /* Action */
-                    ParseAction(client, child, args);
+                    CommandText.ParseAction(client, child, args);
                     break;
 
                 case "AME":
-                    ParseAme(client, args);
+                    CommandText.ParseAme(client, args);
                     break;
 
                 case "AMSG":
-                    ParseAmsg(client, args);
+                    CommandText.ParseAmsg(client, args);
                     break;
 
                 case "MSG":
-                    ParseMsg(client, child, args);
+                    CommandText.ParseMsg(client, child, args);
                     break;
 
                 case "SAY":
-                    ParseSay(client, child, args);
+                    CommandText.ParseSay(client, child, args);
                     break;
 
                 case "NOTICE":
-                    ParseNotice(client, child, args);
+                    CommandText.ParseNotice(client, child, args);
                     break;
 
                 case "PART":
@@ -159,7 +125,11 @@ namespace FusionIRC.Helpers
                     break;
 
                 case "ECHO":
-                    ParseEcho(client, args);
+                    CommandText.ParseEcho(client, args);
+                    break;
+
+                case "SPLAY":
+                    CommandSoundPlay.Parse(args);
                     break;
 
                 default:
@@ -173,316 +143,7 @@ namespace FusionIRC.Helpers
             }
         }
 
-        /* Parse alias as command line */
-        private static bool ParseAlias(ClientConnection client, FrmChildWindow child, string command, string args)
-        {
-            /* First check it's not an alias, if it is - pass it back to command processor */
-            var alias = ScriptManager.GetScript(ScriptManager.Aliases, command);
-            if (alias == null)
-            {
-                return false;
-            }
-            var sp = new ScriptArgs
-                         {
-                             ClientConnection = client,
-                             ChildWindow = child,
-                             Channel = child.Tag.ToString()[0] == '#' ? child.Tag.ToString() : string.Empty,
-                             Nick =
-                                 child.WindowType == ChildWindowType.Private ||
-                                 child.WindowType == ChildWindowType.DccChat
-                                     ? child.Tag.ToString()
-                                     : string.Empty
-                         };
-            alias.LineParsed += ScriptLineParsed;
-            alias.ParseCompleted += ScriptParseCompleted;
-            alias.Parse(sp, args.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries));
-            return true;
-        }
-
-        /* Script callbacks */
-        private static void ScriptLineParsed(Script script, ScriptArgs e, string data)
-        {           
-            //System.Diagnostics.Debug.Print(">> DATA " +data);
-            if (string.IsNullOrEmpty(data))
-            {
-                return;
-            }
-            var i = data.IndexOf(' ');
-            string command;
-            var args = string.Empty;
-            if (i == -1)
-            {
-                command = data.Trim();
-            }
-            else
-            {
-                command = data.Substring(0, i).Trim().ToUpper().Replace("/", "");
-                args = data.Substring(i + 1).Trim();
-            }
-            ParseCommand(e.ClientConnection, (FrmChildWindow) e.ChildWindow, command, args);
-        }
-
-        private static void ScriptParseCompleted(Script script)
-        {
-            script.LineParsed -= ScriptLineParsed;
-            script.ParseCompleted -= ScriptParseCompleted;
-        }
-
-        /* Connection events */
-        private static void ParseServerConnection(ClientConnection client, string args)
-        {
-            var s = args.Split(' ');
-            string[] address;
-            var port = 6667;
-            bool ssl = false;
-            var c = WindowManager.GetConsoleWindow(client);
-            if (c == null || s.Length == 0)
-            {
-                return;
-            }
-            switch (s.Length)
-            {
-                case 1:
-                    if (s[0].Equals("-m", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return;
-                    }
-                    address = s[0].Split(':');
-                    break;
-
-                default:
-                    /* /server -m server[:port]  or /server -m server[:port] -j #chan */
-                    if (s[0].Equals("-m", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        /* Create new connection */
-                        c = WindowManager.AddWindow(null, ChildWindowType.Console, ConnectionCallbackManager.MainForm,
-                                                    "Console", "Console", true);
-                        if (c == null)
-                        {
-                            return;
-                        }
-                        address = s[1].Split(':');
-                    }
-                    else
-                    {
-                        address = s[0].Split(':');
-                    }
-                    c.Client.Parser.JoinChannelsOnConnect = s.Length > 2 &&
-                                                            s[1].Equals("-j", StringComparison.InvariantCultureIgnoreCase)
-                                                                ? s[2]
-                                                                : s.Length > 3 &&
-                                                                  s[2].Equals("-j", StringComparison.InvariantCultureIgnoreCase)
-                                                                      ? s[3]
-                                                                      : string.Empty;
-                    break;
-            }
-            if (address.Length == 2)
-            {
-                /* Look for a '+' to determine SSL */
-                if (address[1][0] == '+')
-                {
-                    ssl = true;
-                    address[1] = address[1].Substring(1);
-                }
-                if (!int.TryParse(address[1], out port))
-                {
-                    port = 6667;
-                }
-            }
-            /* If currently connected, we should send quit message */
-            if (c.Client.IsConnecting)
-            {
-                c.Client.CancelConnection();
-            }
-            else if (c.Client.IsConnected)
-            {
-                c.Client.IsWaitingToReconnect = true;
-                c.Client.Disconnect();
-                c.Client.Server.Address = address[0];
-                c.Client.Server.Port = port;
-                c.Client.Server.IsSsl = ssl;
-                TmrWaitToReconnectTimeOut.Tag = c.Client;
-                TmrWaitToReconnectTimeOut.Enabled = true;
-                return;
-            }
-            c.Client.Connect(address[0], port, ssl);
-        }
-
-        private static void ParseServerDisconnection(ClientConnection client)
-        {
-            var c = WindowManager.GetConsoleWindow(client);
-            if (c == null)
-            {
-                return;
-            }
-            client.IsManualDisconnect = true;
-            if (client.IsConnecting)
-            {
-                /* Cancel current connection */
-                client.CancelConnection();
-                return;
-            }
-            client.Disconnect();
-        }
-
-        /* Text events */
-        private static void ParseAction(ClientConnection client, FrmChildWindow child, string args)
-        {
-            if (child.WindowType == ChildWindowType.Console || !client.IsConnected)
-            {
-                return;
-            }
-            var tmd = new IncomingMessageData
-                          {
-                              Message =
-                                  child.WindowType == ChildWindowType.Channel
-                                      ? ThemeMessage.ChannelSelfActionText
-                                      : child.WindowType == ChildWindowType.Private
-                                            ? ThemeMessage.PrivateSelfActionText
-                                            : ThemeMessage.ChannelSelfActionText,
-                              TimeStamp = DateTime.Now,
-                              Nick = client.UserInfo.Nick,
-                              Prefix = child.WindowType == ChildWindowType.Channel ? child.Nicklist.GetNickPrefix(client.UserInfo.Nick) : string.Empty,
-                              Text = args
-                          };
-            var pmd = ThemeManager.ParseMessage(tmd);
-            child.Output.AddLine(pmd.DefaultColor, pmd.Message);
-            /* Update treenode color */
-            WindowManager.SetWindowEvent(child, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
-            var action = string.Format("PRIVMSG {0} :{1}ACTION {2}{3}", child.Tag, (char)1, args, (char)1);
-            client.Send(action);
-        }
-
-        private static void ParseAme(ClientConnection client, string args)
-        {
-            if (!client.IsConnected)
-            {
-                return;
-            }
-            foreach (var c in WindowManager.Windows[client].Where(c => c.WindowType == ChildWindowType.Channel))
-            {
-                ParseAction(client, c, args);
-            }
-        }
-
-        private static void ParseSay(ClientConnection client, FrmChildWindow child, string args)
-        {
-            /* Message args to active window */
-            if (child.WindowType == ChildWindowType.Console || !client.IsConnected)
-            {
-                return;
-            }
-            ParseMsg(client, child, string.Format("{0} {1}", child.Tag, args));
-        }
-
-        private static void ParseMsg(ClientConnection client, FrmChildWindow child, string args)
-        {
-            /* /msg <target> <text> */
-            var i = args.IndexOf(' ');
-            if (i == -1 || !client.IsConnected)
-            {
-                return;
-            }
-            IncomingMessageData tmd;
-            ParsedMessageData pmd;
-            var target = args.Substring(0, i).Trim();
-            args = args.Substring(i).Trim();
-            /* Now we need to find the "target" window, if it exists send text to there, if not we display an "echo" in the acitve window */
-            var c = WindowManager.GetWindow(client, target);
-            if (c == null)
-            {
-                /* Echo the message to the active window */
-                if (child != null)
-                {
-                    tmd = new IncomingMessageData
-                              {
-                                  Message = ThemeMessage.MessageTargetText,
-                                  TimeStamp = DateTime.Now,
-                                  Target = target,
-                                  Text = args
-                              };
-                    pmd = ThemeManager.ParseMessage(tmd);
-                    child.Output.AddLine(pmd.DefaultColor, pmd.Message);
-                    /* Update treenode color */
-                    WindowManager.SetWindowEvent(child, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
-                    child.Client.Send(string.Format("PRIVMSG {0} :{1}", target, args));
-                }
-                return;
-            }
-            /* Target exists */
-            tmd = new IncomingMessageData
-                      {
-                          Message =
-                              c.WindowType == ChildWindowType.Channel
-                                  ? ThemeMessage.ChannelSelfText
-                                  : c.WindowType == ChildWindowType.Private
-                                        ? ThemeMessage.PrivateSelfText
-                                        : ThemeMessage.ChannelSelfText,
-                          TimeStamp = DateTime.Now,
-                          Nick =
-                              c.WindowType == ChildWindowType.Channel
-                                  ? c.Client.UserInfo.Nick
-                                  : c.WindowType == ChildWindowType.Private ? c.Tag.ToString() : target,
-                          Text = args
-                      };
-            pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
-            /* Update treenode color */
-            WindowManager.SetWindowEvent(c, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
-            c.Client.Send(string.Format("PRIVMSG {0} :{1}", target, args));
-        }
-
-        private static void ParseAmsg(ClientConnection client, string args)
-        {
-            if (!client.IsConnected)
-            {
-                return;
-            }
-            foreach (var c in WindowManager.Windows[client].Where(c => c.WindowType == ChildWindowType.Channel))
-            {
-                var tmd = new IncomingMessageData
-                              {
-                                  Message = ThemeMessage.ChannelSelfText,
-                                  TimeStamp = DateTime.Now,
-                                  Nick = client.UserInfo.Nick,
-                                  Prefix = c.Nicklist.GetNickPrefix(client.UserInfo.Nick),
-                                  Text = args
-                              };
-                var pmd = ThemeManager.ParseMessage(tmd);
-                c.Output.AddLine(pmd.DefaultColor, pmd.Message);
-                /* Update treenode color */
-                WindowManager.SetWindowEvent(c, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
-                client.Send(string.Format("PRIVMSG {0} :{1}", c.Tag, args));
-            }
-        }
-
-        private static void ParseNotice(ClientConnection client, FrmChildWindow child, string args)
-        {
-            if (!client.IsConnected || string.IsNullOrEmpty(args))
-            {
-                return;
-            }
-            var i = args.IndexOf(' ');
-            if (i == -1)
-            {
-                return;
-            }
-            var target = args.Substring(0, i).Trim();
-            args = args.Substring(i).Trim();
-            var tmd = new IncomingMessageData
-                          {
-                              Message = ThemeMessage.NoticeSelfText,
-                              TimeStamp = DateTime.Now,
-                              Target = target,
-                              Text = args
-                          };
-            var pmd = ThemeManager.ParseMessage(tmd);
-            child.Output.AddLine(pmd.DefaultColor, pmd.Message);
-            /* Update treenode color */
-            WindowManager.SetWindowEvent(child, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
-            client.Send(string.Format("NOTICE {0} :{1}", target, args));
-        }
-
+        /* CTCP */
         private static void ParseCtcp(ClientConnection client, string args)
         {
             if (!client.IsConnected || string.IsNullOrEmpty(args))
@@ -653,32 +314,6 @@ namespace FusionIRC.Helpers
                 child.AutoClose = true; /* This will stop the child window sending "PART" on closing */
             }
             client.Send(string.Format("PART {0}\r\nJOIN {0}", child.Tag));
-        }
-
-        private static void ParseEcho(ClientConnection client, string args)
-        {
-            /* Echo text to window (currently only supporting active window for now) -
-             * client param not used for now but eventually will be */
-            var w = WindowManager.GetActiveWindow(ConnectionCallbackManager.MainForm);
-            if (w == null)
-            {
-                return;
-            }
-            var tmd = new IncomingMessageData
-                          {
-                              Message = ThemeMessage.EchoText,
-                              TimeStamp = DateTime.Now,
-                              Text = args
-                          };
-            var pmd = ThemeManager.ParseMessage(tmd);
-            w.Output.AddLine(pmd.DefaultColor, pmd.Message);
-        }
-
-        /* Timer callback */
-        private static void TimerWaitToReconnectTimeOut(object sender, EventArgs e)
-        {
-            TmrWaitToReconnectTimeOut.Enabled = false;
-            OnClientWaitToReconnect((ClientConnection)TmrWaitToReconnectTimeOut.Tag);
         }
     }
 }

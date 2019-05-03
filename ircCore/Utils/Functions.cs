@@ -235,6 +235,11 @@ namespace ircCore.Utils
             return string.IsNullOrEmpty(text) ? string.Empty : RegExAllCodes.Replace(text, "");
         }
 
+        public static string TruncateString(string text, int length)
+        {
+            return text.Length > length ? string.Format("{0}...", text.Substring(0, length)) : text;
+        }
+
         /* Private methods */
         private static void CopyDirectory(string srcFolder, string destFolder)
         {

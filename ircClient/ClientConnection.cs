@@ -128,7 +128,6 @@ namespace ircClient
             /* Clear other parser variables */
             Parser.UserModeCharacters = string.Empty;
             Parser.UserModes = string.Empty;
-            Parser.ChannelModes = string.Empty;
             Parser.ChannelPrefixTypes = new ChannelTypes();
             /* Begin connection */
             IsConnecting = true;

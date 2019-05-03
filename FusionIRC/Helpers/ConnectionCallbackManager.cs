@@ -50,7 +50,6 @@ namespace FusionIRC.Helpers
 
         public static void OnChannelModes(ClientConnection client, string channel, string modes)
         {
-            System.Diagnostics.Debug.Print(channel + " " + modes);
             var w = WindowManager.GetWindow(client, channel);
             if (w != null)
             {
@@ -541,7 +540,6 @@ namespace FusionIRC.Helpers
             {
                 client.Send(string.Format("MODE {0} +i", client.UserInfo.Nick));
             }
-            System.Diagnostics.Debug.Print("Updating recent server for " + client.Server.Address);
             /* Update recent servers list */
             UpdateRecentServers(client);
             /* Resolve local IP */
@@ -584,6 +582,8 @@ namespace FusionIRC.Helpers
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update title bar */
+            c.Modes.SetTopic(Functions.StripControlCodes(text));
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -624,6 +624,8 @@ namespace FusionIRC.Helpers
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update title bar */
+            c.Modes.SetTopic(Functions.StripControlCodes(text));
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
         }
@@ -918,8 +920,6 @@ namespace FusionIRC.Helpers
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
-            /* Update channel modes */            
-            c.Modes.SetModes(string.Format("{0} {1}", modes, modeData), client.Parser.ChannelModes);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
             /* We need to parse the mode data */
@@ -962,6 +962,42 @@ namespace FusionIRC.Helpers
                             c.Nicklist.RemoveUserMode(data[modePointer], modes[i].ToString());
                         }
                         modePointer++;
+                        break;
+
+                    case 'b':
+                    case 'f':
+                        modePointer++;
+                        break;
+
+                    case 'l':                        
+                        if (plusMode)
+                        {
+                            c.Modes.AddMode(modes[i], data[modePointer]);
+                            modePointer++;
+                        }
+                        else
+                        {
+                            c.Modes.Limit = 0;
+                            c.Modes.RemoveMode(modes[i]);
+                        }
+                        break;
+
+                    case 'k':                        
+                        if (plusMode)
+                        {
+                            c.Modes.AddMode(modes[i], data[modePointer]);
+                        }
+                        else
+                        {
+                            c.Modes.Key = string.Empty;
+                            c.Modes.RemoveMode(modes[i]);
+                        }
+                        modePointer++;
+                        break;
+
+                    default:
+                        /* Update channel modes */
+                        c.Modes.AddMode(modes[i], string.Empty);
                         break;
                 }
             }
@@ -1108,12 +1144,12 @@ namespace FusionIRC.Helpers
         {
             var servers = ServerManager.Servers.Recent.Server;
             var index = servers.FindIndex(s => s.Address.Equals(client.Server.Address, StringComparison.InvariantCultureIgnoreCase));
-            if (index > 0)
+            if (index > -1)
             {
                 servers.RemoveAt(index);
-                /* Insert current server at the top of the recent list */
-                servers.Insert(0, client.Server);
             }
+            /* Lol... helps to actually add the damn thing if it doesn't exist */
+            servers.Insert(0, client.Server);
             /* Keep the list length down */
             if (servers.Count > 25)
             {

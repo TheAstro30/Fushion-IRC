@@ -15,6 +15,7 @@ using FusionIRC.Properties;
 using ircClient;
 using ircCore.Controls;
 using ircCore.Controls.ChildWindows.Classes;
+using ircCore.Controls.ChildWindows.Classes.Channels;
 using ircCore.Controls.ChildWindows.Input;
 using ircCore.Controls.ChildWindows.Nicklist;
 using ircCore.Controls.ChildWindows.OutputDisplay;
@@ -41,7 +42,7 @@ namespace FusionIRC.Forms.Child
 
         public Logger Logger = new Logger();
 
-        public ChannelModes Modes = new ChannelModes();
+        public Channel Modes = new Channel();
 
         /* Public properties */
         public ChildWindowType WindowType { get; private set; }
@@ -173,7 +174,7 @@ namespace FusionIRC.Forms.Child
             Input.TabKeyPress += InputTabKeyPress;
             Input.KeyDown += InputKeyDown;
             Input.MouseWheel += InputMouseWheel;
-            Modes.OnModesChanged += ChannelModesChanged;
+            Modes.OnSettingsChanged += ChannelSettingsChanged;
             /* Window properties */
             BackColor = Color.FromArgb(190, 190, 190);            
             ShowInTaskbar = false;
@@ -419,7 +420,7 @@ namespace FusionIRC.Forms.Child
         }
 
         /* Channel modes class */
-        private void ChannelModesChanged(ChannelModes modes)
+        private void ChannelSettingsChanged(Channel modes)
         {
             if (WindowType == ChildWindowType.Console)
             {
@@ -520,7 +521,6 @@ namespace FusionIRC.Forms.Child
                 case ChildWindowType.Channel:
                     if (type != LoggingType.Channels && type != LoggingType.Both)
                     {
-                        System.Diagnostics.Debug.Print("return");
                         return;
                     }
                     break;
