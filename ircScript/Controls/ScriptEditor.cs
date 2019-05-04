@@ -144,7 +144,7 @@ namespace ircScript.Controls
             for (var i = 0; i < lines.Count; i++)
             {
                 var line = lines[i].TrimStart(); /* Remove any leading spacing already */
-                if (line.EndsWith("{"))
+                if (!line.StartsWith("//") && line.EndsWith("{"))
                 {
                     lines[i] = string.Format("{0}{1}", new String(' ', indent * 2), line);
                     indent++;

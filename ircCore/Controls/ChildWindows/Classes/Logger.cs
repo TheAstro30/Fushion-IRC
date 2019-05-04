@@ -69,7 +69,7 @@ namespace ircCore.Controls.ChildWindows.Classes
         {
             try
             {
-                if (_stream != null && _writer != null)
+                if (_stream != null && _writer != null && line != ((char)0).ToString())
                 {
                     _writer.WriteLine(line);
                     _writer.Flush();

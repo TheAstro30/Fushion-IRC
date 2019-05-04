@@ -5,7 +5,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using ircScript.Classes.Parsers;
 using ircScript.Classes.Structures;
 
@@ -46,8 +45,14 @@ namespace ircScript.Classes
             var br = false;
             var finalResult = string.Empty;
             /* Parse each line - conditions then finally check for return/break */
-            foreach (var parsed in LineData.Select(line => parser.Parse(e, line, args)).Where(conditional.Parse))
+            for (var l = 0; l < LineData.Count; l++)
             {
+                var line = LineData[l];
+                var parsed = parser.Parse(e, line, args);
+                if (!conditional.Parse(parsed, ref l))
+                {
+                    continue;
+                }
                 /* Now parse everything else (if, etc) */
                 string com;
                 var arg = string.Empty;

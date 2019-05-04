@@ -20,9 +20,11 @@ namespace ircScript.Classes.Parsers
         private int _ifResumeProcess;
         private bool _ifLastExecute;
         private bool _processCode = true;
+        private int _endBlock;
 
-        public bool Parse(string lineData)
+        public bool Parse(string lineData, ref int lineNumber)
         {
+            ScriptWhile sw;
             var sp = lineData.Split(new[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries);
             if (sp.Length == 3)
             {
@@ -36,6 +38,7 @@ namespace ircScript.Classes.Parsers
                             _if.Push(false);
                             return false;
                         }
+                        _endBlock++;
                         if (ParseConditional(sp[1]))
                         {
                             _if.Push(true);
@@ -56,6 +59,7 @@ namespace ircScript.Classes.Parsers
                             _if.Push(false);
                             return false;
                         }
+                        _endBlock++;
                         if (_ifLastExecute)
                         {
                             if (_processCode)
@@ -78,6 +82,35 @@ namespace ircScript.Classes.Parsers
                         }
                         _if.Push(false);
                         break;
+
+                    case "WHILE":
+                        if (!_processCode)
+                        {
+                            return false;
+                        }
+                        _endBlock++;
+                        if (_while.Count > 0)
+                        {
+                            sw = _while.Peek();
+                            if (sw.StartLine == lineNumber && sw.Execute)
+                            {
+                                if (!ParseConditional(sp[1]))
+                                {
+                                    sw.Execute = false;
+                                    _processCode = false;
+                                }
+                                return false;
+                            }
+                        }
+                        /* Create a new entry */
+                        sw = new ScriptWhile
+                                 {
+                                     StartLine = lineNumber,
+                                     EndBlock = _endBlock,
+                                     Execute = ParseConditional(sp[1])
+                                 };
+                        _while.Push(sw);
+                        return false;
                 }
             }
             sp = lineData.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -86,6 +119,7 @@ namespace ircScript.Classes.Parsers
                 switch (sp[0].Trim().ToUpper())
                 {
                     case "ELSE":
+                       _endBlock++;
                         if (_ifLastExecute)
                         {
                             if (_processCode)
@@ -103,6 +137,26 @@ namespace ircScript.Classes.Parsers
             if (lineData.Trim() == "}")
             {
                 /* End of code block */
+                if (_while.Count > 0)
+                {
+                    /* Get last entry */
+                    sw = _while.Peek();
+                    if (_endBlock == sw.EndBlock)
+                    {
+                        if (sw.Execute)
+                        {
+                            /* Now we jump back to our start line and begin processing again */
+                            lineNumber = sw.StartLine - 1;
+                            _endBlock--;
+                            return false;
+                        }
+                        /* Remove it */
+                        _processCode = true;
+                        _endBlock--;
+                        _while.Pop();
+                        return false;
+                    }
+                }
                 if (_if.Count > 0)
                 {
                     _ifLastExecute = _if.Pop();
@@ -111,6 +165,7 @@ namespace ircScript.Classes.Parsers
                 {
                     _processCode = true;
                 }
+                _endBlock--;
                 return false;
             }
             return _processCode;
@@ -213,7 +268,7 @@ namespace ircScript.Classes.Parsers
                 {
                     sTmpArgs[i] = sTmpArgs[i].Substring(0, sTmpArgs[i].Length - 1);
                 }
-                var conditionTrue = Parse(sTmpArgs[i]);                
+                var conditionTrue = ParseConditional(sTmpArgs[i]);     //note: hi           
                 if (andOr != " || " && !conditionTrue)
                 {
                     return false;
