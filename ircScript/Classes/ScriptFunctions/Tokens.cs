@@ -42,7 +42,7 @@ namespace ircScript.Classes.ScriptFunctions
                     {
                         start = 1;
                     }
-                    end = TokenLength(args[0], (char) ch) - start;
+                    end = TokenLength(args[0], (char) ch) - (start - 2);
                 }
             }
             else
@@ -106,16 +106,19 @@ namespace ircScript.Classes.ScriptFunctions
 
         private static string GetToken(string line, char delim, int start, int end)
         {
-            var tokens = new List<string>(line.Split(new[] {delim}, StringSplitOptions.RemoveEmptyEntries));
+            var tokens = new List<string>(line.Split(new[] {delim}, StringSplitOptions.RemoveEmptyEntries));            
             if (start == end && start > 0 && start <= tokens.Count)
             {
                 return tokens[start - 1];
             }
             if (end > start && end <= tokens.Count)
             {
-                for (var i = start - 1; i >= 0; i--)
+                for (var i = tokens.Count - 1; i >= 0; i--)
                 {
-                    tokens.RemoveAt(i);
+                    if (i <= start - 2 || (i >= end - 1 && end < tokens.Count))
+                    {
+                        tokens.RemoveAt(i);
+                    }
                 }
                 return string.Join(delim.ToString(), tokens);
             }

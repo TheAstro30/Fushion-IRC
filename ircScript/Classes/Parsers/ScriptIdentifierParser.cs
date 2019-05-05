@@ -25,6 +25,7 @@ namespace ircScript.Classes.Parsers
         private readonly Regex _tokenIdentifiers = new Regex(@"\$\w+", RegexOptions.Compiled); /* Replaces $chan, etc */
         private readonly Regex _tokenParenthisisParts = new Regex(@"\$([a-zA-Z_][a-zA-Z0-9_]*)\(((?<BR>\()|(?<-BR>\))|[^()]*)+\)", RegexOptions.Compiled);
         private readonly Regex _parenthisisPart = new Regex(@"^\$(?<id>\w+?)\((?<args>.+)\)$", RegexOptions.Compiled);
+        //private readonly Regex _parenthisisPart = new Regex(@"^\$(?<id>\w+?)\((?<args>.+)\)(?<rest>.+)", RegexOptions.Compiled);
 
         private Stack<IdentifierParams> _nestedIdStack;
 
@@ -73,32 +74,26 @@ namespace ircScript.Classes.Parsers
                 case "$NICK":
                     return e.Nick;
 
+                case "APPDIR":
+                    return Functions.MainDir(@"\\", false);
+
                 default:
                     /* Check if it's an alias */                    
                     var id = value.Replace("$", "");
+                    /* Is it an alias or an internal identifier? (Args aren't required here) */
                     var script = ScriptManager.GetScript(ScriptManager.Aliases, id);
-                    string rec;
-                    if (script != null)
-                    {
-                        rec = script.Parse(e, null); /* Args aren't required here */
-                    }
-                    else
-                    {
-                        /* Internal identifier? */
-                        rec = ParseInternalIdentifier(e, id.ToUpper(), null);
-                    }
-                    return rec;
+                    return script != null ? script.Parse(e, null) : ParseInternalIdentifier(e, id.ToUpper(), null);
             }
         }
 
         private string ParseParenthisis(ScriptArgs e, string line)
         {
-            var part = _tokenParenthisisParts.Matches(line);
+            var part = _tokenParenthisisParts.Matches(line);//.Replace((char) 44, (char) 7));
             var sb = new StringBuilder(line);
             if (part.Count > 0)
             {
                 foreach (Match pt in part)
-                {                    
+                {                
                     sb.Replace(pt.Value, ParseIdentifierArgs(e, pt.Value));
                 }
             }
@@ -111,7 +106,7 @@ namespace ircScript.Classes.Parsers
             var m = _parenthisisPart.Match(id);
             IdentifierParams p;
             while (m.Success)
-            {
+            {                
                 p = new IdentifierParams
                         {
                             Id = m.Groups[1].Value,
@@ -156,14 +151,22 @@ namespace ircScript.Classes.Parsers
                         {
                             /* Unfortunately, this is how regex works ... need to call this "twice" (once from main
                              * parse routine of this file, and once here */
-                            argList[i] = ParseSingleIdentifier(e, argList[i].Replace("$", ""));                            
+                            if (argList[i].Contains("(") && argList[i].Contains(")"))
+                            {
+                                /* Its a paramatized id */
+                                argList[i] = ParseIdentifierArgs(e, argList[i]);
+                            }
+                            else
+                            {
+                                argList[i] = ParseSingleIdentifier(e, argList[i].Replace("$", ""));
+                            }                                                        
                         }
                         argList[i] = argList[i];
                     }
                 }
             }
             switch (id)
-            {
+            {        
                 case "IIF":
                     /* $iif(condition,true part,false part) */
                     if (argList.Length == 3)
@@ -192,6 +195,10 @@ namespace ircScript.Classes.Parsers
                     /* Not sure yet if this is desired behaviour */
                     return int.TryParse(argList[0], out i) ? ((char) i).ToString() : string.Empty;
 
+                case "ASC":
+                    char c;
+                    return Char.TryParse(argList[0], out c) ? ((int) c).ToString() : string.Empty;
+
                 case "GETTOK":
                     /* $gettok(string,position,char) */
                     return argList.Length == 3 ? Tokens.ScriptGetDelToken(argList, true) : string.Empty;
@@ -205,10 +212,15 @@ namespace ircScript.Classes.Parsers
                     return argList.Length == 3 ? Tokens.ScriptGetDelToken(argList, false) : argList[0];
 
                 case "ENCODE":
-                    return System.Text.Encoding.UTF8.Base64Encode(argList[0]);
+                    return Encoding.UTF8.Base64Encode(argList[0]);
 
                 case "DECODE":
                     return Encoding.UTF8.Base64Decode(argList[0]);
+
+                case "APPDIR":
+                    return !string.IsNullOrEmpty(argList[0])
+                               ? Functions.MainDir(string.Format(@"\{0}", argList[0]), false)
+                               : Functions.MainDir(@"\\", false);
             }
             return string.Empty;
         }

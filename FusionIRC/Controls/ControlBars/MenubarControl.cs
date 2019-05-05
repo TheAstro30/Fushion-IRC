@@ -4,13 +4,15 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Forms;
 using FusionIRC.Forms.Child;
+using FusionIRC.Forms.Misc;
 using FusionIRC.Helpers;
-using ircCore.Controls;
 using ircCore.Controls.Rendering;
 using ircCore.Forms;
 using ircCore.Settings.Networks;
@@ -25,6 +27,7 @@ namespace FusionIRC.Controls.ControlBars
 
         private readonly ToolStripMenuItem _mnuFile;
         private readonly ToolStripMenuItem _mnuWindow;
+        private readonly ToolStripMenuItem _mnuHelp;
 
         public MenubarControl(Form owner)
         {
@@ -57,10 +60,20 @@ namespace FusionIRC.Controls.ControlBars
                              {
                                  Text = @"&Window"
                              };
+            _mnuHelp = new ToolStripMenuItem
+                           {
+                               Text = @"&Help"
+                           };
+            _mnuHelp.DropDownItems.AddRange(new ToolStripItem[]
+                                                {
+                                                    new ToolStripMenuItem("Show Help", null, OnMenuHelpClick, Keys.F1),
+                                                    new ToolStripSeparator(),
+                                                    new ToolStripMenuItem("About FusionIRC...", null, OnMenuFileClick),
+                                                });
             BuildWindowsMenu();
             _mnuWindow.DropDownOpening += OnMenuWindowDropDownOpening;
             /* Add all menus */
-            Items.AddRange(new[] { _mnuFile, _mnuWindow });           
+            Items.AddRange(new[] { _mnuFile, _mnuWindow, _mnuHelp });           
         }
 
         public void ConnectionUpdate(bool connected)
@@ -257,6 +270,39 @@ namespace FusionIRC.Controls.ControlBars
                     if (c != null)
                     {
                         c.Activate();
+                    }
+                    break;
+            }
+        }
+
+        private void OnMenuHelpClick(object sender, EventArgs e)
+        {
+            var item = (ToolStripMenuItem)sender;
+            if (item == null)
+            {
+                return;
+            }
+            var hf = Functions.MainDir(@"\FusionIRC Help.chm", true);
+            switch (item.Text.ToUpper())
+            {
+                case "SHOW HELP":
+                    if (File.Exists(hf))
+                    {
+                        try
+                        {
+                            Process.Start(hf);
+                        }
+                        catch
+                        {
+                            Debug.Assert(true);
+                        }                        
+                    }
+                    break;
+
+                case "ABOUT FUSIONIRC...":
+                    using (var d = new FrmAbout())
+                    {
+                        d.ShowDialog(this);
                     }
                     break;
             }

@@ -43,6 +43,12 @@ namespace FusionIRC.Helpers
             }
             switch (command)
             {
+                case "CLR":
+                case "CLEAR":
+                    /* Clear child output window of text */
+                    child.Output.Clear();
+                    break;
+
                 case "SERVER":
                     CommandServer.ParseServerConnection(client, args);
                     break;
