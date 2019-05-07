@@ -148,7 +148,7 @@ namespace ircCore.Settings.Networks
             int port;
             if (!int.TryParse(portString, out port))
             {
-                port = 6667;
+                port = SettingsManager.Settings.Connection.Options.DefaultPort;
             }
             s.Port = port;
             /* Now we should have a server, but would be a good idea to test for null at the other end... */

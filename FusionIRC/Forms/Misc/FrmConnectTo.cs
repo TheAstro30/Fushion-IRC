@@ -279,7 +279,7 @@ namespace FusionIRC.Forms.Misc
             var port = SettingsManager.Settings.Connection.Port;
             if (port == 0)
             {
-                port = 6667;
+                port = SettingsManager.Settings.Connection.Options.DefaultPort;
             }
             /* Current client connection */
             _console = console;           
@@ -369,11 +369,11 @@ namespace FusionIRC.Forms.Misc
                     p = p.Substring(1);
                 }
                 int t;
-                _port = !int.TryParse(p, out t) ? 6667 : t;
+                _port = !int.TryParse(p, out t) ? SettingsManager.Settings.Connection.Options.DefaultPort : t;
             }
             else
             {
-                _port = 6667;
+                _port = SettingsManager.Settings.Connection.Options.DefaultPort;
             }
             if (port == null)
             {

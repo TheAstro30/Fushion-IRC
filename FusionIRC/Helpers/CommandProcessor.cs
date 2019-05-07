@@ -8,7 +8,6 @@ using FusionIRC.Forms.Child;
 using FusionIRC.Helpers.Commands;
 using ircClient;
 using ircClient.Parsing.Helpers;
-using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
 
@@ -85,11 +84,11 @@ namespace FusionIRC.Helpers
                     break;
 
                 case "PART":
-                    ParsePart(client, child, args);
+                    CommandPartHop.ParsePart(client, child, args);
                     break;
 
                 case "HOP":
-                    ParseHop(client, child);
+                    CommandPartHop.ParseHop(client, child);
                     break;
 
                 case "NICK":
@@ -136,6 +135,10 @@ namespace FusionIRC.Helpers
 
                 case "SPLAY":
                     CommandSoundPlay.Parse(args);
+                    break;
+
+                case "WRITEINI":
+                    CommandFiles.WriteIni(args);
                     break;
 
                 default:
@@ -277,49 +280,6 @@ namespace FusionIRC.Helpers
             console.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(console, ConnectionCallbackManager.MainForm, WindowEvent.EventReceived);
-        }
-
-        private static void ParsePart(ClientConnection client, FrmChildWindow child, string args)
-        {
-            if (!client.IsConnected)
-            {
-                return;
-            }
-            string channel;
-            if (string.IsNullOrEmpty(args))
-            {
-                if (child.WindowType != ChildWindowType.Channel)
-                {
-                    /* Cannot part a console, query or DCC chat! */
-                    return;
-                }
-                /* Part the active window */
-                channel = child.Tag.ToString();
-            }
-            else
-            {
-                var c = args.Split(' ');
-                channel = c[0];
-            }
-            client.Send(string.Format("PART {0}", channel));
-        }
-
-        private static void ParseHop(ClientConnection client, FrmChildWindow child)
-        {
-            /* Cannot hop a non-channel (or on a connection that isn't even connected...) */
-            if (child.WindowType != ChildWindowType.Channel || !client.IsConnected)
-            {
-                return;
-            }
-            if (SettingsManager.Settings.Client.Channels.KeepChannelsOpen)
-            {
-                child.KeepOpen = true;
-            }
-            else
-            {
-                child.AutoClose = true; /* This will stop the child window sending "PART" on closing */
-            }
-            client.Send(string.Format("PART {0}\r\nJOIN {0}", child.Tag));
-        }
+        }        
     }
 }

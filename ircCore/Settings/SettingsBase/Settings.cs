@@ -74,6 +74,9 @@ namespace ircCore.Settings.SettingsBase
             Editor.Colors.CommandColor = Color.BlueViolet;
             Editor.Colors.CommentColor = Color.Green;
             Editor.Colors.MiscColor = Color.Brown;
+            /* Connection Options */
+            Connection.Options.DefaultPort = 6667;
+            Connection.Options.RetryTimes = 99;
             /* Identd */
             Connection.Identd.System = "UNIX";
             Connection.Identd.Port = 113;

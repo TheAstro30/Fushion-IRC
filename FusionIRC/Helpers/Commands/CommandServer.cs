@@ -6,12 +6,13 @@
 using System;
 using System.Windows.Forms;
 using ircClient;
+using ircCore.Settings;
 using ircCore.Settings.Networks;
 using ircCore.Settings.Theming;
 
 namespace FusionIRC.Helpers.Commands
 {
-    public static class CommandServer
+    internal static class CommandServer
     {
         private static readonly Timer TmrWaitToReconnectTimeOut;
 
@@ -28,13 +29,13 @@ namespace FusionIRC.Helpers.Commands
         {
             string[] s = null;
             string[] address = null;
-            var port = 6667;
+            var port = SettingsManager.Settings.Connection.Options.DefaultPort;
             var ssl = false;
             if (String.IsNullOrEmpty(args))
             {
                 var recent = ServerManager.Servers.Recent.Server.Count > 0
                                  ? ServerManager.Servers.Recent.Server[0].ToString()
-                                 : "irc.dal.net:6667";
+                                 : string.Format("irc.dal.net:{0}", port);
                 var server = !String.IsNullOrEmpty(client.Server.Address) ? client.Server.ToString() : recent;
                 address = server.Split(':');
             }
@@ -99,7 +100,7 @@ namespace FusionIRC.Helpers.Commands
                 }
                 if (!Int32.TryParse(address[1], out port))
                 {
-                    port = 6667;
+                    port = SettingsManager.Settings.Connection.Options.DefaultPort;
                 }
             }
             /* If currently connected, we should send quit message */

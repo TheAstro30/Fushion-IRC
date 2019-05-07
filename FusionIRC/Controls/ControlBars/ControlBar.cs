@@ -10,6 +10,7 @@ using FusionIRC.Forms.Child;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Helpers;
 using ircClient;
+using ircCore.Settings;
 using ircCore.Settings.Networks;
 
 namespace FusionIRC.Controls.ControlBars
@@ -26,7 +27,7 @@ namespace FusionIRC.Controls.ControlBars
                                    : new Server
                                          {
                                              Address = "irc.dragonirc.com",
-                                             Port = 6667
+                                             Port = SettingsManager.Settings.Connection.Options.DefaultPort
                                          };
             CommandProcessor.Parse(client, console,
                                    string.Format("SERVER {0}:{1}", server.Address,

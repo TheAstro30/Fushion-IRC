@@ -10,6 +10,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
+using System.Linq;
 using System.Media;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -50,8 +51,6 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         private bool _incomingText;
 
         private readonly bool _initialized;
-
-        private int _lineMarkerPos;
 
         /* Public events */
         public event Action<string> OnLineAdded;
@@ -570,13 +569,20 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         /* Methods */
         public void AddLineMarker()
         {
-            if (_lineMarkerPos > 0)
+            AddLineMarker(false);
+        }
+
+        public void AddLineMarker(bool removePrevious)
+        {
+            if (removePrevious)
             {
-                /* Really shouldn't add a line marker at line 0 ... */
-                TextData.Lines.RemoveAt(_lineMarkerPos);                
+                var t = GetLineMarker();
+                if (t != null)
+                {
+                    TextData.Lines.Remove(t);
+                }
             }
             AddLine(1, ((char) 0).ToString());
-            _lineMarkerPos = TextData.Lines.Count - 1;
         }
 
         public void AddLine(int defaultColor, string text)
@@ -658,11 +664,15 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 return;
             }
             TextData = tmp;
+            TextData.LoadBuffer = true;
             /* Add a separator line at the bottom */
             AddLineMarker();
             /* Reset scrollbar */
             _scrollValue = TextData.WrappedLinesCount - 1;
-            if (_scrollValue < 0) { _scrollValue = 0; }
+            if (_scrollValue < 0)
+            {
+                _scrollValue = 0;
+            }
             _scrolledToBottom = true;
             _vScroll.Maximum = _scrollValue + _vScroll.LargeChange - 1;
             _vScroll.Value = _scrollValue;
@@ -672,10 +682,12 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
 
         public void SaveBuffer(string file)
         {
-            if (_lineMarkerPos > 0)
+            var t = GetLineMarker();
+            if (t != null)
             {
-                TextData.Lines.RemoveAt(_lineMarkerPos);
+                TextData.Lines.Remove(t);
             }
+            TextData.WindowWidth = ClientRectangle.Width;
             /* Save the buffer output to file */
             BinarySerialize<TextData>.Save(file, TextData);
         }
@@ -708,6 +720,11 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         }
 
         /* Private methods */
+        private TextData.Text GetLineMarker()
+        {
+            return TextData.Lines.FirstOrDefault(tx => tx.Line == ((char)0).ToString());
+        }
+
         private void TrimBuffer()
         {
             while (TextData.Lines.Count > _maximumLines)
@@ -772,8 +789,13 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
 
         /* Timer events */
         private void TimerReWrap(object sender, EventArgs e)
-        {
+        {            
             _wrapUpdate.Enabled = false;
+            if (TextData.LoadBuffer && TextData.WindowWidth == ClientRectangle.Width)
+            {
+                TextData.LoadBuffer = false;
+                return;
+            }
             /* Re-wrap */
             TextData.Wrapped.Clear();
             using (var g = CreateGraphics())

@@ -21,6 +21,7 @@ using ircCore.Controls.ChildWindows.Nicklist;
 using ircCore.Controls.ChildWindows.OutputDisplay;
 using ircCore.Controls.ChildWindows.OutputDisplay.Helpers;
 using ircCore.Settings;
+using ircCore.Settings.Networks;
 using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
@@ -39,6 +40,8 @@ namespace FusionIRC.Forms.Child
 
         private readonly bool _initialize;
         private readonly string _windowChildName;
+
+        public ReconnectOnDisconnect Reconnect;
 
         public Logger Logger = new Logger();
 
@@ -199,6 +202,10 @@ namespace FusionIRC.Forms.Child
             {
                 WindowState = FormWindowState.Maximized;
             }
+            Reconnect = new ReconnectOnDisconnect(Client);
+            Reconnect.OnReconnectCancel += OnReconnectCancel;
+            Reconnect.OnReconnectTimer += OnReconnectTimer;
+            Reconnect.OnConnectionTry += OnConnectionTry;
             _initialize = false;            
         }
         
@@ -658,6 +665,34 @@ namespace FusionIRC.Forms.Child
         {
             /* Save the nicklist width */
             SettingsManager.Settings.Windows.NicklistWidth = ClientRectangle.Width - e.SplitX;
+        }
+
+        private void OnReconnectCancel()
+        {
+            if (WindowType == ChildWindowType.Console)
+            {
+                Text = string.Format("{0}: {1} ({2}:{3})",
+                                     !string.IsNullOrEmpty(Client.Network) ? Client.Network : Client.Server.Address,
+                                     Client.UserInfo.Nick, Client.Server.Address, Client.Server.Port);
+            }
+        }
+
+        private void OnReconnectTimer(int count)
+        {
+            System.Diagnostics.Debug.Print(count.ToString());
+            if (WindowType == ChildWindowType.Console)
+            {
+                Text = string.Format("{0}: {1} ({2}:{3}) [{4} {5}]",
+                                     !string.IsNullOrEmpty(Client.Network) ? Client.Network : Client.Server.Address,
+                                     Client.UserInfo.Nick, Client.Server.Address, Client.Server.Port,
+                                     "Reconnecting in: ", count);
+            }
+        }
+
+        private void OnConnectionTry(Server s)
+        {
+            System.Diagnostics.Debug.Print("Retry " + s.Address);
+            Client.Connect(s.Address, s.Port, s.IsSsl);
         }
 
         private void TimerFocus(object sender, EventArgs e)

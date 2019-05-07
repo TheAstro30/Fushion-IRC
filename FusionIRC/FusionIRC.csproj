@@ -190,11 +190,14 @@
     </Compile>
     <Compile Include="Helpers\CommandProcessor.cs" />
     <Compile Include="Helpers\Commands\CommandAlias.cs" />
+    <Compile Include="Helpers\Commands\CommandFiles.cs" />
+    <Compile Include="Helpers\Commands\CommandPartHop.cs" />
     <Compile Include="Helpers\Commands\CommandServer.cs" />
     <Compile Include="Helpers\Commands\CommandSoundPlay.cs" />
     <Compile Include="Helpers\Commands\CommandText.cs" />
     <Compile Include="Helpers\ConnectionCallbackManager.cs" />
     <Compile Include="Helpers\MdiHelper.cs" />
+    <Compile Include="Helpers\ReconnectOnDisconnect.cs" />
     <Compile Include="Helpers\WindowManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -203,6 +206,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Connection\ClientLogging.resx">
       <DependentUpon>ClientLogging.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Settings\Controls\Connection\ConnectionOptions.resx">
+      <DependentUpon>ConnectionOptions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Theming\Controls\ThemeColors.resx">
       <DependentUpon>ThemeColors.cs</DependentUpon>

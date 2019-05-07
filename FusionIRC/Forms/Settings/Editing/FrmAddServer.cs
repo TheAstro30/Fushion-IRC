@@ -6,6 +6,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using ircCore.Controls;
+using ircCore.Settings;
 using ircCore.Settings.Networks;
 using ircCore.Utils;
 
@@ -183,7 +184,9 @@ namespace FusionIRC.Forms.Settings.Editing
                     return;
                 }
                 _server.Address = Functions.GetFirstWord(_txtAddress.Text);
-                _server.PortRange = !string.IsNullOrEmpty(_txtPorts.Text) ? Functions.GetFirstWord(_txtPorts.Text) : "6667";
+                _server.PortRange = !string.IsNullOrEmpty(_txtPorts.Text)
+                                        ? Functions.GetFirstWord(_txtPorts.Text)
+                                        : SettingsManager.Settings.Connection.Options.DefaultPort.ToString();
                 _server.Description = !string.IsNullOrEmpty(_txtDescription.Text) ? _txtDescription.Text : null;
                 _server.Password = !string.IsNullOrEmpty(_txtPassword.Text) ? Functions.GetFirstWord(_txtPassword.Text) : null;
                 _network.NetworkName = !string.IsNullOrEmpty(_txtNetwork.Text) ? Functions.GetFirstWord(_txtNetwork.Text) : "Unknown";

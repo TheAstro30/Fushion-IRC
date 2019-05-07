@@ -4,12 +4,6 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using FusionIRC.Forms.Settings.Controls.Base;
 using ircCore.Settings;

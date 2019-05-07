@@ -118,6 +118,7 @@ namespace FusionIRC.Helpers
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, MainForm, WindowEvent.EventReceived);
+            c.Reconnect.Cancel();
         }
 
         public static void OnClientDisconnected(ClientConnection client)
@@ -145,6 +146,7 @@ namespace FusionIRC.Helpers
                 return;
             }            
             /* Now we process re-connection code if the server wasn't manually disconnected by the user */
+            c.Reconnect.BeginReconnect();
         }
 
         public static void OnClientConnectionError(ClientConnection client, string error)
@@ -171,6 +173,13 @@ namespace FusionIRC.Helpers
                 UpdateChannelsOnDisconnect(client, pmd);
             }
             client.UserInfo.AlternateUsed = false;
+            if (client.IsManualDisconnect)
+            {
+                client.IsManualDisconnect = false;
+                return;
+            }
+            /* Now we process re-connection code if the server wasn't manually disconnected by the user */
+            c.Reconnect.BeginReconnect();
         }
 
         public static void OnClientSslInvalidCertificate(ClientConnection client, X509Certificate certificate)

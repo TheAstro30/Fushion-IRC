@@ -21,10 +21,12 @@ namespace ircScript.Controls
                                                           RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private readonly Regex _identifierPrefix =
-            new Regex(@"\$\+|\$me|\$chan|\$nick|\$gettok|\$addtok|\$deltok|\$asctime|\$ctime|\$duration|\$calc|\$iif|\$encode|\$decode|\$appdir|\$chr|\$asc");
+            new Regex(@"\$\+|\$me|\$chan|\$nick|\$gettok|\$addtok|\$deltok|\$asctime|\$ctime|\$duration|\$calc|\$iif|\$encode|\$decode|\$appdir|\$chr|\$asc|\$readini|\$read");
 
-        private readonly Regex _commandPrefix = new Regex(@"\b(set|var|inc|dec|unset|echo)\b",
+        private readonly Regex _commandPrefix = new Regex(@"\b(set|var|inc|dec|unset|echo|writeini)\b",
                                                           RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        private readonly Regex _ircCommandPrefix = new Regex(@"\b(me|say|amsg|ame|msg|join|part|quit|nick|kick|mode|ignore)\b");
 
         private static readonly SolidBrush CommentBrush = new SolidBrush(Color.Green);
         private static readonly SolidBrush KeywordBrush = new SolidBrush(Color.Blue);
@@ -176,6 +178,7 @@ namespace ircScript.Controls
             Range.SetStyle(_comment, _commentPrefix);
             Range.SetStyle(_commandStyle, _commandPrefix);
             Range.SetStyle(_identifierStyle, _identifierPrefix);
+            Range.SetStyle(_miscStyle, _ircCommandPrefix);
             foreach (var found in GetRanges(@"%\w+|\$\w+|\$(?<range>)\w+[\(^]|(?<range>\w+):|#"))
             {
                 switch (found.Text[0])

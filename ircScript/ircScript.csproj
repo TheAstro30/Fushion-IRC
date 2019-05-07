@@ -46,6 +46,8 @@
   <ItemGroup>
     <Compile Include="Classes\ScriptFunctions\Calc.cs" />
     <Compile Include="Classes\ScriptFunctions\Base64Encoding.cs" />
+    <Compile Include="Classes\ScriptFunctions\FileFunctions.cs" />
+    <Compile Include="Classes\ScriptFunctions\Ini.cs" />
     <Compile Include="Classes\ScriptFunctions\Tokens.cs" />
     <Compile Include="Classes\Parsers\ScriptVariableParser.cs" />
     <Compile Include="Classes\Structures\ScriptEventParams.cs" />
@@ -159,6 +161,7 @@
     <Compile Include="Controls\SyntaxHighlight\TextBoxEventArgs\TextChangingEventArgs.cs" />
     <Compile Include="Controls\SyntaxHighlight\TextBoxEventArgs\ToolTipNeededEventArgs.cs" />
     <Compile Include="Controls\SyntaxHighlight\TextBoxEventArgs\WordWrapNeededEventArgs.cs" />
+    <Compile Include="Helpers\ScriptException.cs" />
     <Compile Include="ScriptManager.cs" />
     <Compile Include="Classes\Parsers\ScriptParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

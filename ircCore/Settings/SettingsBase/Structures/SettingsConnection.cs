@@ -26,6 +26,9 @@ namespace ircCore.Settings.SettingsBase.Structures
         [XmlAttribute("isSsl")]
         public bool IsSsl { get; set; }
 
+        [XmlElement("options")]
+        public SettingsConnectionOptions Options = new SettingsConnectionOptions();
+
         [XmlElement("identd")]
         public SettingsIdentd Identd = new SettingsIdentd();
 

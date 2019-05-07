@@ -114,7 +114,9 @@ namespace ircClient
             {
                 return;
             }
-            Connect(Server.Address, Server.Port > 0 ? Server.Port : 6667, Server.IsSsl);
+            Connect(Server.Address,
+                    Server.Port > 0 ? Server.Port : SettingsManager.Settings.Connection.Options.DefaultPort,
+                    Server.IsSsl);
         }
 
         public void Connect(string address, int port, bool ssl)

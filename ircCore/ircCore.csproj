@@ -113,6 +113,7 @@
     <Compile Include="Settings\SettingsBase\Structures\SettingsChannel.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsConfirmation.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsConnection.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsConnectionOptions.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsEditor.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsFind.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsIdentd.cs" />
@@ -186,9 +187,7 @@
   <ItemGroup>
     <None Include="Images\prot.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Logging\Core\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -68,7 +68,7 @@ namespace FusionIRC.Controls.ControlBars
                                                 {
                                                     new ToolStripMenuItem("Show Help", null, OnMenuHelpClick, Keys.F1),
                                                     new ToolStripSeparator(),
-                                                    new ToolStripMenuItem("About FusionIRC...", null, OnMenuFileClick),
+                                                    new ToolStripMenuItem("About FusionIRC...", null, OnMenuFileClick)
                                                 });
             BuildWindowsMenu();
             _mnuWindow.DropDownOpening += OnMenuWindowDropDownOpening;

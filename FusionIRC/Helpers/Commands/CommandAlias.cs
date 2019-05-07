@@ -13,7 +13,7 @@ using ircScript.Classes.Structures;
 
 namespace FusionIRC.Helpers.Commands
 {
-    public static class CommandAlias
+    internal static class CommandAlias
     {
         public static bool ParseAlias(ClientConnection client, FrmChildWindow child, string command, string args)
         {

@@ -7,7 +7,7 @@ using ircCore.Utils.DirectX;
 
 namespace FusionIRC.Helpers.Commands
 {
-    public static class CommandSoundPlay
+    internal static class CommandSoundPlay
     {
         private static readonly Sound Sound;
 

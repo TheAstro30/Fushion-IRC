@@ -221,6 +221,16 @@ namespace ircScript.Classes.Parsers
                     return !string.IsNullOrEmpty(argList[0])
                                ? Functions.MainDir(string.Format(@"\{0}", argList[0]), false)
                                : Functions.MainDir(@"\\", false);
+
+                case "READ":
+                    if (argList.Length > 1 && !string.IsNullOrEmpty(argList[1]))
+                    {
+                        return !int.TryParse(argList[1], out i) ? string.Empty : FileFunctions.Read(argList[0], i);
+                    }
+                    return FileFunctions.Read(argList[0]);
+
+                case "READINI":
+                    return argList.Length == 3 ? Ini.ReadIni(argList[0], argList[1], argList[2]) : string.Empty;
             }
             return string.Empty;
         }

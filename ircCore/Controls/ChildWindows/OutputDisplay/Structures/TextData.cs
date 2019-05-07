@@ -27,6 +27,10 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Structures
             public string Line { get; set; } /* The original unmodified line */
         }
 
+        public bool LoadBuffer { get; set; } /* Used only when loading a buffer to stop a re-wrap if unnecessary */
+
+        public int WindowWidth { get; set; } /* Used only when loading a buffer to stop a re-wrap if unnecessary */
+
         public List<Text> Lines { get; set; }
 
         public List<WrapData> Wrapped { get; set; } /* These are the lines drawn out using ControlByteData for positions */

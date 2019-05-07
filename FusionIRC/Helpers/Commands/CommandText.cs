@@ -11,7 +11,7 @@ using ircCore.Settings.Theming;
 
 namespace FusionIRC.Helpers.Commands
 {
-    public static class CommandText
+    internal static class CommandText
     {
         public static void ParseAction(ClientConnection client, FrmChildWindow child, string args)
         {
@@ -172,18 +172,54 @@ namespace FusionIRC.Helpers.Commands
 
         public static void ParseEcho(ClientConnection client, string args)
         {
-            /* Echo text to window (currently only supporting active window for now) -
-             * client param not used for now but eventually will be */
-            var w = WindowManager.GetActiveWindow(ConnectionCallbackManager.MainForm);
+            /* Echo text to window */
+            string text;
+            FrmChildWindow w;
+            var i = args.IndexOf(' ');
+            if (i == -1)
+            {
+                /* Single word as <text> - possibly just active window only */
+                w = WindowManager.GetActiveWindow(ConnectionCallbackManager.MainForm);
+                text = args;
+            }
+            else
+            {
+                var s = args.Substring(0, i);
+                text = args.Substring(i + 1);
+                switch (s.ToUpper())
+                {
+                    case "-A":
+                        /* Active window (of active server called) */
+                        w = WindowManager.GetActiveWindow(ConnectionCallbackManager.MainForm);
+                        break;
+
+                    case "-S":
+                        /* Console window (of active server called) */
+                        w = WindowManager.GetConsoleWindow(client);
+                        break;
+
+                    default:
+                        /* Search for window by name */
+                        w = WindowManager.GetWindow(client, s);
+                        if (w == null)
+                        {                            
+                            /* Possibly "echo <text>" */
+                            w = WindowManager.GetActiveWindow(ConnectionCallbackManager.MainForm);
+                            text = args;
+                        }                        
+                        break;
+                }
+            }            
             if (w == null)
             {
+                /* Shouldn't be null ... */
                 return;
             }
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.EchoText,
                               TimeStamp = DateTime.Now,
-                              Text = args
+                              Text = text
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             w.Output.AddLine(pmd.DefaultColor, pmd.Message);

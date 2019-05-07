@@ -136,7 +136,7 @@ namespace FusionIRC.Forms.Script
                                                                           Keys.None),
                                                     new ToolStripSeparator(),
                                                     new ToolStripMenuItem("Highlight Colors", null, MenuItemOnClick,
-                                                                          Keys.None),
+                                                                          Keys.None)
                                                 });
 
             _menu.Items.AddRange(new ToolStripItem[]
