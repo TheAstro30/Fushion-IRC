@@ -129,6 +129,10 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
         internal static string ReturnWord(Graphics deviceContext, WrapData wrapData, int wrapIndex, int startPosition)
         {
             /* We search backwards and forwards in the current line for a space either side of our current startPosition */
+            if (startPosition < 0)
+            {
+                return string.Empty;
+            }
             var startSpace = wrapData.Lines[wrapIndex].Text.LastIndexOf(' ', startPosition);
             var endSpace = wrapData.Lines[wrapIndex].Text.IndexOf(' ', startPosition);
             var s = wrapData.Lines[wrapIndex].Text;

@@ -22,12 +22,18 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
 
             Header = "Connection Options";
 
+            chkConnect.Checked = SettingsManager.Settings.Connection.ShowConnectDialog;
+            chkFave.Checked = SettingsManager.Settings.Client.Channels.ShowFavoritesDialogOnConnect;
+            chkSsl.Checked = SettingsManager.Settings.Connection.SslAcceptRequests;
+            chkInvalid.Checked = SettingsManager.Settings.Connection.SslAutoAcceptInvalidCertificates;
+
             txtPort.Text = SettingsManager.Settings.Connection.Options.DefaultPort.ToString();
             chkRecon.Checked = SettingsManager.Settings.Connection.Options.Reconnect;
             gbOptions.Enabled = chkRecon.Checked;
             chkRetry.Checked = SettingsManager.Settings.Connection.Options.RetryConnection;
             txtRetry.Text = SettingsManager.Settings.Connection.Options.RetryTimes.ToString();
             /* Disable/enable controls */
+            chkInvalid.Enabled = chkSsl.Checked;
             txtRetry.Enabled = chkRetry.Checked;
             lblRetry.Enabled = chkRetry.Checked;
             lblDelay.Enabled = chkRetry.Checked;
@@ -38,6 +44,10 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
             txtDelay.Text = SettingsManager.Settings.Connection.Options.RetryDelay.ToString();
             chkNext.Checked = SettingsManager.Settings.Connection.Options.NextServer;
 
+            chkConnect.CheckedChanged += ControlsChanged;
+            chkFave.CheckedChanged += ControlsChanged;
+            chkSsl.CheckedChanged += ControlsChanged;
+            chkInvalid.CheckedChanged += ControlsChanged;
             txtPort.TextChanged += ControlsChanged;
             chkRecon.CheckedChanged += ControlsChanged;
             chkRetry.CheckedChanged += ControlsChanged;
@@ -48,6 +58,10 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
 
         public void SaveSettings()
         {
+            SettingsManager.Settings.Connection.ShowConnectDialog = chkConnect.Checked;
+            SettingsManager.Settings.Client.Channels.ShowFavoritesDialogOnConnect = chkFave.Checked;
+            SettingsManager.Settings.Connection.SslAcceptRequests = chkSsl.Checked;
+            SettingsManager.Settings.Connection.SslAutoAcceptInvalidCertificates = chkInvalid.Checked;
             int i;
             if (!int.TryParse(txtPort.Text, out i))
             {
@@ -90,9 +104,15 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
                 return;
             }
             var c = (CheckBox) sender;
-            if (c.Text == @"Reconnect on disconnect")
+            switch (c.Text)
             {
-                gbOptions.Enabled = c.Checked;
+                case "Accept SSL authentication requests":
+                    chkInvalid.Enabled = c.Checked;
+                    break;
+
+                case "Reconnect on disconnect":
+                    gbOptions.Enabled = c.Checked;
+                    break;
             }
             if (c.Text != @"Retry connection:")
             {

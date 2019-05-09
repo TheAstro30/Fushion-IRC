@@ -10,6 +10,15 @@ using ircCore.Controls.ChildWindows.OutputDisplay.Helpers;
 
 namespace ircCore.Settings.Theming
 {   
+    public enum BackgroundWindow
+    {
+        Main = 0,
+        Console = 1,
+        Channel = 2,
+        Private = 3,
+        Chat = 4
+    }
+
     [Serializable]
     public class Theme
     {
@@ -18,6 +27,7 @@ namespace ircCore.Settings.Theming
         public class ThemeBackgroundData
         {
             public string Path { get; set; }
+
             public BackgroundImageLayoutStyles LayoutStyle { get; set; }
         }
 
@@ -25,6 +35,7 @@ namespace ircCore.Settings.Theming
         public class ThemeMessageData
         {
             public int DefaultColor { get; set; }
+
             public string MessageFormat { get; set; }
         }
 

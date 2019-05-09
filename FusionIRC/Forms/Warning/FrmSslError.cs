@@ -8,6 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using FusionIRC.Properties;
 using ircCore.Controls;
+using ircCore.Settings;
 
 namespace FusionIRC.Forms.Warning
 {

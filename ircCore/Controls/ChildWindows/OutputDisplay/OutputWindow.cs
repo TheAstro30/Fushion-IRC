@@ -481,7 +481,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                     /* Get current word under mouse */
                     var c = Character.ReturnChar(g, wrapData, e.X, wrapIndex > 0, IndentWidth, _font, out position,
                                                  out startX, ref bold, ref underLine, ref italic);
-                    var wordUnderMouse = c != (char)0
+                    var wordUnderMouse = c != '-'
                                                 ? Character.ReturnWord(g, TextData.Wrapped[lineIndex], wrapIndex, position)
                                                 : string.Empty;
                     if (!string.IsNullOrEmpty(wordUnderMouse))
@@ -582,7 +582,13 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                     TextData.Lines.Remove(t);
                 }
             }
-            AddLine(1, ((char) 0).ToString());
+            var text = new TextData.Text
+                           {
+                               DefaultColor = ThemeManager.CurrentTheme.Colors[1], 
+                               Line = "-",
+                               IsLineMarker = true
+                           };
+            AddLine(text);
         }
 
         public void AddLine(int defaultColor, string text)
@@ -590,27 +596,33 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             if (string.IsNullOrEmpty(text))
             {                
                 return; /* Nothing to do */
-            }         
-            /* Add the raw text to our structure first; this may or may not be used as the control develops */
-            _incomingText = true;
-            var lines = TextData.WrappedLinesCount - 1;
-            var currentLines = lines > 0 ? lines : 0;
+            }                     
             var t = new TextData.Text
                         {
                             DefaultColor = ThemeManager.CurrentTheme.Colors[defaultColor % 15],
                             Line = text
                         };
+            AddLine(t);
+        }
+
+        public void AddLine(TextData.Text t)
+        {
+            /* Add the raw text to our structure first; this may or may not be used as the control develops */
+            _incomingText = true;
+            var lines = TextData.WrappedLinesCount - 1;
+            var currentLines = lines > 0 ? lines : 0;
             TextData.Lines.Add(t);
             WrapData w;
             using (var g = CreateGraphics())
             {
-                Wrapping.WordWrap(g, t.DefaultColor, BackColor, WordWrap, IndentWidth, text, _windowWidth, _font, out w);
+                Wrapping.WordWrap(g, t.DefaultColor, BackColor, WordWrap, IndentWidth, t.Line, _windowWidth, _font, out w);
             }
             if (w.Lines.Count == 0)
             {
                 return; /* It's unlikely ... */
-            }            
-            TextData.Wrapped.Add(w);            
+            }
+            w.IsLineMarker = t.IsLineMarker;
+            TextData.Wrapped.Add(w);
             /* Set scrolled to bottom value */
             if (_scrollValue == currentLines)
             {
@@ -625,21 +637,23 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                     }
                 }
             }
-            else if (text != ((char)0).ToString())
+            //else if (text != "-")
+            //{
+            else if (!t.IsLineMarker)
             {
                 _scrolledToBottom = false;
                 SystemSounds.Beep.Play();
             }
-            if (OnLineAdded != null)
+            if (OnLineAdded != null && !t.IsLineMarker)
             {
-                OnLineAdded(text); /* This can be used to output to a log file */
+                OnLineAdded(t.Line); /* This can be used to output to a log file */
             }
             if (MarkingData != null)
             {
                 /* Do not refresh the screen as marking is in progress */
                 return;
             }
-            /* Now refresh the hDC and draw out our newly added line ;) */        
+            /* Now refresh the hDC and draw out our newly added line ;) */
             if (_update.Enabled)
             {
                 return;
@@ -722,7 +736,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         /* Private methods */
         private TextData.Text GetLineMarker()
         {
-            return TextData.Lines.FirstOrDefault(tx => tx.Line == ((char)0).ToString());
+            return TextData.Lines.FirstOrDefault(tx => tx.IsLineMarker);
         }
 
         private void TrimBuffer()
@@ -808,6 +822,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                     {
                         return;
                     }
+                    w.IsLineMarker = l.IsLineMarker;                    
                     TextData.Wrapped.Add(w); /* It's unlikely ... */
                 }
             }

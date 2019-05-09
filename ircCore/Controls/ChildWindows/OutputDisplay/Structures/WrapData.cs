@@ -26,7 +26,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Structures
 
             public bool IsBold { get; set; }
             public bool IsUnderline { get; set; }
-            public bool IsItalic { get; set; }
+            public bool IsItalic { get; set; }            
 
             public WrapLineData()
             {
@@ -50,7 +50,9 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Structures
             }
         }
 
-        public List<WrapLineData> Lines { get; set; }        
+        public List<WrapLineData> Lines { get; set; }
+
+        public bool IsLineMarker { get; set; }
 
         public WrapData()
         {

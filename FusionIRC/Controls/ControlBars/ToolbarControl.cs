@@ -238,7 +238,7 @@ namespace FusionIRC.Controls.ControlBars
 
                 case "SETTINGS":
                     using (var settings = new FrmSettings())
-                    {
+                    {                        
                         settings.ShowDialog(_owner);
                     }
                     break;

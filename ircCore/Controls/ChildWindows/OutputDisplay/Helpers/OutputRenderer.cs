@@ -250,7 +250,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
                     {
                         rectBottom -= LinePadding; /* Add a bit of padding between lines */
                     }
-                    if (ShowLineMarker && count == 0 && lineData.Lines[0].Text == ((char)0).ToString())
+                    if (ShowLineMarker && count == 0 && lineData.IsLineMarker)
                     {
                         using (var pen = new Pen(LineMarkerColor))
                         {

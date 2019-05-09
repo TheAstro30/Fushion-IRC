@@ -5,6 +5,7 @@
  */
 using System;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Forms.Settings.Controls.Base;
@@ -14,6 +15,7 @@ using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
+using ircCore.Utils;
 
 namespace FusionIRC.Forms.Settings
 {
@@ -23,12 +25,14 @@ namespace FusionIRC.Forms.Settings
         private readonly Button _btnApply;
         private readonly Button _btnCancel;
         private readonly Button _btnOk;
-       
-        private readonly ClientLogging _clientLogging;
+               
         private readonly ConnectionIdentDaemon _connectionIdentDaemon;
         private readonly ConnectionLocalInfo _connectionLocalInfo;
         private readonly ConnectionOptions _connectionOptions;
         private readonly ConnectionServers _connectionServers;
+
+        private readonly ClientLogging _clientLogging;
+        private readonly ClientSystemTray _clientSystemTray;
 
         private readonly Timer _tmrSelect;
 
@@ -91,6 +95,7 @@ namespace FusionIRC.Forms.Settings
             _connectionLocalInfo = new ConnectionLocalInfo {Location = new Point(168, 12), Visible = false};
 
             _clientLogging = new ClientLogging {Location = new Point(168, 12), Visible = false};
+            _clientSystemTray = new ClientSystemTray { Location = new Point(168, 12), Visible = false };
 
             Controls.AddRange(new Control[]
                                   {
@@ -102,7 +107,8 @@ namespace FusionIRC.Forms.Settings
                                       _connectionOptions,
                                       _connectionIdentDaemon,
                                       _connectionLocalInfo,
-                                      _clientLogging
+                                      _clientLogging,
+                                      _clientSystemTray
                                   });
 
             _connectionServers.OnSettingsChanged += OnSettingsChanged;
@@ -111,6 +117,7 @@ namespace FusionIRC.Forms.Settings
             _connectionLocalInfo.OnSettingsChanged += OnSettingsChanged;
 
             _clientLogging.OnSettingsChanged += OnSettingsChanged;
+            _clientSystemTray.OnSettingsChanged += OnSettingsChanged;
 
             BuildTreeMenuNodes();
 
@@ -202,13 +209,18 @@ namespace FusionIRC.Forms.Settings
                                                                             });
             /* Client options... */
             _tvMenu.Nodes.Add("CLIENT", "Client").Nodes.AddRange(new[]
-                                                                    {
-                                                                        new TreeNode("Logging")
-                                                                            {
-                                                                                Tag = _clientLogging,
-                                                                                Name = "CLIENTLOGGING"
-                                                                            }
-                                                                    });
+                                                                     {
+                                                                         new TreeNode("Logging")
+                                                                             {
+                                                                                 Tag = _clientLogging,
+                                                                                 Name = "CLIENTLOGGING"
+                                                                             },
+                                                                         new TreeNode("System Tray")
+                                                                             {
+                                                                                 Tag = _clientSystemTray,
+                                                                                 Name = "CLIENTTRAY"
+                                                                             }
+                                                                     });
         }
 
         private void OnSettingsChanged()
@@ -260,6 +272,18 @@ namespace FusionIRC.Forms.Settings
                         w.Logger.CreateLog();
                     }
                 }
+            }
+            /* Update tray icon */
+            var owner = (TrayIcon)ConnectionCallbackManager.MainForm;
+            if (owner != null)
+            {
+                owner.TrayHideOnMinimize = SettingsManager.Settings.Client.TrayIcon.HideMinimized;
+                var ico = Functions.MainDir(SettingsManager.Settings.Client.TrayIcon.Icon, false);
+                owner.TrayNotifyIcon.Icon = !string.IsNullOrEmpty(ico) && File.Exists(ico)
+                                                ? Icon.ExtractAssociatedIcon(ico)
+                                                : owner.Icon;
+                owner.TrayAlwaysShowIcon = SettingsManager.Settings.Client.TrayIcon.AlwaysShow;
+                owner.TrayNotifyIcon.Visible = owner.TrayAlwaysShowIcon;
             }
         }
 

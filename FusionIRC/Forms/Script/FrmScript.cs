@@ -5,6 +5,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -13,6 +14,7 @@ using System.Windows.Forms;
 using FusionIRC.Properties;
 using ircCore.Controls.Rendering;
 using ircCore.Settings;
+using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Utils;
 using ircScript;
 using ircScript.Classes.Structures;
@@ -27,6 +29,8 @@ namespace FusionIRC.Forms.Script
         private readonly ToolStripMenuItem _mnuFile;
         private readonly ToolStripMenuItem _mnuEdit;
         private readonly ToolStripMenuItem _mnuView;
+        private readonly ToolStripMenuItem _mnuHelp;
+
         private readonly TreeListView _tvFiles;
         private readonly OlvColumn _colFiles;
         private readonly ScriptEditor _txtEdit;
@@ -86,11 +90,10 @@ namespace FusionIRC.Forms.Script
                                                                           Keys.Control | Keys.L),
                                                     new ToolStripMenuItem("Unload", null, MenuItemOnClick,
                                                                           Keys.Control | Keys.Shift | Keys.U),
-                                                    new ToolStripSeparator(),
-                                                    new ToolStripMenuItem("Rename...", null, MenuItemOnClick, Keys.None),
-                                                    new ToolStripSeparator(),
+                                                    new ToolStripSeparator(),                                                    
                                                     new ToolStripMenuItem("Save", null, MenuItemOnClick,
                                                                           Keys.Control | Keys.S),
+                                                    new ToolStripMenuItem("Save As...", null, MenuItemOnClick, Keys.None),
                                                     new ToolStripMenuItem("Save All", null, MenuItemOnClick,
                                                                           Keys.Control | Keys.Shift | Keys.S),
                                                     new ToolStripSeparator(),
@@ -138,12 +141,16 @@ namespace FusionIRC.Forms.Script
                                                     new ToolStripMenuItem("Highlight Colors", null, MenuItemOnClick,
                                                                           Keys.None)
                                                 });
+            /* Help menu */
+            _mnuHelp = new ToolStripMenuItem {Size = new Size(39, 20), Text = @"&Help"};
+            _mnuHelp.DropDownItems.Add(new ToolStripMenuItem("Show Help", null, MenuItemOnClick, Keys.F1));
 
             _menu.Items.AddRange(new ToolStripItem[]
                                     {
                                         _mnuFile,
                                         _mnuEdit,
-                                        _mnuView
+                                        _mnuView,
+                                        _mnuHelp
                                     });
             /* Status bar - order components are added to the control array is IMPORTANT */
             _status = new StatusStrip
@@ -275,9 +282,17 @@ namespace FusionIRC.Forms.Script
             _timer = new Timer { Interval = 10 };
 
             MainMenuStrip = _menu;            
-            /* Copy scripts to temporary arrays */
+            /* Copy scripts to temporary arrays - create at least one of each if none */
             _aliases = ScriptManager.AliasData.Clone();
+            if (_aliases.Count == 0)
+            {
+                NewScript(ScriptType.Aliases);
+            }
             _events = ScriptManager.EventData.Clone();
+            if (_events.Count == 0)
+            {
+                NewScript(ScriptType.Events);
+            }
             /* Here we can cheat with displaying variables by creating them as new script file -
              * we leave the data blank as this gets "imported" when the viewing file is switched to %variables */
             _variables = new ScriptData
@@ -301,7 +316,7 @@ namespace FusionIRC.Forms.Script
             /* Attempt to get last script file and display it (if it's null, or aliases is 0, display variables
              * file, as it's always there, blank or not */
             var s = GetScriptFileByName(SettingsManager.Settings.Editor.Last);
-            _currentEditingScript = s ?? (_aliases.Count > 0 ? _aliases[0] : _variables);
+            _currentEditingScript = s ?? _aliases[0];
             _tvFiles.ExpandAll();
             _tvFiles.SelectObject(_currentEditingScript);
             /* Set current editing script file */
@@ -450,12 +465,12 @@ namespace FusionIRC.Forms.Script
                     var type = _tvFiles.SelectedObject != null && _tvFiles.SelectedObject.GetType() != typeof(ScriptFileNode);
                     _mnuFile.DropDownItems[0].Enabled = node;
                     _mnuFile.DropDownItems[2].Enabled = node;
-                    /* Cannot unload/rename the root item! */
+                    /* Cannot unload/save as the root item! */
                     _mnuFile.DropDownItems[3].Enabled = node && type;
-                    _mnuFile.DropDownItems[5].Enabled = node && type;
+                    _mnuFile.DropDownItems[6].Enabled = node && type;                    
                     /* Cannot move variables or root items */
+                    _mnuFile.DropDownItems[9].Enabled = node && type;
                     _mnuFile.DropDownItems[10].Enabled = node && type;
-                    _mnuFile.DropDownItems[11].Enabled = node && type;
                     break;
 
                 case "&EDIT":
@@ -470,7 +485,7 @@ namespace FusionIRC.Forms.Script
                         SettingsManager.Settings.Editor.SyntaxHighlight;
                     ((ToolStripMenuItem) _mnuView.DropDownItems[1]).Checked =
                         SettingsManager.Settings.Editor.LineNumbering;
-                    break;
+                    break;                    
             }
         }
 
@@ -510,12 +525,12 @@ namespace FusionIRC.Forms.Script
                     UnloadScript();
                     break;
 
-                case "RENAME...":
-                    RenameScript();
-                    break;
-
                 case "SAVE":
                     Save();
+                    break;
+
+                case "SAVE AS...":
+                    SaveAs();
                     break;
 
                 case "SAVE ALL":
@@ -612,6 +627,21 @@ namespace FusionIRC.Forms.Script
                         }
                     }
                     break;
+
+                case "SHOW HELP":
+                    try
+                    {
+                        var path = Functions.MainDir(@"\FusionIRC Help.chm", true);
+                        if (File.Exists(path))
+                        {
+                            Process.Start("hh", string.Format(@"{0}::/Scripting.htm", path));
+                        }
+                    }
+                    catch
+                    {
+                        Debug.Assert(true);
+                    }
+                    break;
             }
         }
 
@@ -620,10 +650,15 @@ namespace FusionIRC.Forms.Script
         {
             /* Create a new script file - we need to know the type of file to add and we can't rely on tvFiles
              * to always have a selection */
-            var type = GetNodeType();
+            var type = GetNodeType();            
+            NewScript(type);
+        }
+
+        private void NewScript(ScriptType type)
+        {
             /* We generate a random file name based on type (aliases01) */
-            string name;
             var list = GetScriptListByType(type);
+            string name;
             switch (type)
             {
                 case ScriptType.Aliases:
@@ -634,11 +669,17 @@ namespace FusionIRC.Forms.Script
                     name = "events";
                     break;
             }
-            var script = new ScriptData {Name = string.Format("{0}{1}", name, list.Count + 1), ContentsChanged = true};
+            var scriptName = string.Format("{0}{1}", name, list.Count + 1);
+            var script = new ScriptData { Name = scriptName, ContentsChanged = true };
             /* Don't need to find what FileNode this script belongs to, as when added to either list below, _files
-             * is referenced to that list - any changes made on the lists is reflected by _files */            
+             * is referenced to that list - any changes made on the lists is reflected by _files */
             list.Add(script);
-            SaveAll();
+            /* Update file list */
+            var path = Functions.MainDir(string.Format(@"\scripts\{0}.xml", scriptName), false);
+            /* Save script */
+            AddNewFilePath(type, path);
+            ScriptManager.SaveScript(script, path);
+            /* Update treeview */
             _tvFiles.RefreshObjects(_files);
             _tvFiles.Expand(script);
             _tvFiles.SelectObject(script);
@@ -678,6 +719,9 @@ namespace FusionIRC.Forms.Script
             /* We have a script file, add it to file list and treeview */
             var list = GetScriptListByType(nodeType);
             list.Add(script);
+            /* Update file list */
+            AddNewFilePath(nodeType, fileName);
+            /* Save all scripts */
             SaveAll();
             _tvFiles.RefreshObjects(_files);
             _tvFiles.Expand(script);
@@ -713,8 +757,18 @@ namespace FusionIRC.Forms.Script
             var list = GetScriptListByType(nodeType);
             list.Remove(script);
             var nextIndex = list.Count - 1;
-            script = nextIndex >= 0 ? list[nextIndex] : null;
-            SaveAll();
+            script = nextIndex >= 0 ? list[nextIndex] : null;   
+            /* Remove from file list */
+            switch (nodeType)
+            {
+                case ScriptType.Aliases:
+                    ScriptManager.RemoveScriptFilePath(SettingsManager.Settings.Scripts.Aliases, _currentEditingScript);
+                    break;
+
+                case ScriptType.Events:
+                    ScriptManager.RemoveScriptFilePath(SettingsManager.Settings.Scripts.Events, _currentEditingScript);
+                    break;
+            }
             _tvFiles.RefreshObjects(_files);
             if (script != null)
             {
@@ -725,50 +779,6 @@ namespace FusionIRC.Forms.Script
             {
                 _txtEdit.Clear();//.Lines = new string[0];
             }
-        }
-
-        private void RenameScript()
-        {
-            /* Slightly harder to do ... but, we can just rename the script object's Name and update the files list
-             * that is stored in settings */
-            if (_currentEditingScript == null)
-            {
-                return;
-            }
-            /* Make sure to dump contents of editbox! */
-            if (_currentEditingScript.ContentsChanged)
-            {
-                _currentEditingScript.RawScriptData = new List<string>(_txtEdit.Lines);
-            }
-            var oldFile = _currentEditingScript.Name;
-            string fileName;
-            using (var r = new FrmRename { FileName = _currentEditingScript.Name })
-            {
-                if (r.ShowDialog(this) == DialogResult.Cancel)
-                {
-                    return;
-                }
-                fileName = r.FileName;
-            }
-            /* Check the file doesn't already exist */
-            var newFile = Functions.MainDir(string.Format(@"\scripts\{0}.xml", fileName), false);
-            if (File.Exists(newFile))
-            {
-                if (MessageBox.Show(string.Format(@"The file ""{0}"" already exists. Do you wish to overwrite this file?", fileName), @"Overwrite File", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
-                {
-                    return;
-                }
-            }
-            /* Update current name and save the file */
-            _currentEditingScript.Name = fileName;
-            ScriptManager.SaveScript(_currentEditingScript, newFile);
-            _currentEditingScript.ContentsChanged = false;
-            /* Delete original file */
-            File.Delete(Functions.MainDir(string.Format(@"\scripts\{0}.xml", oldFile), false));
-            /* Update stored names */
-            RebuildAllScripts();
-            _tvFiles.SetObjects(_files);
-            _tvFiles.SelectObject(_currentEditingScript);
         }
 
         private void Save()
@@ -794,6 +804,43 @@ namespace FusionIRC.Forms.Script
             }
             _currentEditingScript.ContentsChanged = false;
             RebuildAllScripts();
+        }
+
+        private void SaveAs()
+        {
+            /* Make sure to dump contents of editbox! */
+            if (_currentEditingScript.ContentsChanged)
+            {
+                _currentEditingScript.RawScriptData = new List<string>(_txtEdit.Lines);
+            }
+            var type = GetNodeType();
+            var oldFile = type == ScriptType.Aliases
+                              ? ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Aliases, _currentEditingScript)
+                              : ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Events, _currentEditingScript);
+            
+            string fileName;
+            using (
+                var sfd = new SaveFileDialog
+                              {
+                                  InitialDirectory = Functions.MainDir(@"\scripts", false),
+                                  Title = @"Save script as",
+                                  Filter = @"Script files (*.XML)|*.XML"
+                              })
+            {
+                if (sfd.ShowDialog(this) == DialogResult.Cancel)
+                {
+                    return;
+                }
+                fileName = sfd.FileName;
+            }
+            var name = Path.GetFileNameWithoutExtension(fileName);            
+            if (string.IsNullOrEmpty(name))
+            {
+                return; /* Shouldn't be - but... */
+            }
+            _currentEditingScript.Name = name;
+            ScriptManager.SaveScript(_currentEditingScript, fileName);
+            oldFile.Path = Functions.MainDir(fileName, false);
         }
 
         private void SaveAll()
@@ -869,6 +916,21 @@ namespace FusionIRC.Forms.Script
         }
 
         /* Script rebuilding */
+        private static void AddNewFilePath(ScriptType type, string fileName)
+        {
+            var p = new SettingsScripts.SettingsScriptPath {Path = Functions.MainDir(fileName, false)};
+            switch (type)
+            {
+                case ScriptType.Aliases:
+                    SettingsManager.Settings.Scripts.Aliases.Add(p);
+                    break;
+
+                case ScriptType.Events:
+                    SettingsManager.Settings.Scripts.Events.Add(p);
+                    break;
+            }
+        }
+
         private void RebuildAllScripts()
         {
             /* Make sure to clone these lists back to master lists (adding of new files/renaming) */
@@ -876,10 +938,7 @@ namespace FusionIRC.Forms.Script
             ScriptManager.EventData = _events.Clone();
             /* Build script data */
             ScriptManager.BuildScripts(ScriptType.Aliases, ScriptManager.AliasData, ScriptManager.Aliases);
-            ScriptManager.BuildScripts(ScriptType.Events, ScriptManager.EventData, ScriptManager.Events);
-            /* Update filesnames in settings */
-            ScriptManager.BuildFileList(SettingsManager.Settings.Scripts.Aliases, ScriptManager.AliasData);
-            ScriptManager.BuildFileList(SettingsManager.Settings.Scripts.Events, ScriptManager.EventData);
+            ScriptManager.BuildScripts(ScriptType.Events, ScriptManager.EventData, ScriptManager.Events);            
             UpdateStatusInfo();
         }
 
@@ -907,7 +966,7 @@ namespace FusionIRC.Forms.Script
 
         /* Helper methods */
         private void UpdateStatusInfo()
-        {
+        {            
             var r = _txtEdit.Selection;
             var path = Functions.MainDir(string.Format(@"\scripts\{0}.xml", _currentEditingScript.Name), false);
             _fileName.Text = string.Format("{0}", _currentEditingScript.ContentsChanged

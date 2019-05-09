@@ -29,6 +29,9 @@ namespace ircCore.Settings.SettingsBase.Structures
 
         [XmlElement("logging")]
         public SettingsLog Logging = new SettingsLog();
+
+        [XmlElement("trayIcon")]
+        public SettingsTrayIcon TrayIcon = new SettingsTrayIcon();
     }
 
     [Serializable]

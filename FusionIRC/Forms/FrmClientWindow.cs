@@ -5,6 +5,7 @@
  */
 using System;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Controls.ControlBars;
@@ -14,6 +15,7 @@ using FusionIRC.Forms.Misc;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
 using ircCore.Autos;
+using ircCore.Controls;
 using ircCore.Dcc;
 using ircCore.Settings;
 using ircCore.Settings.Channels;
@@ -26,11 +28,13 @@ using ircScript;
 
 namespace FusionIRC.Forms
 {
-    public sealed class FrmClientWindow : Form
+    public sealed class FrmClientWindow : TrayIcon
     {
         private readonly bool _initialize;
         private readonly ImageList _images;
         private readonly MdiHelper _mdi;
+
+        private readonly ContextMenuStrip _mdiMenu;
 
         private readonly ToolStripPanel _dockTop;
         private readonly ToolStripPanel _dockLeft;
@@ -38,6 +42,8 @@ namespace FusionIRC.Forms
         private readonly ToolStripPanel _dockRight;
 
         private readonly Splitter _switchViewSplitter;
+
+        private readonly Timer _timerConnect;
 
         public WindowTreeView SwitchView;        
         public ToolbarControl ToolBar { get; private set; }
@@ -57,7 +63,9 @@ namespace FusionIRC.Forms
             ServerManager.Load();
             /* Load client current theme */
             ThemeManager.ThemeLoaded += WindowManager.OnThemeLoaded;
-            ThemeManager.Load(Functions.MainDir(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path, false));
+            ThemeManager.Load(
+                Functions.MainDir(
+                    SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path, false));
             /* Load users list */
             UserManager.Load();
             /* Load automations */
@@ -131,7 +139,7 @@ namespace FusionIRC.Forms
                                  TabIndex = 0
                              };
             /* Treeview icons */
-            _images = new ImageList { ImageSize = new Size(16, 16), ColorDepth = ColorDepth.Depth32Bit };
+            _images = new ImageList {ImageSize = new Size(16, 16), ColorDepth = ColorDepth.Depth32Bit};
             _images.Images.AddRange(new[]
                                         {
                                             Resources.status.ToBitmap(),
@@ -143,37 +151,60 @@ namespace FusionIRC.Forms
             SwitchView.AfterSelect += SwitchViewAfterSelect;
             /* Splitter */
             _switchViewSplitter = new Splitter
-                                     {
-                                         Location = new Point(160, 0),
-                                         MinExtra = 60,
-                                         MinSize = 80,
-                                         Size = new Size(1, 554),
-                                         TabIndex = 4,
-                                         TabStop = false                                         
-                                     };
-            _switchViewSplitter.SplitterMoving += SwitchViewSplitterMoving;            
+                                      {
+                                          Location = new Point(160, 0),
+                                          MinExtra = 60,
+                                          MinSize = 80,
+                                          Size = new Size(1, 554),
+                                          TabIndex = 4,
+                                          TabStop = false
+                                      };
+            _switchViewSplitter.SplitterMoving += SwitchViewSplitterMoving;
+            _switchViewSplitter.SplitterMoved += SwitchViewSplitterMoved;
             /* Add controls */
-            Controls.AddRange(new Control[] { _switchViewSplitter, SwitchView, _dockLeft, _dockRight, _dockTop, _dockBottom });
+            Controls.AddRange(new Control[]
+                                  {_switchViewSplitter, SwitchView, _dockLeft, _dockRight, _dockTop, _dockBottom});
             /* Adjust splitter */
-            _switchViewSplitter.SplitPosition = SettingsManager.Settings.Windows.SwitchTreeWidth;            
-            /* Setup toolbar */            
+            _switchViewSplitter.SplitPosition = SettingsManager.Settings.Windows.SwitchTreeWidth;
+            /* Setup toolbar */
             ToolBar = new ToolbarControl(this);
             SetDockControl(ToolBar);
-            /* Setup menubar */            
-            MenuBar = new MenubarControl(this);            
+            /* Setup menubar */
+            MenuBar = new MenubarControl(this);
             SetDockControl(MenuBar);
             ToolBar.MenuBar = MenuBar;
             MainMenuStrip = MenuBar;
             /* MDI helper class */
-            _mdi = new MdiHelper(this);            
-            ConnectionCallbackManager.MainForm = this;            
+            _mdi = new MdiHelper(this);
+            _mdi.MdiClientWnd.MouseDown += OnMdiMouseDown;
+            ConnectionCallbackManager.MainForm = this;
             /* Set window position and size */
             var w = SettingsManager.GetWindowByName("application");
             Size = w.Size;
             Location = w.Position;
             WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
+            /* Create MDI context menu */
+            _mdiMenu = new ContextMenuStrip();
+            _mdiMenu.Opening += MdiMenuOpening;
+            BuildMdiMenu();
+            /* Set this window background */
+            SetNewMdiBackground();
             /* Create DCC file manager window */
             WindowManager.DccManagerWindow = new FrmDccManager();
+            /* Tray icon */
+            TrayNotifyIcon.Text = @"FusionIRC IRC Client";
+            var ico = Functions.MainDir(SettingsManager.Settings.Client.TrayIcon.Icon, false);
+            TrayNotifyIcon.Icon = !string.IsNullOrEmpty(ico) && File.Exists(ico)
+                                      ? Icon.ExtractAssociatedIcon(ico)
+                                      : Icon;
+            if (SettingsManager.Settings.Client.TrayIcon.AlwaysShow)
+            {
+                TrayAlwaysShowIcon = true;
+                TrayNotifyIcon.Visible = true;
+            }
+            /* Show connect dialog */
+            _timerConnect = new Timer {Interval = 10};
+            _timerConnect.Tick += ShowConnectDialog;
             _initialize = false;
         }
 
@@ -185,7 +216,12 @@ namespace FusionIRC.Forms
             if (w != null)
             {
                 w.DisplayNode.Text = string.Format("{0}: {1}", "Console", w.Client.UserInfo.Nick);
+                //w.Output.LoadBuffer("test.buf");  
+                //w.Output.AddLine(1,"fuck me");
+                //w.Output.AddLine(1,"This is a test of line marking");
+                //w.Output.SaveBuffer("test.buf");                
             }
+            _timerConnect.Enabled = true;
             base.OnLoad(e);
         }
 
@@ -226,11 +262,12 @@ namespace FusionIRC.Forms
                 w.Maximized = WindowState == FormWindowState.Maximized;
             }
             base.OnResize(e);
+            Invalidate(true);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            /* First check close confirmation */
+            /* First check close confirmation */            
             string msg = null;
             switch (SettingsManager.Settings.Client.Confirmation.ClientClose)
             {
@@ -289,6 +326,15 @@ namespace FusionIRC.Forms
             base.OnFormClosing(e);
         }
 
+        private void OnMdiMouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                _mdiMenu.Show(this, PointToClient(Cursor.Position));
+            }
+            OnMouseDown(e);
+        }
+
         private void SwitchViewSplitterMoving(object sender, SplitterEventArgs e)
         {
             if (_initialize)
@@ -297,6 +343,11 @@ namespace FusionIRC.Forms
             }
             /* Save the switch window "size" */
             SettingsManager.Settings.Windows.SwitchTreeWidth = e.SplitX;
+        }
+
+        private void SwitchViewSplitterMoved(object sender, SplitterEventArgs e)
+        {
+            Invalidate(true);
         }
 
         /* Dock panels */
@@ -323,6 +374,18 @@ namespace FusionIRC.Forms
             }    
             /* Set visibility */
             ctl.Visible = cs.Visible;
+        }
+
+        /* Private helpers */
+        private void SetNewMdiBackground()
+        {
+            var bmp = Functions.MainDir(SettingsManager.Settings.Windows.MdiBackground.Path, false);
+            if (string.IsNullOrEmpty(bmp) || !File.Exists(bmp))
+            {
+                return;
+            }
+            BackgroundImage = new Bitmap(bmp);
+            BackgroundImageLayout = SettingsManager.Settings.Windows.MdiBackground.Layout;
         }
 
         private void UpdateDockLayout()
@@ -391,6 +454,112 @@ namespace FusionIRC.Forms
             win.Restore();
             _mdi.ActivateChild(win);
             win.MyActivate();            
+        }
+
+        /* MDI context menu */
+        private void BuildMdiMenu()
+        {
+            _mdiMenu.Items.Clear();
+            var enable = BackgroundImage != null;
+            var m = new ToolStripMenuItem("Background");
+            m.DropDownItems.AddRange(new ToolStripItem[]
+                                         {
+                                             new ToolStripMenuItem("Select", null, OnMdiMenuClick),
+                                             new ToolStripMenuItem("None", null, OnMdiMenuClick),
+                                             new ToolStripSeparator(),
+                                             new ToolStripMenuItem("Tile", null, OnMdiMenuClick),
+                                             new ToolStripMenuItem("Center", null, OnMdiMenuClick),
+                                             new ToolStripMenuItem("Stretch", null, OnMdiMenuClick),
+                                             new ToolStripMenuItem("Zoom", null, OnMdiMenuClick)                                             
+                                         });
+            //none = 0, tile = 1; center = 2; stretch = 3; zoom = 4; 
+            System.Diagnostics.Debug.Print(((int)ImageLayout.None).ToString());
+            for (var i = 3; i <= m.DropDownItems.Count - 1; i++)
+            {
+                m.DropDownItems[i].Enabled = enable;
+                if (enable && ((int)BackgroundImageLayout == i - 2))
+                {
+                    ((ToolStripMenuItem) m.DropDownItems[i]).Checked = true;
+                }
+            }
+            _mdiMenu.Items.Add(m);
+        }
+
+        private void MdiMenuOpening(object sender, EventArgs e)
+        {
+            BuildMdiMenu();
+        }
+
+        private void OnMdiMenuClick(object sender, EventArgs e)
+        {
+            var i = (ToolStripMenuItem) sender;
+            if (i == null)
+            {
+                return;
+            }
+            switch (i.Text.ToUpper())
+            {
+                case "SELECT":
+                    using (var ofd = new OpenFileDialog
+                    {
+                        Title = @"Select a background image to load",
+                        Filter = @"Picture files (*.png;*.jpg;*.bmp)|*.png;*.jpg;*.bmp|" + @"PNG Images (*.png)|*.png|JPEG Images (*.jpg)|*.jpg|" + @"Bitmap Images (*.bmp)|*.bmp",
+                    })
+                    {
+                        if (ofd.ShowDialog(this) == DialogResult.Cancel)
+                        {
+                            return;
+                        }
+                        SettingsManager.Settings.Windows.MdiBackground = new MdiBackground
+                                                                             {
+                                                                                 Path = Functions.MainDir(ofd.FileName, false),
+                                                                                 Layout = ImageLayout.Center
+                                                                             };
+                    }
+                    SetNewMdiBackground();
+                    return;
+
+                case "NONE":
+                    BackgroundImage = null;
+                    BackgroundImageLayout = ImageLayout.None;
+                    SettingsManager.Settings.Windows.MdiBackground = new MdiBackground();
+                    break;
+
+                case "TILE":                    
+                    BackgroundImageLayout = ImageLayout.Tile;
+                    break;
+
+                case "CENTER":
+                    BackgroundImageLayout = ImageLayout.Center;
+                    break;
+
+                case "STRETCH":
+                    BackgroundImageLayout = ImageLayout.Stretch;
+                    break;
+
+                case "ZOOM":
+                    BackgroundImageLayout = ImageLayout.Zoom;
+                    break;
+            }
+            SettingsManager.Settings.Windows.MdiBackground.Layout = BackgroundImageLayout;
+        }
+
+        private void ShowConnectDialog(object sender, EventArgs e)
+        {
+            _timerConnect.Enabled = false;
+            if (!SettingsManager.Settings.Connection.ShowConnectDialog)
+            {
+                return;
+            }
+            var w = WindowManager.GetActiveWindow(this);
+            if (w == null)
+            {
+                return;
+            }
+            using (var connect = new FrmConnectTo(this, w))
+            {
+                connect.ShowDialog(this);
+            }
         }
     }
 }

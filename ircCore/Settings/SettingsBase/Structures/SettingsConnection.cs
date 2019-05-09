@@ -26,6 +26,15 @@ namespace ircCore.Settings.SettingsBase.Structures
         [XmlAttribute("isSsl")]
         public bool IsSsl { get; set; }
 
+        [XmlAttribute("showConnectDialog")]
+        public bool ShowConnectDialog { get; set; }
+
+        [XmlAttribute("sslAcceptRequests")]
+        public bool SslAcceptRequests { get; set; }
+
+        [XmlAttribute("sslAutoAcceptInvalidCertificates")]
+        public bool SslAutoAcceptInvalidCertificates { get; set; }
+
         [XmlElement("options")]
         public SettingsConnectionOptions Options = new SettingsConnectionOptions();
 

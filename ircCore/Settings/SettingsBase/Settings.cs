@@ -80,6 +80,8 @@ namespace ircCore.Settings.SettingsBase
             /* Identd */
             Connection.Identd.System = "UNIX";
             Connection.Identd.Port = 113;
+            Connection.ShowConnectDialog = true;
+            Connection.SslAcceptRequests = true;
             /* Local info */
             Connection.LocalInfo.LookupMethod = LocalInfoLookupMethod.Socket;
             /* Create control styles */

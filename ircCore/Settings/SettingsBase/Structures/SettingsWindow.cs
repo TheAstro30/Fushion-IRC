@@ -6,11 +6,22 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Windows.Forms;
 using System.Xml.Serialization;
 using ircCore.Utils;
 
 namespace ircCore.Settings.SettingsBase.Structures
 {
+    [Serializable]
+    public class MdiBackground
+    {
+        [XmlAttribute("path")]
+        public string Path { get; set; }
+
+        [XmlAttribute("layout")]
+        public ImageLayout Layout { get; set; }
+    }
+
     [Serializable]
     public class SettingsWindow
     {
@@ -31,6 +42,9 @@ namespace ircCore.Settings.SettingsBase.Structures
 
         [XmlElement("window")]
         public List<WindowData> Window = new List<WindowData>();  
+
+        [XmlElement("mdiBackground")]
+        public MdiBackground MdiBackground = new MdiBackground();
     }
 
     [Serializable]

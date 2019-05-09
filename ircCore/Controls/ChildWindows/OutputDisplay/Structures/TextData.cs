@@ -25,6 +25,8 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Structures
             public Color DefaultColor { get; set; }            
 
             public string Line { get; set; } /* The original unmodified line */
+
+            public bool IsLineMarker { get; set; }
         }
 
         public bool LoadBuffer { get; set; } /* Used only when loading a buffer to stop a re-wrap if unnecessary */

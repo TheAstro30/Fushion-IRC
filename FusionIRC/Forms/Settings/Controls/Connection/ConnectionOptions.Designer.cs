@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.lblPort = new System.Windows.Forms.Label();
-            this.txtPort = new System.Windows.Forms.TextBox();
-            this.chkRecon = new System.Windows.Forms.CheckBox();
-            this.chkRetry = new System.Windows.Forms.CheckBox();
+            this.chkInvalid = new System.Windows.Forms.CheckBox();
+            this.chkSsl = new System.Windows.Forms.CheckBox();
+            this.chkFave = new System.Windows.Forms.CheckBox();
+            this.chkConnect = new System.Windows.Forms.CheckBox();
             this.gbOptions = new System.Windows.Forms.GroupBox();
             this.chkNext = new System.Windows.Forms.CheckBox();
             this.lblSecs = new System.Windows.Forms.Label();
@@ -39,46 +39,52 @@
             this.lblDelay = new System.Windows.Forms.Label();
             this.lblRetry = new System.Windows.Forms.Label();
             this.txtRetry = new System.Windows.Forms.TextBox();
+            this.chkRetry = new System.Windows.Forms.CheckBox();
+            this.chkRecon = new System.Windows.Forms.CheckBox();
+            this.txtPort = new System.Windows.Forms.TextBox();
+            this.lblPort = new System.Windows.Forms.Label();
             this.gbOptions.SuspendLayout();
             this.SuspendLayout();
             // 
-            // lblPort
+            // chkInvalid
             // 
-            this.lblPort.AutoSize = true;
-            this.lblPort.Location = new System.Drawing.Point(93, 101);
-            this.lblPort.Name = "lblPort";
-            this.lblPort.Size = new System.Drawing.Size(73, 15);
-            this.lblPort.TabIndex = 0;
-            this.lblPort.Text = "Default port:";
+            this.chkInvalid.AutoSize = true;
+            this.chkInvalid.Location = new System.Drawing.Point(108, 156);
+            this.chkInvalid.Name = "chkInvalid";
+            this.chkInvalid.Size = new System.Drawing.Size(257, 19);
+            this.chkInvalid.TabIndex = 8;
+            this.chkInvalid.Text = "Automatically accept invalid SSL certificates";
+            this.chkInvalid.UseVisualStyleBackColor = true;
             // 
-            // txtPort
+            // chkSsl
             // 
-            this.txtPort.Location = new System.Drawing.Point(172, 98);
-            this.txtPort.MaxLength = 5;
-            this.txtPort.Name = "txtPort";
-            this.txtPort.Size = new System.Drawing.Size(53, 23);
-            this.txtPort.TabIndex = 1;
-            this.txtPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.chkSsl.AutoSize = true;
+            this.chkSsl.Location = new System.Drawing.Point(88, 131);
+            this.chkSsl.Name = "chkSsl";
+            this.chkSsl.Size = new System.Drawing.Size(211, 19);
+            this.chkSsl.TabIndex = 7;
+            this.chkSsl.Text = "Accept SSL authentication requests";
+            this.chkSsl.UseVisualStyleBackColor = true;
             // 
-            // chkRecon
+            // chkFave
             // 
-            this.chkRecon.AutoSize = true;
-            this.chkRecon.Location = new System.Drawing.Point(96, 133);
-            this.chkRecon.Name = "chkRecon";
-            this.chkRecon.Size = new System.Drawing.Size(160, 19);
-            this.chkRecon.TabIndex = 2;
-            this.chkRecon.Text = "Reconnect on disconnect";
-            this.chkRecon.UseVisualStyleBackColor = true;
+            this.chkFave.AutoSize = true;
+            this.chkFave.Location = new System.Drawing.Point(88, 106);
+            this.chkFave.Name = "chkFave";
+            this.chkFave.Size = new System.Drawing.Size(247, 19);
+            this.chkFave.TabIndex = 6;
+            this.chkFave.Text = "Show channel favorites dialog on connect";
+            this.chkFave.UseVisualStyleBackColor = true;
             // 
-            // chkRetry
+            // chkConnect
             // 
-            this.chkRetry.AutoSize = true;
-            this.chkRetry.Location = new System.Drawing.Point(10, 22);
-            this.chkRetry.Name = "chkRetry";
-            this.chkRetry.Size = new System.Drawing.Size(119, 19);
-            this.chkRetry.TabIndex = 3;
-            this.chkRetry.Text = "Retry connection:";
-            this.chkRetry.UseVisualStyleBackColor = true;
+            this.chkConnect.AutoSize = true;
+            this.chkConnect.Location = new System.Drawing.Point(88, 81);
+            this.chkConnect.Name = "chkConnect";
+            this.chkConnect.Size = new System.Drawing.Size(240, 19);
+            this.chkConnect.TabIndex = 5;
+            this.chkConnect.Text = "Show connect to location dialog on start";
+            this.chkConnect.UseVisualStyleBackColor = true;
             // 
             // gbOptions
             // 
@@ -90,7 +96,7 @@
             this.gbOptions.Controls.Add(this.txtRetry);
             this.gbOptions.Controls.Add(this.chkRetry);
             this.gbOptions.Enabled = false;
-            this.gbOptions.Location = new System.Drawing.Point(86, 165);
+            this.gbOptions.Location = new System.Drawing.Point(80, 210);
             this.gbOptions.Name = "gbOptions";
             this.gbOptions.Size = new System.Drawing.Size(257, 105);
             this.gbOptions.TabIndex = 4;
@@ -100,7 +106,7 @@
             // chkNext
             // 
             this.chkNext.AutoSize = true;
-            this.chkNext.Location = new System.Drawing.Point(10, 78);
+            this.chkNext.Location = new System.Drawing.Point(8, 78);
             this.chkNext.Name = "chkNext";
             this.chkNext.Size = new System.Drawing.Size(195, 19);
             this.chkNext.TabIndex = 9;
@@ -110,7 +116,7 @@
             // lblSecs
             // 
             this.lblSecs.AutoSize = true;
-            this.lblSecs.Location = new System.Drawing.Point(200, 52);
+            this.lblSecs.Location = new System.Drawing.Point(198, 52);
             this.lblSecs.Name = "lblSecs";
             this.lblSecs.Size = new System.Drawing.Size(50, 15);
             this.lblSecs.TabIndex = 8;
@@ -118,7 +124,7 @@
             // 
             // txtDelay
             // 
-            this.txtDelay.Location = new System.Drawing.Point(150, 49);
+            this.txtDelay.Location = new System.Drawing.Point(148, 49);
             this.txtDelay.MaxLength = 3;
             this.txtDelay.Name = "txtDelay";
             this.txtDelay.Size = new System.Drawing.Size(44, 23);
@@ -128,7 +134,7 @@
             // lblDelay
             // 
             this.lblDelay.AutoSize = true;
-            this.lblDelay.Location = new System.Drawing.Point(7, 52);
+            this.lblDelay.Location = new System.Drawing.Point(5, 52);
             this.lblDelay.Name = "lblDelay";
             this.lblDelay.Size = new System.Drawing.Size(137, 15);
             this.lblDelay.TabIndex = 6;
@@ -137,7 +143,7 @@
             // lblRetry
             // 
             this.lblRetry.AutoSize = true;
-            this.lblRetry.Location = new System.Drawing.Point(200, 23);
+            this.lblRetry.Location = new System.Drawing.Point(198, 23);
             this.lblRetry.Name = "lblRetry";
             this.lblRetry.Size = new System.Drawing.Size(36, 15);
             this.lblRetry.TabIndex = 5;
@@ -145,17 +151,59 @@
             // 
             // txtRetry
             // 
-            this.txtRetry.Location = new System.Drawing.Point(150, 20);
+            this.txtRetry.Location = new System.Drawing.Point(148, 20);
             this.txtRetry.MaxLength = 3;
             this.txtRetry.Name = "txtRetry";
             this.txtRetry.Size = new System.Drawing.Size(44, 23);
             this.txtRetry.TabIndex = 4;
             this.txtRetry.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
+            // chkRetry
+            // 
+            this.chkRetry.AutoSize = true;
+            this.chkRetry.Location = new System.Drawing.Point(8, 22);
+            this.chkRetry.Name = "chkRetry";
+            this.chkRetry.Size = new System.Drawing.Size(119, 19);
+            this.chkRetry.TabIndex = 3;
+            this.chkRetry.Text = "Retry connection:";
+            this.chkRetry.UseVisualStyleBackColor = true;
+            // 
+            // chkRecon
+            // 
+            this.chkRecon.AutoSize = true;
+            this.chkRecon.Location = new System.Drawing.Point(88, 56);
+            this.chkRecon.Name = "chkRecon";
+            this.chkRecon.Size = new System.Drawing.Size(235, 19);
+            this.chkRecon.TabIndex = 2;
+            this.chkRecon.Text = "Reconnect automatically on disconnect";
+            this.chkRecon.UseVisualStyleBackColor = true;
+            // 
+            // txtPort
+            // 
+            this.txtPort.Location = new System.Drawing.Point(169, 181);
+            this.txtPort.MaxLength = 5;
+            this.txtPort.Name = "txtPort";
+            this.txtPort.Size = new System.Drawing.Size(53, 23);
+            this.txtPort.TabIndex = 1;
+            this.txtPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // lblPort
+            // 
+            this.lblPort.AutoSize = true;
+            this.lblPort.Location = new System.Drawing.Point(90, 184);
+            this.lblPort.Name = "lblPort";
+            this.lblPort.Size = new System.Drawing.Size(73, 15);
+            this.lblPort.TabIndex = 0;
+            this.lblPort.Text = "Default port:";
+            // 
             // ConnectionOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkInvalid);
+            this.Controls.Add(this.chkSsl);
+            this.Controls.Add(this.chkFave);
+            this.Controls.Add(this.chkConnect);
             this.Controls.Add(this.gbOptions);
             this.Controls.Add(this.chkRecon);
             this.Controls.Add(this.txtPort);
@@ -181,5 +229,9 @@
         private System.Windows.Forms.Label lblDelay;
         private System.Windows.Forms.Label lblRetry;
         private System.Windows.Forms.TextBox txtRetry;
+        private System.Windows.Forms.CheckBox chkConnect;
+        private System.Windows.Forms.CheckBox chkFave;
+        private System.Windows.Forms.CheckBox chkSsl;
+        private System.Windows.Forms.CheckBox chkInvalid;
     }
 }

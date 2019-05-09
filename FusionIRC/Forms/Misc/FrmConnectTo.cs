@@ -42,6 +42,8 @@ namespace FusionIRC.Forms.Misc
 
         private readonly Button _btnConnect;
         private readonly Button _btnClose;
+
+        private readonly CheckBox _chkShow;
         
         private FrmChildWindow _console;
 
@@ -270,7 +272,15 @@ namespace FusionIRC.Forms.Misc
                                 UseVisualStyleBackColor = true
                             };
 
-            Controls.AddRange(new Control[] {_gbCredentials, _gbServer, _btnConnect, _btnClose});            
+            _chkShow = new CheckBox
+                           {
+                               Text = @"Show dialog on start-up",
+                               Size = new Size(158, 19),
+                               Location = new Point(12, 383),
+                               TabIndex = 22
+                           };
+
+            Controls.AddRange(new Control[] {_gbCredentials, _gbServer, _btnConnect, _btnClose, _chkShow});            
 
             AcceptButton = _btnConnect;
             _owner = owner;
@@ -309,7 +319,7 @@ namespace FusionIRC.Forms.Misc
                 _btnConnect.Text = @"Disconnect";
                 _btnConnect.Tag = "DISCONNECT";
             }
-
+            _chkShow.Checked = SettingsManager.Settings.Connection.ShowConnectDialog;
             _chkNewWindow.CheckedChanged += CheckNewWindowHandler;
             _btnConnect.Click += ButtonClickHandler;
             _btnClose.Click += ButtonClickHandler;            
@@ -332,6 +342,7 @@ namespace FusionIRC.Forms.Misc
                 SettingsManager.Settings.Connection.IsSsl = _isSsl;
                 SettingsManager.Settings.Connection.Channels = _txtChannels.Text;
                 SettingsManager.Settings.Connection.NewWindow = _chkNewWindow.Checked;
+                SettingsManager.Settings.Connection.ShowConnectDialog = _chkShow.Checked;
             }
             base.OnFormClosing(e);
         }
@@ -433,6 +444,18 @@ namespace FusionIRC.Forms.Misc
             _chkInvisible.Enabled = c;
             _btnConnect.Text = c ? "Connect" : "Disconnect";
             _btnConnect.Tag = c ? "CONNECT" : "DISCONNECT";
+        }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            // 
+            // FrmConnectTo
+            // 
+            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Name = "FrmConnectTo";
+            this.ResumeLayout(false);
+
         }
     }
 }

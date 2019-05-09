@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Utils;
 using ircCore.Utils.Serialization;
@@ -100,6 +101,26 @@ namespace ircScript
             return Events.Where(script => script.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).ToList();
         }
 
+        public static SettingsScripts.SettingsScriptPath GetScriptFilePath(List<SettingsScripts.SettingsScriptPath> scriptList, ScriptData script)
+        {
+            return (from s in scriptList
+                    let p = s.Path.Split(new[] {'\\'})
+                    where
+                        p[p.Length - 1].Equals(string.Format("{0}.xml", script.Name),
+                                               StringComparison.InvariantCultureIgnoreCase)
+                    select s).FirstOrDefault();
+        }
+
+        public static void RemoveScriptFilePath(List<SettingsScripts.SettingsScriptPath> scriptList, ScriptData script)
+        {
+            var p = GetScriptFilePath(scriptList, script);
+            if (p == null)
+            {
+                return;
+            }
+            scriptList.Remove(p);
+        }
+
         /* Must be called after editing or loading the raw data */
         public static void BuildScripts(ScriptType type, List<ScriptData> rawScriptData, List<Script> scriptList)
         {
@@ -109,14 +130,6 @@ namespace ircScript
             {
                 BuildScripts(type, d, scriptList);
             }
-        }
-
-        public static void BuildFileList(List<SettingsScripts.SettingsScriptPath> scriptList, List<ScriptData> data)
-        {
-            scriptList.Clear();
-            scriptList.AddRange(
-                data.Select(
-                    s => new SettingsScripts.SettingsScriptPath {Path = string.Format(@"\scripts\{0}.xml", s.Name)}));
         }
 
         /* Private methods */

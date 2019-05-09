@@ -184,6 +184,10 @@ namespace FusionIRC.Helpers
 
         public static void OnClientSslInvalidCertificate(ClientConnection client, X509Certificate certificate)
         {
+            if (!SettingsManager.Settings.Connection.SslAcceptRequests)
+            {
+                return;
+            }
             var store = new X509Store("FusionIRC", StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadWrite);
             if (store.Certificates.Cast<X509Certificate2>().Any(cert => cert.Subject == certificate.Subject))
@@ -192,16 +196,19 @@ namespace FusionIRC.Helpers
                 store.Close();
                 return;
             }
-            using (var ssl = new FrmSslError())
+            if (!SettingsManager.Settings.Connection.SslAutoAcceptInvalidCertificates)
             {
-                ssl.Server = client.Server.Address;
-                ssl.CertificateStore = store;
-                ssl.Certificate = certificate;
-                if (ssl.ShowDialog(MainForm) == DialogResult.Cancel)
+                using (var ssl = new FrmSslError())
                 {
-                    client.SslAcceptCertificate(false);
-                    store.Close();
-                    return;
+                    ssl.Server = client.Server.Address;
+                    ssl.CertificateStore = store;
+                    ssl.Certificate = certificate;
+                    if (ssl.ShowDialog(MainForm) == DialogResult.Cancel)
+                    {
+                        client.SslAcceptCertificate(false);
+                        store.Close();
+                        return;
+                    }
                 }
             }
             store.Close();
