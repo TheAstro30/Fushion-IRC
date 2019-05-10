@@ -13,7 +13,7 @@ namespace ircCore.Settings.Channels
     {
         public static Channels Channels = new Channels();
 
-        private static readonly string FileName = Functions.MainDir(@"\data\channels.xml", false);
+        private static readonly string FileName = Functions.MainDir(@"\data\channels.xml");
 
         public static void Load()
         {

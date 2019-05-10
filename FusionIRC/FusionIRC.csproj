@@ -111,10 +111,10 @@
     <Compile Include="Forms\Misc\FrmPart.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\Script\FrmColors.cs">
+    <Compile Include="Forms\ScriptEditor\FrmColors.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\Script\FrmScript.cs">
+    <Compile Include="Forms\ScriptEditor\FrmScript.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Settings\Controls\Base\BaseControlRenderer.cs">

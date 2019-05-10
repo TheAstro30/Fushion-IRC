@@ -69,13 +69,13 @@ namespace ircScript
             foreach (var s in scripts)
             {
                 /* Check file even exists.. */
-                var f = Functions.MainDir(s.Path, false);
+                var f = Functions.MainDir(s.Path);
                 if (!File.Exists(f))
                 {
                     del.Push(s);
                     continue;
                 }
-                var sf = LoadScript(Functions.MainDir(s.Path, false));
+                var sf = LoadScript(Functions.MainDir(s.Path));
                 if (sf == null)
                 {
                     continue;

@@ -278,7 +278,7 @@ namespace FusionIRC.Forms.Settings
             if (owner != null)
             {
                 owner.TrayHideOnMinimize = SettingsManager.Settings.Client.TrayIcon.HideMinimized;
-                var ico = Functions.MainDir(SettingsManager.Settings.Client.TrayIcon.Icon, false);
+                var ico = Functions.MainDir(SettingsManager.Settings.Client.TrayIcon.Icon);
                 owner.TrayNotifyIcon.Icon = !string.IsNullOrEmpty(ico) && File.Exists(ico)
                                                 ? Icon.ExtractAssociatedIcon(ico)
                                                 : owner.Icon;

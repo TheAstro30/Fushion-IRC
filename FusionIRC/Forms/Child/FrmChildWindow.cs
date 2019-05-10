@@ -25,6 +25,8 @@ using ircCore.Settings.Networks;
 using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
+using ircScript.Classes;
+using ircScript.Classes.Structures;
 
 namespace FusionIRC.Forms.Child
 {
@@ -570,8 +572,14 @@ namespace FusionIRC.Forms.Child
                     /* Send text to server */
                     if (WindowType != ChildWindowType.Console)
                     {
-                        if (s[0] == '/')
+                        if (s[0] == '/' && !e.Control)
                         {
+                            if (s.Length > 1 && s[1] == '/')
+                            {
+                                /* Process following line as a script */
+                                ParseCommandLineAsScript(s.Substring(2));
+                                return;
+                            }
                             CommandProcessor.Parse(Client, this, s);
                             return;
                         }
@@ -603,6 +611,12 @@ namespace FusionIRC.Forms.Child
                     /* Console window */
                     if (s[0] == '/')
                     {
+                        if (s.Length > 1 && s[1] == '/')
+                        {
+                            /* Process following line as a script */
+                            ParseCommandLineAsScript(s.Substring(2));
+                            return;
+                        }
                         CommandProcessor.Parse(Client, this, s);
                         return;
                     }
@@ -693,6 +707,19 @@ namespace FusionIRC.Forms.Child
         {
             System.Diagnostics.Debug.Print("Retry " + s.Address);
             Client.Connect(s.Address, s.Port, s.IsSsl);
+        }
+
+        private void ParseCommandLineAsScript(string line)
+        {
+            /* Used with //command <args> from input window */
+            var script = new Script();
+            script.LineData.Add(line);
+            var args = new ScriptArgs
+                           {
+                               ClientConnection = Client,
+                               Channel = WindowType != ChildWindowType.Console ? Tag.ToString() : string.Empty
+                           };
+            CommandProcessor.Parse(Client, this, script.Parse(args, null));
         }
 
         private void TimerFocus(object sender, EventArgs e)

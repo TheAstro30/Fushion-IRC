@@ -155,7 +155,7 @@ namespace FusionIRC.Forms.Theming.Controls
                                          {
                                              Name = t.Name
                                          };
-                            ThemeManager.Save(Functions.MainDir(t.Path, false), _theme);
+                            ThemeManager.Save(Functions.MainDir(t.Path), _theme);
                             _cmbThemes.Items.Add(t);
                             _cmbThemes.SelectedIndex = _cmbThemes.Items.Count - 1;
                             BuildTextPreview();
@@ -174,7 +174,7 @@ namespace FusionIRC.Forms.Theming.Controls
                     }                    
                     /* Delete theme data */
                     SettingsManager.Settings.Themes.Theme.RemoveAt(_cmbThemes.SelectedIndex);
-                    var path = Functions.MainDir(deleted.Path, false);
+                    var path = Functions.MainDir(deleted.Path);
                     if (File.Exists(path))
                     {
                         File.Delete(path);
@@ -182,7 +182,7 @@ namespace FusionIRC.Forms.Theming.Controls
                     _cmbThemes.Items.RemoveAt(_cmbThemes.SelectedIndex);
                     /* Select previous theme and load it */
                     var theme = new Theme();
-                    path = Functions.MainDir(t.Path, false);
+                    path = Functions.MainDir(t.Path);
                     ThemeManager.Load(path, ref theme, true);
                     _theme = theme;                    
                     _cmbThemes.SelectedIndex = sel;
@@ -202,7 +202,7 @@ namespace FusionIRC.Forms.Theming.Controls
                 return;
             }
             var theme = new Theme();
-            ThemeManager.Load(Functions.MainDir(t.Path, false), ref theme, true);
+            ThemeManager.Load(Functions.MainDir(t.Path), ref theme, true);
             _theme = theme;
             _preview.Clear();
             _preview.Font = new Font(ThemeManager.GetFont(ChildWindowType.Channel).Name, 10); /* We keep the size static so it fits the preview */

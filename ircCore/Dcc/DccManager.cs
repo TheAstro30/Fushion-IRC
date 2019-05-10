@@ -87,7 +87,7 @@ namespace ircCore.Dcc
         public static void Load()
         {
             /* Load settings from disk */
-            if (!XmlSerialize<DccTransferData>.Load(Functions.MainDir(@"\data\transfers.xml", false), ref DccTransfers))
+            if (!XmlSerialize<DccTransferData>.Load(Functions.MainDir(@"\data\transfers.xml"), ref DccTransfers))
             {
                 DccTransfers = new DccTransferData();
             }
@@ -96,7 +96,7 @@ namespace ircCore.Dcc
         public static void Save()
         {
             /* Save settings to disk */
-            XmlSerialize<DccTransferData>.Save(Functions.MainDir(@"\data\transfers.xml", false), DccTransfers);
+            XmlSerialize<DccTransferData>.Save(Functions.MainDir(@"\data\transfers.xml"), DccTransfers);
         }
 
         public static void Add(DccFile file)

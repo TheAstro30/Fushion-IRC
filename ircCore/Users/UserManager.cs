@@ -16,7 +16,7 @@ namespace ircCore.Users
     {
         public static UserList UserList = new UserList();
 
-        private static readonly string FileName = Functions.MainDir(@"\data\users.xml", false);
+        private static readonly string FileName = Functions.MainDir(@"\data\users.xml");
 
         /* Load/save functions */
         public static void Load()

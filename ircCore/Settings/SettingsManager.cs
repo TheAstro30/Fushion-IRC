@@ -20,7 +20,7 @@ namespace ircCore.Settings
         public static void Load()
         {
             /* Load settings from disk */
-            if (!XmlSerialize<SettingsBase.Settings>.Load(Functions.MainDir(@"\data\settings.xml", false), ref Settings))
+            if (!XmlSerialize<SettingsBase.Settings>.Load(Functions.MainDir(@"\data\settings.xml"), ref Settings))
             {
                 Settings = new SettingsBase.Settings();
             }
@@ -29,7 +29,7 @@ namespace ircCore.Settings
         public static void Save()
         {
             /* Save settings to disk */
-            XmlSerialize<SettingsBase.Settings>.Save(Functions.MainDir(@"\data\settings.xml", false), Settings);
+            XmlSerialize<SettingsBase.Settings>.Save(Functions.MainDir(@"\data\settings.xml"), Settings);
         }
 
         public static WindowData GetWindowByName(string name)

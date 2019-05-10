@@ -59,7 +59,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
         /* Callbacks */
         private void ButtonClickHandler(object sender, EventArgs e)
         {
-            var path = Functions.MainDir(txtPath.Text, false);
+            var path = Functions.MainDir(txtPath.Text);
             using (var f = new FolderBrowserDialog())
             {
                 f.Description = @"Select the folder path to save log files to:";
@@ -68,7 +68,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
                 {
                     return;
                 }
-                txtPath.Text = Functions.MainDir(f.SelectedPath, false);
+                txtPath.Text = Functions.MainDir(f.SelectedPath);
             }
         }
 

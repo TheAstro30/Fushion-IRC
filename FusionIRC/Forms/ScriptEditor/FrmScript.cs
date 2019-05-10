@@ -18,10 +18,9 @@ using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Utils;
 using ircScript;
 using ircScript.Classes.Structures;
-using ircScript.Controls;
 using libolv;
 
-namespace FusionIRC.Forms.Script
+namespace FusionIRC.Forms.ScriptEditor
 {
     public sealed class FrmScript : Form
     {
@@ -33,7 +32,7 @@ namespace FusionIRC.Forms.Script
 
         private readonly TreeListView _tvFiles;
         private readonly OlvColumn _colFiles;
-        private readonly ScriptEditor _txtEdit;
+        private readonly ircScript.Controls.ScriptEditor _txtEdit;
 
         private readonly SplitContainer _splitter;
         private readonly StatusStrip _status;
@@ -243,7 +242,7 @@ namespace FusionIRC.Forms.Script
                                              ? Resources.codeHeader.ToBitmap()
                                              : Resources.codeFile.ToBitmap();
 
-            _txtEdit = new ScriptEditor
+            _txtEdit = new ircScript.Controls.ScriptEditor
                            {
                                BackColor = SystemColors.Window,
                                BorderStyle = BorderStyle.None,
@@ -675,7 +674,7 @@ namespace FusionIRC.Forms.Script
              * is referenced to that list - any changes made on the lists is reflected by _files */
             list.Add(script);
             /* Update file list */
-            var path = Functions.MainDir(string.Format(@"\scripts\{0}.xml", scriptName), false);
+            var path = Functions.MainDir(string.Format(@"\scripts\{0}.xml", scriptName));
             /* Save script */
             AddNewFilePath(type, path);
             ScriptManager.SaveScript(script, path);
@@ -695,7 +694,7 @@ namespace FusionIRC.Forms.Script
             string fileName;
             using (var fd = new OpenFileDialog
                                 {
-                                    InitialDirectory = Functions.MainDir(@"\scripts", false), Title = @"Load script", Filter = @"Script files (*.XML)|*.XML"
+                                    InitialDirectory = Functions.MainDir(@"\scripts"), Title = @"Load script", Filter = @"Script files (*.XML)|*.XML"
                                 })
             {
                 if (fd.ShowDialog(this) == DialogResult.Cancel)
@@ -747,7 +746,7 @@ namespace FusionIRC.Forms.Script
             {
                 if (MessageBox.Show(@"Current file's contents have changed. Do you wish to save the changes before unloading the selected script?", @"Save script", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    ScriptManager.SaveScript(script, Functions.MainDir(string.Format(@"\scripts\{0}.xml", script.Name), false));
+                    ScriptManager.SaveScript(script, Functions.MainDir(string.Format(@"\scripts\{0}.xml", script.Name)));
                 }
                 else
                 {
@@ -799,7 +798,7 @@ namespace FusionIRC.Forms.Script
                 default:
                     /* Renaming of scripts happens elsewhere and does not need this flag set to true
                      * nor the file deleted - just rename file and change the Name flag */
-                    ScriptManager.SaveScript(_currentEditingScript, Functions.MainDir(string.Format(@"\scripts\{0}.xml", _currentEditingScript.Name), false));                    
+                    ScriptManager.SaveScript(_currentEditingScript, Functions.MainDir(string.Format(@"\scripts\{0}.xml", _currentEditingScript.Name)));                    
                     break;
             }
             _currentEditingScript.ContentsChanged = false;
@@ -822,7 +821,7 @@ namespace FusionIRC.Forms.Script
             using (
                 var sfd = new SaveFileDialog
                               {
-                                  InitialDirectory = Functions.MainDir(@"\scripts", false),
+                                  InitialDirectory = Functions.MainDir(@"\scripts"),
                                   Title = @"Save script as",
                                   Filter = @"Script files (*.XML)|*.XML"
                               })
@@ -840,7 +839,7 @@ namespace FusionIRC.Forms.Script
             }
             _currentEditingScript.Name = name;
             ScriptManager.SaveScript(_currentEditingScript, fileName);
-            oldFile.Path = Functions.MainDir(fileName, false);
+            oldFile.Path = Functions.MainDir(fileName);
         }
 
         private void SaveAll()
@@ -863,7 +862,7 @@ namespace FusionIRC.Forms.Script
                         default:
                             /* Renaming of scripts happens elsewhere and does not need this flag set to true
                              * nor the file deleted - just rename file and change the Name flag */
-                            ScriptManager.SaveScript(s, Functions.MainDir(string.Format(@"\scripts\{0}.xml", s.Name), false));
+                            ScriptManager.SaveScript(s, Functions.MainDir(string.Format(@"\scripts\{0}.xml", s.Name)));
                             break;
                     }
                     s.ContentsChanged = false;
@@ -918,7 +917,7 @@ namespace FusionIRC.Forms.Script
         /* Script rebuilding */
         private static void AddNewFilePath(ScriptType type, string fileName)
         {
-            var p = new SettingsScripts.SettingsScriptPath {Path = Functions.MainDir(fileName, false)};
+            var p = new SettingsScripts.SettingsScriptPath {Path = Functions.MainDir(fileName)};
             switch (type)
             {
                 case ScriptType.Aliases:
@@ -961,14 +960,14 @@ namespace FusionIRC.Forms.Script
                 }
                 ScriptManager.Variables.Variable.Add(globalVar);
             }
-            ScriptManager.SaveVariables(Functions.MainDir(@"\scripts\variables.xml", false));
+            ScriptManager.SaveVariables(Functions.MainDir(@"\scripts\variables.xml"));
         }
 
         /* Helper methods */
         private void UpdateStatusInfo()
         {            
             var r = _txtEdit.Selection;
-            var path = Functions.MainDir(string.Format(@"\scripts\{0}.xml", _currentEditingScript.Name), false);
+            var path = Functions.MainDir(string.Format(@"\scripts\{0}.xml", _currentEditingScript.Name));
             _fileName.Text = string.Format("{0}", _currentEditingScript.ContentsChanged
                                                       ? string.Format("* {0}",
                                                                       path)

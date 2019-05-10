@@ -36,7 +36,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
             chkMinimized.Checked = SettingsManager.Settings.Client.TrayIcon.HideMinimized;
             chkBalloon.Checked = SettingsManager.Settings.Client.TrayIcon.ShowBalloonTips;
 
-            _iconFile = Functions.MainDir(SettingsManager.Settings.Client.TrayIcon.Icon, false);
+            _iconFile = Functions.MainDir(SettingsManager.Settings.Client.TrayIcon.Icon);
             _defaultIcon = ConnectionCallbackManager.MainForm.Icon;
             _icon = File.Exists(_iconFile)
                         ? Icon.ExtractAssociatedIcon(_iconFile)
@@ -60,7 +60,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
             SettingsManager.Settings.Client.TrayIcon.HideMinimized = chkMinimized.Checked;
             SettingsManager.Settings.Client.TrayIcon.ShowBalloonTips = chkBalloon.Checked;
             SettingsManager.Settings.Client.TrayIcon.Icon = !string.IsNullOrEmpty(_iconFile)
-                                                                ? Functions.MainDir(_iconFile, true)
+                                                                ? Functions.MainDir(_iconFile)
                                                                 : string.Empty;            
         }
 

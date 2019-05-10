@@ -160,7 +160,7 @@ namespace FusionIRC.Forms.Theming
                         return;
                     }
                     SettingsManager.Settings.Themes.CurrentTheme = _themePreview.ThemeIndex;
-                    ThemeManager.Load(Functions.MainDir(t.Path, false));
+                    ThemeManager.Load(Functions.MainDir(t.Path));
                     break;
             }
         }

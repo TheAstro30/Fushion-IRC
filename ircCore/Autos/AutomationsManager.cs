@@ -23,7 +23,7 @@ namespace ircCore.Autos
 
         public static void Load()
         {
-            if (!XmlSerialize<Automations>.Load(Functions.MainDir(@"\data\autos.xml", false), ref Automations))
+            if (!XmlSerialize<Automations>.Load(Functions.MainDir(@"\data\autos.xml"), ref Automations))
             {
                 Automations = new Automations();
             }
@@ -31,7 +31,7 @@ namespace ircCore.Autos
 
         public static void Save()
         {            
-            XmlSerialize<Automations>.Save(Functions.MainDir(@"\data\autos.xml", false), Automations);
+            XmlSerialize<Automations>.Save(Functions.MainDir(@"\data\autos.xml"), Automations);
         }
 
         public static object[] GetAllNetworks(AutomationType type)

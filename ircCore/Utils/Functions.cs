@@ -130,10 +130,20 @@ namespace ircCore.Utils
             }
         }
 
+        public static string MainDir(string path)
+        {
+            return MainDir(path, false, false);
+        }
+
         public static string MainDir(string path, bool forceAppDir)
         {
+            return MainDir(path, forceAppDir, false);
+        }
+
+        public static string MainDir(string path, bool forceAppDir, bool allowEmptyPath)
+        {
             var sFolder = !forceAppDir ? _mainFolder : AppDomain.CurrentDomain.BaseDirectory;
-            if (!String.IsNullOrEmpty(path))
+            if (!string.IsNullOrEmpty(path))
             {
                 if (path.ToLower().Contains(sFolder.ToLower()))
                 {
@@ -143,7 +153,7 @@ namespace ircCore.Utils
                 return path.Substring(0, 1) == @"\" ? (sFolder + path).Replace(@"\\", @"\") : path.Replace(@"\\", @"\");
             }
             /* Failed */
-            return String.Empty;
+            return allowEmptyPath ? sFolder : string.Empty;
         }
 
         /* Check IRC addrss - validate the input is of *!*@* */
@@ -206,7 +216,7 @@ namespace ircCore.Utils
                 p = @"\logs";
                 SettingsManager.Settings.Client.Logging.LogPath = p;
             }
-            var path = Functions.MainDir(p, false);
+            var path = Functions.MainDir(p);
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);

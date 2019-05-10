@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using FusionIRC.Forms.Autos;
 using FusionIRC.Forms.Favorites;
 using FusionIRC.Forms.Misc;
-using FusionIRC.Forms.Script;
+using FusionIRC.Forms.ScriptEditor;
 using FusionIRC.Forms.Settings;
 using FusionIRC.Forms.Theming;
 using FusionIRC.Forms.Users;

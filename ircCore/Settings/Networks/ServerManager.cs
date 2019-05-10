@@ -17,7 +17,7 @@ namespace ircCore.Settings.Networks
 
         public static void Load()
         {
-            if (!XmlSerialize<Servers>.Load(Functions.MainDir(@"\data\servers.xml", false), ref Servers))
+            if (!XmlSerialize<Servers>.Load(Functions.MainDir(@"\data\servers.xml"), ref Servers))
             {
                 Servers = new Servers();
             }
@@ -25,7 +25,7 @@ namespace ircCore.Settings.Networks
 
         public static void Save()
         {
-            XmlSerialize<Servers>.Save(Functions.MainDir(@"\data\servers.xml", false), Servers);
+            XmlSerialize<Servers>.Save(Functions.MainDir(@"\data\servers.xml"), Servers);
         }
 
         public static object[] GetAllNetworks()

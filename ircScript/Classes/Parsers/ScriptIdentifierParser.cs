@@ -74,8 +74,8 @@ namespace ircScript.Classes.Parsers
                 case "$NICK":
                     return e.Nick;
 
-                case "APPDIR":
-                    return Functions.MainDir(@"\\", false);
+                case "$APPDIR":
+                    return Functions.MainDir(string.Empty, true, true);
 
                 default:
                     /* Check if it's an alias */                    
@@ -219,8 +219,8 @@ namespace ircScript.Classes.Parsers
 
                 case "APPDIR":
                     return !string.IsNullOrEmpty(argList[0])
-                               ? Functions.MainDir(string.Format(@"\{0}", argList[0]), false)
-                               : Functions.MainDir(@"\\", false);
+                               ? Functions.MainDir(string.Format(@"\{0}", argList[0]), true)
+                               : Functions.MainDir(string.Empty, true, true);
 
                 case "READ":
                     if (argList.Length > 1 && !string.IsNullOrEmpty(argList[1]))

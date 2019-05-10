@@ -65,7 +65,7 @@ namespace FusionIRC.Forms
             ThemeManager.ThemeLoaded += WindowManager.OnThemeLoaded;
             ThemeManager.Load(
                 Functions.MainDir(
-                    SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path, false));
+                    SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path));
             /* Load users list */
             UserManager.Load();
             /* Load automations */
@@ -81,7 +81,7 @@ namespace FusionIRC.Forms
             ScriptManager.BuildScripts(ScriptType.Aliases, ScriptManager.AliasData, ScriptManager.Aliases);
             ScriptManager.BuildScripts(ScriptType.Events, ScriptManager.EventData, ScriptManager.Events);
             /* Load variables */
-            ScriptManager.LoadVariables(Functions.MainDir(@"\scripts\variables.xml", false));
+            ScriptManager.LoadVariables(Functions.MainDir(@"\scripts\variables.xml"));
             /* Main form initialization */
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             Text = @"FusionIRC";
@@ -193,7 +193,7 @@ namespace FusionIRC.Forms
             WindowManager.DccManagerWindow = new FrmDccManager();
             /* Tray icon */
             TrayNotifyIcon.Text = @"FusionIRC IRC Client";
-            var ico = Functions.MainDir(SettingsManager.Settings.Client.TrayIcon.Icon, false);
+            var ico = Functions.MainDir(SettingsManager.Settings.Client.TrayIcon.Icon);
             TrayNotifyIcon.Icon = !string.IsNullOrEmpty(ico) && File.Exists(ico)
                                       ? Icon.ExtractAssociatedIcon(ico)
                                       : Icon;
@@ -312,7 +312,7 @@ namespace FusionIRC.Forms
             /* Save servers */
             ServerManager.Save();
             /* Save client current theme */                        
-            ThemeManager.Save(Functions.MainDir(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path, false));            
+            ThemeManager.Save(Functions.MainDir(SettingsManager.Settings.Themes.Theme[SettingsManager.Settings.Themes.CurrentTheme].Path));            
             /* Save users list */
             UserManager.Save();
             /* Save automations */
@@ -322,7 +322,7 @@ namespace FusionIRC.Forms
             /* DCC File transfers manager */
             DccManager.Save();
             /* Save variables */
-            ScriptManager.SaveVariables(Functions.MainDir(@"\scripts\variables.xml", false));
+            ScriptManager.SaveVariables(Functions.MainDir(@"\scripts\variables.xml"));
             base.OnFormClosing(e);
         }
 
@@ -379,7 +379,7 @@ namespace FusionIRC.Forms
         /* Private helpers */
         private void SetNewMdiBackground()
         {
-            var bmp = Functions.MainDir(SettingsManager.Settings.Windows.MdiBackground.Path, false);
+            var bmp = Functions.MainDir(SettingsManager.Settings.Windows.MdiBackground.Path);
             if (string.IsNullOrEmpty(bmp) || !File.Exists(bmp))
             {
                 return;
@@ -512,7 +512,7 @@ namespace FusionIRC.Forms
                         }
                         SettingsManager.Settings.Windows.MdiBackground = new MdiBackground
                                                                              {
-                                                                                 Path = Functions.MainDir(ofd.FileName, false),
+                                                                                 Path = Functions.MainDir(ofd.FileName),
                                                                                  Layout = ImageLayout.Center
                                                                              };
                     }
