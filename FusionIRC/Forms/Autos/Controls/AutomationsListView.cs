@@ -146,7 +146,7 @@ namespace FusionIRC.Forms.Autos.Controls
                              };
             _imageList.Images.AddRange(new[]
                                            {
-                                               Properties.Resources.channel.ToBitmap(),
+                                               Properties.Resources.autoJoin.ToBitmap(),
                                                Properties.Resources.identify.ToBitmap()
                                            });
 

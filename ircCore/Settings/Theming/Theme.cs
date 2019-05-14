@@ -88,6 +88,12 @@ namespace ircCore.Settings.Theming
             ThemeFonts.Add(ChildWindowType.Console, new Font("Lucida Console", 10));
             ThemeFonts.Add(ChildWindowType.Channel, new Font("Lucida Console", 10));
             ThemeFonts.Add(ChildWindowType.Private, new Font("Lucida Console", 10));
+            ThemeFonts.Add(ChildWindowType.DccChat, new Font("Lucida Console", 10));
+            /* Default backgrounds */
+            ThemeBackgrounds.Add(ChildWindowType.Console, new ThemeBackgroundData());
+            ThemeBackgrounds.Add(ChildWindowType.Channel, new ThemeBackgroundData());
+            ThemeBackgrounds.Add(ChildWindowType.Private, new ThemeBackgroundData());
+            ThemeBackgrounds.Add(ChildWindowType.DccChat, new ThemeBackgroundData());
             /* Default messages */
             Messages.Add(ThemeMessage.ConnectingText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * Connecting to: $server [$port]" });
             Messages.Add(ThemeMessage.ConnectedText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * Connected! Waiting for welcome message..." });
@@ -154,6 +160,7 @@ namespace ircCore.Settings.Theming
             ThemeColors = new Dictionary<ThemeColor, int>(theme.ThemeColors);
             TimeStampFormat = theme.TimeStampFormat;
             ThemeFonts = new Dictionary<ChildWindowType, Font>(theme.ThemeFonts);
+            ThemeBackgrounds = new Dictionary<ChildWindowType, ThemeBackgroundData>(theme.ThemeBackgrounds);
             Messages = new Dictionary<ThemeMessage, ThemeMessageData>(theme.Messages);
             NicklistImages = new Dictionary<ThemeNicklistImage, Bitmap>(theme.NicklistImages);
         }

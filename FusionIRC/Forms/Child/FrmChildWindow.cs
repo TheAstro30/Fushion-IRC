@@ -103,13 +103,13 @@ namespace FusionIRC.Forms.Child
             _initialize = true;            
             /* Constructor where we pass what type of window this is - then we know what controls to create ;) */
             Client = client;
-            WindowType = type;
-            /* Next line is used for getting/setting window size/position */
+            WindowType = type;           
+            /* Next line is used for getting/setting window size/position & background image */
             _windowChildName = type == ChildWindowType.Console
                                    ? "console"
                                    : type == ChildWindowType.Channel
                                          ? "channel"
-                                         : type == ChildWindowType.Private ? "private" : "chat";
+                                         : type == ChildWindowType.Private ? "private" : "chat";            
             /* Controls */
             Input = new InputWindow
                         {
@@ -127,6 +127,18 @@ namespace FusionIRC.Forms.Child
                              LineSpacingStyle = LineSpacingStyle.Paragraph,
                              MaximumLines = SettingsManager.Settings.Windows.Caching.Output                             
                          };
+
+            /* Backgrounds */
+            var bg = ThemeManager.GetBackground(type);
+            if (!string.IsNullOrEmpty(bg.Path))
+            {
+                var file = Functions.MainDir(bg.Path);
+                if (File.Exists(file))
+                {
+                    Output.BackgroundImage = (Bitmap)Image.FromFile(file);
+                    Output.BackgroundImageLayout = bg.LayoutStyle;
+                }
+            }
 
             if (type == ChildWindowType.Channel)
             {                
@@ -692,8 +704,7 @@ namespace FusionIRC.Forms.Child
         }
 
         private void OnReconnectTimer(int count)
-        {
-            System.Diagnostics.Debug.Print(count.ToString());
+        {            
             if (WindowType == ChildWindowType.Console)
             {
                 Text = string.Format("{0}: {1} ({2}:{3}) [{4} {5}]",
@@ -704,8 +715,7 @@ namespace FusionIRC.Forms.Child
         }
 
         private void OnConnectionTry(Server s)
-        {
-            System.Diagnostics.Debug.Print("Retry " + s.Address);
+        {            
             Client.Connect(s.Address, s.Port, s.IsSsl);
         }
 

@@ -152,13 +152,29 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Settings\Controls\Base\ISettings.cs" />
-    <Compile Include="Forms\Theming\Controls\ThemeColors.cs">
+    <Compile Include="Forms\Theming\Controls\BackgroundStrip.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Forms\Theming\Controls\ThemeColors.Designer.cs">
-      <DependentUpon>ThemeColors.cs</DependentUpon>
+    <Compile Include="Forms\Theming\Controls\BackgroundStrip.Designer.cs">
+      <DependentUpon>BackgroundStrip.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Theming\Controls\ThemePreview.cs">
+    <Compile Include="Forms\Theming\Controls\FontStrip.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Theming\Controls\ThemeBackgrounds.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Theming\Controls\ThemeBackgrounds.Designer.cs">
+      <DependentUpon>ThemeBackgrounds.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Theming\Controls\ThemeFonts.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Theming\Controls\ThemeMessages.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Theming\Helpers\IThemeSetting.cs" />
+    <Compile Include="Forms\Theming\Controls\ThemeColors.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Forms\Theming\FrmNew.cs">
@@ -167,6 +183,7 @@
     <Compile Include="Forms\Theming\FrmTheme.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\Theming\Helpers\Preview.cs" />
     <Compile Include="Forms\Users\Controls\UserListView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -216,8 +233,11 @@
     <EmbeddedResource Include="Forms\Settings\Controls\Connection\ConnectionOptions.resx">
       <DependentUpon>ConnectionOptions.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Theming\Controls\ThemeColors.resx">
-      <DependentUpon>ThemeColors.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\Theming\Controls\BackgroundStrip.resx">
+      <DependentUpon>BackgroundStrip.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Theming\Controls\ThemeBackgrounds.resx">
+      <DependentUpon>ThemeBackgrounds.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -298,6 +318,11 @@
     <None Include="Icons\Dialog\editLines.ico" />
     <None Include="Icons\Dialog\editReplace.ico" />
     <None Include="Images\about-dialog-1.jpg" />
+    <None Include="Icons\Dialog\themeColor.ico" />
+    <None Include="Icons\Dialog\themeFont.ico" />
+    <None Include="Icons\Dialog\themeMessage.ico" />
+    <None Include="Icons\Dialog\themePicture.ico" />
+    <None Include="Icons\Dialog\autoJoin.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

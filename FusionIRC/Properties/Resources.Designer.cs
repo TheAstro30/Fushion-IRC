@@ -103,6 +103,16 @@ namespace FusionIRC.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon autoJoin {
+            get {
+                object obj = ResourceManager.GetObject("autoJoin", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon autos {
             get {
                 object obj = ResourceManager.GetObject("autos", resourceCulture);
@@ -405,6 +415,46 @@ namespace FusionIRC.Properties {
         internal static System.Drawing.Icon theme {
             get {
                 object obj = ResourceManager.GetObject("theme", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon themeColor {
+            get {
+                object obj = ResourceManager.GetObject("themeColor", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon themeFont {
+            get {
+                object obj = ResourceManager.GetObject("themeFont", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon themeMessage {
+            get {
+                object obj = ResourceManager.GetObject("themeMessage", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon themePicture {
+            get {
+                object obj = ResourceManager.GetObject("themePicture", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

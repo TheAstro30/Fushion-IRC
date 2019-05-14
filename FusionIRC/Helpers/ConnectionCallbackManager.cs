@@ -466,6 +466,22 @@ namespace FusionIRC.Helpers
         public static void OnNotice(ClientConnection client, string nick, string address, string text)
         {
             /* Check ignored */
+            if (nick.Equals("nickserv", StringComparison.InvariantCultureIgnoreCase) && text.Contains("nickname is registered") && AutomationsManager.Automations.Identify.Enable)
+            {
+                var n = AutomationsManager.GetAutomationByNetwork(AutomationsManager.AutomationType.Identify,
+                                                                  client.Network);
+                if (n != null)
+                {
+                    foreach (var nn in n.Data)
+                    {
+                        if (nn.Item.Equals(client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            client.Send(string.Format("PRIVMSG NICKSERV :IDENTIFY {0}", nn.Value));
+                            break;
+                        }
+                    }
+                }
+            }
             if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
             {
                 return;

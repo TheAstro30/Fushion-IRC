@@ -5,6 +5,8 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using System.Linq;
 using FusionIRC.Forms;
@@ -14,6 +16,7 @@ using FusionIRC.Helpers.Commands;
 using ircClient;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
+using ircCore.Utils;
 
 namespace FusionIRC.Helpers
 {
@@ -198,8 +201,51 @@ namespace FusionIRC.Helpers
         /* Theme loaded callback */
         public static void OnThemeLoaded()
         {
-            System.Diagnostics.Debug.Print("Theme loaded " + ThemeManager.CurrentTheme.Name);
             /* Here we now refresh all open chat windows ... */
+            var c = (FrmClientWindow) ConnectionCallbackManager.MainForm;
+            if (c == null)
+            {
+                return;
+            }
+            c.SwitchView.BackColor = ThemeManager.GetColor(ThemeColor.SwitchTreeBackColor);
+            c.SwitchView.ForeColor = ThemeManager.GetColor(ThemeColor.SwitchTreeForeColor);
+            foreach (var win in Windows.SelectMany(w => w.Value))
+            {
+                var fnt = ThemeManager.GetFont(win.WindowType);
+                var bg = ThemeManager.GetBackground(win.WindowType);
+                switch (win.WindowType)
+                {
+                    case ChildWindowType.Channel:
+                        /* Nicklist */
+                        win.Nicklist.Font = fnt;
+                        win.Nicklist.BackColor = ThemeManager.GetColor(ThemeColor.NicklistBackColor);
+                        win.Nicklist.ForeColor = ThemeManager.GetColor(ThemeColor.NicklistForeColor);
+                        break;
+                }
+                /* Fonts */
+                win.Output.Font = fnt;
+                win.Input.Font = fnt;
+                /* Backgrounds */
+                if (!string.IsNullOrEmpty(bg.Path))
+                {
+                    var file = Functions.MainDir(bg.Path);
+                    if (File.Exists(file))
+                    {
+                        win.Output.BackgroundImage = (Bitmap)Image.FromFile(file);
+                        win.Output.BackgroundImageLayout = bg.LayoutStyle;
+                    }
+                }
+                else
+                {
+                    win.Output.BackgroundImage = null;
+                }
+                /* Colors */
+                win.Output.BackColor = ThemeManager.GetColor(ThemeColor.OutputWindowBackColor);
+                win.Output.ForeColor = ThemeManager.GetColor(ThemeColor.OutputWindowForeColor);
+                win.Input.BackColor = ThemeManager.GetColor(ThemeColor.InputWindowBackColor);
+                win.Input.ForeColor = ThemeManager.GetColor(ThemeColor.InputWindowForeColor);
+                win.Refresh();
+            }
         }
 
         /* Private methods */

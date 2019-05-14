@@ -19,5 +19,8 @@ namespace ircCore.Settings.SettingsBase.Structures
 
         [XmlAttribute("autoList")]
         public int AutoList { get; set; }
+
+        [XmlAttribute("theme")]
+        public int Theme { get; set; }
     }
 }

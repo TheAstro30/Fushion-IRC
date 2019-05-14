@@ -3,7 +3,6 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
-
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -23,6 +22,8 @@ namespace FusionIRC.Forms.Autos
         private readonly AutomationsListView _autoIdentify;
         private readonly Button _btnClose;
 
+        private readonly ImageList _images;
+
         public FrmAutos()
         {
             /* Form code */
@@ -36,14 +37,22 @@ namespace FusionIRC.Forms.Autos
             StartPosition = FormStartPosition.CenterParent;
             Text = @"Automations";
 
+            _images = new ImageList { ColorDepth = ColorDepth.Depth32Bit, ImageSize = new Size(16, 16) };
+            _images.Images.AddRange(new Image[]
+                                        {
+                                            Properties.Resources.autoJoin.ToBitmap(),
+                                            Properties.Resources.identify.ToBitmap()
+                                        });
+
             _tabAutos = new TabControl
                             {
                                 Location = new Point(12, 12),
                                 SelectedIndex = 0,
                                 Size = new Size(397, 368),
+                                ImageList = _images,
                                 TabIndex = 0
                             };
-
+            
             /* Auto join tab */
             _tabJoin = new TabPage
                            {
@@ -52,7 +61,8 @@ namespace FusionIRC.Forms.Autos
                                Size = new Size(389, 342),
                                TabIndex = 0,
                                Text = @"Join",
-                               UseVisualStyleBackColor = true
+                               UseVisualStyleBackColor = true,
+                               ImageIndex = 0
                            };
 
             _autoJoin = new AutomationsListView(AutomationsManager.AutomationType.Join)
@@ -72,7 +82,8 @@ namespace FusionIRC.Forms.Autos
                                    Size = new Size(389, 342),
                                    TabIndex = 1,
                                    Text = @"Identify",
-                                   UseVisualStyleBackColor = true
+                                   UseVisualStyleBackColor = true,
+                                   ImageIndex = 1
                                };
 
             _autoIdentify = new AutomationsListView(AutomationsManager.AutomationType.Identify)

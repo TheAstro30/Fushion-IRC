@@ -125,7 +125,7 @@ namespace ircCore.Controls.ChildWindows.Input
         protected override void OnResize(EventArgs e)
         {
             Height = GetTextHeight() + 6; /* Extra padding at top and bottom */
-            _txtOut.SetBounds(0, 4, Width - 4, _txtOut.Height);
+            _txtOut.SetBounds(0, 4, Width - 4, Height);
             base.OnResize(e);
         }
 

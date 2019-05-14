@@ -3,6 +3,7 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using ircCore.Controls.ChildWindows.Helpers;
@@ -13,11 +14,22 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
     /* Drawing functions for the output window */
     public enum BackgroundImageLayoutStyles
     {
+        [Description("None")]
         None = 0,
+
+        [Description("Tile")]
         Tile = 1,
+
+        [Description("Center")]
         Center = 2,
+
+        [Description("Stretch")]
         Stretch = 3,
+
+        [Description("Zoom")]
         Zoom = 4,
+
+        [Description("Photo")]
         Photo = 5
     }
 
@@ -146,7 +158,10 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
             {             
                 /* Render normal line data */
                 RenderBackgroundImage(deviceContext, clientRect);
-                RenderLineData(deviceContext, font, clientRect, scrollValue);
+                if (TextData.Lines.Count > 0)
+                {
+                    RenderLineData(deviceContext, font, clientRect, scrollValue);
+                }
             }
         }
 

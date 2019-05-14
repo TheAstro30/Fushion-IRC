@@ -229,4 +229,19 @@
   <data name="cork" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Wave\cork.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="themeColor" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\Dialog\themeColor.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="themeFont" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\Dialog\themeFont.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="themeMessage" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\Dialog\themeMessage.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="themePicture" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\Dialog\themePicture.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="autoJoin" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\Dialog\autoJoin.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

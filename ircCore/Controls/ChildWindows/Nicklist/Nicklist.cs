@@ -14,6 +14,7 @@ using ircCore.Controls.ChildWindows.Nicklist.Helpers;
 using ircCore.Controls.ChildWindows.Nicklist.Structures;
 using libolv;
 using libolv.Implementation.Events;
+using libolv.Rendering.Styles;
 
 namespace ircCore.Controls.ChildWindows.Nicklist
 {
@@ -23,6 +24,7 @@ namespace ircCore.Controls.ChildWindows.Nicklist
         private readonly List<NickData> _list = new List<NickData>();
         
         private readonly ObjectListView _nickList;
+        private readonly HeaderFormatStyle _header = new HeaderFormatStyle();
         private readonly OlvColumn _nickColumn;
         private ImageList _images;
 
@@ -64,9 +66,14 @@ namespace ircCore.Controls.ChildWindows.Nicklist
                                 FullRowSelect = true,
                                 HideSelection = false,
                                 OwnerDraw = true,
-                                HeaderStyle = ColumnHeaderStyle.Nonclickable,
+                                HeaderUsesThemes = false,
+                                UseExplorerTheme = false,
                                 View = View.Details,
-                                BorderStyle = BorderStyle.None
+                                BorderStyle = BorderStyle.None,
+                                HasCollapsibleGroups = false,
+                                ShowGroups = false,
+                                HeaderStyle = ColumnHeaderStyle.Nonclickable,
+                                HeaderFormatStyle = _header
                             };
 
             _nickColumn = new OlvColumn("Members: 0", "Nick")
@@ -74,6 +81,8 @@ namespace ircCore.Controls.ChildWindows.Nicklist
                                   Sortable = false,
                                   IsEditable = false,
                                   IsVisible = true,
+                                  Groupable = false,
+                                  Hideable = false,
                                   Width = 300
                               };
 
@@ -109,6 +118,36 @@ namespace ircCore.Controls.ChildWindows.Nicklist
             {
                 _nickList.Font = value;
                 base.Font = value;
+            }
+        }
+
+        public override Color BackColor
+        {
+            get
+            {
+                return base.BackColor;
+            }
+            set
+            {       
+                _header.Normal.BackColor = value;
+                _nickList.BackColor = value;
+                base.BackColor = value;
+                _nickList.RefreshObjects(_list);
+            }
+        }
+
+        public override Color ForeColor
+        {
+            get
+            {
+                return base.ForeColor;
+            }
+            set
+            {           
+                _header.Normal.ForeColor = value;
+                _nickList.ForeColor = value;
+                base.ForeColor = value;
+                _nickList.RefreshObjects(_list);
             }
         }
 

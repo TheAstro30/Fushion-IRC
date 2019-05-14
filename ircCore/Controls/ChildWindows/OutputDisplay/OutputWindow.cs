@@ -10,7 +10,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
-using System.Linq;
 using System.Media;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -181,7 +180,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         protected override void OnPaint(PaintEventArgs e)
         {
             /* Where the magic happens ;) - simplified to a separate class */
-            if (!Visible || _isDesignMode || TextData.Lines.Count == 0)
+            if (!Visible || _isDesignMode)
             {
                 return;
             }
@@ -544,6 +543,10 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
 
         protected override void OnMouseWheel(MouseEventArgs e)
         {
+            if (!_showScrollBar)
+            {
+                return;
+            }
             var lines = TextData.WrappedLinesCount - 1;
             if (e.Delta < 0)
             {
@@ -577,9 +580,10 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             if (removePrevious)
             {
                 var t = GetLineMarker();
-                if (t != null)
+                if (t != -1)
                 {
-                    TextData.Lines.Remove(t);
+                    TextData.Wrapped.RemoveAt(t);
+                    TextData.Lines.RemoveAt(t);
                 }
             }
             var text = new TextData.Text
@@ -697,25 +701,15 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         public void SaveBuffer(string file)
         {
             var t = GetLineMarker();
-            if (t != null)
+            if (t != -1)
             {
-                TextData.Lines.Remove(t);
+                TextData.Wrapped.RemoveAt(t);
+                TextData.Lines.RemoveAt(t);
             }
             TextData.WindowWidth = ClientRectangle.Width;
             /* Save the buffer output to file */
             BinarySerialize<TextData>.Save(file, TextData);
-        }
-
-        public void ModifyLine(int line, string newText)
-        {
-            /* Really only used for the theme line data modification (single line anyway) */
-            if (line > TextData.Lines.Count - 1 || TextData.Lines.Count == 0)
-            {
-                return;
-            }
-            TextData.Lines[line].Line = newText;
-            _wrapUpdate.Enabled = true;
-        }
+        }   
 
         public void Clear()
         {
@@ -734,9 +728,17 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         }
 
         /* Private methods */
-        private TextData.Text GetLineMarker()
+        private int GetLineMarker()
         {
-            return TextData.Lines.FirstOrDefault(tx => tx.IsLineMarker);
+            for (var i = 0; i <= TextData.Lines.Count - 1; i++ )
+            {
+                if (TextData.Lines[i].IsLineMarker)
+                {
+                    return i;
+                }
+            }
+            return -1;
+            //return TextData.Lines.FirstOrDefault(tx => tx.IsLineMarker);
         }
 
         private void TrimBuffer()

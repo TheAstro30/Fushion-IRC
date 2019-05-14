@@ -21,6 +21,8 @@ namespace FusionIRC.Forms.Users
         private readonly TabPage _tabNotify;
         private readonly TabPage _tabIgnore;
         private readonly Button _btnClose;
+
+        private readonly ImageList _images;
       
         public FrmUsers()
         {
@@ -52,11 +54,19 @@ namespace FusionIRC.Forms.Users
                                 TabIndex = 0                                
                             };
 
+            _images = new ImageList { ColorDepth = ColorDepth.Depth32Bit, ImageSize = new Size(16, 16) };
+            _images.Images.AddRange(new Image[]
+                                        {
+                                            Properties.Resources.notify.ToBitmap(),
+                                            Properties.Resources.ignored.ToBitmap()
+                                        });
+
             _tabUsers = new TabControl
                             {
                                 Location = new Point(12, 12),                                
                                 SelectedIndex = 0,
                                 Size = new Size(388, 334),
+                                ImageList = _images,
                                 TabIndex = 0
                             };
 
@@ -67,7 +77,8 @@ namespace FusionIRC.Forms.Users
                                  Size = new Size(380, 306),
                                  TabIndex = 0,
                                  Text = @"Notify",
-                                 UseVisualStyleBackColor = true
+                                 UseVisualStyleBackColor = true,
+                                 ImageIndex = 0
                              };
 
             _tabNotify.Controls.Add(_lvNotify);
@@ -79,7 +90,8 @@ namespace FusionIRC.Forms.Users
                                  Size = new Size(380, 306),
                                  TabIndex = 1,
                                  Text = @"Ignore",
-                                 UseVisualStyleBackColor = true
+                                 UseVisualStyleBackColor = true,
+                                 ImageIndex = 1
                              };
 
             _tabIgnore.Controls.Add(_lvIgnore);

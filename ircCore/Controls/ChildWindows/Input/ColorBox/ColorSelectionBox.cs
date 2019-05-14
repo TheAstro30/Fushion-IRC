@@ -72,7 +72,7 @@ namespace ircCore.Controls.ChildWindows.Input.ColorBox
                     }
                     else
                     {
-                        if (e.X >= ((21 * (i + 1)) - 16) && e.X <= (21 * (i + 1)))
+                        if (e.X >= ((21*(i + 1)) - 16) && e.X <= (21*(i + 1)))
                         {
                             _selected = i;
                             break;

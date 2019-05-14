@@ -472,8 +472,7 @@ namespace FusionIRC.Forms
                                              new ToolStripMenuItem("Stretch", null, OnMdiMenuClick),
                                              new ToolStripMenuItem("Zoom", null, OnMdiMenuClick)                                             
                                          });
-            //none = 0, tile = 1; center = 2; stretch = 3; zoom = 4; 
-            System.Diagnostics.Debug.Print(((int)ImageLayout.None).ToString());
+            //none = 0, tile = 1; center = 2; stretch = 3; zoom = 4;             
             for (var i = 3; i <= m.DropDownItems.Count - 1; i++)
             {
                 m.DropDownItems[i].Enabled = enable;
