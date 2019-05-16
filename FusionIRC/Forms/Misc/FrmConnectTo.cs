@@ -341,9 +341,9 @@ namespace FusionIRC.Forms.Misc
                 SettingsManager.Settings.Connection.Port = _port;
                 SettingsManager.Settings.Connection.IsSsl = _isSsl;
                 SettingsManager.Settings.Connection.Channels = _txtChannels.Text;
-                SettingsManager.Settings.Connection.NewWindow = _chkNewWindow.Checked;
-                SettingsManager.Settings.Connection.ShowConnectDialog = _chkShow.Checked;
+                SettingsManager.Settings.Connection.NewWindow = _chkNewWindow.Checked;                
             }
+            SettingsManager.Settings.Connection.ShowConnectDialog = _chkShow.Checked;
             base.OnFormClosing(e);
         }
 

@@ -702,6 +702,8 @@ namespace FusionIRC.Helpers
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Send /WHO to get user addresses */
             client.Send(string.Format("WHO {0}{1}MODE {0}", channel, Environment.NewLine));
+            /* Remember to unset the halt disconnect message bool */
+            c.DisconnectedShown = false;
         }
 
         public static void OnPartSelf(ClientConnection client, string channel)
@@ -1163,8 +1165,9 @@ namespace FusionIRC.Helpers
         private static void UpdateChannelsOnDisconnect(ClientConnection client, ParsedMessageData message)
         {
             /* Here we either close all open windows or just clear the nicklist - dependant on settings */
-            foreach (var win in WindowManager.Windows[client].Where(win => win.WindowType == ChildWindowType.Channel))
+            foreach (var win in WindowManager.Windows[client].Where(win => win.WindowType == ChildWindowType.Channel).Where(win => !win.DisconnectedShown))
             {
+                win.DisconnectedShown = true;
                 win.Nicklist.Clear();
                 win.Output.AddLine(message.DefaultColor, message.Message);
                 /* Update treenode color */

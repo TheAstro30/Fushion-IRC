@@ -7,11 +7,15 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using ircCore.Controls.ChildWindows.Helpers;
+using ircCore.Forms;
 using ircCore.Settings;
 
 namespace ircCore.Utils
@@ -30,6 +34,9 @@ namespace ircCore.Utils
 
     public static class Functions
     {
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern int GetCaretPos(ref Point lpPoint);
+
         private static string _mainFolder;
 
         private static readonly Regex AddressValidate = new Regex(@"(?<nick>[^ ]+?)\!(?<user>[^ ]+?)@(?<host>[^ ]+?)$", RegexOptions.Compiled);
@@ -43,6 +50,8 @@ namespace ircCore.Utils
                 string.Format(@"{0}|{1}|{2}|{3}|{4}|{5}|{6}", CodePattern, (char) ControlByte.Bold, (char) ControlByte.Underline,
                               (char) ControlByte.Italic, (char) ControlByte.Reverse, (char) ControlByte.Normal,
                               (char) ControlByte.Reverse), RegexOptions.Compiled);
+
+        private static FrmColorIndex _frmColor;
 
         public sealed class EnumUtils
         {
@@ -248,6 +257,42 @@ namespace ircCore.Utils
         public static string TruncateString(string text, int length)
         {
             return text.Length > length ? string.Format("{0}...", text.Substring(0, length)) : text;
+        }
+
+        public static FrmColorIndex ShowColorIndexBox(Control box, int selectionStart)
+        {
+            if (_frmColor == null)
+            {
+                var pt = Point.Empty;
+                /* Init new color form */
+                _frmColor = new FrmColorIndex {Box = box};
+                /* Get cursor position */
+                GetCaretPos(ref pt);
+                var x = box.PointToScreen(pt).X - (_frmColor.Size.Width / 2);
+                var y = box.PointToScreen(pt).Y - ((_frmColor.Height - _frmColor.ClientRectangle.Height) - SystemInformation.CaptionHeight);
+                /* Check form isn't off the screen */
+                var i = Screen.PrimaryScreen.Bounds.Width - _frmColor.Size.Width;
+                if (x < 0) { x = 0; }
+                if (x > i) { x = i; }
+                /* Set bounds */
+                _frmColor.SetBounds(x, y - _frmColor.Size.Height, _frmColor.Size.Width, _frmColor.Size.Height);
+                /* Show and set focus back to this textbox */                
+                _frmColor.Show(box);
+                box.Focus();
+                return _frmColor;
+            }
+            return null;
+        }
+
+        public static void DestroyColorIndexBox()
+        {
+            if (_frmColor == null)
+            {
+                return;
+            }
+            _frmColor.Close();
+            _frmColor.Dispose();
+            _frmColor = null;
         }
 
         /* Private methods */

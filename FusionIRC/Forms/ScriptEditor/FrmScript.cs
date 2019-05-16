@@ -694,7 +694,7 @@ namespace FusionIRC.Forms.ScriptEditor
             string fileName;
             using (var fd = new OpenFileDialog
                                 {
-                                    InitialDirectory = Functions.MainDir(@"\scripts"), Title = @"Load script", Filter = @"Script files (*.XML)|*.XML"
+                                    Title = @"Load script", Filter = @"Script files (*.XML)|*.XML"
                                 })
             {
                 if (fd.ShowDialog(this) == DialogResult.Cancel)
@@ -746,7 +746,10 @@ namespace FusionIRC.Forms.ScriptEditor
             {
                 if (MessageBox.Show(@"Current file's contents have changed. Do you wish to save the changes before unloading the selected script?", @"Save script", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    ScriptManager.SaveScript(script, Functions.MainDir(string.Format(@"\scripts\{0}.xml", script.Name)));
+                    var file = nodeType == ScriptType.Aliases
+                                   ? ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Aliases, script)
+                                   : ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Events, script);
+                    ScriptManager.SaveScript(script, Functions.MainDir(file.Path));
                 }
                 else
                 {
@@ -776,7 +779,7 @@ namespace FusionIRC.Forms.ScriptEditor
             }
             else
             {
-                _txtEdit.Clear();//.Lines = new string[0];
+                _txtEdit.Clear();
             }
         }
 
@@ -789,16 +792,21 @@ namespace FusionIRC.Forms.ScriptEditor
             /* Make sure to dump contents of edit window text */
             _currentEditingScript.RawScriptData = new List<string>(_txtEdit.Lines);
             /* Save current editing file */
-            switch (_currentEditingScript.Name.ToUpper())
+            var type = GetNodeType();
+            switch (type)
             {
-                case "%VARIABLES":
+                case ScriptType.Variables:
                     RebuildVariables(_currentEditingScript);
                     break;
 
                 default:
                     /* Renaming of scripts happens elsewhere and does not need this flag set to true
                      * nor the file deleted - just rename file and change the Name flag */
-                    ScriptManager.SaveScript(_currentEditingScript, Functions.MainDir(string.Format(@"\scripts\{0}.xml", _currentEditingScript.Name)));                    
+                    var file = type == ScriptType.Aliases
+                              ? ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Aliases, _currentEditingScript)
+                              : ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Events, _currentEditingScript);
+                    //ScriptManager.SaveScript(_currentEditingScript, Functions.MainDir(string.Format(@"\scripts\{0}.xml", _currentEditingScript.Name)));                    
+                    ScriptManager.SaveScript(_currentEditingScript, Functions.MainDir(file.Path));
                     break;
             }
             _currentEditingScript.ContentsChanged = false;
@@ -862,7 +870,11 @@ namespace FusionIRC.Forms.ScriptEditor
                         default:
                             /* Renaming of scripts happens elsewhere and does not need this flag set to true
                              * nor the file deleted - just rename file and change the Name flag */
-                            ScriptManager.SaveScript(s, Functions.MainDir(string.Format(@"\scripts\{0}.xml", s.Name)));
+                            var f = file.Type == ScriptType.Aliases
+                                        ? ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Aliases, s)
+                                        : ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Events, s);
+                            //ScriptManager.SaveScript(s, Functions.MainDir(string.Format(@"\scripts\{0}.xml", s.Name)));
+                            ScriptManager.SaveScript(s, Functions.MainDir(f.Path));
                             break;
                     }
                     s.ContentsChanged = false;
@@ -967,7 +979,12 @@ namespace FusionIRC.Forms.ScriptEditor
         private void UpdateStatusInfo()
         {            
             var r = _txtEdit.Selection;
-            var path = Functions.MainDir(string.Format(@"\scripts\{0}.xml", _currentEditingScript.Name));
+            //var path = Functions.MainDir(string.Format(@"\scripts\{0}.xml", _currentEditingScript.Name));
+            var type = GetNodeType();
+            var file = type == ScriptType.Aliases
+                              ? ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Aliases, _currentEditingScript)
+                              : ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Events, _currentEditingScript);
+            var path = Functions.MainDir(file.Path);
             _fileName.Text = string.Format("{0}", _currentEditingScript.ContentsChanged
                                                       ? string.Format("* {0}",
                                                                       path)

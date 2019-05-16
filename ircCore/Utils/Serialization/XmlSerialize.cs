@@ -5,6 +5,7 @@
  */
 using System.IO;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace ircCore.Utils.Serialization
@@ -27,14 +28,22 @@ namespace ircCore.Utils.Serialization
             if (!fi.Exists || fi.Length == 0) { return false; }
             try
             {
-                var xml = new XmlSerializer(typeof(TType));
+                var xml = new XmlSerializer(typeof (TType));
                 bool success;
                 TType cRet;
-                using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                //using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                //{   
+                using (TextReader fs = new StreamReader(fileName, Encoding.UTF8))
                 {
                     try
                     {
-                        cRet = (TType)xml.Deserialize(fs);
+                        //cRet = (TType)xml.Deserialize(fs);
+                        /* This fixes an issue with deserialization of non-ascii characters */
+                        using (var xtr = new XmlTextReader(fs))
+                        {
+                            var s = new XmlSerializer(typeof (TType));
+                            cRet = (TType) s.Deserialize(xtr);
+                        }
                         success = true;
                     }
                     catch
@@ -42,7 +51,10 @@ namespace ircCore.Utils.Serialization
                         cRet = default(TType);
                         success = false;
                     }
-                    finally { fs.Close(); }
+                    finally
+                    {
+                        fs.Close();
+                    }
                 }
                 classObject = cRet;
                 return success;
@@ -63,7 +75,7 @@ namespace ircCore.Utils.Serialization
         {
             try
             {
-                var xml = new XmlSerializer(typeof(TType));
+                var xml = new XmlSerializer(typeof (TType));
                 XmlSerializerNamespaces ns = null;
                 if (nameSpace != null)
                 {
@@ -73,7 +85,6 @@ namespace ircCore.Utils.Serialization
                 bool success;
                 using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
                 {
-
                     try
                     {
                         using (TextWriter tw = new StreamWriter(fs, Encoding.UTF8))

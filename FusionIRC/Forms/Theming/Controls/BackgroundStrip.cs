@@ -12,26 +12,34 @@ using ircCore.Utils;
 
 namespace FusionIRC.Forms.Theming.Controls
 {
-    public partial class BackgroundStrip : UserControl
+    public sealed class BackgroundStrip : UserControl
     {
-        private string _selectedImage;
+        private readonly Label _lblHeader;
+        private readonly TextBox _txtImage;
+        private readonly Button _btnSelect;
+        private readonly Panel _pnlPreview;
+        private readonly Label _lblLayout;
+        private readonly ComboBox _cmbLayout;
+                        
         private BackgroundImageLayoutStyles _layoutStyle;
+        private string _selectedImage;
 
         public event Action SelectedBackgroundChanged;
 
+        /* Public properties */
         public string Header
         {
-            get { return lblHeader.Text; }
-            set { lblHeader.Text = value; }
+            get { return _lblHeader.Text; }
+            set { _lblHeader.Text = value; }
         }
 
         public string SelectedImage
         {
             get { return _selectedImage; }
             set
-            {                
+            {
                 _selectedImage = value;
-                txtImage.Text = value;
+                _txtImage.Text = value;
                 DrawPreview();
                 if (SelectedBackgroundChanged != null)
                 {
@@ -39,46 +47,105 @@ namespace FusionIRC.Forms.Theming.Controls
                 }
             }
         }
-        
+
         public BackgroundImageLayoutStyles LayoutStyle
         {
             get { return _layoutStyle; }
             set
             {
                 _layoutStyle = value;
-                for (var i = 0; i <= cmbLayout.Items.Count -1;i++)
+                for (var i = 0; i <= _cmbLayout.Items.Count - 1; i++)
                 {
-                    if ((BackgroundImageLayoutStyles)i == value)
+                    if ((BackgroundImageLayoutStyles) i != value)
                     {
-                        cmbLayout.SelectedIndex = i;
-                        break;
+                        continue;
                     }
+                    _cmbLayout.SelectedIndex = i;
+                    break;
                 }
                 if (value == BackgroundImageLayoutStyles.None)
                 {
-                    pnlPreview.BackgroundImage = null;
+                    _pnlPreview.BackgroundImage = null;
                 }
             }
         }
 
+        /* Constructor */
         public BackgroundStrip()
         {
-            InitializeComponent();
-            cmbLayout.Items.AddRange(Functions.EnumUtils.GetDescriptions(typeof(BackgroundImageLayoutStyles)));
-            pnlPreview.BackgroundImageLayout = ImageLayout.Center;
+            BackColor = Color.Transparent;
+            Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, ((0)));
+            MaximumSize = new Size(405, 78);
+            MinimumSize = new Size(405, 78);
+            Size = new Size(405, 78);
 
-            cmbLayout.SelectedIndexChanged += ComboSelect;
-            btnSelect.Click += ButtonSelect;
+            _lblHeader = new Label
+                             {
+                                 AutoSize = true, 
+                                 Location = new Point(3, 3),
+                                 Size = new Size(45, 15), 
+                                 Text = @"Header"
+                             };
+
+            _txtImage = new TextBox
+                            {
+                                Location = new Point(6, 21), 
+                                ReadOnly = true,
+                                Size = new Size(256, 23),
+                                TabIndex = 0
+                            };
+
+            _btnSelect = new Button
+                             {
+                                 Location = new Point(268, 21),
+                                 Size = new Size(30, 23),
+                                 TabIndex = 1,
+                                 Text = @"...",
+                                 UseVisualStyleBackColor = true
+                             };
+
+            _pnlPreview = new Panel
+                              {
+                                  BorderStyle = BorderStyle.FixedSingle,
+                                  Location = new Point(304, 3),
+                                  Size = new Size(98, 68),
+                                  BackgroundImageLayout = ImageLayout.Zoom
+                              };
+
+            _lblLayout = new Label
+                             {
+                                 AutoSize = true,
+                                 Location = new Point(3, 51),
+                                 Size = new Size(79, 15),
+                                 Text = @"Image layout:"
+                             };
+
+            _cmbLayout = new ComboBox
+                             {
+                                 DropDownStyle = ComboBoxStyle.DropDownList,
+                                 FormattingEnabled = true,
+                                 Location = new Point(88, 48),
+                                 Size = new Size(174, 23),
+                                 TabIndex = 2
+                             };
+
+            Controls.AddRange(new Control[] {_lblHeader, _txtImage, _pnlPreview, _lblLayout, _cmbLayout});
+
+            _cmbLayout.Items.AddRange(Functions.EnumUtils.GetDescriptions(typeof (BackgroundImageLayoutStyles)));
+
+            _cmbLayout.SelectedIndexChanged += ComboSelect;
+            _btnSelect.Click += ButtonSelect;
         }
 
+        /* Handlers */
         private void ComboSelect(object sender, EventArgs e)
         {
-            if (cmbLayout.SelectedIndex == -1 || string.IsNullOrEmpty(_selectedImage))
+            if (_cmbLayout.SelectedIndex == -1 || string.IsNullOrEmpty(_selectedImage))
             {
-                cmbLayout.SelectedIndex = 0;
+                _cmbLayout.SelectedIndex = 0;
                 return;
             }
-            _layoutStyle = (BackgroundImageLayoutStyles) cmbLayout.SelectedIndex;
+            _layoutStyle = (BackgroundImageLayoutStyles) _cmbLayout.SelectedIndex;
             if (_layoutStyle == BackgroundImageLayoutStyles.None)
             {
                 SelectedImage = string.Empty;
@@ -104,23 +171,22 @@ namespace FusionIRC.Forms.Theming.Controls
                 if (ofd.ShowDialog(this) == DialogResult.Cancel)
                 {
                     return;
-                }                
+                }
                 SelectedImage = Functions.MainDir(ofd.FileName);
                 LayoutStyle = BackgroundImageLayoutStyles.Center;
             }
         }
 
+        /* Private helper method */
         private void DrawPreview()
         {
             var f = Functions.MainDir(_selectedImage);
             if (File.Exists(f) && LayoutStyle != BackgroundImageLayoutStyles.None)
             {
-                pnlPreview.BackgroundImage = Image.FromFile(f);
+                _pnlPreview.BackgroundImage = Image.FromFile(f);
+                return;
             }
-            else
-            {
-                pnlPreview.BackgroundImage = null;
-            }
+            _pnlPreview.BackgroundImage = null;
         }
     }
 }

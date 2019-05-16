@@ -65,6 +65,8 @@ namespace FusionIRC.Forms.Child
         /* This allows the child to be temporarily kept open during "hop" or "kick" for example */
         public bool KeepOpen { get; set; } /* In FormClosing, this will be reset to false automatically */
 
+        public bool DisconnectedShown { get; set; } /* Stop "Disconnected" being shown in channel windows more than once */
+
         public WindowEvent CurrentWindowEvent
         {
             get

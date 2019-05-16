@@ -4,11 +4,9 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
-using System.Drawing;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
 using ircCore.Controls.ChildWindows.Helpers;
-using ircCore.Forms;
+using ircCore.Utils;
 
 namespace ircCore.Controls.ChildWindows.Input.ColorBox
 {
@@ -19,13 +17,9 @@ namespace ircCore.Controls.ChildWindows.Input.ColorBox
            ©2010 - 2011 - KangaSoft Software
            All Rights Reserved
          */
-        private FrmColorIndex _frmCol;
         private bool _isItalic;
 
         protected const int WmPaste = 0x302;
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern int GetCaretPos(ref Point lpPoint);
 
         public ColorTextBox()
         {
@@ -75,25 +69,7 @@ namespace ircCore.Controls.ChildWindows.Input.ColorBox
                         {
                             /* Color */
                             InsertChar(((char) ControlByte.Color).ToString());
-                            if (_frmCol == null)
-                            {
-                                var pt = Point.Empty;
-                                /* Init new color form */
-                                _frmCol = new FrmColorIndex { Box = this, Start = SelectionStart };
-                                /* Get cursor position */
-                                GetCaretPos(ref pt);
-                                var x = PointToScreen(pt).X - (_frmCol.Size.Width / 2);
-                                var y = PointToScreen(pt).Y - ((_frmCol.Height - _frmCol.ClientRectangle.Height) - SystemInformation.CaptionHeight);
-                                /* Check form isn't off the screen */
-                                var i = Screen.PrimaryScreen.Bounds.Width - _frmCol.Size.Width;
-                                if (x < 0) { x = 0; }
-                                if (x > i) { x = i; }
-                                /* Set bounds */
-                                _frmCol.SetBounds(x, y - _frmCol.Size.Height, _frmCol.Size.Width, _frmCol.Size.Height);
-                                /* Show and set focus back to this textbox */
-                                _frmCol.Show(Parent);
-                                Focus();
-                            }
+                            Functions.ShowColorIndexBox(this, SelectionStart).SelectedIndexChanged += ColorIndexSelection;                            
                             return;
                         }
                         break;
@@ -140,12 +116,7 @@ namespace ircCore.Controls.ChildWindows.Input.ColorBox
                         break;
                 }
             }
-            if (_frmCol != null)
-            {
-                _frmCol.Close();
-                _frmCol.Dispose();
-                _frmCol = null;
-            }
+            Functions.DestroyColorIndexBox();
             base.OnKeyDown(e);
         }
 
@@ -193,6 +164,18 @@ namespace ircCore.Controls.ChildWindows.Input.ColorBox
                     base.OnKeyPress(e);
                     break;
             }
+        }
+
+        /* Private helpers */
+        private void ColorIndexSelection(string color)
+        {
+            var start = SelectionStart;
+            var txtEnd = Text.Substring(start);
+            Text = Text.Substring(0, start) + color + txtEnd;
+            start += color.Length;
+            SelectionStart = start;
+            SelectionLength = 0;
+            ScrollToCaret();
         }
 
         private void InsertChar(string c)

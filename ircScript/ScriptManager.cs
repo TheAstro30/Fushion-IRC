@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Utils;
 using ircCore.Utils.Serialization;

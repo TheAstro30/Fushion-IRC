@@ -3,6 +3,7 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using ircCore.Controls.ChildWindows.Input.ColorBox;
@@ -15,7 +16,8 @@ namespace ircCore.Forms
         private readonly ColorSelectionBox _ircColors;
 
         public Control Box { get; set; }
-        public int Start { get; set; }
+
+        public event Action<string> SelectedIndexChanged;
 
         /* Constructor */
         public FrmColorIndex()
@@ -46,20 +48,13 @@ namespace ircCore.Forms
         }
 
         /* Handle color box click */
-        private void ColorSelect(object sender,MouseEventArgs e)
-        {                        
-            var color = _ircColors.SelectedColor.ToString();
-            if (Box is TextBox)
-            {
-                var txt = (TextBox) Box;
-                var txtEnd = txt.Text.Substring(Start);
-                txt.Text = txt.Text.Substring(0, Start) + color + txtEnd;
-                Start += color.Length;
-                txt.SelectionStart = Start;
-                txt.SelectionLength = 0;
-                txt.ScrollToCaret();
-            }          
+        private void ColorSelect(object sender, MouseEventArgs e)
+        {            
             Close();
+            if (SelectedIndexChanged != null)
+            {
+                SelectedIndexChanged(_ircColors.SelectedColor.ToString());
+            }
         }
     }
 }

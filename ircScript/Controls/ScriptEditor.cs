@@ -7,6 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using ircCore.Controls.ChildWindows.Helpers;
+using ircCore.Utils;
 using ircScript.Controls.SyntaxHighlight;
 using ircScript.Controls.SyntaxHighlight.Highlight;
 using ircScript.Controls.SyntaxHighlight.Styles;
@@ -43,6 +46,9 @@ namespace ircScript.Controls
         private readonly Style _keywordsStyle= new TextStyle(KeywordBrush, null, FontStyle.Regular);
         private readonly Style _commandStyle = new TextStyle(CommandBrush, null, FontStyle.Regular);
         private readonly Style _miscStyle = new TextStyle(MiscBrush, null, FontStyle.Regular);
+
+        private readonly Timer _unlockMouse;
+        private bool _lockMouse;
 
         private bool _enableSyntaxHighlight;
 
@@ -121,9 +127,70 @@ namespace ircScript.Controls
             TabLength = 2;
             base.TextChanged += OnTextChanged;
             TextChangedDelayed += OnTextChangedDelayed;
+            _unlockMouse = new Timer {Interval = 1};
+            _unlockMouse.Tick += TimerSelection;
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            /* Over comes an issue with having the color selection dialog open, clicking a color, and this stupid window
+             * having a selection range... */
+            if (_lockMouse)
+            {
+                return;
+            }
+            base.OnMouseMove(e);
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if (e.Control)
+            {
+                switch (e.KeyCode)
+                {
+                    case Keys.B:
+                        InsertChar((char) ControlByte.Bold);
+                        return;
+
+                    case Keys.I:
+                        InsertChar((char) ControlByte.Italic);
+                        return;
+
+                    case Keys.U:
+                        InsertChar((char) ControlByte.Underline);
+                        return;
+
+                    case Keys.R:
+                        InsertChar((char) ControlByte.Reverse);
+                        return;
+
+                    case Keys.O:
+                        InsertChar((char) ControlByte.Normal);
+                        return;
+
+                    case Keys.K:
+                        _lockMouse = true;
+                        InsertChar((char) ControlByte.Color);
+                        Functions.ShowColorIndexBox(this, SelectionStart).SelectedIndexChanged += ColorIndexSelection;
+                        return;
+                }
+            }
+            Functions.DestroyColorIndexBox();
+            _lockMouse = false;
+            base.OnKeyDown(e);
         }
 
         /* Handlers */
+        private void ColorIndexSelection(string color)
+        {    
+            var c = color.ToCharArray();
+            foreach (var ch in c)
+            {
+                InsertChar(ch);
+            }          
+            _unlockMouse.Enabled = true;
+        }
+
         private void OnTextChanged(object sender, EventArgs e)
         {
             if (TextChanged != null)
@@ -210,6 +277,12 @@ namespace ircScript.Controls
             Range.ClearStyle(_comment, _keywordsStyle,
                              _variableStyle, _customIdentifierStyle,
                              _identifierStyle, _miscStyle, _commandStyle);
+        }
+
+        private void TimerSelection(object sender, EventArgs e)
+        {
+            _unlockMouse.Enabled = false; 
+            _lockMouse = false;
         }
     }
 }
