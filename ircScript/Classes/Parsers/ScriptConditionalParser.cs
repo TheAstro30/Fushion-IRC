@@ -52,7 +52,7 @@ namespace ircScript.Classes.Parsers
                         _if.Push(false);
                         break;
 
-                    case "ELSEIF":
+                    case "ELSEIF":                        
                         if (_if.Any() && !_if.Peek())
                         {
                             _processCode = false;
@@ -89,18 +89,25 @@ namespace ircScript.Classes.Parsers
                             return false;
                         }
                         _endBlock++;
+                        var create = true;
                         if (_while.Count > 0)
                         {
                             sw = _while.Peek();
+                            create = sw.Execute;
                             if (sw.StartLine == lineNumber && sw.Execute)
                             {
                                 if (!ParseConditional(sp[1]))
                                 {
+                                    System.Diagnostics.Debug.Print(sp[1]);
                                     sw.Execute = false;
                                     _processCode = false;
                                 }
                                 return false;
                             }
+                        }
+                        if (!create)
+                        {
+                            return false;
                         }
                         /* Create a new entry */
                         sw = new ScriptWhile
@@ -131,42 +138,77 @@ namespace ircScript.Classes.Parsers
                             return false;
                         }
                         _if.Push(true);
-                        return false;
+                        return false;                    
                 }
             }
-            if (lineData.Trim() == "}")
+            switch (lineData.Trim().ToUpper())
             {
-                /* End of code block */
-                if (_while.Count > 0)
-                {
-                    /* Get last entry */
-                    sw = _while.Peek();
-                    if (_endBlock == sw.EndBlock)
+                case "BREAK":                                    
+                    if (_processCode && _while.Count > 0)
                     {
-                        if (sw.Execute)
-                        {
-                            /* Now we jump back to our start line and begin processing again */
-                            lineNumber = sw.StartLine - 1;
-                            _endBlock--;
-                            return false;
-                        }
-                        /* Remove it */
-                        _processCode = true;
-                        _endBlock--;
+                        /* Pop out of current executing while */
                         _while.Pop();
                         return false;
                     }
-                }
-                if (_if.Count > 0)
-                {
-                    _ifLastExecute = _if.Pop();
-                }
-                if (_if.Count == _ifResumeProcess)
-                {
-                    _processCode = true;
-                }
-                _endBlock--;
-                return false;
+                    break; 
+               
+                case "CONTINUE":
+                    if (_processCode && _while.Count > 0)
+                    {
+                        /* Jump back to start of loop */
+                        sw = _while.Peek();
+                        if (sw.Execute)
+                        {
+                            lineNumber = sw.StartLine - 1;
+                            _endBlock = sw.EndBlock - 1;
+                        }
+                        return false;
+                    }
+                    break;
+
+                case "}":
+                    /* End of code block */
+                    if (_while.Count > 0)
+                    {
+                        /* Get last entry */
+                        sw = _while.Peek();
+                        if (_endBlock == sw.EndBlock)
+                        {
+                            if (sw.Execute)
+                            {
+                                /* Now we jump back to our start line and begin processing again */
+                                lineNumber = sw.StartLine - 1;                                
+                                _endBlock--;
+                                return false;
+                            }
+                            /* Remove it */
+                            _processCode = true;
+                            _endBlock--;
+                            _while.Pop();
+                            return false;
+                        }
+                    }
+                    if (_if.Count > 0)
+                    {
+                        _ifLastExecute = _if.Pop();
+                    }
+                    if (_if.Count == _ifResumeProcess)
+                    {
+                        _processCode = true;
+                    }
+                    _endBlock--;
+                    return false;
+
+                default:
+                    if (_processCode && _while.Count > 0)
+                    {
+                        sw = _while.Peek();
+                        if (!sw.Execute)
+                        {
+                            return false;
+                        }
+                    }
+                    break;
             }
             return _processCode;
         }

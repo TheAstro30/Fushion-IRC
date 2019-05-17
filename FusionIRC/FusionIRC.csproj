@@ -102,6 +102,9 @@
     <Compile Include="Forms\Favorites\FrmFavorites.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\Misc\FrmException.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\Misc\FrmJoin.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -204,12 +207,24 @@
     </Compile>
     <Compile Include="Helpers\CommandProcessor.cs" />
     <Compile Include="Helpers\Commands\CommandAlias.cs" />
+    <Compile Include="Helpers\Commands\CommandCtcp.cs" />
+    <Compile Include="Helpers\Commands\CommandDns.cs" />
     <Compile Include="Helpers\Commands\CommandFiles.cs" />
-    <Compile Include="Helpers\Commands\CommandPartHop.cs" />
+    <Compile Include="Helpers\Commands\CommandNick.cs" />
+    <Compile Include="Helpers\Commands\CommandChannel.cs" />
     <Compile Include="Helpers\Commands\CommandServer.cs" />
     <Compile Include="Helpers\Commands\CommandSoundPlay.cs" />
     <Compile Include="Helpers\Commands\CommandText.cs" />
-    <Compile Include="Helpers\ConnectionCallbackManager.cs" />
+    <Compile Include="Helpers\Connection\Events.cs" />
+    <Compile Include="Helpers\Connection\Raw.cs" />
+    <Compile Include="Helpers\Connection\Channel.cs" />
+    <Compile Include="Helpers\Connection\Ctcp.cs" />
+    <Compile Include="Helpers\Connection\Message.cs" />
+    <Compile Include="Helpers\Connection\Dns.cs" />
+    <Compile Include="Helpers\Connection\LocalInfo.cs" />
+    <Compile Include="Helpers\Connection\Misc.cs" />
+    <Compile Include="Helpers\Connection\SocketEvents.cs" />
+    <Compile Include="Helpers\Connection\Modes.cs" />
     <Compile Include="Helpers\MdiHelper.cs" />
     <Compile Include="Helpers\ReconnectOnDisconnect.cs" />
     <Compile Include="Helpers\WindowManager.cs" />
@@ -311,6 +326,7 @@
     <None Include="Icons\Dialog\themeMessage.ico" />
     <None Include="Icons\Dialog\themePicture.ico" />
     <None Include="Icons\Dialog\autoJoin.ico" />
+    <None Include="Icons\Dialog\error.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

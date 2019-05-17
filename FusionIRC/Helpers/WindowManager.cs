@@ -13,10 +13,12 @@ using FusionIRC.Forms;
 using FusionIRC.Forms.Child;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Helpers.Commands;
+using FusionIRC.Helpers.Connection;
 using ircClient;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
+using Message = FusionIRC.Helpers.Connection.Message;
 
 namespace FusionIRC.Helpers
 {
@@ -29,6 +31,8 @@ namespace FusionIRC.Helpers
 
     public static class WindowManager
     {
+        public static Form MainForm { get; set; }
+
         /* DCC file transfer manager window */
         public static FrmDccManager DccManagerWindow;
 
@@ -44,7 +48,7 @@ namespace FusionIRC.Helpers
                 var connection = new ClientConnection(mdiOwner, SettingsManager.Settings.UserInfo);
                 win = new FrmChildWindow(connection, type, mdiOwner)
                           {
-                              Text = string.Format("{0}: {1}", text, connection.UserInfo.Nick),
+                              Text = String.Format("{0}: {1}", text, connection.UserInfo.Nick),
                               Tag = tag
                           };
                 var wins = new List<FrmChildWindow>
@@ -97,11 +101,11 @@ namespace FusionIRC.Helpers
                     /* Update the window type count */
                     var count = GetChildWindowCount(win);
                     win.DisplayNodeRoot.Text = win.WindowType == ChildWindowType.Channel
-                                                     ? string.Format("Channels ({0})", count)
+                                                     ? String.Format("Channels ({0})", count)
                                                      : win.WindowType == ChildWindowType.Private
-                                                           ? string.Format("Queries ({0})", count)
+                                                           ? String.Format("Queries ({0})", count)
                                                            : win.WindowType == ChildWindowType.DccChat
-                                                                 ? string.Format("Chats ({0})", count)
+                                                                 ? String.Format("Chats ({0})", count)
                                                                  : win.DisplayNodeRoot.Text;
                 }
             }           
@@ -132,11 +136,11 @@ namespace FusionIRC.Helpers
                 /* Update the window type count */
                 var count = GetChildWindowCount(window);
                 window.DisplayNodeRoot.Text = window.WindowType == ChildWindowType.Channel
-                                                    ? string.Format("Channels ({0})", count)
+                                                    ? String.Format("Channels ({0})", count)
                                                     : window.WindowType == ChildWindowType.Private
-                                                          ? string.Format("Queries ({0})", count)
+                                                          ? String.Format("Queries ({0})", count)
                                                           : window.WindowType == ChildWindowType.DccChat
-                                                                ? string.Format("Chats ({0})", count)
+                                                                ? String.Format("Chats ({0})", count)
                                                                 : window.DisplayNodeRoot.Text;
             }            
         }
@@ -202,7 +206,7 @@ namespace FusionIRC.Helpers
         public static void OnThemeLoaded()
         {
             /* Here we now refresh all open chat windows ... */
-            var c = (FrmClientWindow) ConnectionCallbackManager.MainForm;
+            var c = (FrmClientWindow) MainForm;
             if (c == null)
             {
                 return;
@@ -226,7 +230,7 @@ namespace FusionIRC.Helpers
                 win.Output.Font = fnt;
                 win.Input.Font = fnt;
                 /* Backgrounds */
-                if (!string.IsNullOrEmpty(bg.Path))
+                if (!String.IsNullOrEmpty(bg.Path))
                 {
                     var file = Functions.MainDir(bg.Path);
                     if (File.Exists(file))
@@ -252,104 +256,104 @@ namespace FusionIRC.Helpers
         private static void AddConnectionHandlers(ClientConnection client)
         {
             /* Add the callback handlers to ConnectionCallbackManager */
-            client.Parser.OnOther += ConnectionCallbackManager.OnOther;
-            client.Parser.OnNetworkNameChanged += ConnectionCallbackManager.OnNetworkNameChanged;
-            client.Parser.OnChannelModes += ConnectionCallbackManager.OnChannelModes;
-            client.OnClientBeginConnect += ConnectionCallbackManager.OnClientBeginConnect;
-            client.OnClientCancelConnection += ConnectionCallbackManager.OnClientCancelConnection;
-            client.OnClientConnected += ConnectionCallbackManager.OnClientConnected;
-            client.OnClientDisconnected += ConnectionCallbackManager.OnClientDisconnected;
-            client.OnClientConnectionError += ConnectionCallbackManager.OnClientConnectionError;
+            client.Parser.OnOther += Raw.OnOther;
+            client.Parser.OnNetworkNameChanged += Misc.OnNetworkNameChanged;
+            client.Parser.OnChannelModes += Modes.OnChannelModes;
+            client.OnClientBeginConnect += SocketEvents.OnClientBeginConnect;
+            client.OnClientCancelConnection += SocketEvents.OnClientCancelConnection;
+            client.OnClientConnected += SocketEvents.OnClientConnected;
+            client.OnClientDisconnected += SocketEvents.OnClientDisconnected;
+            client.OnClientConnectionError += SocketEvents.OnClientConnectionError;
             client.OnClientConnectionClosed += CommandServer.OnClientWaitToReconnect;
-            client.Parser.OnServerPingPong += ConnectionCallbackManager.OnServerPingPong;
-            client.Parser.OnErrorLink += ConnectionCallbackManager.OnErrorLink;
-            client.OnClientSslInvalidCertificate += ConnectionCallbackManager.OnClientSslInvalidCertificate;
-            client.OnClientLocalInfoResolved += ConnectionCallbackManager.OnClientLocalInfoResolved;
-            client.OnClientLocalInfoFailed += ConnectionCallbackManager.OnClientLocalInfoFailed;
-            client.OnClientDnsResolved += ConnectionCallbackManager.OnClientDnsResolved;
-            client.OnClientDnsFailed += ConnectionCallbackManager.OnClientDnsFailed;
-            client.OnClientIdentDaemonRequest += ConnectionCallbackManager.OnClientIdentDaemonRequest;
-            client.Parser.OnMotd += ConnectionCallbackManager.OnMotd;
-            client.Parser.OnLUsers += ConnectionCallbackManager.OnLUsers;
-            client.Parser.OnWelcome += ConnectionCallbackManager.OnWelcome;
-            client.Parser.OnTopicIs += ConnectionCallbackManager.OnTopicIs;
-            client.Parser.OnTopicSetBy += ConnectionCallbackManager.OnTopicSetBy;
-            client.Parser.OnTopicChanged += ConnectionCallbackManager.OnTopicChanged;
-            client.Parser.OnJoinUser += ConnectionCallbackManager.OnJoinUser;
-            client.Parser.OnJoinSelf += ConnectionCallbackManager.OnJoinSelf;
-            client.Parser.OnPartUser += ConnectionCallbackManager.OnPartUser;
-            client.Parser.OnPartSelf += ConnectionCallbackManager.OnPartSelf;
-            client.Parser.OnNames += ConnectionCallbackManager.OnNames;
-            client.Parser.OnWho += ConnectionCallbackManager.OnWho;
-            client.Parser.OnTextChannel += ConnectionCallbackManager.OnTextChannel;
-            client.Parser.OnTextSelf += ConnectionCallbackManager.OnTextSelf;
-            client.Parser.OnActionChannel += ConnectionCallbackManager.OnActionChannel;
-            client.Parser.OnActionSelf += ConnectionCallbackManager.OnActionSelf;            
-            client.Parser.OnNotice += ConnectionCallbackManager.OnNotice;
-            client.Parser.OnNick += ConnectionCallbackManager.OnNick;
-            client.Parser.OnQuit += ConnectionCallbackManager.OnQuit;
-            client.Parser.OnKickSelf += ConnectionCallbackManager.OnKickSelf;
-            client.Parser.OnKickUser += ConnectionCallbackManager.OnKickUser;
-            client.Parser.OnModeSelf += ConnectionCallbackManager.OnModeSelf;
-            client.Parser.OnModeChannel += ConnectionCallbackManager.OnModeChannel;
-            client.Parser.OnRaw += ConnectionCallbackManager.OnRaw;
-            client.Parser.OnUserInfo += ConnectionCallbackManager.OnUserInfo;
-            client.Parser.OnWallops += ConnectionCallbackManager.OnWallops;
-            client.Parser.OnWhois += ConnectionCallbackManager.OnWhois;
-            client.Parser.OnInvite += ConnectionCallbackManager.OnInvite;
-            client.Parser.OnCtcp += ConnectionCallbackManager.OnCtcp;
-            client.Parser.OnCtcpReply += ConnectionCallbackManager.OnCtcpReply;
+            client.Parser.OnServerPingPong += Misc.OnServerPingPong;
+            client.Parser.OnErrorLink += Misc.OnErrorLink;
+            client.OnClientSslInvalidCertificate += SocketEvents.OnClientSslInvalidCertificate;
+            client.OnClientLocalInfoResolved += LocalInfo.OnClientLocalInfoResolved;
+            client.OnClientLocalInfoFailed += LocalInfo.OnClientLocalInfoFailed;
+            client.OnClientDnsResolved += Dns.OnClientDnsResolved;
+            client.OnClientDnsFailed += Dns.OnClientDnsFailed;
+            client.OnClientIdentDaemonRequest += Misc.OnClientIdentDaemonRequest;
+            client.Parser.OnMotd += Misc.OnMotd;
+            client.Parser.OnLUsers += Misc.OnLUsers;
+            client.Parser.OnWelcome += Misc.OnWelcome;
+            client.Parser.OnTopicIs += Channel.OnTopicIs;
+            client.Parser.OnTopicSetBy += Channel.OnTopicSetBy;
+            client.Parser.OnTopicChanged += Channel.OnTopicChanged;
+            client.Parser.OnJoinUser += Channel.OnJoinUser;
+            client.Parser.OnJoinSelf += Channel.OnJoinSelf;
+            client.Parser.OnPartUser += Channel.OnPartUser;
+            client.Parser.OnPartSelf += Channel.OnPartSelf;
+            client.Parser.OnNames += Channel.OnNames;
+            client.Parser.OnWho += Channel.OnWho;
+            client.Parser.OnTextChannel += Message.OnTextChannel;
+            client.Parser.OnTextSelf += Message.OnTextSelf;
+            client.Parser.OnActionChannel += Message.OnActionChannel;
+            client.Parser.OnActionSelf += Message.OnActionSelf;            
+            client.Parser.OnNotice += Message.OnNotice;
+            client.Parser.OnNick += Channel.OnNick;
+            client.Parser.OnQuit += Channel.OnQuit;
+            client.Parser.OnKickSelf += Channel.OnKickSelf;
+            client.Parser.OnKickUser += Channel.OnKickUser;
+            client.Parser.OnModeSelf += Modes.OnModeSelf;
+            client.Parser.OnModeChannel += Modes.OnModeChannel;
+            client.Parser.OnRaw += Raw.OnRaw;
+            client.Parser.OnUserInfo += Misc.OnUserInfo;
+            client.Parser.OnWallops += Message.OnWallops;
+            client.Parser.OnWhois += Misc.OnWhois;
+            client.Parser.OnInvite += Channel.OnInvite;
+            client.Parser.OnCtcp += Ctcp.OnCtcp;
+            client.Parser.OnCtcpReply += Ctcp.OnCtcpReply;
         }
 
         private static void RemoveConnectionHandlers(ClientConnection client)
         {
             /* Add the callback handlers to ConnectionCallbackManager */
-            client.Parser.OnOther -= ConnectionCallbackManager.OnOther;
-            client.Parser.OnNetworkNameChanged -= ConnectionCallbackManager.OnNetworkNameChanged;
-            client.Parser.OnChannelModes -= ConnectionCallbackManager.OnChannelModes;
-            client.OnClientBeginConnect -= ConnectionCallbackManager.OnClientBeginConnect;
-            client.OnClientCancelConnection -= ConnectionCallbackManager.OnClientCancelConnection;
-            client.OnClientConnected -= ConnectionCallbackManager.OnClientConnected;
-            client.OnClientDisconnected -= ConnectionCallbackManager.OnClientDisconnected;
-            client.OnClientConnectionError -= ConnectionCallbackManager.OnClientConnectionError;
+            client.Parser.OnOther -= Raw.OnOther;
+            client.Parser.OnNetworkNameChanged -= Misc.OnNetworkNameChanged;
+            client.Parser.OnChannelModes -= Modes.OnChannelModes;
+            client.OnClientBeginConnect -= SocketEvents.OnClientBeginConnect;
+            client.OnClientCancelConnection -= SocketEvents.OnClientCancelConnection;
+            client.OnClientConnected -= SocketEvents.OnClientConnected;
+            client.OnClientDisconnected -= SocketEvents.OnClientDisconnected;
+            client.OnClientConnectionError -= SocketEvents.OnClientConnectionError;
             client.OnClientConnectionClosed -= CommandServer.OnClientWaitToReconnect;
-            client.OnClientSslInvalidCertificate -= ConnectionCallbackManager.OnClientSslInvalidCertificate;
-            client.OnClientLocalInfoResolved -= ConnectionCallbackManager.OnClientLocalInfoResolved;
-            client.OnClientLocalInfoFailed -= ConnectionCallbackManager.OnClientLocalInfoFailed;
-            client.OnClientDnsResolved -= ConnectionCallbackManager.OnClientDnsResolved;
-            client.OnClientDnsFailed -= ConnectionCallbackManager.OnClientDnsFailed;
-            client.OnClientIdentDaemonRequest -= ConnectionCallbackManager.OnClientIdentDaemonRequest;
-            client.Parser.OnServerPingPong -= ConnectionCallbackManager.OnServerPingPong;
-            client.Parser.OnErrorLink -= ConnectionCallbackManager.OnErrorLink;
-            client.Parser.OnMotd -= ConnectionCallbackManager.OnMotd;
-            client.Parser.OnLUsers -= ConnectionCallbackManager.OnLUsers;
-            client.Parser.OnWelcome -= ConnectionCallbackManager.OnWelcome;
-            client.Parser.OnTopicIs -= ConnectionCallbackManager.OnTopicIs;
-            client.Parser.OnTopicSetBy -= ConnectionCallbackManager.OnTopicSetBy;
-            client.Parser.OnJoinUser -= ConnectionCallbackManager.OnJoinUser;
-            client.Parser.OnJoinSelf -= ConnectionCallbackManager.OnJoinSelf;
-            client.Parser.OnPartUser -= ConnectionCallbackManager.OnPartUser;
-            client.Parser.OnPartSelf -= ConnectionCallbackManager.OnPartSelf;
-            client.Parser.OnNames -= ConnectionCallbackManager.OnNames;
-            client.Parser.OnWho -= ConnectionCallbackManager.OnWho;
-            client.Parser.OnTextChannel -= ConnectionCallbackManager.OnTextChannel;
-            client.Parser.OnTextSelf -= ConnectionCallbackManager.OnTextSelf;
-            client.Parser.OnActionChannel -= ConnectionCallbackManager.OnActionChannel;
-            client.Parser.OnActionSelf -= ConnectionCallbackManager.OnActionSelf;            
-            client.Parser.OnNotice -= ConnectionCallbackManager.OnNotice;
-            client.Parser.OnNick -= ConnectionCallbackManager.OnNick;
-            client.Parser.OnQuit -= ConnectionCallbackManager.OnQuit;
-            client.Parser.OnKickSelf -= ConnectionCallbackManager.OnKickSelf;
-            client.Parser.OnKickUser -= ConnectionCallbackManager.OnKickUser;
-            client.Parser.OnModeSelf -= ConnectionCallbackManager.OnModeSelf;
-            client.Parser.OnModeChannel -= ConnectionCallbackManager.OnModeChannel;
-            client.Parser.OnRaw -= ConnectionCallbackManager.OnRaw;
-            client.Parser.OnUserInfo -= ConnectionCallbackManager.OnUserInfo;
-            client.Parser.OnWallops -= ConnectionCallbackManager.OnWallops;
-            client.Parser.OnWhois -= ConnectionCallbackManager.OnWhois;
-            client.Parser.OnInvite -= ConnectionCallbackManager.OnInvite;
-            client.Parser.OnCtcp -= ConnectionCallbackManager.OnCtcp;
-            client.Parser.OnCtcpReply -= ConnectionCallbackManager.OnCtcpReply;
+            client.OnClientSslInvalidCertificate -= SocketEvents.OnClientSslInvalidCertificate;
+            client.OnClientLocalInfoResolved -= LocalInfo.OnClientLocalInfoResolved;
+            client.OnClientLocalInfoFailed -= LocalInfo.OnClientLocalInfoFailed;
+            client.OnClientDnsResolved -= Dns.OnClientDnsResolved;
+            client.OnClientDnsFailed -= Dns.OnClientDnsFailed;
+            client.OnClientIdentDaemonRequest -= Misc.OnClientIdentDaemonRequest;
+            client.Parser.OnServerPingPong -= Misc.OnServerPingPong;
+            client.Parser.OnErrorLink -= Misc.OnErrorLink;
+            client.Parser.OnMotd -= Misc.OnMotd;
+            client.Parser.OnLUsers -= Misc.OnLUsers;
+            client.Parser.OnWelcome -= Misc.OnWelcome;
+            client.Parser.OnTopicIs -= Channel.OnTopicIs;
+            client.Parser.OnTopicSetBy -= Channel.OnTopicSetBy;
+            client.Parser.OnJoinUser -= Channel.OnJoinUser;
+            client.Parser.OnJoinSelf -= Channel.OnJoinSelf;
+            client.Parser.OnPartUser -= Channel.OnPartUser;
+            client.Parser.OnPartSelf -= Channel.OnPartSelf;
+            client.Parser.OnNames -= Channel.OnNames;
+            client.Parser.OnWho -= Channel.OnWho;
+            client.Parser.OnTextChannel -= Message.OnTextChannel;
+            client.Parser.OnTextSelf -= Message.OnTextSelf;
+            client.Parser.OnActionChannel -= Message.OnActionChannel;
+            client.Parser.OnActionSelf -= Message.OnActionSelf;            
+            client.Parser.OnNotice -= Message.OnNotice;
+            client.Parser.OnNick -= Channel.OnNick;
+            client.Parser.OnQuit -= Channel.OnQuit;
+            client.Parser.OnKickSelf -= Channel.OnKickSelf;
+            client.Parser.OnKickUser -= Channel.OnKickUser;
+            client.Parser.OnModeSelf -= Modes.OnModeSelf;
+            client.Parser.OnModeChannel -= Modes.OnModeChannel;
+            client.Parser.OnRaw -= Raw.OnRaw;
+            client.Parser.OnUserInfo -= Misc.OnUserInfo;
+            client.Parser.OnWallops -= Message.OnWallops;
+            client.Parser.OnWhois -= Misc.OnWhois;
+            client.Parser.OnInvite -= Channel.OnInvite;
+            client.Parser.OnCtcp -= Ctcp.OnCtcp;
+            client.Parser.OnCtcpReply -= Ctcp.OnCtcpReply;
         }
     }
 }

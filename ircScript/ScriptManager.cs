@@ -93,7 +93,7 @@ namespace ircScript
         {
             /* Get script by name */
             return scripts.FirstOrDefault(s => s.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-        }
+        }        
 
         public static List<Script> GetEvent(string name)
         {

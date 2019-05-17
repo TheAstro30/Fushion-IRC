@@ -66,7 +66,7 @@ namespace FusionIRC.Helpers.Commands
                         {
                             /* Create new connection */
                             c = WindowManager.AddWindow(null, ChildWindowType.Console,
-                                                        ConnectionCallbackManager.MainForm,
+                                                        WindowManager.MainForm,
                                                         "Console", "Console", true);
                             if (c == null)
                             {

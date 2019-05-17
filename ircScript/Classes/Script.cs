@@ -36,6 +36,11 @@ namespace ircScript.Classes
          * but the code looks messy as SHIT) - so, having a direct return value option is a better
          * solution in that instance.
          */
+        public string Parse(ScriptArgs e)
+        {
+            return Parse(e, null);
+        }
+
         public string Parse(ScriptArgs e, string[] args)
         {
             /* Make sure local variables are empty on each call of this script */
@@ -73,8 +78,8 @@ namespace ircScript.Classes
                         br = true;
                         break;
 
-                    case "BREAK":
-                        /* Break is treated differently, ALL execution stops here and LineParsed is NOT raised */
+                    case "HALT":
+                        /* ALL execution stops here and LineParsed is NOT raised */
                         if (ParseCompleted != null)
                         {
                             ParseCompleted(this);

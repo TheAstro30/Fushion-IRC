@@ -177,7 +177,7 @@ namespace FusionIRC.Forms
             /* MDI helper class */
             _mdi = new MdiHelper(this);
             _mdi.MdiClientWnd.MouseDown += OnMdiMouseDown;
-            ConnectionCallbackManager.MainForm = this;
+            WindowManager.MainForm = this;
             /* Set window position and size */
             var w = SettingsManager.GetWindowByName("application");
             Size = w.Size;
@@ -205,7 +205,7 @@ namespace FusionIRC.Forms
             /* Show connect dialog */
             _timerConnect = new Timer {Interval = 10};
             _timerConnect.Tick += ShowConnectDialog;
-            _initialize = false;
+            _initialize = false;            
         }
 
         /* Overrides */

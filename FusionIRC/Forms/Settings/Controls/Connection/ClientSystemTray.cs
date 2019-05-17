@@ -37,7 +37,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
             chkBalloon.Checked = SettingsManager.Settings.Client.TrayIcon.ShowBalloonTips;
 
             _iconFile = Functions.MainDir(SettingsManager.Settings.Client.TrayIcon.Icon);
-            _defaultIcon = ConnectionCallbackManager.MainForm.Icon;
+            _defaultIcon = WindowManager.MainForm.Icon;
             _icon = File.Exists(_iconFile)
                         ? Icon.ExtractAssociatedIcon(_iconFile)
                         : null;

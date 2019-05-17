@@ -64,7 +64,7 @@ namespace ircScript.Classes.Parsers
                             : tmp.Trim();
                 return true;
             }
-            if (line[0] == '%')
+            if (line.Length > 0 && line[0] == '%')
             {
                 /* Our variable assignment is %var=%var [+/-///*] [N]/%var=%var2, etc */                
                 var i = line.IndexOf('=');

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using ircCore.Utils;
+using ircScript.Classes.Helpers;
 using ircScript.Classes.ScriptFunctions;
 using ircScript.Classes.Structures;
 
@@ -231,6 +232,9 @@ namespace ircScript.Classes.Parsers
 
                 case "READINI":
                     return argList.Length == 3 ? Ini.ReadIni(argList[0], argList[1], argList[2]) : string.Empty;
+
+                case "HGET":
+                    return argList.Length == 2 ? CommandHash.HashGet(argList) : string.Empty;
             }
             return string.Empty;
         }

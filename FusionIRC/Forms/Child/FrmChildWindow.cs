@@ -731,7 +731,7 @@ namespace FusionIRC.Forms.Child
                                ClientConnection = Client,
                                Channel = WindowType != ChildWindowType.Console ? Tag.ToString() : string.Empty
                            };
-            CommandProcessor.Parse(Client, this, script.Parse(args, null));
+            CommandProcessor.Parse(Client, this, script.Parse(args));
         }
 
         private void TimerFocus(object sender, EventArgs e)

@@ -274,7 +274,7 @@ namespace FusionIRC.Forms.Settings
                 }
             }
             /* Update tray icon */
-            var owner = (TrayIcon)ConnectionCallbackManager.MainForm;
+            var owner = (TrayIcon)WindowManager.MainForm;
             if (owner != null)
             {
                 owner.TrayHideOnMinimize = SettingsManager.Settings.Client.TrayIcon.HideMinimized;

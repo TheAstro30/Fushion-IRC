@@ -35,7 +35,7 @@ namespace FusionIRC.Helpers.Commands
             var pmd = ThemeManager.ParseMessage(tmd);
             child.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
-            WindowManager.SetWindowEvent(child, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
+            WindowManager.SetWindowEvent(child, WindowManager.MainForm, WindowEvent.MessageReceived);
             var action = String.Format("PRIVMSG {0} :{1}ACTION {2}{3}", child.Tag, (char)1, args, (char)1);
             client.Send(action);
         }
@@ -91,7 +91,7 @@ namespace FusionIRC.Helpers.Commands
                     pmd = ThemeManager.ParseMessage(tmd);
                     child.Output.AddLine(pmd.DefaultColor, pmd.Message);
                     /* Update treenode color */
-                    WindowManager.SetWindowEvent(child, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
+                    WindowManager.SetWindowEvent(child, WindowManager.MainForm, WindowEvent.MessageReceived);
                     child.Client.Send(String.Format("PRIVMSG {0} :{1}", target, args));
                 }
                 return;
@@ -115,7 +115,7 @@ namespace FusionIRC.Helpers.Commands
             pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
-            WindowManager.SetWindowEvent(c, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
+            WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
             c.Client.Send(String.Format("PRIVMSG {0} :{1}", target, args));
         }
 
@@ -138,7 +138,7 @@ namespace FusionIRC.Helpers.Commands
                 var pmd = ThemeManager.ParseMessage(tmd);
                 c.Output.AddLine(pmd.DefaultColor, pmd.Message);
                 /* Update treenode color */
-                WindowManager.SetWindowEvent(c, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
+                WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
                 client.Send(String.Format("PRIVMSG {0} :{1}", c.Tag, args));
             }
         }
@@ -166,7 +166,7 @@ namespace FusionIRC.Helpers.Commands
             var pmd = ThemeManager.ParseMessage(tmd);
             child.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
-            WindowManager.SetWindowEvent(child, ConnectionCallbackManager.MainForm, WindowEvent.MessageReceived);
+            WindowManager.SetWindowEvent(child, WindowManager.MainForm, WindowEvent.MessageReceived);
             client.Send(String.Format("NOTICE {0} :{1}", target, args));
         }
 
@@ -179,7 +179,7 @@ namespace FusionIRC.Helpers.Commands
             if (i == -1)
             {
                 /* Single word as <text> - possibly just active window only */
-                w = WindowManager.GetActiveWindow(ConnectionCallbackManager.MainForm);
+                w = WindowManager.GetActiveWindow(WindowManager.MainForm);
                 text = args;
             }
             else
@@ -190,7 +190,7 @@ namespace FusionIRC.Helpers.Commands
                 {
                     case "-A":
                         /* Active window (of active server called) */
-                        w = WindowManager.GetActiveWindow(ConnectionCallbackManager.MainForm);
+                        w = WindowManager.GetActiveWindow(WindowManager.MainForm);
                         break;
 
                     case "-S":
@@ -204,7 +204,7 @@ namespace FusionIRC.Helpers.Commands
                         if (w == null)
                         {                            
                             /* Possibly "echo <text>" */
-                            w = WindowManager.GetActiveWindow(ConnectionCallbackManager.MainForm);
+                            w = WindowManager.GetActiveWindow(WindowManager.MainForm);
                             text = args;
                         }                        
                         break;

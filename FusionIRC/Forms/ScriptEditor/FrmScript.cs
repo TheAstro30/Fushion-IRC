@@ -981,15 +981,29 @@ namespace FusionIRC.Forms.ScriptEditor
             var r = _txtEdit.Selection;
             //var path = Functions.MainDir(string.Format(@"\scripts\{0}.xml", _currentEditingScript.Name));
             var type = GetNodeType();
-            var file = type == ScriptType.Aliases
-                              ? ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Aliases, _currentEditingScript)
-                              : ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Events, _currentEditingScript);
+            SettingsScripts.SettingsScriptPath file;
+            switch (type)
+            {
+                case ScriptType.Aliases:
+                    file = ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Aliases, _currentEditingScript);
+                    break;
+
+                case ScriptType.Events:
+                    file = ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Events, _currentEditingScript);
+                    break;
+
+                default:
+                    file = new SettingsScripts.SettingsScriptPath {Path = @"\scripts\variables.xml"};
+                    break;
+            }
+            if (file == null)
+            {
+                return;
+            }
             var path = Functions.MainDir(file.Path);
             _fileName.Text = string.Format("{0}", _currentEditingScript.ContentsChanged
-                                                      ? string.Format("* {0}",
-                                                                      path)
-                                                      : string.Format("{0}",
-                                                                      path));
+                                                      ? string.Format("* {0}", path)
+                                                      : string.Format("{0}", path));
             _lineInfo.Text = string.Format("Line: {0}/{1}    Col: {2}", r.Start.Line + 1, _txtEdit.LinesCount, r.Start.Char);            
             _editMode.Text = _txtEdit.IsReplaceMode ? "Overwrite" : "Insert";
         }
@@ -1061,7 +1075,7 @@ namespace FusionIRC.Forms.ScriptEditor
                 }
             }
             else
-            {
+            {                
                 type = GetNodeTypeFromScript(_currentEditingScript);
             }
             return type;
