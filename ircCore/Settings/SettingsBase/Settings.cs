@@ -104,6 +104,12 @@ namespace ircCore.Settings.SettingsBase
             Client.Confirmation.Url = true;
             /* Channel seetings */
             Client.Channels.ShowFavoritesDialogOnConnect = true;
+            /* Messages */
+            Client.Messages.QuitMessage = "Leaving.";
+            Client.Messages.CommandCharacter = "/";
+            /* Show information */
+            Client.Show.PingPong = true;
+            Client.Show.Motd = true;
             /* Logging */
             Client.Logging.LogPath = @"\logs";
             /* Create a blank theme */

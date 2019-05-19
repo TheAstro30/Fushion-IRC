@@ -29,14 +29,14 @@ namespace FusionIRC.Helpers.Commands
                                             : ThemeMessage.ChannelSelfActionText,
                               TimeStamp = DateTime.Now,
                               Nick = client.UserInfo.Nick,
-                              Prefix = child.WindowType == ChildWindowType.Channel ? child.Nicklist.GetNickPrefix(client.UserInfo.Nick) : String.Empty,
+                              Prefix = child.WindowType == ChildWindowType.Channel ? child.Nicklist.GetNickPrefix(client.UserInfo.Nick) : string.Empty,
                               Text = args
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             child.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(child, WindowManager.MainForm, WindowEvent.MessageReceived);
-            var action = String.Format("PRIVMSG {0} :{1}ACTION {2}{3}", child.Tag, (char)1, args, (char)1);
+            var action = string.Format("PRIVMSG {0} :{1}ACTION {2}{3}", child.Tag, (char)1, args, (char)1);
             client.Send(action);
         }
 
@@ -59,7 +59,7 @@ namespace FusionIRC.Helpers.Commands
             {
                 return;
             }
-            ParseMsg(client, child, String.Format("{0} {1}", child.Tag, args));
+            ParseMsg(client, child, string.Format("{0} {1}", child.Tag, args));
         }
 
         public static void ParseMsg(ClientConnection client, FrmChildWindow child, string args)
@@ -92,7 +92,7 @@ namespace FusionIRC.Helpers.Commands
                     child.Output.AddLine(pmd.DefaultColor, pmd.Message);
                     /* Update treenode color */
                     WindowManager.SetWindowEvent(child, WindowManager.MainForm, WindowEvent.MessageReceived);
-                    child.Client.Send(String.Format("PRIVMSG {0} :{1}", target, args));
+                    child.Client.Send(string.Format("PRIVMSG {0} :{1}", target, args));
                 }
                 return;
             }
@@ -116,7 +116,7 @@ namespace FusionIRC.Helpers.Commands
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
-            c.Client.Send(String.Format("PRIVMSG {0} :{1}", target, args));
+            c.Client.Send(string.Format("PRIVMSG {0} :{1}", target, args));
         }
 
         public static void ParseAmsg(ClientConnection client, string args)
@@ -139,13 +139,13 @@ namespace FusionIRC.Helpers.Commands
                 c.Output.AddLine(pmd.DefaultColor, pmd.Message);
                 /* Update treenode color */
                 WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
-                client.Send(String.Format("PRIVMSG {0} :{1}", c.Tag, args));
+                client.Send(string.Format("PRIVMSG {0} :{1}", c.Tag, args));
             }
         }
 
         public static void ParseNotice(ClientConnection client, FrmChildWindow child, string args)
         {
-            if (!client.IsConnected || String.IsNullOrEmpty(args))
+            if (!client.IsConnected || string.IsNullOrEmpty(args))
             {
                 return;
             }
@@ -167,7 +167,7 @@ namespace FusionIRC.Helpers.Commands
             child.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(child, WindowManager.MainForm, WindowEvent.MessageReceived);
-            client.Send(String.Format("NOTICE {0} :{1}", target, args));
+            client.Send(string.Format("NOTICE {0} :{1}", target, args));
         }
 
         public static void ParseEcho(ClientConnection client, string args)
@@ -202,7 +202,7 @@ namespace FusionIRC.Helpers.Commands
                         /* Search for window by name */
                         w = WindowManager.GetWindow(client, s);
                         if (w == null)
-                        {                            
+                        {              
                             /* Possibly "echo <text>" */
                             w = WindowManager.GetActiveWindow(WindowManager.MainForm);
                             text = args;

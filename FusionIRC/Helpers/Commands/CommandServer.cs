@@ -31,12 +31,12 @@ namespace FusionIRC.Helpers.Commands
             string[] address = null;
             var port = SettingsManager.Settings.Connection.Options.DefaultPort;
             var ssl = false;
-            if (String.IsNullOrEmpty(args))
+            if (string.IsNullOrEmpty(args))
             {
                 var recent = ServerManager.Servers.Recent.Server.Count > 0
                                  ? ServerManager.Servers.Recent.Server[0].ToString()
                                  : string.Format("irc.dal.net:{0}", port);
-                var server = !String.IsNullOrEmpty(client.Server.Address) ? client.Server.ToString() : recent;
+                var server = !string.IsNullOrEmpty(client.Server.Address) ? client.Server.ToString() : recent;
                 address = server.Split(':');
             }
             else
@@ -86,7 +86,7 @@ namespace FusionIRC.Helpers.Commands
                                                                       s[2].Equals("-j",
                                                                                   StringComparison.InvariantCultureIgnoreCase)
                                                                           ? s[3]
-                                                                          : String.Empty;
+                                                                          : string.Empty;
                         break;
                 }
             }
@@ -150,9 +150,9 @@ namespace FusionIRC.Helpers.Commands
                 TmrWaitToReconnectTimeOut.Enabled = false;
             }
             ParseServerConnection(client,
-                                  String.Format("{0}:{1}", client.Server.Address,
+                                  string.Format("{0}:{1}", client.Server.Address,
                                                 client.Server.IsSsl
-                                                    ? String.Format("+{0}", client.Server.Port.ToString())
+                                                    ? string.Format("+{0}", client.Server.Port.ToString())
                                                     : client.Server.Port.ToString()));
         }
 

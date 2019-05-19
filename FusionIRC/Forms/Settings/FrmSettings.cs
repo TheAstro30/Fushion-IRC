@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Forms.Settings.Controls.Base;
+using FusionIRC.Forms.Settings.Controls.Client;
 using FusionIRC.Forms.Settings.Controls.Connection;
 using FusionIRC.Helpers;
 using ircCore.Controls;
@@ -31,6 +32,8 @@ namespace FusionIRC.Forms.Settings
         private readonly ConnectionOptions _connectionOptions;
         private readonly ConnectionServers _connectionServers;
 
+        private readonly ClientOptions _clientOptions;
+        private readonly ClientMessages _clientMessages;
         private readonly ClientLogging _clientLogging;
         private readonly ClientSystemTray _clientSystemTray;
 
@@ -56,6 +59,7 @@ namespace FusionIRC.Forms.Settings
                               HideSelection = false,
                               Location = new Point(12, 12),
                               Size = new Size(150, 344),
+                              BorderStyle = BorderStyle.FixedSingle,
                               TabIndex = 0
                           };
 
@@ -94,6 +98,8 @@ namespace FusionIRC.Forms.Settings
             _connectionIdentDaemon = new ConnectionIdentDaemon {Location = new Point(168, 12), Visible = false};
             _connectionLocalInfo = new ConnectionLocalInfo {Location = new Point(168, 12), Visible = false};
 
+            _clientOptions = new ClientOptions {Location = new Point(168, 12), Visible = false};
+            _clientMessages = new ClientMessages { Location = new Point(168, 12), Visible = false };
             _clientLogging = new ClientLogging {Location = new Point(168, 12), Visible = false};
             _clientSystemTray = new ClientSystemTray { Location = new Point(168, 12), Visible = false };
 
@@ -107,6 +113,8 @@ namespace FusionIRC.Forms.Settings
                                       _connectionOptions,
                                       _connectionIdentDaemon,
                                       _connectionLocalInfo,
+                                      _clientOptions,
+                                      _clientMessages,
                                       _clientLogging,
                                       _clientSystemTray
                                   });
@@ -116,6 +124,8 @@ namespace FusionIRC.Forms.Settings
             _connectionIdentDaemon.OnSettingsChanged += OnSettingsChanged;
             _connectionLocalInfo.OnSettingsChanged += OnSettingsChanged;
 
+            _clientOptions.OnSettingsChanged += OnSettingsChanged;
+            _clientMessages.OnSettingsChanged += OnSettingsChanged;
             _clientLogging.OnSettingsChanged += OnSettingsChanged;
             _clientSystemTray.OnSettingsChanged += OnSettingsChanged;
 
@@ -210,6 +220,16 @@ namespace FusionIRC.Forms.Settings
             /* Client options... */
             _tvMenu.Nodes.Add("CLIENT", "Client").Nodes.AddRange(new[]
                                                                      {
+                                                                         new TreeNode("Options")
+                                                                             {
+                                                                                 Tag = _clientOptions,
+                                                                                 Name = "CLIENTOPTIONS"
+                                                                             },
+                                                                         new TreeNode("Messages")
+                                                                             {
+                                                                                 Tag = _clientMessages,
+                                                                                 Name = "CLIENTMESSAGES"
+                                                                             },
                                                                          new TreeNode("Logging")
                                                                              {
                                                                                  Tag = _clientLogging,
@@ -284,7 +304,11 @@ namespace FusionIRC.Forms.Settings
                                                 : owner.Icon;
                 owner.TrayAlwaysShowIcon = SettingsManager.Settings.Client.TrayIcon.AlwaysShow;
                 owner.TrayNotifyIcon.Visible = owner.TrayAlwaysShowIcon;
+                /* Control bars */
+                ((FrmClientWindow)owner).MenuBar.Visible = SettingsManager.Settings.Client.Appearance.ControlBars.Control[0].Visible;
+                ((FrmClientWindow)owner).ToolBar.Visible = SettingsManager.Settings.Client.Appearance.ControlBars.Control[1].Visible;
             }
+            
         }
 
         /* Select last known node */

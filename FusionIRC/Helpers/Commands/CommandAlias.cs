@@ -27,12 +27,12 @@ namespace FusionIRC.Helpers.Commands
                          {
                              ClientConnection = client,
                              ChildWindow = child,
-                             Channel = child.Tag.ToString()[0] == '#' ? child.Tag.ToString() : String.Empty,
+                             Channel = child.Tag.ToString()[0] == '#' ? child.Tag.ToString() : string.Empty,
                              Nick =
                                  child.WindowType == ChildWindowType.Private ||
                                  child.WindowType == ChildWindowType.DccChat
                                      ? child.Tag.ToString()
-                                     : String.Empty
+                                     : string.Empty
                          };
             alias.LineParsed += ScriptLineParsed;
             alias.ParseCompleted += ScriptParseCompleted;
@@ -43,13 +43,13 @@ namespace FusionIRC.Helpers.Commands
         /* Script callbacks */
         private static void ScriptLineParsed(Script script, ScriptArgs e, string data)
         {
-            if (String.IsNullOrEmpty(data))
+            if (string.IsNullOrEmpty(data))
             {
                 return;
             }
             var i = data.IndexOf(' ');
             string command;
-            var args = String.Empty;
+            var args = string.Empty;
             if (i == -1)
             {
                 command = data.Trim();

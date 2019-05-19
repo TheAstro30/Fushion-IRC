@@ -78,6 +78,12 @@ namespace ircScript.Classes.Parsers
                 case "$APPDIR":
                     return Functions.MainDir(string.Empty, true, true);
 
+                case "$ACTIVE":
+                    return e.ChildWindow.Tag.ToString();
+
+                case "$CID":
+                    return e.ClientConnection.ConnectionId.ToString();
+
                 default:
                     /* Check if it's an alias */                    
                     var id = value.Replace("$", "");

@@ -55,7 +55,7 @@ namespace FusionIRC.Helpers.Connection
                               TimeStamp = DateTime.Now,
                               Nick = nick,
                               Prefix = c.Nicklist.GetNickPrefix(nick),
-                              Text = String.Format("{0} {1}", modes, modeData)
+                              Text = string.Format("{0} {1}", modes, modeData)
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
@@ -128,7 +128,7 @@ namespace FusionIRC.Helpers.Connection
                         }
                         else
                         {
-                            c.Modes.Key = String.Empty;
+                            c.Modes.Key = string.Empty;
                             c.Modes.RemoveMode(modes[i]);
                         }
                         modePointer++;
@@ -136,7 +136,7 @@ namespace FusionIRC.Helpers.Connection
 
                     default:
                         /* Update channel modes */
-                        c.Modes.AddMode(modes[i], String.Empty);
+                        c.Modes.AddMode(modes[i], string.Empty);
                         break;
                 }
             }

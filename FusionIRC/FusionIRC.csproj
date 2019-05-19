@@ -123,16 +123,28 @@
     <Compile Include="Forms\Settings\Controls\Base\BaseControlRenderer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Forms\Settings\Controls\Connection\ClientLogging.cs">
+    <Compile Include="Forms\Settings\Controls\Client\ClientLogging.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Forms\Settings\Controls\Connection\ClientLogging.Designer.cs">
+    <Compile Include="Forms\Settings\Controls\Client\ClientLogging.Designer.cs">
       <DependentUpon>ClientLogging.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\Settings\Controls\Connection\ClientSystemTray.cs">
+    <Compile Include="Forms\Settings\Controls\Client\ClientMessages.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Forms\Settings\Controls\Connection\ClientSystemTray.Designer.cs">
+    <Compile Include="Forms\Settings\Controls\Client\ClientMessages.Designer.cs">
+      <DependentUpon>ClientMessages.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Client\ClientOptions.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Client\ClientOptions.Designer.cs">
+      <DependentUpon>ClientOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Client\ClientSystemTray.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Client\ClientSystemTray.Designer.cs">
       <DependentUpon>ClientSystemTray.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Settings\Controls\Connection\ConnectionIdentDaemon.cs">
@@ -215,6 +227,7 @@
     <Compile Include="Helpers\Commands\CommandServer.cs" />
     <Compile Include="Helpers\Commands\CommandSoundPlay.cs" />
     <Compile Include="Helpers\Commands\CommandText.cs" />
+    <Compile Include="Helpers\Commands\CommandWrite.cs" />
     <Compile Include="Helpers\Connection\Events.cs" />
     <Compile Include="Helpers\Connection\Raw.cs" />
     <Compile Include="Helpers\Connection\Channel.cs" />
@@ -233,10 +246,16 @@
     <EmbeddedResource Include="Forms\Misc\FrmDccManager.resx">
       <DependentUpon>FrmDccManager.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Settings\Controls\Connection\ClientLogging.resx">
+    <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientLogging.resx">
       <DependentUpon>ClientLogging.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Settings\Controls\Connection\ClientSystemTray.resx">
+    <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientMessages.resx">
+      <DependentUpon>ClientMessages.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientOptions.resx">
+      <DependentUpon>ClientOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientSystemTray.resx">
       <DependentUpon>ClientSystemTray.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Connection\ConnectionOptions.resx">
@@ -327,6 +346,9 @@
     <None Include="Icons\Dialog\themePicture.ico" />
     <None Include="Icons\Dialog\autoJoin.ico" />
     <None Include="Icons\Dialog\error.ico" />
+    <None Include="Icons\Dialog\dialogApply.ico" />
+    <None Include="Icons\Dialog\dialogClose.ico" />
+    <None Include="Icons\Dialog\dialogOk.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

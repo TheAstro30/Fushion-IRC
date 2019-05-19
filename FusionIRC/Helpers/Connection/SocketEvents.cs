@@ -34,10 +34,10 @@ namespace FusionIRC.Helpers.Connection
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update title bar of this console window */
-            var net = !String.IsNullOrEmpty(client.Network) ? client.Network : client.Server.Address;
-            c.Text = String.Format("{0}: {1} ({2}:{3})", net, client.UserInfo.Nick, client.Server.Address,
+            var net = !string.IsNullOrEmpty(client.Network) ? client.Network : client.Server.Address;
+            c.Text = string.Format("{0}: {1} ({2}:{3})", net, client.UserInfo.Nick, client.Server.Address,
                                    client.Server.Port);
-            c.DisplayNode.Text = String.Format("{0}: {1} ({2})", net, client.UserInfo.Nick, client.Server.Address);
+            c.DisplayNode.Text = string.Format("{0}: {1} ({2})", net, client.UserInfo.Nick, client.Server.Address);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
         }
@@ -59,7 +59,11 @@ namespace FusionIRC.Helpers.Connection
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
             /* Process event script */
-            var e = new ScriptArgs { ChildWindow = c, ClientConnection = client };
+            var e = new ScriptArgs
+                        {
+                            ChildWindow = c,
+                            ClientConnection = client
+                        };
             Events.Execute("connect", e);
         }
 
@@ -110,6 +114,13 @@ namespace FusionIRC.Helpers.Connection
             }
             /* Now we process re-connection code if the server wasn't manually disconnected by the user */
             c.Reconnect.BeginReconnect();
+            /* Process event script */
+            var e = new ScriptArgs
+                        {
+                            ChildWindow = c,
+                            ClientConnection = client
+                        };
+            Events.Execute("disconnect", e);
         }
 
         public static void OnClientConnectionError(ClientConnection client, string error)
@@ -143,6 +154,13 @@ namespace FusionIRC.Helpers.Connection
             }
             /* Now we process re-connection code if the server wasn't manually disconnected by the user */
             c.Reconnect.BeginReconnect();
+            /* Process event script */
+            var e = new ScriptArgs
+                        {
+                            ChildWindow = c,
+                            ClientConnection = client
+                        };
+            Events.Execute("disconnect", e);
         }
 
         public static void OnClientSslInvalidCertificate(ClientConnection client, X509Certificate certificate)

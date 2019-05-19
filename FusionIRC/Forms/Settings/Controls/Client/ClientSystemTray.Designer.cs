@@ -1,4 +1,4 @@
-﻿namespace FusionIRC.Forms.Settings.Controls.Connection
+﻿namespace FusionIRC.Forms.Settings.Controls.Client
 {
     partial class ClientSystemTray
     {
@@ -28,45 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.chkAlways = new System.Windows.Forms.CheckBox();
-            this.chkMinimized = new System.Windows.Forms.CheckBox();
-            this.chkBalloon = new System.Windows.Forms.CheckBox();
             this.gbTray = new System.Windows.Forms.GroupBox();
             this.btnSelect = new System.Windows.Forms.Button();
             this.btnDefault = new System.Windows.Forms.Button();
             this.pnlIcon = new System.Windows.Forms.Panel();
+            this.chkBalloon = new System.Windows.Forms.CheckBox();
+            this.chkMinimized = new System.Windows.Forms.CheckBox();
+            this.chkAlways = new System.Windows.Forms.CheckBox();
             this.gbTray.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // chkAlways
-            // 
-            this.chkAlways.AutoSize = true;
-            this.chkAlways.Location = new System.Drawing.Point(112, 93);
-            this.chkAlways.Name = "chkAlways";
-            this.chkAlways.Size = new System.Drawing.Size(183, 19);
-            this.chkAlways.TabIndex = 0;
-            this.chkAlways.Text = "Always show system tray icon";
-            this.chkAlways.UseVisualStyleBackColor = true;
-            // 
-            // chkMinimized
-            // 
-            this.chkMinimized.AutoSize = true;
-            this.chkMinimized.Location = new System.Drawing.Point(112, 118);
-            this.chkMinimized.Name = "chkMinimized";
-            this.chkMinimized.Size = new System.Drawing.Size(221, 19);
-            this.chkMinimized.TabIndex = 1;
-            this.chkMinimized.Text = "Place in system tray when minimized";
-            this.chkMinimized.UseVisualStyleBackColor = true;
-            // 
-            // chkBalloon
-            // 
-            this.chkBalloon.AutoSize = true;
-            this.chkBalloon.Location = new System.Drawing.Point(112, 143);
-            this.chkBalloon.Name = "chkBalloon";
-            this.chkBalloon.Size = new System.Drawing.Size(141, 19);
-            this.chkBalloon.TabIndex = 2;
-            this.chkBalloon.Text = "Show balloon tooltips";
-            this.chkBalloon.UseVisualStyleBackColor = true;
             // 
             // gbTray
             // 
@@ -100,11 +70,41 @@
             // 
             // pnlIcon
             // 
-            this.pnlIcon.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.pnlIcon.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlIcon.Location = new System.Drawing.Point(6, 22);
             this.pnlIcon.Name = "pnlIcon";
             this.pnlIcon.Size = new System.Drawing.Size(64, 64);
             this.pnlIcon.TabIndex = 0;
+            // 
+            // chkBalloon
+            // 
+            this.chkBalloon.AutoSize = true;
+            this.chkBalloon.Location = new System.Drawing.Point(112, 143);
+            this.chkBalloon.Name = "chkBalloon";
+            this.chkBalloon.Size = new System.Drawing.Size(141, 19);
+            this.chkBalloon.TabIndex = 2;
+            this.chkBalloon.Text = "Show balloon tooltips";
+            this.chkBalloon.UseVisualStyleBackColor = true;
+            // 
+            // chkMinimized
+            // 
+            this.chkMinimized.AutoSize = true;
+            this.chkMinimized.Location = new System.Drawing.Point(112, 118);
+            this.chkMinimized.Name = "chkMinimized";
+            this.chkMinimized.Size = new System.Drawing.Size(221, 19);
+            this.chkMinimized.TabIndex = 1;
+            this.chkMinimized.Text = "Place in system tray when minimized";
+            this.chkMinimized.UseVisualStyleBackColor = true;
+            // 
+            // chkAlways
+            // 
+            this.chkAlways.AutoSize = true;
+            this.chkAlways.Location = new System.Drawing.Point(112, 93);
+            this.chkAlways.Name = "chkAlways";
+            this.chkAlways.Size = new System.Drawing.Size(183, 19);
+            this.chkAlways.TabIndex = 0;
+            this.chkAlways.Text = "Always show system tray icon";
+            this.chkAlways.UseVisualStyleBackColor = true;
             // 
             // ClientSystemTray
             // 

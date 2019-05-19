@@ -14,7 +14,7 @@ namespace FusionIRC.Helpers.Commands
     {
         public static void ParseCtcp(ClientConnection client, string args)
         {
-            if (!client.IsConnected || String.IsNullOrEmpty(args))
+            if (!client.IsConnected || string.IsNullOrEmpty(args))
             {
                 return;
             }
@@ -38,8 +38,8 @@ namespace FusionIRC.Helpers.Commands
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
             client.Send(ct == "PING"
-                            ? String.Format("PRIVMSG {0} :{1}{2} {3}{4}", ctcp[0], (char)1, ct, TimeFunctions.CTime(), (char)1)
-                            : String.Format("PRIVMSG {0} :{1}{2}{3}", ctcp[0], (char)1, ct, (char)1));
+                            ? string.Format("PRIVMSG {0} :{1}{2} {3}{4}", ctcp[0], (char)1, ct, TimeFunctions.CTime(), (char)1)
+                            : string.Format("PRIVMSG {0} :{1}{2}{3}", ctcp[0], (char)1, ct, (char)1));
         }
     }
 }

@@ -145,12 +145,12 @@ namespace FusionIRC.Forms.ScriptEditor
             _mnuHelp.DropDownItems.Add(new ToolStripMenuItem("Show Help", null, MenuItemOnClick, Keys.F1));
 
             _menu.Items.AddRange(new ToolStripItem[]
-                                    {
-                                        _mnuFile,
-                                        _mnuEdit,
-                                        _mnuView,
-                                        _mnuHelp
-                                    });
+                                     {
+                                         _mnuFile,
+                                         _mnuEdit,
+                                         _mnuView,
+                                         _mnuHelp
+                                     });
             /* Status bar - order components are added to the control array is IMPORTANT */
             _status = new StatusStrip
                           {
@@ -423,6 +423,11 @@ namespace FusionIRC.Forms.ScriptEditor
                 return;
             }
             var s = (ScriptData) node;
+            if (s == _currentEditingScript)
+            {
+                System.Diagnostics.Debug.Print("same");
+                return;
+            }
             SwitchEditingFile(s);
         }
 
@@ -1054,6 +1059,7 @@ namespace FusionIRC.Forms.ScriptEditor
             _txtEdit.Indent();
             _txtEdit.SelectionStart = _currentEditingScript.SelectionStart;
             _txtEdit.DoSelectionVisible();
+            _txtEdit.ClearUndo();
             SettingsManager.Settings.Editor.Last = file.Name;
             _fileChanged = false;
 

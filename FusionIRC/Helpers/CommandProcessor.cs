@@ -135,6 +135,10 @@ namespace FusionIRC.Helpers
                     CommandSoundPlay.Parse(args);
                     break;
 
+                case "WRITE":
+                    CommandWrite.Write(args);
+                    break;
+
                 case "WRITEINI":
                     CommandFiles.WriteIni(args);
                     break;

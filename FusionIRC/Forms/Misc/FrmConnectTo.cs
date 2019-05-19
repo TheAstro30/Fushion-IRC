@@ -416,7 +416,7 @@ namespace FusionIRC.Forms.Misc
                     {
                         return;
                     }
-                    _console.Client.Send("QUIT :Leaving.");
+                    _console.Client.Send(string.Format("QUIT :{0}", SettingsManager.Settings.Client.Messages.QuitMessage));
                     _console.Client.Disconnect();
                     _txtNick.Enabled = true;
                     _txtAlternate.Enabled = true;

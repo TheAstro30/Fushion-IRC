@@ -1,4 +1,4 @@
-﻿namespace FusionIRC.Forms.Settings.Controls.Connection
+﻿namespace FusionIRC.Forms.Settings.Controls.Client
 {
     partial class ClientLogging
     {

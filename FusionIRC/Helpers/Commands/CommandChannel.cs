@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections.Generic;
 using FusionIRC.Forms.Child;
 using ircClient;
 using ircCore.Settings;
@@ -20,7 +21,8 @@ namespace FusionIRC.Helpers.Commands
                 return;
             }
             string channel;
-            if (String.IsNullOrEmpty(args))
+            var message = string.Empty;
+            if (string.IsNullOrEmpty(args))
             {
                 if (child.WindowType != ChildWindowType.Channel)
                 {
@@ -32,10 +34,27 @@ namespace FusionIRC.Helpers.Commands
             }
             else
             {
-                var c = args.Split(' ');
-                channel = c[0];
+                var c = new List<string>(args.Split(' '));
+                if (c[0][0] == client.Parser.ChannelPrefixTypes.MatchChannelType(child.Tag.ToString()[0]))
+                {
+                    channel = c[0];
+                    c.RemoveAt(0);
+                    message = string.Join(" ", c);
+                }
+                else
+                {
+                    channel = child.Tag.ToString();
+                    message = args;
+                }                
             }
-            client.Send(String.Format("PART {0}", channel));
+            if (string.IsNullOrEmpty(message))
+            {
+                /* Use the message stored in settings (if there is one) */
+                message = SettingsManager.Settings.Client.Messages.PartMessage;
+            }
+            client.Send(!string.IsNullOrEmpty(message)
+                            ? string.Format("PART {0} :{1}", channel, message)
+                            : string.Format("PART {0}", channel));
         }
 
         public static void ParseHop(ClientConnection client, FrmChildWindow child)
@@ -53,12 +72,15 @@ namespace FusionIRC.Helpers.Commands
             {
                 child.AutoClose = true; /* This will stop the child window sending "PART" on closing */
             }
-            client.Send(String.Format("PART {0}\r\nJOIN {0}", child.Tag));
+            var p = SettingsManager.Settings.Client.Messages.PartMessage;
+            client.Send(!string.IsNullOrEmpty(p)
+                            ? string.Format("PART {0} :{1}\r\nJOIN {0}", child.Tag, p)
+                            : string.Format("PART {0}\r\nJOIN {0}", child.Tag));
         }
 
         public static void ParseNames(ClientConnection client, string args)
         {
-            if (!client.IsConnected || String.IsNullOrEmpty(args))
+            if (!client.IsConnected || string.IsNullOrEmpty(args))
             {
                 return;
             }
@@ -70,12 +92,12 @@ namespace FusionIRC.Helpers.Commands
                 return;
             }
             c.Nicklist.Clear();
-            client.Send(String.Format("NAMES {0}\r\nWHO {0}", channel));
+            client.Send(string.Format("NAMES {0}\r\nWHO {0}", channel));
         }
 
         public static void ParseTopic(ClientConnection client, string args)
         {
-            if (String.IsNullOrEmpty(args) || !client.IsConnected)
+            if (string.IsNullOrEmpty(args) || !client.IsConnected)
             {
                 return;
             }
@@ -83,12 +105,12 @@ namespace FusionIRC.Helpers.Commands
             if (i == -1)
             {
                 /* Most likely /topic #chan */
-                client.Send(String.Format("TOPIC {0}", args));
+                client.Send(string.Format("TOPIC {0}", args));
                 return;
             }
             var channel = args.Substring(0, i).Trim();
             args = args.Substring(i).Trim();
-            client.Send(String.Format("TOPIC {0} :{1}", channel, args));
+            client.Send(string.Format("TOPIC {0} :{1}", channel, args));
         }
     }
 }

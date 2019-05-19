@@ -122,7 +122,9 @@
     <Compile Include="Settings\SettingsBase\Structures\SettingsIdentd.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsLocalInfo.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsLog.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsMessages.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsScripts.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsShow.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsTabs.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsTrayIcon.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsUserInfo.cs" />

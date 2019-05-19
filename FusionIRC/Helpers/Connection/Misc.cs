@@ -20,6 +20,10 @@ namespace FusionIRC.Helpers.Connection
     {
         public static void OnServerPingPong(ClientConnection client)
         {
+            if (!SettingsManager.Settings.Client.Show.PingPong)
+            {
+                return;
+            }
             var c = WindowManager.GetConsoleWindow(client);
             if (c == null || c.WindowType != ChildWindowType.Console)
             {
@@ -76,21 +80,24 @@ namespace FusionIRC.Helpers.Connection
 
         public static void OnMotd(ClientConnection client, string text, bool isEnd)
         {
-            var c = WindowManager.GetConsoleWindow(client);
-            if (c == null)
+            if (SettingsManager.Settings.Client.Show.PingPong)
             {
-                return;
+                var c = WindowManager.GetConsoleWindow(client);
+                if (c == null)
+                {
+                    return;
+                }
+                var tmd = new IncomingMessageData
+                              {
+                                  Message = ThemeMessage.MotdText,
+                                  TimeStamp = DateTime.Now,
+                                  Text = text
+                              };
+                var pmd = ThemeManager.ParseMessage(tmd);
+                c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+                /* Update treenode color */
+                WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
             }
-            var tmd = new IncomingMessageData
-                          {
-                              Message = ThemeMessage.MotdText,
-                              TimeStamp = DateTime.Now,
-                              Text = text
-                          };
-            var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
-            /* Update treenode color */
-            WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
             if (!isEnd)
             {
                 return;
@@ -98,7 +105,7 @@ namespace FusionIRC.Helpers.Connection
             /* Set invisible */
             if (client.UserInfo.Invisible)
             {
-                client.Send(String.Format("MODE {0} +i", client.UserInfo.Nick));
+                client.Send(string.Format("MODE {0} +i", client.UserInfo.Nick));
             }
             /* Update recent servers list */
             UpdateRecentServers(client);
@@ -134,7 +141,7 @@ namespace FusionIRC.Helpers.Connection
             {
                 return;
             }
-            if (String.Compare(n[0], client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase) != 0)
+            if (string.Compare(n[0], client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase) != 0)
             {
                 return;
             }
@@ -163,10 +170,10 @@ namespace FusionIRC.Helpers.Connection
             {
                 return;
             }
-            c.Text = String.Format("{0}: {1} ({2}:{3})",
-                                   !String.IsNullOrEmpty(client.Network) ? client.Network : client.Server.Address,
+            c.Text = string.Format("{0}: {1} ({2}:{3})",
+                                   !string.IsNullOrEmpty(client.Network) ? client.Network : client.Server.Address,
                                    client.UserInfo.Nick, client.Server.Address, client.Server.Port);
-            c.DisplayNode.Text = String.Format("{0}: {1} ({2})", network, client.UserInfo.Nick,
+            c.DisplayNode.Text = string.Format("{0}: {1} ({2})", network, client.UserInfo.Nick,
                                                client.Server.Address);
         }
 
@@ -209,7 +216,7 @@ namespace FusionIRC.Helpers.Connection
                     break;
 
                 case LocalInfoLookupMethod.Server:
-                    client.Send(String.Format("USERHOST {0}", client.UserInfo.Nick));
+                    client.Send(string.Format("USERHOST {0}", client.UserInfo.Nick));
                     break;
             }
         }
@@ -221,22 +228,22 @@ namespace FusionIRC.Helpers.Connection
             {
                 foreach (var chan in WindowManager.Windows[client].Where(chan => chan.WindowType == ChildWindowType.Channel))
                 {
-                    client.Send(String.Format("JOIN {0}", chan.Tag));
+                    client.Send(string.Format("JOIN {0}", chan.Tag));
                 }
             }
             /* Process auto-join ... */
-            if (!AutomationsManager.Automations.Join.Enable)
+            if (AutomationsManager.Automations.Join.Enable)
             {
-                return;
-            }
-            var join = AutomationsManager.GetAutomationByNetwork(AutomationsManager.AutomationType.Join, client.Network);
-            if (@join != null)
-            {
-                foreach (var j in @join.Data)
+                var join = AutomationsManager.GetAutomationByNetwork(AutomationsManager.AutomationType.Join,
+                                                                     client.Network);
+                if (@join != null)
                 {
-                    client.Send(String.IsNullOrEmpty(j.Value)
-                                    ? String.Format("JOIN {0}", j.Item)
-                                    : String.Format("JOIN {0} {1}", j.Item, j.Value));
+                    foreach (var j in @join.Data)
+                    {
+                        client.Send(string.IsNullOrEmpty(j.Value)
+                                        ? string.Format("JOIN {0}", j.Item)
+                                        : string.Format("JOIN {0} {1}", j.Item, j.Value));
+                    }
                 }
             }
             /* Show favorites dialog */
@@ -265,7 +272,7 @@ namespace FusionIRC.Helpers.Connection
                           {
                               Message = ThemeMessage.InfoText,
                               TimeStamp = DateTime.Now,
-                              Text = String.Format("Identd request: ({0}) {1}", remoteHost, data)
+                              Text = string.Format("Identd request: ({0}) {1}", remoteHost, data)
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);

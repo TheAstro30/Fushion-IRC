@@ -8,6 +8,7 @@ using ircClient;
 using ircCore.Autos;
 using ircCore.Settings.Theming;
 using ircCore.Users;
+using ircScript.Classes.Structures;
 
 namespace FusionIRC.Helpers.Connection
 {
@@ -16,7 +17,7 @@ namespace FusionIRC.Helpers.Connection
         public static void OnTextChannel(ClientConnection client, string nick, string address, string channel, string text)
         {
             /* Check ignored */
-            if (UserManager.IsIgnored(String.Format("{0}!{1}", nick, address)))
+            if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
             {
                 return;
             }
@@ -38,12 +39,19 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
+            /* Process event script */
+            var e = new ScriptArgs
+                        {
+                            ChildWindow = c,
+                            ClientConnection = client
+                        };
+            Events.Execute("text", e, c, text);
         }
 
         public static void OnTextSelf(ClientConnection client, string nick, string address, string text)
         {
             /* Check ignored */
-            if (UserManager.IsIgnored(String.Format("{0}!{1}", nick, address)))
+            if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
             {
                 return;
             }
@@ -61,12 +69,19 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
+            /* Process event script */
+            var e = new ScriptArgs
+                        {
+                            ChildWindow = c,
+                            ClientConnection = client
+                        };
+            Events.Execute("text", e, c, text);
         }
 
         public static void OnActionChannel(ClientConnection client, string nick, string address, string channel, string text)
         {
             /* Check ignored */
-            if (UserManager.IsIgnored(String.Format("{0}!{1}", nick, address)))
+            if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
             {
                 return;
             }
@@ -88,12 +103,19 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
+            /* Process event script */
+            var e = new ScriptArgs
+                        {
+                            ChildWindow = c,
+                            ClientConnection = client
+                        };
+            Events.Execute("action", e, c, text);
         }
 
         public static void OnActionSelf(ClientConnection client, string nick, string address, string text)
         {
             /* Check ignored */
-            if (UserManager.IsIgnored(String.Format("{0}!{1}", nick, address)))
+            if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
             {
                 return;
             }
@@ -111,6 +133,13 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
+            /* Process event script */
+            var e = new ScriptArgs
+                        {
+                            ChildWindow = c,
+                            ClientConnection = client
+                        };
+            Events.Execute("action", e, c, text);
         }
 
         public static void OnNotice(ClientConnection client, string nick, string address, string text)
@@ -126,13 +155,13 @@ namespace FusionIRC.Helpers.Connection
                     {
                         if (nn.Item.Equals(client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
                         {
-                            client.Send(String.Format("PRIVMSG NICKSERV :IDENTIFY {0}", nn.Value));
+                            client.Send(string.Format("PRIVMSG NICKSERV :IDENTIFY {0}", nn.Value));
                             break;
                         }
                     }
                 }
             }
-            if (UserManager.IsIgnored(String.Format("{0}!{1}", nick, address)))
+            if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
             {
                 return;
             }

@@ -24,7 +24,7 @@ namespace FusionIRC.Helpers.Commands
                 /* Client is in the middle of connecting - but not fully connected, update credentials */
                 client.UserInfo.Nick = nick;
             }
-            client.Send(String.Format("NICK {0}", nick));
+            client.Send(string.Format("NICK {0}", nick));
             if (client.IsConnected || client.IsConnecting)
             {
                 return;

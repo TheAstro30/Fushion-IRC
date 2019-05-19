@@ -10,7 +10,7 @@ using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Utils;
 
-namespace FusionIRC.Forms.Settings.Controls.Connection
+namespace FusionIRC.Forms.Settings.Controls.Client
 {
     public partial class ClientLogging : BaseControlRenderer, ISettings
     {

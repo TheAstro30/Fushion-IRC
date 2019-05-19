@@ -30,6 +30,12 @@ namespace ircCore.Settings.SettingsBase.Structures
         [XmlElement("logging")]
         public SettingsLog Logging = new SettingsLog();
 
+        [XmlElement("messages")]
+        public SettingsMessages Messages = new SettingsMessages();
+
+        [XmlElement("show")]
+        public SettingsShow Show = new SettingsShow();
+
         [XmlElement("trayIcon")]
         public SettingsTrayIcon TrayIcon = new SettingsTrayIcon();
     }

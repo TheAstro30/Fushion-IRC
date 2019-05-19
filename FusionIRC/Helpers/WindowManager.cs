@@ -45,10 +45,10 @@ namespace FusionIRC.Helpers
             if (type == ChildWindowType.Console)
             {
                 /* Create a new dictionary entry */
-                var connection = new ClientConnection(mdiOwner, SettingsManager.Settings.UserInfo);
+                var connection = new ClientConnection(mdiOwner, SettingsManager.Settings.UserInfo) {ConnectionId = Windows.Count + 1};
                 win = new FrmChildWindow(connection, type, mdiOwner)
                           {
-                              Text = String.Format("{0}: {1}", text, connection.UserInfo.Nick),
+                              Text = string.Format("{0}: {1}", text, connection.UserInfo.Nick),
                               Tag = tag
                           };
                 var wins = new List<FrmChildWindow>
@@ -74,6 +74,7 @@ namespace FusionIRC.Helpers
                     {
                         return win;
                     }
+                    
                     /* Add the window to the list */
                     win = new FrmChildWindow(client, type, mdiOwner)
                               {
@@ -101,11 +102,11 @@ namespace FusionIRC.Helpers
                     /* Update the window type count */
                     var count = GetChildWindowCount(win);
                     win.DisplayNodeRoot.Text = win.WindowType == ChildWindowType.Channel
-                                                     ? String.Format("Channels ({0})", count)
+                                                     ? string.Format("Channels ({0})", count)
                                                      : win.WindowType == ChildWindowType.Private
-                                                           ? String.Format("Queries ({0})", count)
+                                                           ? string.Format("Queries ({0})", count)
                                                            : win.WindowType == ChildWindowType.DccChat
-                                                                 ? String.Format("Chats ({0})", count)
+                                                                 ? string.Format("Chats ({0})", count)
                                                                  : win.DisplayNodeRoot.Text;
                 }
             }           
@@ -136,11 +137,11 @@ namespace FusionIRC.Helpers
                 /* Update the window type count */
                 var count = GetChildWindowCount(window);
                 window.DisplayNodeRoot.Text = window.WindowType == ChildWindowType.Channel
-                                                    ? String.Format("Channels ({0})", count)
+                                                    ? string.Format("Channels ({0})", count)
                                                     : window.WindowType == ChildWindowType.Private
-                                                          ? String.Format("Queries ({0})", count)
+                                                          ? string.Format("Queries ({0})", count)
                                                           : window.WindowType == ChildWindowType.DccChat
-                                                                ? String.Format("Chats ({0})", count)
+                                                                ? string.Format("Chats ({0})", count)
                                                                 : window.DisplayNodeRoot.Text;
             }            
         }
@@ -156,6 +157,21 @@ namespace FusionIRC.Helpers
             {
                 Windows[client][i].Close();
             }
+        }
+
+        public static int GetConsoleWindowIndex(ClientConnection client)
+        {
+            /* $cid */
+            var i = 0;
+            foreach (var w in Windows)
+            {
+                if (w.Key == client)
+                {
+                    return i;
+                }
+                i++;
+            }
+            return -1;
         }
 
         public static FrmChildWindow GetWindow(ClientConnection client, string tag)
@@ -230,7 +246,7 @@ namespace FusionIRC.Helpers
                 win.Output.Font = fnt;
                 win.Input.Font = fnt;
                 /* Backgrounds */
-                if (!String.IsNullOrEmpty(bg.Path))
+                if (!string.IsNullOrEmpty(bg.Path))
                 {
                     var file = Functions.MainDir(bg.Path);
                     if (File.Exists(file))

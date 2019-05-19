@@ -6,14 +6,13 @@
 using System;
 using System.Drawing;
 using System.IO;
-using System.Reflection;
 using System.Windows.Forms;
 using FusionIRC.Forms.Settings.Controls.Base;
 using FusionIRC.Helpers;
 using ircCore.Settings;
 using ircCore.Utils;
 
-namespace FusionIRC.Forms.Settings.Controls.Connection
+namespace FusionIRC.Forms.Settings.Controls.Client
 {
     public partial class ClientSystemTray : BaseControlRenderer, ISettings
     {

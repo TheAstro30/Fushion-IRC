@@ -116,7 +116,7 @@ namespace FusionIRC.Helpers.Connection
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Send /WHO to get user addresses */
-            client.Send(String.Format("WHO {0}{1}MODE {0}", channel, Environment.NewLine));
+            client.Send(string.Format("WHO {0}{1}MODE {0}", channel, Environment.NewLine));
             /* Remember to unset the halt disconnect message bool */
             c.DisconnectedShown = false;
         }
@@ -202,12 +202,12 @@ namespace FusionIRC.Helpers.Connection
                 var pmd = ThemeManager.ParseMessage(tmd);
                 console.Output.AddLine(pmd.DefaultColor, pmd.Message);
                 /* Update title bar */
-                var net = !String.IsNullOrEmpty(client.Network)
+                var net = !string.IsNullOrEmpty(client.Network)
                               ? client.Network
                               : client.Server.Address;
-                console.Text = String.Format("{0}: {1} ({2}:{3}) {4}", net, client.UserInfo.Nick, client.Server.Address,
+                console.Text = string.Format("{0}: {1} ({2}:{3}) {4}", net, client.UserInfo.Nick, client.Server.Address,
                                              client.Server.Port, console.Modes);
-                console.DisplayNode.Text = String.Format("{0}: {1} ({2})", net, client.UserInfo.Nick,
+                console.DisplayNode.Text = string.Format("{0}: {1} ({2})", net, client.UserInfo.Nick,
                                                          client.Server.Address);
                 /* Update treenode color */
                 WindowManager.SetWindowEvent(console, WindowManager.MainForm, WindowEvent.EventReceived);
@@ -302,7 +302,7 @@ namespace FusionIRC.Helpers.Connection
             /* Attempt to rejoin the channel */
             if (SettingsManager.Settings.Client.Channels.ReJoinChannelsOnKick)
             {
-                client.Send(String.Format("JOIN {0}", channel));
+                client.Send(string.Format("JOIN {0}", channel));
             }
         }
 

@@ -54,7 +54,7 @@ namespace FusionIRC.Forms.Child
         public ClientConnection Client { get; private set; }
         public OutputWindow Output { get; set; }
         public InputWindow Input { get; set; }
-        public Nicklist Nicklist { get; set; }        
+        public Nicklist Nicklist { get; set; }
 
         /* Nodes used by the switch treeview - much easier to keep track of/update from here */
         public TreeNode DisplayNodeRoot { get; set; }
@@ -344,7 +344,7 @@ namespace FusionIRC.Forms.Child
                     }
                     if (Client.IsConnected)
                     {
-                        Client.Send(string.Format("QUIT :Leaving."));
+                        Client.Send(string.Format("QUIT :{0}", SettingsManager.Settings.Client.Messages.QuitMessage));
                     }
                     WindowManager.RemoveAllWindowsOfConsole(Client);
                     break;
@@ -353,7 +353,10 @@ namespace FusionIRC.Forms.Child
                     if (Client.IsConnected && !AutoClose)
                     {
                         /* Part channel if closing it */
-                        Client.Send(string.Format("PART {0}", Tag));
+                        var p = SettingsManager.Settings.Client.Messages.PartMessage;
+                        Client.Send(!string.IsNullOrEmpty(p)
+                                        ? string.Format("PART {0} :{1}", Tag, p)
+                                        : string.Format("PART {0}", Tag));
                     }
                     break;
             }
@@ -584,11 +587,13 @@ namespace FusionIRC.Forms.Child
                     var s = Input.Text;
                     Input.Text = string.Empty;                    
                     /* Send text to server */
+                    char c;
+                    char.TryParse(SettingsManager.Settings.Client.Messages.CommandCharacter, out c);
                     if (WindowType != ChildWindowType.Console)
                     {
-                        if (s[0] == '/' && !e.Control)
-                        {
-                            if (s.Length > 1 && s[1] == '/')
+                        if (s[0] == c && !e.Control)
+                        {                            
+                            if (s.Length > 1 && s[1] == c)
                             {
                                 /* Process following line as a script */
                                 ParseCommandLineAsScript(s.Substring(2));
@@ -623,7 +628,7 @@ namespace FusionIRC.Forms.Child
                         return;
                     }
                     /* Console window */
-                    if (s[0] == '/')
+                    if (s[0] == c)
                     {
                         if (s.Length > 1 && s[1] == '/')
                         {
@@ -729,7 +734,7 @@ namespace FusionIRC.Forms.Child
             var args = new ScriptArgs
                            {
                                ClientConnection = Client,
-                               Channel = WindowType != ChildWindowType.Console ? Tag.ToString() : string.Empty
+                               Channel = WindowType != ChildWindowType.Console ? Tag.ToString() : string.Empty                               
                            };
             CommandProcessor.Parse(Client, this, script.Parse(args));
         }

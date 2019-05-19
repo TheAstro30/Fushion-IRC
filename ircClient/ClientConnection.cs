@@ -49,7 +49,9 @@ namespace ircClient
         public string SocketRemoteIp { get { return _sock.RemoteHostIp; } }
 
         public Server Server = new Server();
-        public string Network { get; set; }        
+        public string Network { get; set; }
+
+        public int ConnectionId { get; set; }
 
         public event Action<ClientConnection> OnClientBeginConnect;
         public event Action<ClientConnection> OnClientConnected;
@@ -148,7 +150,7 @@ namespace ircClient
         {
             if (IsConnected)
             {
-                Send("QUIT :Leaving");
+                Send(string.Format("QUIT :{0}", SettingsManager.Settings.Client.Messages.QuitMessage));
             }
             else
             {
@@ -160,7 +162,7 @@ namespace ircClient
         {
             if (IsConnected)
             {
-                Send("QUIT :Leaving.");
+                Send(string.Format("QUIT :{0}", SettingsManager.Settings.Client.Messages.QuitMessage));
             }
             else
             {
@@ -341,6 +343,10 @@ namespace ircClient
             var third = string.Empty;
             var fourth = string.Empty;
             var s = Utf8.ConvertToUtf8(_sockData[0], true);
+            if (SettingsManager.Settings.Client.Messages.StripCodes)
+            {
+                s = Functions.StripControlCodes(s);
+            }
             _sockData.RemoveAt(0);
             if (string.IsNullOrEmpty(s))
             {

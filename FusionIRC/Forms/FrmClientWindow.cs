@@ -296,7 +296,7 @@ namespace FusionIRC.Forms
             /* Disconnect each connection */
             foreach (var client in WindowManager.Windows.Where(client => client.Key.IsConnected))
             {
-                client.Key.Send("QUIT :Leaving.");
+                client.Key.Send(string.Format("QUIT :{0}", SettingsManager.Settings.Client.Messages.QuitMessage));
                 client.Key.Disconnect();
             }
             /* Get the first console window's user info data and copy it back to settings */
