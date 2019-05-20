@@ -215,11 +215,7 @@ namespace FusionIRC.Forms
             var w = WindowManager.AddWindow(null, ChildWindowType.Console, this, "Console", "Console", true);
             if (w != null)
             {
-                w.DisplayNode.Text = string.Format("{0}: {1}", "Console", w.Client.UserInfo.Nick);
-                //w.Output.LoadBuffer("test.buf");  
-                //w.Output.AddLine(1,"fuck me");
-                //w.Output.AddLine(1,"This is a test of line marking");
-                //w.Output.SaveBuffer("test.buf");                
+                w.DisplayNode.Text = string.Format("{0}: {1}", "Console", w.Client.UserInfo.Nick);              
             }
             _timerConnect.Enabled = true;
             base.OnLoad(e);
@@ -228,7 +224,7 @@ namespace FusionIRC.Forms
         protected override void OnActivated(EventArgs e)
         {            
             /* Activate the child window that's currently to front */
-            var win = WindowManager.GetActiveWindow(this);
+            var win = WindowManager.GetActiveWindow();
             if (win != null)
             {
                 win.MyActivate();
@@ -300,7 +296,7 @@ namespace FusionIRC.Forms
                 client.Key.Disconnect();
             }
             /* Get the first console window's user info data and copy it back to settings */
-            var c = WindowManager.GetActiveConnection(this);
+            var c = WindowManager.GetActiveConnection();
             if (c != null)
             {                
                 SettingsManager.Settings.UserInfo = new SettingsUserInfo(c.UserInfo);
@@ -550,7 +546,7 @@ namespace FusionIRC.Forms
             {
                 return;
             }
-            var w = WindowManager.GetActiveWindow(this);
+            var w = WindowManager.GetActiveWindow();
             if (w == null)
             {
                 return;

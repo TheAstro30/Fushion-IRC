@@ -219,6 +219,11 @@ namespace ircCore.Utils
 
         public static string GetLogFileName(string network, string name)
         {
+            return GetLogFileName(network, name, false);
+        }
+
+        public static string GetLogFileName(string network, string name, bool allowDate)
+        {
             var p = SettingsManager.Settings.Client.Logging.LogPath;
             if (string.IsNullOrEmpty(p))
             {
@@ -242,7 +247,7 @@ namespace ircCore.Utils
                 }
             }
             b.Append(string.Format(@"\{0}", RFileObj.Replace(name, "_")));
-            if (SettingsManager.Settings.Client.Logging.DateByDay)
+            if (SettingsManager.Settings.Client.Logging.DateByDay && allowDate)
             {
                 b.Append(string.Format("-{0}", DateTime.Now.ToString("ddMMyyyy")));
             }

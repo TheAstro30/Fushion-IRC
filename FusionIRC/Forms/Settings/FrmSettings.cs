@@ -34,6 +34,7 @@ namespace FusionIRC.Forms.Settings
 
         private readonly ClientOptions _clientOptions;
         private readonly ClientMessages _clientMessages;
+        private readonly ClientCaching _clientCaching;
         private readonly ClientLogging _clientLogging;
         private readonly ClientSystemTray _clientSystemTray;
 
@@ -100,6 +101,7 @@ namespace FusionIRC.Forms.Settings
 
             _clientOptions = new ClientOptions {Location = new Point(168, 12), Visible = false};
             _clientMessages = new ClientMessages { Location = new Point(168, 12), Visible = false };
+            _clientCaching = new ClientCaching { Location = new Point(168, 12), Visible = false };
             _clientLogging = new ClientLogging {Location = new Point(168, 12), Visible = false};
             _clientSystemTray = new ClientSystemTray { Location = new Point(168, 12), Visible = false };
 
@@ -115,6 +117,7 @@ namespace FusionIRC.Forms.Settings
                                       _connectionLocalInfo,
                                       _clientOptions,
                                       _clientMessages,
+                                      _clientCaching,
                                       _clientLogging,
                                       _clientSystemTray
                                   });
@@ -126,6 +129,7 @@ namespace FusionIRC.Forms.Settings
 
             _clientOptions.OnSettingsChanged += OnSettingsChanged;
             _clientMessages.OnSettingsChanged += OnSettingsChanged;
+            _clientCaching.OnSettingsChanged += OnSettingsChanged;
             _clientLogging.OnSettingsChanged += OnSettingsChanged;
             _clientSystemTray.OnSettingsChanged += OnSettingsChanged;
 
@@ -230,6 +234,11 @@ namespace FusionIRC.Forms.Settings
                                                                                  Tag = _clientMessages,
                                                                                  Name = "CLIENTMESSAGES"
                                                                              },
+                                                                             new TreeNode("Caching")
+                                                                                 {
+                                                                                     Tag = _clientCaching,
+                                                                                     Name = "CLIENTCACHING"
+                                                                                 }, 
                                                                          new TreeNode("Logging")
                                                                              {
                                                                                  Tag = _clientLogging,
@@ -292,6 +301,10 @@ namespace FusionIRC.Forms.Settings
                         w.Logger.CreateLog();
                     }
                 }
+                /* Line spacing */
+                w.Output.LinePaddingPixels = SettingsManager.Settings.Client.Messages.LinePadding;
+                w.Output.LineSpacingStyle = SettingsManager.Settings.Client.Messages.LineSpacing;                
+                w.Output.AdjustWidth(false);
             }
             /* Update tray icon */
             var owner = (TrayIcon)WindowManager.MainForm;

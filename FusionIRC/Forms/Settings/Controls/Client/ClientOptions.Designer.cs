@@ -40,6 +40,7 @@
             System.Windows.Forms.ListViewItem listViewItem7 = new System.Windows.Forms.ListViewItem("Show favorites dialog on connect");
             System.Windows.Forms.ListViewItem listViewItem8 = new System.Windows.Forms.ListViewItem("Client ping/pong event in console");
             System.Windows.Forms.ListViewItem listViewItem9 = new System.Windows.Forms.ListViewItem("MOTD on connect");
+            System.Windows.Forms.ListViewItem listViewItem10 = new System.Windows.Forms.ListViewItem("Notices in active window");
             this.lvOptions = new System.Windows.Forms.ListView();
             this.cHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
@@ -79,6 +80,8 @@
             listViewItem8.StateImageIndex = 0;
             listViewItem9.Group = listViewGroup3;
             listViewItem9.StateImageIndex = 0;
+            listViewItem10.Group = listViewGroup3;
+            listViewItem10.StateImageIndex = 0;
             this.lvOptions.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             listViewItem1,
             listViewItem2,
@@ -88,7 +91,8 @@
             listViewItem6,
             listViewItem7,
             listViewItem8,
-            listViewItem9});
+            listViewItem9,
+            listViewItem10});
             this.lvOptions.Location = new System.Drawing.Point(3, 39);
             this.lvOptions.MultiSelect = false;
             this.lvOptions.Name = "lvOptions";

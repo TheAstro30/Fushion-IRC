@@ -3,6 +3,7 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
+using System.Text.RegularExpressions;
 using FusionIRC.Forms.Child;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
@@ -16,10 +17,10 @@ namespace FusionIRC.Helpers.Connection
     {
         public static void Execute(string name, ScriptArgs e)
         {
-            Execute(name, e, null, string.Empty);
+            Execute(name, e, string.Empty);
         }
 
-        public static void Execute(string name, ScriptArgs e, FrmChildWindow child, string text)
+        public static void Execute(string name, ScriptArgs e, string text)
         {
             var s = ScriptManager.GetEvent(name);
             if (s == null)
@@ -27,52 +28,58 @@ namespace FusionIRC.Helpers.Connection
                 return;
             }
             foreach (var script in s)
-            {                
-                if (child != null && script.EventParams != null)
-                {                    
-                    var process = false;
-                    var match = new WildcardMatch(script.EventParams.Match);
-                    var target = script.EventParams.Target.ToLower();
-                    var winName = child.Tag.ToString().ToLower();
+            {
+                var process = false;
+                if (!string.IsNullOrEmpty(script.EventParams.Match))
+                {
+                    var match = new WildcardMatch(script.EventParams.Match, RegexOptions.IgnoreCase);
                     if (match.IsMatch(text))
                     {
-                        match = new WildcardMatch(target);
-                        if (match.IsMatch(winName))
+                        if (e.ChildWindow != null)
                         {
+                            match = new WildcardMatch(script.EventParams.Target, RegexOptions.IgnoreCase);
+                            if (!match.IsMatch(e.ChildWindow.Tag.ToString()))
+                            {
+                                process = true;
+                            }
+                            switch (((FrmChildWindow) e.ChildWindow).WindowType)
+                            {
+                                case ChildWindowType.Channel:
+                                    if (script.EventParams.Target == "#")
+                                    {
+                                        process = true;
+                                    }
+                                    break;
+
+                                case ChildWindowType.Private:
+                                    if (script.EventParams.Target == "?")
+                                    {
+                                        process = true;
+                                    }
+                                    break;
+
+                                case ChildWindowType.DccChat:
+                                    if (script.EventParams.Target == "=")
+                                    {
+                                        process = true;
+                                    }
+                                    break;
+                            }
+                        }
+                        else if (script.EventParams.Target == "?" || script.EventParams.Target == "*")
+                        {
+                            /* Most likely called from on NOTICE */
                             process = true;
                         }
-                        switch (child.WindowType)
-                        {
-                            case ChildWindowType.Channel:
-                                if (target == "#")
-                                {
-                                    process = true;
-                                }
-                                break;
-
-                            case ChildWindowType.Private:
-                                if (target == "?")
-                                {
-                                    process = true;
-                                }
-                                break;
-
-                            case ChildWindowType.DccChat:
-                                if (target == "=")
-                                {
-                                    process = true;
-                                }
-                                break;
-                        }
                     }
-                    if (!process)
-                    {
-                        continue;
-                    }
-                }                
+                }
+                if (!process)
+                {
+                    continue;
+                }
                 script.LineParsed += EventLineParsed;
                 script.ParseCompleted += EventParseCompleted;
-                script.Parse(e);
+                script.Parse(e, text.Split(' '));
             }
         }
 

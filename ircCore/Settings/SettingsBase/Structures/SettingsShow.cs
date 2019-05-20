@@ -16,5 +16,8 @@ namespace ircCore.Settings.SettingsBase.Structures
 
         [XmlAttribute("motd")]
         public bool Motd { get; set; }
+
+        [XmlAttribute("notices")]
+        public bool Notices { get; set; }
     }
 }

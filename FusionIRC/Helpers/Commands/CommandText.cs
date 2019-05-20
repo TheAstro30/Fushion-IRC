@@ -179,7 +179,7 @@ namespace FusionIRC.Helpers.Commands
             if (i == -1)
             {
                 /* Single word as <text> - possibly just active window only */
-                w = WindowManager.GetActiveWindow(WindowManager.MainForm);
+                w = WindowManager.GetActiveWindow();
                 text = args;
             }
             else
@@ -190,7 +190,7 @@ namespace FusionIRC.Helpers.Commands
                 {
                     case "-A":
                         /* Active window (of active server called) */
-                        w = WindowManager.GetActiveWindow(WindowManager.MainForm);
+                        w = WindowManager.GetActiveWindow();
                         break;
 
                     case "-S":
@@ -204,7 +204,7 @@ namespace FusionIRC.Helpers.Commands
                         if (w == null)
                         {              
                             /* Possibly "echo <text>" */
-                            w = WindowManager.GetActiveWindow(WindowManager.MainForm);
+                            w = WindowManager.GetActiveWindow();
                             text = args;
                         }                        
                         break;

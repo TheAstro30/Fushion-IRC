@@ -185,7 +185,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 return;
             }
             if (!UserResize && _wrapUpdate.Enabled)
-            {
+            {                
                 /* Because of the way the control wraps/rewraps lines on resize, there is a slight jump if the parent form is maximized -
                  * this gets around that issue (but will flicker if the end user is resizing the form) */
                 return;
@@ -709,7 +709,25 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             TextData.WindowWidth = ClientRectangle.Width;
             /* Save the buffer output to file */
             BinarySerialize<TextData>.Save(file, TextData);
-        }   
+        }
+
+        public void AdjustWidth(bool adjustClientWidth)
+        {
+            using (var g = CreateGraphics())
+            {
+                _averageCharacterWidth = TextMeasurement.MeasureStringWidth(g, _font, "*");
+                IndentWidth = _averageCharacterWidth * 2;
+            }
+            TextHeight = _font.Height * LineSpacing;
+            if (!adjustClientWidth) { return; }
+            var i = ClientRectangle.Width - (_showScrollBar ? _vScroll.Width + _averageCharacterWidth : _averageCharacterWidth) - 2;
+            if (i == _windowWidth)
+            {
+                return;
+            }
+            _windowWidth = i; /* Update average characters that will fit in the client area */
+            _wrapUpdate.Enabled = true;
+        }
 
         public void Clear()
         {
@@ -753,25 +771,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             {
                 _scrollValue = TextData.WrappedLinesCount - 1;
             }
-        }
-
-        private void AdjustWidth(bool adjustClientWidth)
-        {
-            using (var g = CreateGraphics())
-            {
-                _averageCharacterWidth = TextMeasurement.MeasureStringWidth(g, _font, "*");
-                IndentWidth = _averageCharacterWidth*2;
-            }
-            TextHeight = _font.Height*LineSpacing;
-            if (!adjustClientWidth) { return; }
-            var i = ClientRectangle.Width - (_showScrollBar ? _vScroll.Width + _averageCharacterWidth : _averageCharacterWidth) - 2;                   
-            if (i == _windowWidth)
-            {
-                return;
-            }
-            _windowWidth = i; /* Update average characters that will fit in the client area */
-            _wrapUpdate.Enabled = true;
-        }
+        }        
 
         private void VerticalScrollUpdate(object sender, ScrollEventArgs e)
         {

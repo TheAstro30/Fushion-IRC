@@ -124,9 +124,10 @@ namespace FusionIRC.Forms.Child
             Output = new OutputWindow
                          {                             
                              BackColor = ThemeManager.GetColor(ThemeColor.OutputWindowBackColor),
-                             ForeColor = ThemeManager.GetColor(ThemeColor.OutputWindowForeColor),
+                             LineMarkerColor = ThemeManager.GetColor(ThemeColor.OutputWindowLineMarkerColor),
                              Font = ThemeManager.CurrentTheme.ThemeFonts[type],
-                             LineSpacingStyle = LineSpacingStyle.Paragraph,
+                             LinePaddingPixels = SettingsManager.Settings.Client.Messages.LinePadding,
+                             LineSpacingStyle = SettingsManager.Settings.Client.Messages.LineSpacing,                             
                              MaximumLines = SettingsManager.Settings.Windows.Caching.Output                             
                          };
 
@@ -239,7 +240,7 @@ namespace FusionIRC.Forms.Child
             if (WindowType != ChildWindowType.Console)
             {
                 var name = Tag.ToString();
-                Logger.FilePath = string.Format("{0}.log", Functions.GetLogFileName(Client.Network, name));
+                Logger.FilePath = string.Format("{0}.log", Functions.GetLogFileName(Client.Network, name, true));
                 type = SettingsManager.Settings.Client.Logging.ReloadLogsType;
                 file = string.Format("{0}.buf", Functions.GetLogFileName(Client.Network, name));
             }
@@ -561,7 +562,7 @@ namespace FusionIRC.Forms.Child
             }
             if (SettingsManager.Settings.Client.Logging.DateByDay)
             {
-                var name = string.Format("{0}.log", Functions.GetLogFileName(Client.Network, Tag.ToString()));
+                var name = string.Format("{0}.log", Functions.GetLogFileName(Client.Network, Tag.ToString(), true));
                 if (!name.Equals(Logger.FilePath))
                 {
                     Logger.CloseLog();

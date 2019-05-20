@@ -35,8 +35,13 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
 
     public enum LineSpacingStyle
     {
+        [Description("Single")]
         Single = 0,
+
+        [Description("Double")]
         Double = 1,
+
+        [Description("Paragraph")]
         Paragraph = 2
     }
 
@@ -104,7 +109,9 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
                         break;
                 }
             }
-        }               
+        }
+
+        public int LinePaddingPixels { get; set; } /* Must be called first before LineSpacingStyle */
 
         public LineSpacingStyle LineSpacingStyle
         {
@@ -116,21 +123,21 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
                 {
                     case LineSpacingStyle.Single:
                         LineSpacing = 1;
-                        LinePadding = 0;
+                        LinePadding = LinePaddingPixels;
                         break;
 
                     case LineSpacingStyle.Double:
                         LineSpacing = 2;
-                        LinePadding = 0;
+                        LinePadding = LinePaddingPixels;
                         break;
 
                     case LineSpacingStyle.Paragraph:
                         LineSpacing = 1;
-                        LinePadding = 3;
+                        LinePadding = LinePaddingPixels + 3;
                         break;
-                }                
+                }    
             }
-        }
+        }        
 
         public int IndentWidth { get; set; }
 

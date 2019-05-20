@@ -180,9 +180,9 @@ namespace FusionIRC.Helpers
             return c != null ? c.FirstOrDefault(o => o.Tag.ToString().Equals(tag, StringComparison.InvariantCultureIgnoreCase)) : null;
         }
 
-        public static FrmChildWindow GetActiveWindow(Form owner)
+        public static FrmChildWindow GetActiveWindow()
         {
-            return (FrmChildWindow) owner.ActiveMdiChild;
+            return (FrmChildWindow) MainForm.ActiveMdiChild;
         }
 
         public static FrmChildWindow GetConsoleWindow(ClientConnection client)
@@ -191,9 +191,9 @@ namespace FusionIRC.Helpers
             return c == null ? null : c.FirstOrDefault(o => o.Tag.ToString().Equals("console", StringComparison.InvariantCultureIgnoreCase));
         }
 
-        public static ClientConnection GetActiveConnection(Form owner)
+        public static ClientConnection GetActiveConnection()
         {
-            var win = (FrmChildWindow) owner.ActiveMdiChild;
+            var win = GetActiveWindow();
             return win != null ? win.Client : null;
         }
 
@@ -261,7 +261,7 @@ namespace FusionIRC.Helpers
                 }
                 /* Colors */
                 win.Output.BackColor = ThemeManager.GetColor(ThemeColor.OutputWindowBackColor);
-                win.Output.ForeColor = ThemeManager.GetColor(ThemeColor.OutputWindowForeColor);
+                win.Output.LineMarkerColor = ThemeManager.GetColor(ThemeColor.OutputWindowLineMarkerColor);
                 win.Input.BackColor = ThemeManager.GetColor(ThemeColor.InputWindowBackColor);
                 win.Input.ForeColor = ThemeManager.GetColor(ThemeColor.InputWindowForeColor);
                 win.Refresh();

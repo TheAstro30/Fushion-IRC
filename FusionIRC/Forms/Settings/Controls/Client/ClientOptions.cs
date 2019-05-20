@@ -32,6 +32,7 @@ namespace FusionIRC.Forms.Settings.Controls.Client
 
             lvOptions.Items[7].Checked = SettingsManager.Settings.Client.Show.PingPong;
             lvOptions.Items[8].Checked = SettingsManager.Settings.Client.Show.Motd;
+            lvOptions.Items[9].Checked = SettingsManager.Settings.Client.Show.Notices;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -62,6 +63,7 @@ namespace FusionIRC.Forms.Settings.Controls.Client
 
             SettingsManager.Settings.Client.Show.PingPong = lvOptions.Items[7].Checked;
             SettingsManager.Settings.Client.Show.Motd = lvOptions.Items[8].Checked;
+            SettingsManager.Settings.Client.Show.Notices = lvOptions.Items[9].Checked;
         }
     }
 }

@@ -120,7 +120,7 @@ namespace FusionIRC.Controls.ControlBars
         private void OnMenuFileClick(object sender, EventArgs e)
         {
             var item = (ToolStripMenuItem) sender;
-            var c = WindowManager.GetActiveConnection(_owner);
+            var c = WindowManager.GetActiveConnection();
             if (c == null || item == null)
             {
                 return;
@@ -161,7 +161,7 @@ namespace FusionIRC.Controls.ControlBars
         private void OnMenuRecentServerClick(object sender, EventArgs e)
         {
             var item = (ToolStripMenuItem) sender;
-            var c = WindowManager.GetActiveConnection(_owner);
+            var c = WindowManager.GetActiveConnection();
             if (c == null || item == null)
             {
                 return;
@@ -231,7 +231,7 @@ namespace FusionIRC.Controls.ControlBars
         private void OnMenuWindowClick(object sender, EventArgs e)
         {
             var item = (ToolStripMenuItem)sender;
-            var c = WindowManager.GetActiveWindow(_owner);
+            var c = WindowManager.GetActiveWindow();
             if (c == null || item == null)
             {
                 return;

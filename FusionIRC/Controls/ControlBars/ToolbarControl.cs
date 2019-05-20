@@ -212,7 +212,7 @@ namespace FusionIRC.Controls.ControlBars
         private void ToolbarButtonClick(object sender, EventArgs e)
         {
             var btn = (ToolStripButton)sender;
-            var c = WindowManager.GetActiveConnection(_owner);            
+            var c = WindowManager.GetActiveConnection();            
             if (c == null || btn == null)
             {
                 return;
@@ -348,7 +348,7 @@ namespace FusionIRC.Controls.ControlBars
         private void OnRecentServerClick(object sender, EventArgs e)
         {
             var item = (ToolStripMenuItem)sender;
-            var c = WindowManager.GetActiveConnection(_owner);
+            var c = WindowManager.GetActiveConnection();
             if (c == null || item == null)
             {
                 return;
@@ -358,7 +358,7 @@ namespace FusionIRC.Controls.ControlBars
 
         private void TimerCheckConnection(object sender, EventArgs e)
         {
-            var c = WindowManager.GetActiveConnection(_owner);
+            var c = WindowManager.GetActiveConnection();
             if (c == null)
             {
                 return;

@@ -84,6 +84,12 @@ namespace ircScript.Classes.Parsers
                 case "$CID":
                     return e.ClientConnection.ConnectionId.ToString();
 
+                case "$SERVER":
+                    return e.ClientConnection.Server.Address;
+
+                case "$NETWORK":
+                    return e.ClientConnection.Network;
+
                 default:
                     /* Check if it's an alias */                    
                     var id = value.Replace("$", "");

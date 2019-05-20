@@ -123,6 +123,12 @@
     <Compile Include="Forms\Settings\Controls\Base\BaseControlRenderer.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Forms\Settings\Controls\Client\ClientCaching.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Client\ClientCaching.Designer.cs">
+      <DependentUpon>ClientCaching.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Settings\Controls\Client\ClientLogging.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -245,6 +251,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\Misc\FrmDccManager.resx">
       <DependentUpon>FrmDccManager.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientCaching.resx">
+      <DependentUpon>ClientCaching.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientLogging.resx">
       <DependentUpon>ClientLogging.cs</DependentUpon>

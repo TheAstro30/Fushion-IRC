@@ -7,6 +7,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using ircCore.Controls.ChildWindows.OutputDisplay.Helpers;
 using ircCore.Settings.SettingsBase.Structures;
 
 namespace ircCore.Settings.SettingsBase
@@ -107,6 +108,7 @@ namespace ircCore.Settings.SettingsBase
             /* Messages */
             Client.Messages.QuitMessage = "Leaving.";
             Client.Messages.CommandCharacter = "/";
+            Client.Messages.LineSpacing = LineSpacingStyle.Paragraph;
             /* Show information */
             Client.Show.PingPong = true;
             Client.Show.Motd = true;

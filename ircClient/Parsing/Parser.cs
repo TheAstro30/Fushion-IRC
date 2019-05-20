@@ -28,7 +28,7 @@ namespace ircClient.Parsing
         public event Action<ClientConnection, string, string, string> OnTextSelf;
         public event Action<ClientConnection, string, string, string, string> OnActionChannel;
         public event Action<ClientConnection, string, string, string> OnActionSelf;        
-        public event Action<ClientConnection, string, string, string> OnNotice;
+        public event Action<ClientConnection, string, string, string, string> OnNotice;
 
         public event Action<ClientConnection, string, string> OnNick;
         public event Action<ClientConnection, string, string, string> OnQuit;
@@ -94,7 +94,7 @@ namespace ircClient.Parsing
                         {
                             if (OnNotice != null)
                             {
-                                OnNotice(_client, _client.Server.Address, "",
+                                OnNotice(_client, _client.Server.Address, string.Empty, "*",
                                          RemoveColon(string.Format("{0} {1}", third, fourth)));
                             }
                         }
@@ -135,7 +135,7 @@ namespace ircClient.Parsing
                     break;
 
                 case "NOTICE":
-                    ParseNotice(first, fourth);
+                    ParseNotice(first, third, fourth);
                     break;
 
                 case "TOPIC":
@@ -625,7 +625,7 @@ namespace ircClient.Parsing
             }
         }
 
-        private void ParseNotice(string nick, string msg)
+        private void ParseNotice(string nick, string target, string msg)
         {
             /* Both server and normal notices raises similar events, so we just have one */
             var n = RemoveColon(nick).Split('!');
@@ -659,7 +659,7 @@ namespace ircClient.Parsing
                 {
                     if (OnNotice != null)
                     {
-                        OnNotice(_client, n[0], n.Length > 1 ? n[1] : "", s.Substring(i).Trim());
+                        OnNotice(_client, n[0], n.Length > 1 ? n[1] : string.Empty, target, s.Substring(i).Trim());
                     }
                     return;
                 }
@@ -667,7 +667,7 @@ namespace ircClient.Parsing
             /* Either a server notice or user notice - its kind of difficult to differentiate between the two */
             if (OnNotice != null)
             {
-                OnNotice(_client, n[0], n.Length > 1 ? n[1] : "", s);
+                OnNotice(_client, n[0], n.Length > 1 ? n[1] : string.Empty, target, s);
             }
         }
 

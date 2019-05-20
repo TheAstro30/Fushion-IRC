@@ -5,6 +5,7 @@
  */
 using System;
 using System.Xml.Serialization;
+using ircCore.Controls.ChildWindows.OutputDisplay.Helpers;
 
 namespace ircCore.Settings.SettingsBase.Structures
 {
@@ -25,5 +26,11 @@ namespace ircCore.Settings.SettingsBase.Structures
 
         [XmlAttribute("command")]
         public string CommandCharacter { get; set; }
+
+        [XmlAttribute("spacing")]
+        public LineSpacingStyle LineSpacing { get; set; }
+
+        [XmlAttribute("padding")]
+        public int LinePadding { get; set; }
     }
 }

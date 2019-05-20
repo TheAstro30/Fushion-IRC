@@ -33,8 +33,8 @@ namespace ircCore.Settings.Theming
         [Description("Text Output Backcolor")]
         OutputWindowBackColor = 0,
 
-        [Description("Text Output Forecolor")]
-        OutputWindowForeColor = 1,
+        [Description("Text Output Line Maker Color")]
+        OutputWindowLineMarkerColor = 1,
 
         [Description("Input Box Backcolor")]
         InputWindowBackColor = 2,

@@ -6,6 +6,7 @@
 using System;
 using ircClient;
 using ircCore.Autos;
+using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircCore.Users;
 using ircScript.Classes.Structures;
@@ -43,9 +44,11 @@ namespace FusionIRC.Helpers.Connection
             var e = new ScriptArgs
                         {
                             ChildWindow = c,
-                            ClientConnection = client
+                            ClientConnection = client,
+                            Nick = nick,
+                            Channel = c.Tag.ToString()
                         };
-            Events.Execute("text", e, c, text);
+            Events.Execute("text", e, text);
         }
 
         public static void OnTextSelf(ClientConnection client, string nick, string address, string text)
@@ -73,9 +76,11 @@ namespace FusionIRC.Helpers.Connection
             var e = new ScriptArgs
                         {
                             ChildWindow = c,
-                            ClientConnection = client
+                            ClientConnection = client,
+                            Nick = nick,
+                            Channel = c.Tag.ToString()
                         };
-            Events.Execute("text", e, c, text);
+            Events.Execute("text", e, text);
         }
 
         public static void OnActionChannel(ClientConnection client, string nick, string address, string channel, string text)
@@ -107,9 +112,11 @@ namespace FusionIRC.Helpers.Connection
             var e = new ScriptArgs
                         {
                             ChildWindow = c,
-                            ClientConnection = client
+                            ClientConnection = client,
+                            Nick = nick,
+                            Channel = c.Tag.ToString()
                         };
-            Events.Execute("action", e, c, text);
+            Events.Execute("action", e, text);
         }
 
         public static void OnActionSelf(ClientConnection client, string nick, string address, string text)
@@ -137,12 +144,14 @@ namespace FusionIRC.Helpers.Connection
             var e = new ScriptArgs
                         {
                             ChildWindow = c,
-                            ClientConnection = client
+                            ClientConnection = client,
+                            Nick = nick,
+                            Channel = c.Tag.ToString()
                         };
-            Events.Execute("action", e, c, text);
+            Events.Execute("action", e, text);
         }
 
-        public static void OnNotice(ClientConnection client, string nick, string address, string text)
+        public static void OnNotice(ClientConnection client, string nick, string address, string target, string text)
         {
             /* Check ignored */
             if (nick.Equals("nickserv", StringComparison.InvariantCultureIgnoreCase) && text.Contains("nickname is registered") && AutomationsManager.Automations.Identify.Enable)
@@ -165,6 +174,17 @@ namespace FusionIRC.Helpers.Connection
             {
                 return;
             }
+            var channel = string.Empty;
+            //if (target.Equals(client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
+            //{
+            //    /* It's my nick - I will be using this later */
+            //}
+            //else if (target[0] == client.Parser.ChannelPrefixTypes.MatchChannelType(target[0]))
+            if (target[0] == client.Parser.ChannelPrefixTypes.MatchChannelType(target[0]))
+            {
+                /* It's to a channel - I will be using this later */
+                channel = target;
+            }
             var c = WindowManager.GetConsoleWindow(client);
             if (c == null)
             {
@@ -180,8 +200,26 @@ namespace FusionIRC.Helpers.Connection
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            if (SettingsManager.Settings.Client.Show.Notices)
+            {
+                var active = WindowManager.GetActiveWindow();
+                if (active != c && active.Client == client)
+                {
+                    /* Active window of this connection */
+                    active.Output.AddLine(pmd.DefaultColor, pmd.Message);
+                }
+            }
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
+            /* Process event script */
+            var e = new ScriptArgs
+                        {
+                            ChildWindow = !string.IsNullOrEmpty(channel) ? WindowManager.GetWindow(c.Client, channel) : null,
+                            ClientConnection = client,
+                            Nick = nick,
+                            Channel = channel
+                        };
+            Events.Execute("notice", e, text);
         }
 
         public static void OnWallops(ClientConnection client, string nick, string address, string text)
