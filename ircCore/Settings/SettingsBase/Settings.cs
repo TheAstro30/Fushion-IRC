@@ -27,6 +27,9 @@ namespace ircCore.Settings.SettingsBase
         [XmlElement("client")]
         public SettingsClient Client = new SettingsClient();
 
+        [XmlElement("mouse")]
+        public SettingsMouse Mouse = new SettingsMouse();
+
         [XmlElement("themes")]
         public SettingsTheme Themes = new SettingsTheme();
 
@@ -103,6 +106,8 @@ namespace ircCore.Settings.SettingsBase
             Client.Appearance.ControlBars.Control.Add(d);
             Client.Confirmation.ClientClose = CloseConfirmation.Connected;
             Client.Confirmation.Url = true;
+            Client.Confirmation.ConfirmPaste = true;
+            Client.Confirmation.PasteLines = 10;
             /* Channel seetings */
             Client.Channels.ShowFavoritesDialogOnConnect = true;
             /* Messages */
@@ -114,6 +119,11 @@ namespace ircCore.Settings.SettingsBase
             Client.Show.Motd = true;
             /* Logging */
             Client.Logging.LogPath = @"\logs";
+            /* Mouse */
+            Mouse.Console = "lusers";
+            Mouse.Channel = "channel";
+            Mouse.Query = "whois $1";
+            Mouse.Nicklist = "query $1";
             /* Create a blank theme */
             Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = @"\themes\default.thm"});            
         }

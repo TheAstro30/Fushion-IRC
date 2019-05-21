@@ -132,7 +132,7 @@ namespace FusionIRC.Helpers.Connection
             c.Close();
         }
 
-        public static void OnPartUser(ClientConnection client, string nick, string address, string channel)
+        public static void OnPartUser(ClientConnection client, string nick, string address, string channel, string text)
         {
             var c = WindowManager.GetWindow(client, channel);
             if (c == null || c.WindowType != ChildWindowType.Channel)
@@ -141,12 +141,13 @@ namespace FusionIRC.Helpers.Connection
             }
             var tmd = new IncomingMessageData
                           {
-                              Message = ThemeMessage.ChannelPartText,
+                              Message = !string.IsNullOrEmpty(text) ? ThemeMessage.ChannelPartTextMessage : ThemeMessage.ChannelPartText,
                               TimeStamp = DateTime.Now,
                               Nick = nick,
                               Prefix = c.Nicklist.GetNickPrefix(nick),
                               Address = address,
-                              Target = channel
+                              Target = channel,
+                              Text = text
                           };
             c.Nicklist.RemoveNick(nick);
             var pmd = ThemeManager.ParseMessage(tmd);

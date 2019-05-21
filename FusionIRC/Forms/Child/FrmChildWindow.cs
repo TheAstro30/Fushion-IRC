@@ -19,7 +19,6 @@ using ircCore.Controls.ChildWindows.Classes.Channels;
 using ircCore.Controls.ChildWindows.Input;
 using ircCore.Controls.ChildWindows.Nicklist;
 using ircCore.Controls.ChildWindows.OutputDisplay;
-using ircCore.Controls.ChildWindows.OutputDisplay.Helpers;
 using ircCore.Settings;
 using ircCore.Settings.Networks;
 using ircCore.Settings.SettingsBase.Structures;
@@ -118,7 +117,9 @@ namespace FusionIRC.Forms.Child
                             BackColor = ThemeManager.GetColor(ThemeColor.InputWindowBackColor),
                             ForeColor = ThemeManager.GetColor(ThemeColor.InputWindowForeColor),
                             Font = ThemeManager.CurrentTheme.ThemeFonts[type],
-                            MaximumHistoryCache = SettingsManager.Settings.Windows.Caching.Input
+                            MaximumHistoryCache = SettingsManager.Settings.Windows.Caching.Input,
+                            ConfirmPaste = SettingsManager.Settings.Client.Confirmation.ConfirmPaste,
+                            ConfirmPasteLines = SettingsManager.Settings.Client.Confirmation.PasteLines
                         };
 
             Output = new OutputWindow
@@ -142,7 +143,6 @@ namespace FusionIRC.Forms.Child
                     Output.BackgroundImageLayout = bg.LayoutStyle;
                 }
             }
-
             if (type == ChildWindowType.Channel)
             {                
                 Nicklist = new Nicklist
@@ -191,6 +191,7 @@ namespace FusionIRC.Forms.Child
             Output.MouseUp += OutputMouseUp;
             Output.OnWordUnderMouse += OutputWordUnderMouse;
             Output.OnLineAdded += OutputOnLineAdded;
+            Output.DoubleClick += OutputDoubleClicked;
             Input.TabKeyPress += InputTabKeyPress;
             Input.KeyDown += InputKeyDown;
             Input.MouseWheel += InputMouseWheel;
@@ -228,7 +229,8 @@ namespace FusionIRC.Forms.Child
         
         /* Overrides */
         protected override void OnActivated(EventArgs e)
-        {            
+        {
+            WindowManager.LastActiveChild = this;
             _focus.Enabled = true;
             base.OnActivated(e);
         }
@@ -460,6 +462,26 @@ namespace FusionIRC.Forms.Child
         }
 
         /* Control callbacks */
+        private void OutputDoubleClicked(object sender, EventArgs e)
+        {
+            var s = new Script();
+            var scriptArgs = new ScriptArgs {ChildWindow = this, ClientConnection = Client};
+            var args = new string[1];
+            switch (WindowType)
+            {
+                case ChildWindowType.Console:
+                    s.LineData.Add(SettingsManager.Settings.Mouse.Console);
+                    break;
+
+                case ChildWindowType.Private:
+                    args[0] = Tag.ToString();
+                    scriptArgs.Nick = args[0];
+                    s.LineData.Add(SettingsManager.Settings.Mouse.Query);
+                    break;
+            }
+            CommandProcessor.Parse(Client, this, s.Parse(scriptArgs, args));
+        }
+
         private void OutputUrlDoubleClicked(string url)
         {            
             if (SettingsManager.Settings.Client.Confirmation.Url)
@@ -492,11 +514,31 @@ namespace FusionIRC.Forms.Child
                 Client.Send(string.Format("JOIN {0}", word));
             }
             else
-            {
-                /* Open a query window with the nick (default action) */
+            {                
                 var nick = _regExNick.Replace(word, "");
-                var win = WindowManager.GetWindow(Client, nick) ?? WindowManager.AddWindow(Client, ChildWindowType.Private, MdiParent, nick, nick, true);
-                win.BringToFront();     
+                if (Nicklist != null && Nicklist.ContainsNick(nick))
+                {
+                    /* Open a query window with the nick (default action) */
+                    var win = WindowManager.GetWindow(Client, nick) ??
+                              WindowManager.AddWindow(Client, ChildWindowType.Private, MdiParent, nick, nick, true);
+                    win.BringToFront();
+                }
+                else
+                {
+                    /* Double-Click on window itself */
+                    var s = new Script();
+                    s.LineData.Add(SettingsManager.Settings.Mouse.Channel);
+                    var scriptArgs = new ScriptArgs
+                                         {
+                                             ChildWindow = this, 
+                                             ClientConnection = Client, 
+                                             Channel = Tag.ToString()
+                                         };                    
+                    CommandProcessor.Parse(Client, this,
+                                           s.Parse(scriptArgs,
+                                                   Tag.ToString().Split(new[] {','},
+                                                                        StringSplitOptions.RemoveEmptyEntries)));
+                }
             }
         }
 
@@ -691,8 +733,16 @@ namespace FusionIRC.Forms.Child
             }
             var nick = Nicklist.SelectedNicks[0];
             /* Open a query window with the nick (default action) */
-            var win = WindowManager.GetWindow(Client, nick) ?? WindowManager.AddWindow(Client, ChildWindowType.Private, MdiParent, nick, nick, true);
-            win.BringToFront();
+            var s = new Script();
+            s.LineData.Add(SettingsManager.Settings.Mouse.Nicklist);
+            var scriptArgs = new ScriptArgs
+                                 {
+                                     Channel = Tag.ToString(),
+                                     ChildWindow = this,
+                                     ClientConnection = Client,
+                                     Nick = nick,
+                                 };            
+            CommandProcessor.Parse(Client, this, s.Parse(scriptArgs, nick.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)));
         }
 
         private void SplitterMoving(object sender, SplitterCancelEventArgs e)

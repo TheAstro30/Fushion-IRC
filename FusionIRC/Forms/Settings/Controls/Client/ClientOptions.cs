@@ -13,7 +13,7 @@ namespace FusionIRC.Forms.Settings.Controls.Client
     {
         public bool SettingsChanged { get; set; }
 
-        public event Action OnSettingsChanged;
+        public event Action<ISettings> OnSettingsChanged;
 
         public ClientOptions()
         {
@@ -46,7 +46,7 @@ namespace FusionIRC.Forms.Settings.Controls.Client
             SettingsChanged = true;
             if (OnSettingsChanged != null)
             {
-                OnSettingsChanged();
+                OnSettingsChanged(this);
             }
         }
                

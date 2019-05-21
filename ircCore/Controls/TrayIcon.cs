@@ -4,10 +4,12 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using ircCore.Controls.Notification;
 
 namespace ircCore.Controls
 {
@@ -20,12 +22,20 @@ namespace ircCore.Controls
          */
         private Image _renderBmp;
 
+        private int _positionY;
+
         private bool _trayAlwaysShowIcon;
         private FormWindowState _lastWindowState = FormWindowState.Normal;
+
+        private readonly List<PopupNotifier> _popups = new List<PopupNotifier>();
+
+        public event Action NotificationShow;
 
         public NotifyIcon TrayNotifyIcon { get; set; }
 
         public bool TrayHideOnMinimize { get; set; }
+
+        public bool TrayShowNotifications { get; set; }
 
         public bool TrayAlwaysShowIcon
         {
@@ -98,6 +108,53 @@ namespace ircCore.Controls
                 _lastWindowState = WindowState;
             }
             base.OnResize(e);
+        }
+
+        public void ShowNotificationPopup(string title, string text, int height)
+        {
+            if (!TrayShowNotifications || !TrayNotifyIcon.Visible)
+            {
+                return;
+            }
+            var p = new PopupNotifier
+                        {
+                            TitleFont = new Font("Segeo UI Semibold", 10),
+                            ContentFont = new Font("Segeo UI", 9),
+                            Size = new Size(230, height),
+                            Image = Properties.Resources.fusion.ToBitmap(),
+                            TitleText = title,
+                            ContentText = text,
+                            AnimationDuration = 350,
+                            Delay = 5000
+                        };
+            if (_popups.Count > 0)
+            {
+                _positionY += p.Size.Height;
+            }
+            p.PositionY = _positionY;
+            _popups.Add(p);
+            p.Disappear += PopupDisappear;
+            p.Popup();
+            if (NotificationShow != null)
+            {
+                NotificationShow();
+            }
+        }
+
+        /* Callbacks */
+        private void PopupDisappear(object sender, EventArgs e)
+        {
+            var p = (PopupNotifier)sender;
+            if (p == null)
+            {
+                return;
+            }
+            _popups.Remove(p);
+            p.Dispose();
+            if (_popups.Count > 0)
+            {
+                _positionY -= p.Size.Height;
+            }
         }
 
         private void OnTrayDoubleClick(object sender, EventArgs e)

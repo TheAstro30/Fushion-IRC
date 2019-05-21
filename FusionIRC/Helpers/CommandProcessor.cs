@@ -3,10 +3,15 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
+
+using System;
+using System.Collections.Generic;
+using FusionIRC.Forms;
 using FusionIRC.Forms.Child;
 using FusionIRC.Helpers.Commands;
 using ircClient;
 using ircClient.Parsing.Helpers;
+using ircCore.Settings.Theming;
 using ircScript.Classes.Helpers;
 
 namespace FusionIRC.Helpers
@@ -40,6 +45,10 @@ namespace FusionIRC.Helpers
             }
             switch (command)
             {
+                case "CHANNEL":
+                    CommandChannel.ParseChannel(client, child);
+                    break;
+
                 case "CLR":
                 case "CLEAR":
                     /* Clear child output window of text */
@@ -165,6 +174,10 @@ namespace FusionIRC.Helpers
 
                 case "HADD":
                     CommandHash.HashAdd(args);
+                    break;
+
+                case "QUERY":
+                    CommandText.ParseQuery(client, child, args);
                     break;
 
                 default:

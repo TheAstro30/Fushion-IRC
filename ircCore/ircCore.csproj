@@ -89,6 +89,12 @@
     <Compile Include="Controls\FontComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\Notification\FrmPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\Notification\PopupNotifier.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\Rendering\CustomRenderer.cs" />
     <Compile Include="Controls\Rendering\Renderer.cs" />
     <Compile Include="Controls\TrayIcon.cs">
@@ -123,6 +129,7 @@
     <Compile Include="Settings\SettingsBase\Structures\SettingsLocalInfo.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsLog.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsMessages.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsMouse.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsScripts.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsShow.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsTabs.cs" />
@@ -170,30 +177,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\ttfIcon.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\libolv\libolv.csproj">
       <Project>{18FEDA0C-D147-4286-B39A-01204808106A}</Project>
       <Name>libolv</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\op.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\voice.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\halfop.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\owner.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\prot.ico" />
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

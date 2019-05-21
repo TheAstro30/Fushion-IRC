@@ -424,8 +424,7 @@ namespace FusionIRC.Forms.ScriptEditor
             }
             var s = (ScriptData) node;
             if (s == _currentEditingScript)
-            {
-                System.Diagnostics.Debug.Print("same");
+            {                
                 return;
             }
             SwitchEditingFile(s);

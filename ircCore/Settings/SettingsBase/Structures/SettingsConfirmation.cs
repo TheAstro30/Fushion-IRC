@@ -4,14 +4,20 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.ComponentModel;
 using System.Xml.Serialization;
 
 namespace ircCore.Settings.SettingsBase.Structures
 {
     public enum CloseConfirmation
     {
+        [Description("None")]
         None = 0,
+
+        [Description("Connected")]
         Connected = 1,
+
+        [Description("Always")]
         Always = 2
     }
 
@@ -26,5 +32,11 @@ namespace ircCore.Settings.SettingsBase.Structures
 
         [XmlAttribute("url")]
         public bool Url { get; set; }
+
+        [XmlAttribute("paste")]
+        public bool ConfirmPaste { get; set; }
+
+        [XmlAttribute("pasteLines")]
+        public int PasteLines { get; set; }
     }
 }

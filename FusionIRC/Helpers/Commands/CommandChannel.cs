@@ -14,6 +14,28 @@ namespace FusionIRC.Helpers.Commands
 {
     internal static class CommandChannel
     {
+        public static void ParseChannel(ClientConnection client, FrmChildWindow child)
+        {
+            if (!client.IsConnected)
+            {
+                return;
+            }
+            var c = WindowManager.GetActiveWindow();
+            if (c == null || c.WindowType != ChildWindowType.Channel)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.ChannelProperties,
+                              TimeStamp = DateTime.Now,
+                              Target = c.Tag.ToString()
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Now we'd actually open the dialog... */
+        }
+
         public static void ParsePart(ClientConnection client, FrmChildWindow child, string args)
         {
             if (!client.IsConnected)

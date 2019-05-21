@@ -21,7 +21,7 @@ namespace ircClient.Parsing
 
         public event Action<ClientConnection, string, string, string> OnJoinUser;
         public event Action<ClientConnection, string> OnJoinSelf;
-        public event Action<ClientConnection, string, string, string> OnPartUser;
+        public event Action<ClientConnection, string, string, string, string> OnPartUser;
         public event Action<ClientConnection, string> OnPartSelf;
 
         public event Action<ClientConnection, string, string, string, string> OnTextChannel;
@@ -127,7 +127,7 @@ namespace ircClient.Parsing
                     break;
 
                 case "PART":
-                    ParsePart(first, third);
+                    ParsePart(first, third, fourth);
                     break;
 
                 case "PRIVMSG":
@@ -445,7 +445,7 @@ namespace ircClient.Parsing
             }
         }
 
-        private void ParsePart(string nick, string channel)
+        private void ParsePart(string nick, string channel, string text)
         {
             var n = RemoveColon(nick).Split('!');
             if (n.Length == 0)
@@ -463,7 +463,7 @@ namespace ircClient.Parsing
             }                                        
             if (OnPartUser != null)
             {
-                OnPartUser(_client, n[0], n.Length > 1 ? n[1] : "", RemoveColon(channel));
+                OnPartUser(_client, n[0], n.Length > 1 ? n[1] : "", RemoveColon(channel), RemoveColon(text));
             }
         }
 

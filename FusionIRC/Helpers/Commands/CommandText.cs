@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using FusionIRC.Forms.Child;
 using ircClient;
@@ -13,6 +14,29 @@ namespace FusionIRC.Helpers.Commands
 {
     internal static class CommandText
     {
+        public static void ParseQuery(ClientConnection client, FrmChildWindow child, string args)
+        {
+            if (!client.IsConnected)
+            {
+                return;
+            }
+            var sp = new List<string>(args.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+            if (sp.Count == 0)
+            {
+                return;
+            }
+            var nick = sp[0];
+            var win = WindowManager.GetWindow(client, nick) ??
+                      WindowManager.AddWindow(client, ChildWindowType.Private,
+                                              WindowManager.MainForm, nick, nick, true);
+            win.BringToFront();
+            sp.RemoveAt(0);
+            if (sp.Count > 0)
+            {
+                ParseMsg(client, child, string.Format("{0} {1}", nick, string.Join(" ", sp)));
+            }
+        }
+
         public static void ParseAction(ClientConnection client, FrmChildWindow child, string args)
         {
             if (child.WindowType == ChildWindowType.Console || !client.IsConnected)

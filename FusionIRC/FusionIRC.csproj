@@ -129,6 +129,12 @@
     <Compile Include="Forms\Settings\Controls\Client\ClientCaching.Designer.cs">
       <DependentUpon>ClientCaching.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Settings\Controls\Client\ClientConfirm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Client\ClientConfirm.Designer.cs">
+      <DependentUpon>ClientConfirm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Settings\Controls\Client\ClientLogging.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -167,6 +173,12 @@
     </Compile>
     <Compile Include="Forms\Settings\Controls\Connection\ConnectionServers.cs">
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Mouse\MouseDoubleClick.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Mouse\MouseDoubleClick.Designer.cs">
+      <DependentUpon>MouseDoubleClick.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Settings\Editing\Enums.cs" />
     <Compile Include="Forms\Settings\Editing\FrmAddServer.cs">
@@ -255,6 +267,9 @@
     <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientCaching.resx">
       <DependentUpon>ClientCaching.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientConfirm.resx">
+      <DependentUpon>ClientConfirm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientLogging.resx">
       <DependentUpon>ClientLogging.cs</DependentUpon>
     </EmbeddedResource>
@@ -270,6 +285,9 @@
     <EmbeddedResource Include="Forms\Settings\Controls\Connection\ConnectionOptions.resx">
       <DependentUpon>ConnectionOptions.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Settings\Controls\Mouse\MouseDoubleClick.resx">
+      <DependentUpon>MouseDoubleClick.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -281,10 +299,6 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
-    <None Include="Icons\ChildWindows\channel.ico" />
-    <None Include="Icons\ChildWindows\dcc-chat.ico" />
-    <None Include="Icons\ChildWindows\query.ico" />
-    <None Include="Icons\ChildWindows\status.ico" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -315,49 +329,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Wave\cork.wav" />
-    <None Include="Icons\Toolbar\connect.ico" />
-    <None Include="Icons\Toolbar\disconnect.ico" />
-    <None Include="Icons\Toolbar\connect_to_location.ico" />
-    <None Include="Icons\Toolbar\settings.ico" />
-    <None Include="Icons\Toolbar\theme.ico" />
-    <None Include="Icons\security.ico" />
-    <None Include="Icons\warning.ico" />
-    <None Include="Icons\Toolbar\about.ico" />
-    <None Include="Icons\Toolbar\users.ico" />
-    <None Include="Icons\Options\network.ico" />
-    <None Include="Icons\Options\server.ico" />
-    <None Include="Icons\Toolbar\join.ico" />
-    <None Include="Icons\Toolbar\part.ico" />
-    <None Include="Icons\Toolbar\favorites.ico" />
-    <None Include="Icons\Toolbar\chanlist.ico" />
-    <None Include="Icons\Dialog\ignored.ico" />
-    <None Include="Icons\Dialog\notify.ico" />
-    <None Include="Icons\Dialog\userList.ico" />
-    <None Include="Icons\Dialog\joinChan.ico" />
-    <None Include="Icons\Dialog\partChan.ico" />
-    <None Include="Icons\Toolbar\dcc.ico" />
-    <None Include="Icons\Dialog\dccManager.ico" />
-    <None Include="Icons\Dcc\dccDown.ico" />
-    <None Include="Icons\Dcc\dccUp.ico" />
-    <None Include="Icons\Toolbar\aliases.ico" />
-    <None Include="Icons\Toolbar\autos.ico" />
-    <None Include="Icons\Dialog\identify.ico" />
-    <None Include="Icons\Dialog\codeFile.ico" />
-    <None Include="Icons\Dialog\codeHeader.ico" />
-    <None Include="Icons\Dialog\aliasEditor.ico" />
-    <None Include="Icons\Dialog\editFile.ico" />
-    <None Include="Icons\Dialog\editLines.ico" />
-    <None Include="Icons\Dialog\editReplace.ico" />
-    <None Include="Images\about-dialog-1.jpg" />
-    <None Include="Icons\Dialog\themeColor.ico" />
-    <None Include="Icons\Dialog\themeFont.ico" />
-    <None Include="Icons\Dialog\themeMessage.ico" />
-    <None Include="Icons\Dialog\themePicture.ico" />
-    <None Include="Icons\Dialog\autoJoin.ico" />
-    <None Include="Icons\Dialog\error.ico" />
-    <None Include="Icons\Dialog\dialogApply.ico" />
-    <None Include="Icons\Dialog\dialogClose.ico" />
-    <None Include="Icons\Dialog\dialogOk.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

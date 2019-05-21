@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using FusionIRC.Forms.Warning;
 using ircClient;
+using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircScript.Classes.Structures;
@@ -107,6 +108,8 @@ namespace FusionIRC.Helpers.Connection
             /* Iterate all open channels and clear nick list (or close it's window) */
             Misc.UpdateChannelsOnDisconnect(client, pmd);
             client.UserInfo.AlternateUsed = false;
+            /* Notification */
+            ((TrayIcon) WindowManager.MainForm).ShowNotificationPopup(client.Network, "Disconnect from network", 50);
             if (client.IsManualDisconnect)
             {
                 client.IsManualDisconnect = false;
@@ -147,11 +150,13 @@ namespace FusionIRC.Helpers.Connection
                 Misc.UpdateChannelsOnDisconnect(client, pmd);
             }
             client.UserInfo.AlternateUsed = false;
+            /* Notification */
+            ((TrayIcon) WindowManager.MainForm).ShowNotificationPopup(client.Network, "Disconnect from network", 50);
             if (client.IsManualDisconnect)
             {
                 client.IsManualDisconnect = false;
                 return;
-            }
+            }            
             /* Now we process re-connection code if the server wasn't manually disconnected by the user */
             c.Reconnect.BeginReconnect();
             /* Process event script */

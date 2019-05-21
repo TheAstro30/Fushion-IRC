@@ -197,11 +197,14 @@ namespace FusionIRC.Forms
             TrayNotifyIcon.Icon = !string.IsNullOrEmpty(ico) && File.Exists(ico)
                                       ? Icon.ExtractAssociatedIcon(ico)
                                       : Icon;
+            TrayHideOnMinimize = SettingsManager.Settings.Client.TrayIcon.HideMinimized;
+            TrayShowNotifications = SettingsManager.Settings.Client.TrayIcon.ShowNotifications;
             if (SettingsManager.Settings.Client.TrayIcon.AlwaysShow)
             {
                 TrayAlwaysShowIcon = true;
                 TrayNotifyIcon.Visible = true;
             }
+            NotificationShow += OnNotificationShow;
             /* Show connect dialog */
             _timerConnect = new Timer {Interval = 10};
             _timerConnect.Tick += ShowConnectDialog;
@@ -218,7 +221,7 @@ namespace FusionIRC.Forms
                 w.DisplayNode.Text = string.Format("{0}: {1}", "Console", w.Client.UserInfo.Nick);              
             }
             _timerConnect.Enabled = true;
-            base.OnLoad(e);
+            base.OnLoad(e);            
         }
 
         protected override void OnActivated(EventArgs e)
@@ -255,7 +258,7 @@ namespace FusionIRC.Forms
                     w.Size = Size;
                     w.Position = Location;
                 }
-                w.Maximized = WindowState == FormWindowState.Maximized;
+                w.Maximized = WindowState == FormWindowState.Maximized;                
             }
             base.OnResize(e);
             Invalidate(true);
@@ -555,6 +558,12 @@ namespace FusionIRC.Forms
             {
                 connect.ShowDialog(this);
             }
+        }
+
+        private void OnNotificationShow()
+        {
+            Focus();
+            WindowManager.LastActiveChild.Activate();
         }
     }
 }

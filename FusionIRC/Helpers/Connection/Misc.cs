@@ -9,6 +9,7 @@ using FusionIRC.Forms.Favorites;
 using FusionIRC.Forms.Misc;
 using ircClient;
 using ircCore.Autos;
+using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.Networks;
 using ircCore.Settings.SettingsBase.Structures;
@@ -107,6 +108,8 @@ namespace FusionIRC.Helpers.Connection
             {
                 client.Send(string.Format("MODE {0} +i", client.UserInfo.Nick));
             }
+            /* Notification */
+            ((TrayIcon) WindowManager.MainForm).ShowNotificationPopup(client.Network, "Connected to network", 50);
             /* Update recent servers list */
             UpdateRecentServers(client);
             /* Resolve local IP */

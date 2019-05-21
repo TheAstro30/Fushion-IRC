@@ -12,7 +12,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
 {
     public partial class ConnectionOptions : BaseControlRenderer, ISettings
     {
-        public event Action OnSettingsChanged;
+        public event Action<ISettings> OnSettingsChanged;
 
         public bool SettingsChanged { get; set; }
 
@@ -97,7 +97,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
             SettingsChanged = true;
             if (OnSettingsChanged != null)
             {
-                OnSettingsChanged();
+                OnSettingsChanged(this);
             }
             if (sender.GetType() != typeof (CheckBox))
             {
@@ -110,7 +110,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
                     chkInvalid.Enabled = c.Checked;
                     break;
 
-                case "Reconnect on disconnect":
+                case "Reconnect automatically on disconnect":
                     gbOptions.Enabled = c.Checked;
                     break;
             }

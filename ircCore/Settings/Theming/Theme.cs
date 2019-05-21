@@ -31,7 +31,7 @@ namespace ircCore.Settings.Theming
         }
 
         private const string Rgb = "#FFFFFF,#000000,#00007F,#009300,#FF0000,#7F0000,#9C009C,#FC7F00,#FFFF00,#00FC00,#009393,#00FFFF,#0000FC,#FF00FF,#7F7F7F,#D2D2D2";
-        private const string DefaultColors = "0,1,0,4,0,1,0,1";
+        private const string DefaultColors = "0,4,0,1,0,1,0,1";
 
         /* Public properties */
         public bool ThemeChanged { get; set; }
@@ -92,6 +92,7 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.DisconnectedText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * Disconnected" });
             Messages.Add(ThemeMessage.ConnectionErrorText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * Error connecting to: $server ($text)" });
             Messages.Add(ThemeMessage.ServerPingPongText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Server request PING; client response PONG!" });
+            Messages.Add(ThemeMessage.ChannelProperties, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Looking up $chan properties..." });
             Messages.Add(ThemeMessage.ChannelTopic, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Topic is: '$text'" });
             Messages.Add(ThemeMessage.ChannelTopicSet, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Topic set by: $text" });
             Messages.Add(ThemeMessage.ChannelTopicChange, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * $nick changes $target topic to '$text'" });
@@ -102,6 +103,7 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.ChannelJoinText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * $nick ($address) has joined: $target" });
             Messages.Add(ThemeMessage.ChannelSelfJoinText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Now talking in: $target" });
             Messages.Add(ThemeMessage.ChannelPartText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * $nick ($address) has left: $target" });
+            Messages.Add(ThemeMessage.ChannelPartTextMessage, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * $nick ($address) has left: $target '$text'" });
             Messages.Add(ThemeMessage.QuitText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts * $nick ($address) has quit IRC ($text)" });
             Messages.Add(ThemeMessage.ChannelKickText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts * $knick was kicked from $target by $nick '$text'" });
             Messages.Add(ThemeMessage.ChannelSelfKickText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts * You were kicked from $target by $nick '$text'" });

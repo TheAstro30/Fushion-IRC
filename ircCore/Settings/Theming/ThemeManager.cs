@@ -81,113 +81,119 @@ namespace ircCore.Settings.Theming
         [Description("Channel Topic")]
         ChannelTopic = 7,
 
+        [Description("Channel Properties")]
+        ChannelProperties = 8,
+
         [Description("Channel Topic Set By")]
-        ChannelTopicSet = 8,
+        ChannelTopicSet = 9,
 
         [Description("Channel Topic Changed")]
-        ChannelTopicChange = 9,
+        ChannelTopicChange =10,
 
         [Description("Channel Message")]
-        ChannelText = 10,
+        ChannelText = 11,
 
         [Description("Channel Message Self")]
-        ChannelSelfText = 11,
+        ChannelSelfText = 12,
 
         [Description("Channel Action")]
-        ChannelActionText = 12,
+        ChannelActionText = 13,
 
         [Description("Channel Action Self")]
-        ChannelSelfActionText = 13,
+        ChannelSelfActionText = 14,
 
         [Description("Private Message")]
-        PrivateText = 14,
+        PrivateText = 15,
 
         [Description("Private Message Self")]
-        PrivateSelfText = 15,
+        PrivateSelfText = 16,
 
         [Description("Private Action")]
-        PrivateActionText = 16,
+        PrivateActionText = 17,
 
         [Description("Private Action Self")]
-        PrivateSelfActionText = 17,
+        PrivateSelfActionText = 18,
 
         [Description("Notice Message")]
-        NoticeText = 18,
+        NoticeText = 19,
 
         [Description("Notice Message Self")]
-        NoticeSelfText = 19,
+        NoticeSelfText = 20,
 
         [Description("Channel Join")]
-        ChannelJoinText = 20,
+        ChannelJoinText = 21,
 
         [Description("Channel Join Self")]
-        ChannelSelfJoinText = 21,
+        ChannelSelfJoinText = 22,
 
         [Description("Channel Part")]
-        ChannelPartText = 22,
+        ChannelPartText = 23,
+
+        [Description("Channel Part (With Message)")]
+        ChannelPartTextMessage = 24,
 
         [Description("Mode Text")]
-        ModeChannelText = 23,
+        ModeChannelText = 25,
 
         [Description("Mode Self Text")]
-        ModeSelfText = 24,
+        ModeSelfText = 26,
 
         [Description("Quit Message")]
-        QuitText = 25,
+        QuitText = 27,
 
         [Description("Channel Kick Message")]
-        ChannelKickText = 26,
+        ChannelKickText = 28,
 
         [Description("Channel Kick Message Self")]
-        ChannelSelfKickText = 27,
+        ChannelSelfKickText = 29,
 
         [Description("Nick Change")]
-        NickChangeUserText = 28,
+        NickChangeUserText = 30,
 
         [Description("Nick Change Self")]
-        NickChangeSelfText = 29,
+        NickChangeSelfText = 31,
 
         [Description("Target Message Text")]
-        MessageTargetText = 30,
+        MessageTargetText = 32,
 
         [Description("MOTD Text")]
-        MotdText = 31,
+        MotdText = 33,
 
         [Description("RAW Text")]
-        RawText = 32,
+        RawText = 34,
 
         [Description("Wallops Text")]
-        WallopsText = 33,
+        WallopsText = 35,
 
         [Description("Local Users Text")]
-        LUsersText = 34,
+        LUsersText = 36,
 
         [Description("Invite Text")]
-        InviteText = 35,
+        InviteText = 37,
 
         [Description("CTCP Text")]
-        CtcpText = 36,
+        CtcpText = 38,
 
         [Description("CTCP Text Self")]
-        CtcpSelfText = 37,
+        CtcpSelfText = 39,
 
         [Description("CTCP Reply")]
-        CtcpReplyText = 38,
+        CtcpReplyText = 40,
 
         [Description("Local Info Reply")]
-        LocalInfoReplyText = 39,
+        LocalInfoReplyText = 41,
 
         [Description("DNS Text")]
-        DnsText = 40,
+        DnsText = 42,
 
         [Description("DNS Look-up Reply")]
-        DnsLookupReplyText = 41,
+        DnsLookupReplyText = 43,
 
         [Description("Info Text")]
-        InfoText = 42,
+        InfoText = 44,
 
         [Description("Normal Text")]
-        EchoText = 43
+        EchoText = 45
     }
 
     public enum ThemeNicklistImage

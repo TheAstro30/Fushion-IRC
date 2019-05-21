@@ -22,8 +22,8 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
         private TextBox _txtAddress;
         private Label _lblHost;
         private TextBox _txtHost;
-        
-        public event Action OnSettingsChanged;
+
+        public event Action<ISettings> OnSettingsChanged;
 
         public bool SettingsChanged { get; set; }
 
@@ -116,7 +116,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
             SettingsChanged = true;
             if (OnSettingsChanged != null)
             {
-                OnSettingsChanged();
+                OnSettingsChanged(this);
             }
         }
     }

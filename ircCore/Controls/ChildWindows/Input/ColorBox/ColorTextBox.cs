@@ -31,6 +31,9 @@ namespace ircCore.Controls.ChildWindows.Input.ColorBox
         public bool IsMultiLinePaste { get; set; }
         public bool IsNormalTextbox { get; set; }
 
+        public bool ConfirmPaste { get; set; }
+        public int ConfirmPasteLines { get; set; }
+
         protected override void WndProc(ref Message m)
         {
             if (!IsNormalTextbox)
@@ -197,25 +200,24 @@ namespace ircCore.Controls.ChildWindows.Input.ColorBox
         private void ProcessPaste()
         {
             /* Handle Ctrl+V directly here */
-            var strTemp = InternalClipboard.GetText();
-            if (string.IsNullOrEmpty(strTemp))
+            var lines = InternalClipboard.GetText();
+            if (string.IsNullOrEmpty(lines))
             {
                 return;
             }
-            var sTmp = strTemp.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+            var sp = lines.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
             int start;
-            if (AllowMultiLinePaste && sTmp.Length > 1)
+            if (AllowMultiLinePaste && sp.Length > 1)
             {
-                //var lines = IrcMain.Settings.ConfirmPasteLines;
-                //if (IrcMain.Settings.GetOption(IrcMain.Settings.ConfirmOptions, "CONFIRMPASTE") && sTmp.Length >= lines)
-                //{
-                //    if (MessageBox.Show(string.Format(@"You are about to paste more than {0} of text.{1}{1}Do you wish to paste anyway?", lines, Environment.NewLine), @"dIRC 7 Confirm Paste", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
-                //    {
-                //        return;
-                //    }
-                //}
+                if (ConfirmPaste && sp.Length >= ConfirmPasteLines)
+                {
+                    if (MessageBox.Show(string.Format(@"You are about to paste more than {0} of text.{1}{1}Do you wish to paste anyway?", ConfirmPasteLines, Environment.NewLine), @"FusionIRC Confirm Paste", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                    {
+                        return;
+                    }
+                }
                 IsMultiLinePaste = true;
-                foreach (var s in sTmp)
+                foreach (var s in sp)
                 {
                     start = SelectionStart;
                     Text = Text.Substring(0, start) + s + Text.Substring(start);
@@ -227,8 +229,8 @@ namespace ircCore.Controls.ChildWindows.Input.ColorBox
             else
             {
                 start = SelectionStart;
-                Text = Text.Substring(0, start) + sTmp[0] + Text.Substring(start);
-                SelectionStart = start + sTmp[0].Length;
+                Text = Text.Substring(0, start) + sp[0] + Text.Substring(start);
+                SelectionStart = start + sp[0].Length;
             }
         }
     }

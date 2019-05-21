@@ -21,7 +21,7 @@ namespace FusionIRC.Forms.Settings.Controls.Client
 
         private string _iconFile;
 
-        public event Action OnSettingsChanged;
+        public event Action<ISettings> OnSettingsChanged;
 
         public bool SettingsChanged { get; set; }
 
@@ -33,7 +33,9 @@ namespace FusionIRC.Forms.Settings.Controls.Client
 
             chkAlways.Checked = SettingsManager.Settings.Client.TrayIcon.AlwaysShow;
             chkMinimized.Checked = SettingsManager.Settings.Client.TrayIcon.HideMinimized;
-            chkBalloon.Checked = SettingsManager.Settings.Client.TrayIcon.ShowBalloonTips;
+            chkNotification.Checked = SettingsManager.Settings.Client.TrayIcon.ShowNotifications;
+
+            chkNotification.Enabled = chkAlways.Checked || chkMinimized.Checked;
 
             _iconFile = Functions.MainDir(SettingsManager.Settings.Client.TrayIcon.Icon);
             _defaultIcon = WindowManager.MainForm.Icon;
@@ -47,7 +49,7 @@ namespace FusionIRC.Forms.Settings.Controls.Client
 
             chkAlways.CheckStateChanged += ControlsChanged;
             chkMinimized.CheckedChanged += ControlsChanged;
-            chkBalloon.CheckedChanged += ControlsChanged;
+            chkNotification.CheckedChanged += ControlsChanged;
 
             btnDefault.Click += ButtonClickHandler;
             btnSelect.Click += ButtonClickHandler;
@@ -57,10 +59,10 @@ namespace FusionIRC.Forms.Settings.Controls.Client
         {
             SettingsManager.Settings.Client.TrayIcon.AlwaysShow = chkAlways.Checked;
             SettingsManager.Settings.Client.TrayIcon.HideMinimized = chkMinimized.Checked;
-            SettingsManager.Settings.Client.TrayIcon.ShowBalloonTips = chkBalloon.Checked;
             SettingsManager.Settings.Client.TrayIcon.Icon = !string.IsNullOrEmpty(_iconFile)
                                                                 ? Functions.MainDir(_iconFile)
-                                                                : string.Empty;            
+                                                                : string.Empty;
+            SettingsManager.Settings.Client.TrayIcon.ShowNotifications = chkNotification.Checked;
         }
 
         /* Callbacks */
@@ -69,8 +71,9 @@ namespace FusionIRC.Forms.Settings.Controls.Client
             SettingsChanged = true;
             if (OnSettingsChanged != null)
             {
-                OnSettingsChanged();
+                OnSettingsChanged(this);
             }
+            chkNotification.Enabled = chkAlways.Checked || chkMinimized.Checked;
         }
 
         private void ButtonClickHandler(object sender, EventArgs e)
@@ -112,7 +115,7 @@ namespace FusionIRC.Forms.Settings.Controls.Client
             SettingsChanged = true;
             if (OnSettingsChanged != null)
             {
-                OnSettingsChanged();
+                OnSettingsChanged(this);
             }
         }
     }

@@ -26,7 +26,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
 
         private readonly Servers _servers;
 
-        public event Action OnSettingsChanged;
+        public event Action<ISettings> OnSettingsChanged;
 
         public bool SettingsChanged { get; set; }
 
@@ -210,7 +210,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
                     SettingsChanged = true;
                     if (OnSettingsChanged != null)
                     {
-                        OnSettingsChanged();
+                        OnSettingsChanged(this);
                     }
                     break;
             }
@@ -270,7 +270,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
                 SettingsChanged = true;
                 if (OnSettingsChanged != null)
                 {
-                    OnSettingsChanged();
+                    OnSettingsChanged(this);
                 }
             }
         }
@@ -342,7 +342,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
                 SettingsChanged = true;
                 if (OnSettingsChanged != null)
                 {
-                    OnSettingsChanged();
+                    OnSettingsChanged(this);
                 }
             }
         }
@@ -379,7 +379,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
             SettingsChanged = true;
             if (OnSettingsChanged != null)
             {
-                OnSettingsChanged();
+                OnSettingsChanged(this);
             }
             if (_lvServers.GetItemCount() != 0)
             {
@@ -424,7 +424,7 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
             SettingsChanged = true;
             if (OnSettingsChanged != null)
             {
-                OnSettingsChanged();
+                OnSettingsChanged(this);
             }
         }
     }

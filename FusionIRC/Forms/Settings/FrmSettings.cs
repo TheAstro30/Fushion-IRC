@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using FusionIRC.Forms.Settings.Controls.Base;
 using FusionIRC.Forms.Settings.Controls.Client;
 using FusionIRC.Forms.Settings.Controls.Connection;
+using FusionIRC.Forms.Settings.Controls.Mouse;
 using FusionIRC.Helpers;
 using ircCore.Controls;
 using ircCore.Settings;
@@ -37,10 +38,15 @@ namespace FusionIRC.Forms.Settings
         private readonly ClientCaching _clientCaching;
         private readonly ClientLogging _clientLogging;
         private readonly ClientSystemTray _clientSystemTray;
+        private readonly ClientConfirm _clientConfirm;
+
+        private readonly MouseDoubleClick _mouseDoubleClick;
 
         private readonly Timer _tmrSelect;
 
         private bool _initialize;
+
+        private bool _loggingChanged;
 
         public FrmSettings()
         {
@@ -93,17 +99,21 @@ namespace FusionIRC.Forms.Settings
                                  Text = @"Cancel",
                                  UseVisualStyleBackColor = true
                              };
-
+            /* Connection */
             _connectionServers = new ConnectionServers {Location = new Point(168, 12), Visible = false};
             _connectionOptions = new ConnectionOptions {Location = new Point(168, 12), Visible = false};
             _connectionIdentDaemon = new ConnectionIdentDaemon {Location = new Point(168, 12), Visible = false};
             _connectionLocalInfo = new ConnectionLocalInfo {Location = new Point(168, 12), Visible = false};
-
+            /* Client */
             _clientOptions = new ClientOptions {Location = new Point(168, 12), Visible = false};
             _clientMessages = new ClientMessages { Location = new Point(168, 12), Visible = false };
             _clientCaching = new ClientCaching { Location = new Point(168, 12), Visible = false };
             _clientLogging = new ClientLogging {Location = new Point(168, 12), Visible = false};
             _clientSystemTray = new ClientSystemTray { Location = new Point(168, 12), Visible = false };
+            _clientConfirm = new ClientConfirm { Location = new Point(168, 12), Visible = false };
+            /* Mouse */
+            _mouseDoubleClick = new MouseDoubleClick {Location = new Point(168, 12), Visible = false};
+
 
             Controls.AddRange(new Control[]
                                   {
@@ -119,19 +129,24 @@ namespace FusionIRC.Forms.Settings
                                       _clientMessages,
                                       _clientCaching,
                                       _clientLogging,
-                                      _clientSystemTray
+                                      _clientSystemTray,
+                                      _clientConfirm,
+                                      _mouseDoubleClick
                                   });
-
+            /* Connection */
             _connectionServers.OnSettingsChanged += OnSettingsChanged;
             _connectionOptions.OnSettingsChanged += OnSettingsChanged;
             _connectionIdentDaemon.OnSettingsChanged += OnSettingsChanged;
             _connectionLocalInfo.OnSettingsChanged += OnSettingsChanged;
-
+            /* Client */
             _clientOptions.OnSettingsChanged += OnSettingsChanged;
             _clientMessages.OnSettingsChanged += OnSettingsChanged;
             _clientCaching.OnSettingsChanged += OnSettingsChanged;
             _clientLogging.OnSettingsChanged += OnSettingsChanged;
             _clientSystemTray.OnSettingsChanged += OnSettingsChanged;
+            _clientConfirm.OnSettingsChanged += OnSettingsChanged;
+            /* Mouse */
+            _mouseDoubleClick.OnSettingsChanged += OnSettingsChanged;
 
             BuildTreeMenuNodes();
 
@@ -221,6 +236,7 @@ namespace FusionIRC.Forms.Settings
                                                                                         Name = "CONNECTIONLOCALINFO"
                                                                                     }
                                                                             });
+            _tvMenu.Nodes[0].Tag = _connectionServers;
             /* Client options... */
             _tvMenu.Nodes.Add("CLIENT", "Client").Nodes.AddRange(new[]
                                                                      {
@@ -234,11 +250,11 @@ namespace FusionIRC.Forms.Settings
                                                                                  Tag = _clientMessages,
                                                                                  Name = "CLIENTMESSAGES"
                                                                              },
-                                                                             new TreeNode("Caching")
-                                                                                 {
-                                                                                     Tag = _clientCaching,
-                                                                                     Name = "CLIENTCACHING"
-                                                                                 }, 
+                                                                         new TreeNode("Caching")
+                                                                             {
+                                                                                 Tag = _clientCaching,
+                                                                                 Name = "CLIENTCACHING"
+                                                                             },
                                                                          new TreeNode("Logging")
                                                                              {
                                                                                  Tag = _clientLogging,
@@ -248,14 +264,34 @@ namespace FusionIRC.Forms.Settings
                                                                              {
                                                                                  Tag = _clientSystemTray,
                                                                                  Name = "CLIENTTRAY"
+                                                                             },
+                                                                         new TreeNode("Confirmation")
+                                                                             {
+                                                                                 Tag = _clientConfirm,
+                                                                                 Name = "CLIENTCONFIRM"
                                                                              }
                                                                      });
+            _tvMenu.Nodes[1].Tag = _clientOptions;
+            /* Mouse options... */
+            _tvMenu.Nodes.Add("MOUSE", "Mouse").Nodes.AddRange(new[]
+                                                                   {
+                                                                       new TreeNode("Double-Click")
+                                                                           {
+                                                                               Tag = _mouseDoubleClick,
+                                                                               Name = "MOUSEDOUBLECLICK"
+                                                                           }
+                                                                   });
+            _tvMenu.Nodes[2].Tag = _mouseDoubleClick;
         }
 
-        private void OnSettingsChanged()
+        private void OnSettingsChanged(ISettings control)
         {
             /* Really all this callback does :) */
             _btnApply.Enabled = true;
+            if (control.GetType() == typeof(ClientLogging))
+            {
+                _loggingChanged = true;
+            }
         }
 
         /* Save settings - also, any settings relevant to client appearance should also update main client
@@ -269,42 +305,51 @@ namespace FusionIRC.Forms.Settings
             _btnApply.Enabled = false;
             SettingsManager.Save();
             /* Update logging */
-            var type = SettingsManager.Settings.Client.Logging.KeepLogsType;
-            var close = false;
-            foreach (var w in WindowManager.Windows.SelectMany(c => c.Value))
+            if (_loggingChanged)
             {
-                switch (w.WindowType)
+                var type = SettingsManager.Settings.Client.Logging.KeepLogsType;
+                var close = false;
+                foreach (var w in WindowManager.Windows.SelectMany(c => c.Value))
                 {
-                    case ChildWindowType.Channel:
-                        if (type != LoggingType.Channels && type != LoggingType.Both)
-                        {
-                            close = true;                            
-                        }
-                        break;
-
-                    case ChildWindowType.Private:
-                    case ChildWindowType.DccChat:
-                        if (type != LoggingType.Chats && type != LoggingType.Both)
-                        {
-                            close = true;
-                        }
-                        break;
-                }
-                if (close)
-                {
-                    w.Logger.CloseLog();
-                }
-                else
-                {
-                    if (type != LoggingType.None)
+                    switch (w.WindowType)
                     {
-                        w.Logger.CreateLog();
+                        case ChildWindowType.Channel:
+                            if (type != LoggingType.Channels && type != LoggingType.Both)
+                            {
+                                close = true;
+                            }
+                            break;
+
+                        case ChildWindowType.Private:
+                        case ChildWindowType.DccChat:
+                            if (type != LoggingType.Chats && type != LoggingType.Both)
+                            {
+                                close = true;
+                            }
+                            break;
                     }
+                    if (close)
+                    {
+                        w.Logger.CloseLog();
+                    }
+                    else
+                    {
+                        if (type != LoggingType.None && w.WindowType != ChildWindowType.Console)
+                        {
+                            w.Logger.CloseLog(); /* Must call this first when changing any setting */
+                            /* Forgot to add this!! */
+                            w.Logger.FilePath = w.Logger.FilePath = string.Format("{0}.log", Functions.GetLogFileName(w.Client.Network, w.Tag.ToString(), true));
+                            w.Logger.CreateLog();
+                        }
+                    }
+                    /* Line spacing */
+                    w.Output.LinePaddingPixels = SettingsManager.Settings.Client.Messages.LinePadding;
+                    w.Output.LineSpacingStyle = SettingsManager.Settings.Client.Messages.LineSpacing;
+                    w.Output.AdjustWidth(false);
+                    /* Input box */
+                    w.Input.ConfirmPaste = SettingsManager.Settings.Client.Confirmation.ConfirmPaste;
+                    w.Input.ConfirmPasteLines = SettingsManager.Settings.Client.Confirmation.PasteLines;
                 }
-                /* Line spacing */
-                w.Output.LinePaddingPixels = SettingsManager.Settings.Client.Messages.LinePadding;
-                w.Output.LineSpacingStyle = SettingsManager.Settings.Client.Messages.LineSpacing;                
-                w.Output.AdjustWidth(false);
             }
             /* Update tray icon */
             var owner = (TrayIcon)WindowManager.MainForm;
@@ -317,6 +362,7 @@ namespace FusionIRC.Forms.Settings
                                                 : owner.Icon;
                 owner.TrayAlwaysShowIcon = SettingsManager.Settings.Client.TrayIcon.AlwaysShow;
                 owner.TrayNotifyIcon.Visible = owner.TrayAlwaysShowIcon;
+                owner.TrayShowNotifications = SettingsManager.Settings.Client.TrayIcon.ShowNotifications;
                 /* Control bars */
                 ((FrmClientWindow)owner).MenuBar.Visible = SettingsManager.Settings.Client.Appearance.ControlBars.Control[0].Visible;
                 ((FrmClientWindow)owner).ToolBar.Visible = SettingsManager.Settings.Client.Appearance.ControlBars.Control[1].Visible;
@@ -332,6 +378,20 @@ namespace FusionIRC.Forms.Settings
             if (string.IsNullOrEmpty(tab))
             {
                 tab = "CONNECTIONSERVERS";
+            }
+            switch (tab)
+            {
+                case "CONNECTION":
+                    tab = "CONNECTIONSERVERS";
+                    break;
+
+                case "CLIENT":
+                    tab = "CLIENTOPTIONS";
+                    break;
+
+                case "MOUSE":
+                    tab = "MOUSEDOUBLECLICK";
+                    break;
             }
             var node = _tvMenu.Nodes.Find(tab, true);
             if (node.Length == 0)

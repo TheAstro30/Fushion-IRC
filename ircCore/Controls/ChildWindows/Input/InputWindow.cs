@@ -30,6 +30,18 @@ namespace ircCore.Controls.ChildWindows.Input
         public event Action<InputWindow> TabKeyPress;
         public new event Action<InputWindow> TextChanged;
 
+        public bool ConfirmPaste
+        {
+            get { return _txtOut.ConfirmPaste; }
+            set { _txtOut.ConfirmPaste = value; }
+        }
+
+        public int ConfirmPasteLines
+        {
+            get { return _txtOut.ConfirmPasteLines; }
+            set { _txtOut.ConfirmPasteLines = value; }
+        }
+
         public new Color BackColor
         {
             get { return base.BackColor; }

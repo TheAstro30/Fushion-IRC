@@ -33,6 +33,9 @@ namespace FusionIRC.Helpers
     {
         public static Form MainForm { get; set; }
 
+        /* If form is minimized and hidden, ActiveMDIChild will return NULL */
+        public static FrmChildWindow LastActiveChild { get; set; }
+
         /* DCC file transfer manager window */
         public static FrmDccManager DccManagerWindow;
 
@@ -73,8 +76,7 @@ namespace FusionIRC.Helpers
                     if (win != null)
                     {
                         return win;
-                    }
-                    
+                    }                    
                     /* Add the window to the list */
                     win = new FrmChildWindow(client, type, mdiOwner)
                               {
@@ -182,7 +184,7 @@ namespace FusionIRC.Helpers
 
         public static FrmChildWindow GetActiveWindow()
         {
-            return (FrmChildWindow) MainForm.ActiveMdiChild;
+            return (FrmChildWindow) MainForm.ActiveMdiChild ?? LastActiveChild;
         }
 
         public static FrmChildWindow GetConsoleWindow(ClientConnection client)

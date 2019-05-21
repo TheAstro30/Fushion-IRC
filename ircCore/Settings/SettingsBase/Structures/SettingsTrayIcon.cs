@@ -17,10 +17,10 @@ namespace ircCore.Settings.SettingsBase.Structures
         [XmlAttribute("hideMinimized")]
         public bool HideMinimized { get; set; }
 
-        [XmlAttribute("showBalloonTips")]
-        public bool ShowBalloonTips { get; set; }
-
         [XmlAttribute("icon")]
         public string Icon { get; set; }
+
+        [XmlAttribute("showNotifications")]
+        public bool ShowNotifications { get; set; }
     }
 }
