@@ -5,7 +5,10 @@
  */
 using System;
 using System.Linq;
+using FusionIRC.Forms.ChannelProperties;
+using FusionIRC.Forms.ChannelProperties.Controls;
 using ircClient;
+using ircClient.Parsing;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
@@ -30,7 +33,7 @@ namespace FusionIRC.Helpers.Connection
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update title bar */
-            c.Modes.SetTopic(Functions.StripControlCodes(text));
+            c.Modes.SetTopic(text);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
         }
@@ -72,7 +75,7 @@ namespace FusionIRC.Helpers.Connection
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update title bar */
-            c.Modes.SetTopic(Functions.StripControlCodes(text));
+            c.Modes.SetTopic(text);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
         }
@@ -350,6 +353,53 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
+        }
+
+        public static void OnModeListData(ClientConnection client, ModeListType type, string data)
+        {
+            System.Diagnostics.Debug.Print("p " + data);
+            if (WindowManager.ChannelProperties == null)
+            {
+                return;                
+            }
+            System.Diagnostics.Debug.Print("H");
+            var sp = data.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+            if (sp.Length < 4)
+            {
+                return;
+            }
+            var p = new ChannelPropertyData
+                        {
+                            Address = sp[1],
+                            SetByNick = sp[2],
+                            Date = TimeFunctions.FormatAsciiTime(sp[3], "ddd dd/MM/yyyy h:nnt")
+                        };
+            System.Diagnostics.Debug.Print("here " + p.Address);
+            switch (type)
+            {
+                case ModeListType.Invite:
+                    WindowManager.ChannelProperties.Invites.Add(p);
+                    break;
+
+                case ModeListType.Except:
+                    WindowManager.ChannelProperties.Excepts.Add(p);
+                    break;
+
+                case ModeListType.Ban:
+                    WindowManager.ChannelProperties.Bans.Add(p);
+                    break;
+            }
+        }
+
+        public static void OnEndOfChannelProperties(ClientConnection client)
+        {
+            System.Diagnostics.Debug.Print("end");
+            if (WindowManager.ChannelProperties == null)
+            {
+                return;
+            }
+            WindowManager.ChannelProperties.ShowDialog();
+            WindowManager.ChannelProperties = null;
         }
     }
 }

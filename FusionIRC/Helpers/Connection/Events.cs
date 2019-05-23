@@ -24,54 +24,62 @@ namespace FusionIRC.Helpers.Connection
         {
             var s = ScriptManager.GetEvent(name);
             if (s == null)
-            {
+            {                
                 return;
             }
             foreach (var script in s)
             {
                 var process = false;
-                if (!string.IsNullOrEmpty(script.EventParams.Match))
+                if (!string.IsNullOrEmpty(script.EventParams.Target))
                 {
-                    var match = new WildcardMatch(script.EventParams.Match, RegexOptions.IgnoreCase);
-                    if (match.IsMatch(text))
+                    if (!string.IsNullOrEmpty(script.EventParams.Match))
                     {
-                        if (e.ChildWindow != null)
+                        var match = new WildcardMatch(script.EventParams.Match, RegexOptions.IgnoreCase);
+                        if (match.IsMatch(text))
                         {
-                            match = new WildcardMatch(script.EventParams.Target, RegexOptions.IgnoreCase);
-                            if (!match.IsMatch(e.ChildWindow.Tag.ToString()))
+                            if (e.ChildWindow != null)
                             {
+                                match = new WildcardMatch(script.EventParams.Target, RegexOptions.IgnoreCase);
+                                if (!match.IsMatch(e.ChildWindow.Tag.ToString()))
+                                {
+                                    process = true;
+                                }
+                                switch (((FrmChildWindow) e.ChildWindow).WindowType)
+                                {
+                                    case ChildWindowType.Channel:
+                                        if (script.EventParams.Target == "#")
+                                        {
+                                            process = true;
+                                        }
+                                        break;
+
+                                    case ChildWindowType.Private:
+                                        if (script.EventParams.Target == "?")
+                                        {
+                                            process = true;
+                                        }
+                                        break;
+
+                                    case ChildWindowType.DccChat:
+                                        if (script.EventParams.Target == "=")
+                                        {
+                                            process = true;
+                                        }
+                                        break;
+                                }
+                            }
+                            else if (script.EventParams.Target == "?" || script.EventParams.Target == "*")
+                            {
+                                /* Most likely called from on NOTICE */
                                 process = true;
                             }
-                            switch (((FrmChildWindow) e.ChildWindow).WindowType)
-                            {
-                                case ChildWindowType.Channel:
-                                    if (script.EventParams.Target == "#")
-                                    {
-                                        process = true;
-                                    }
-                                    break;
-
-                                case ChildWindowType.Private:
-                                    if (script.EventParams.Target == "?")
-                                    {
-                                        process = true;
-                                    }
-                                    break;
-
-                                case ChildWindowType.DccChat:
-                                    if (script.EventParams.Target == "=")
-                                    {
-                                        process = true;
-                                    }
-                                    break;
-                            }
-                        }
-                        else if (script.EventParams.Target == "?" || script.EventParams.Target == "*")
-                        {
-                            /* Most likely called from on NOTICE */
-                            process = true;
                         }
                     }
+                }
+                else
+                {
+                    /* Probably an event without ScriptEventParams at all like connect:{ */
+                    process = true;
                 }
                 if (!process)
                 {

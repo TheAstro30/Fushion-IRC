@@ -72,6 +72,13 @@
     <Compile Include="Forms\Autos\Editing\FrmAutoEdit.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Helpers\ChannelPropertyData.cs" />
+    <Compile Include="Forms\ChannelProperties\Controls\ChannelPropertyBase.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\ChannelProperties\Controls\ChannelPropertyBase.Designer.cs">
+      <DependentUpon>ChannelPropertyBase.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Favorites\Editing\FrmChannelEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -89,6 +96,12 @@
     </Compile>
     <Compile Include="Forms\Autos\FrmAutos.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ChannelProperties\FrmChannelProperties.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ChannelProperties\FrmChannelProperties.Designer.cs">
+      <DependentUpon>FrmChannelProperties.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Misc\FrmConnectTo.cs">
       <SubType>Form</SubType>
@@ -261,6 +274,12 @@
     <Compile Include="Helpers\WindowManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Forms\ChannelProperties\Controls\ChannelPropertyBase.resx">
+      <DependentUpon>ChannelPropertyBase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ChannelProperties\FrmChannelProperties.resx">
+      <DependentUpon>FrmChannelProperties.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Misc\FrmDccManager.resx">
       <DependentUpon>FrmDccManager.cs</DependentUpon>
     </EmbeddedResource>

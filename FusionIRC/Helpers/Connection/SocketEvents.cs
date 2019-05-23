@@ -77,6 +77,8 @@ namespace FusionIRC.Helpers.Connection
             }
             client.IsManualDisconnect = false;
             client.UserInfo.AlternateUsed = false;
+            System.Diagnostics.Debug.Print("Cancel");
+            c.Reconnect.Cancel();
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.ConnectionCancelledText,

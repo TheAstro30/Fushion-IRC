@@ -180,7 +180,7 @@ namespace FusionIRC.Helpers.Connection
             //    /* It's my nick - I will be using this later */
             //}
             //else if (target[0] == client.Parser.ChannelPrefixTypes.MatchChannelType(target[0]))
-            if (target[0] == client.Parser.ChannelPrefixTypes.MatchChannelType(target[0]))
+            if (target.Length > 0 && target[0] == client.Parser.ChannelPrefixTypes.MatchChannelType(target[0]))
             {
                 /* It's to a channel - I will be using this later */
                 channel = target;

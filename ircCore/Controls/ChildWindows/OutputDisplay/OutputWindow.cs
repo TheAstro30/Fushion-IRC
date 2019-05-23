@@ -243,10 +243,15 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                             int startX;
                             var bold = wrapData.IsBold;
                             var underLine = wrapData.IsUnderline;
-                            var italic = wrapData.IsItalic;                            
-                            Character.ReturnChar(gSrc, wrapData, e.X, wrapIndex > 0, IndentWidth, _font, out position,
-                                                 out startX, ref bold, ref underLine, ref italic);
-
+                            var italic = wrapData.IsItalic;
+                            var c = Character.ReturnChar(gSrc, wrapData, e.X, wrapIndex > 0, IndentWidth, _font,
+                                                         out position,
+                                                         out startX, ref bold, ref underLine, ref italic);
+                            if (c == (char)0)
+                            {
+                                MarkingData = null;
+                                return;
+                            }
                             MarkingData = new MarkingData
                                               {
                                                   MarkScrolledToBottom = _scrolledToBottom,
@@ -480,6 +485,15 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                     /* Get current word under mouse */
                     var c = Character.ReturnChar(g, wrapData, e.X, wrapIndex > 0, IndentWidth, _font, out position,
                                                  out startX, ref bold, ref underLine, ref italic);
+                    if (c == (char)0)
+                    {
+                        Cursor = Cursors.Default;
+                        _url = string.Empty;
+                        _word = null;
+                        AllowSpecialWordDoubleClick = false;
+                        base.OnMouseMove(e);
+                        return;
+                    }
                     var wordUnderMouse = c != '-'
                                                 ? Character.ReturnWord(g, TextData.Wrapped[lineIndex], wrapIndex, position)
                                                 : string.Empty;
@@ -515,7 +529,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         
         protected override void OnMouseDoubleClick(MouseEventArgs e)
         {
-            MarkingData = null; /* Make sure this is nulled */
+            System.Diagnostics.Debug.Print("double-click " + AllowSpecialWordDoubleClick);
             if (!string.IsNullOrEmpty(_url))
             {                
                 if (OnUrlDoubleClicked != null)
@@ -531,12 +545,14 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                     {
                         OnSpecialWordDoubleClicked(_word);
                     }
-                    return;
                 }
-                if (OnWindowDoubleClicked != null)
+                else
                 {
-                    OnWindowDoubleClicked();
-                }
+                    if (OnWindowDoubleClicked != null)
+                    {
+                        OnWindowDoubleClicked();
+                    }
+                }                
             }
             base.OnMouseDoubleClick(e);
         }
@@ -596,9 +612,9 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         }
 
         public void AddLine(int defaultColor, string text)
-        {
+        {            
             if (string.IsNullOrEmpty(text))
-            {                
+            {                                
                 return; /* Nothing to do */
             }                     
             var t = new TextData.Text
@@ -624,7 +640,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             if (w.Lines.Count == 0)
             {
                 return; /* It's unlikely ... */
-            }
+            }            
             w.IsLineMarker = t.IsLineMarker;
             TextData.Wrapped.Add(w);
             /* Set scrolled to bottom value */
@@ -653,7 +669,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 OnLineAdded(t.Line); /* This can be used to output to a log file */
             }
             if (MarkingData != null)
-            {
+            {                
                 /* Do not refresh the screen as marking is in progress */
                 return;
             }

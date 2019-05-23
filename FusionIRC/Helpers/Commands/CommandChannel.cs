@@ -5,7 +5,9 @@
  */
 using System;
 using System.Collections.Generic;
+using FusionIRC.Forms.ChannelProperties;
 using FusionIRC.Forms.Child;
+using FusionIRC.Forms.Misc;
 using ircClient;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
@@ -16,24 +18,34 @@ namespace FusionIRC.Helpers.Commands
     {
         public static void ParseChannel(ClientConnection client, FrmChildWindow child)
         {
-            if (!client.IsConnected)
+            if (!client.IsConnected || WindowManager.ChannelProperties != null)
+            {           
+                return;
+            }
+            if (child.WindowType != ChildWindowType.Channel)
             {
                 return;
             }
-            var c = WindowManager.GetActiveWindow();
-            if (c == null || c.WindowType != ChildWindowType.Channel)
-            {
-                return;
-            }
+            var chan = child.Tag.ToString();
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.ChannelProperties,
                               TimeStamp = DateTime.Now,
-                              Target = c.Tag.ToString()
+                              Target = chan
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
-            /* Now we'd actually open the dialog... */
+            child.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Now we'd actually open the dialog... */                        
+            WindowManager.ChannelProperties = new FrmChannelProperties(client, chan, child.Modes);
+            client.Send(string.Format("MODE {0} +b", chan));
+            if (client.Parser.ChannelModes.Contains('e'))
+            {
+                client.Send(string.Format("MODE {0} +e", chan));
+            }
+            if (client.Parser.ChannelModes.Contains('I'))
+            {
+                client.Send(string.Format("MODE {0} +I", chan));
+            }
         }
 
         public static void ParsePart(ClientConnection client, FrmChildWindow child, string args)

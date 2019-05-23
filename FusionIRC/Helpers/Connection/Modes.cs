@@ -136,7 +136,14 @@ namespace FusionIRC.Helpers.Connection
 
                     default:
                         /* Update channel modes */
-                        c.Modes.AddMode(modes[i], string.Empty);
+                        if (plusMode)
+                        {
+                            c.Modes.AddMode(modes[i], string.Empty);
+                        }
+                        else
+                        {
+                            c.Modes.RemoveMode(modes[i]);
+                        }
                         break;
                 }
             }

@@ -129,7 +129,7 @@ namespace FusionIRC.Forms.Child
                              Font = ThemeManager.CurrentTheme.ThemeFonts[type],
                              LinePaddingPixels = SettingsManager.Settings.Client.Messages.LinePadding,
                              LineSpacingStyle = SettingsManager.Settings.Client.Messages.LineSpacing,                             
-                             MaximumLines = SettingsManager.Settings.Windows.Caching.Output                             
+                             MaximumLines = SettingsManager.Settings.Windows.Caching.Output
                          };
 
             /* Backgrounds */
@@ -191,7 +191,7 @@ namespace FusionIRC.Forms.Child
             Output.MouseUp += OutputMouseUp;
             Output.OnWordUnderMouse += OutputWordUnderMouse;
             Output.OnLineAdded += OutputOnLineAdded;
-            Output.DoubleClick += OutputDoubleClicked;
+            Output.OnWindowDoubleClicked += OutputDoubleClicked;
             Input.TabKeyPress += InputTabKeyPress;
             Input.KeyDown += InputKeyDown;
             Input.MouseWheel += InputMouseWheel;
@@ -462,7 +462,7 @@ namespace FusionIRC.Forms.Child
         }
 
         /* Control callbacks */
-        private void OutputDoubleClicked(object sender, EventArgs e)
+        private void OutputDoubleClicked()
         {
             var s = new Script();
             var scriptArgs = new ScriptArgs {ChildWindow = this, ClientConnection = Client};
@@ -471,6 +471,12 @@ namespace FusionIRC.Forms.Child
             {
                 case ChildWindowType.Console:
                     s.LineData.Add(SettingsManager.Settings.Mouse.Console);
+                    break;
+
+                case ChildWindowType.Channel:
+                    args[0] = Tag.ToString();
+                    scriptArgs.Channel = args[0];
+                    s.LineData.Add(SettingsManager.Settings.Mouse.Channel);
                     break;
 
                 case ChildWindowType.Private:
@@ -522,22 +528,6 @@ namespace FusionIRC.Forms.Child
                     var win = WindowManager.GetWindow(Client, nick) ??
                               WindowManager.AddWindow(Client, ChildWindowType.Private, MdiParent, nick, nick, true);
                     win.BringToFront();
-                }
-                else
-                {
-                    /* Double-Click on window itself */
-                    var s = new Script();
-                    s.LineData.Add(SettingsManager.Settings.Mouse.Channel);
-                    var scriptArgs = new ScriptArgs
-                                         {
-                                             ChildWindow = this, 
-                                             ClientConnection = Client, 
-                                             Channel = Tag.ToString()
-                                         };                    
-                    CommandProcessor.Parse(Client, this,
-                                           s.Parse(scriptArgs,
-                                                   Tag.ToString().Split(new[] {','},
-                                                                        StringSplitOptions.RemoveEmptyEntries)));
                 }
             }
         }

@@ -28,6 +28,8 @@ namespace FusionIRC.Helpers
         public event Action<int> OnReconnectTimer;
         public event Action<Server> OnConnectionTry;
 
+        public bool IsRetryingConnection { get; set; }
+
         /* Public methods */
         public ReconnectOnDisconnect(ClientConnection client)
         {
@@ -45,6 +47,8 @@ namespace FusionIRC.Helpers
             }
             if (SettingsManager.Settings.Connection.Options.RetryConnection)
             {
+                System.Diagnostics.Debug.Print("fuck " + _times);
+                IsRetryingConnection = true;
                 var t = SettingsManager.Settings.Connection.Options.RetryTimes;
                 if (t == 0)
                 {
@@ -57,6 +61,7 @@ namespace FusionIRC.Helpers
                     _times = 0;
                     _currentTick = 0;
                     _connectOnce = false;
+                    IsRetryingConnection = false;
                     return;
                 }
                 if (OnReconnectTimer != null)
@@ -64,15 +69,14 @@ namespace FusionIRC.Helpers
                     OnReconnectTimer(SettingsManager.Settings.Connection.Options.RetryDelay);
                 }
                 _delay.Enabled = true;
+                return;
             }
-            else 
+            if (!_connectOnce)
             {
-                if (!_connectOnce)
-                {
-                    _connectOnce = true;
-                    ReconnectToServer();
-                    return;
-                }
+                IsRetryingConnection = true;
+                _connectOnce = true;
+                ReconnectToServer();
+                return;
             }
             _connectOnce = false;
             _times = 0;
@@ -85,6 +89,7 @@ namespace FusionIRC.Helpers
             _currentTick = 0;
             _connectOnce = false;
             _delay.Enabled = false;
+            IsRetryingConnection = false;
             if (OnReconnectCancel != null)
             {
                 OnReconnectCancel();
@@ -103,6 +108,10 @@ namespace FusionIRC.Helpers
             if (SettingsManager.Settings.Connection.Options.NextServer)
             {
                 s = ServerManager.GetNextServer(net);
+            }
+            if (s == null)
+            {
+                s = _client.Server;
             }
             if (OnConnectionTry != null)
             {

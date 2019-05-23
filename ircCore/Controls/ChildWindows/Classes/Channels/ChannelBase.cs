@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ircCore.Utils;
 
 namespace ircCore.Controls.ChildWindows.Classes.Channels
 {
@@ -15,9 +16,9 @@ namespace ircCore.Controls.ChildWindows.Classes.Channels
 
         public int Limit { get; set; }
 
-        internal List<char> Modes = new List<char>();
+        public List<char> Modes = new List<char>();
                 
-        internal string Topic { get; set; }
+        public string Topic { get; set; }
 
         public override string ToString()
         {
@@ -40,7 +41,8 @@ namespace ircCore.Controls.ChildWindows.Classes.Channels
             }
             if (!string.IsNullOrEmpty(Topic))
             {
-                sb.Append(sb.Length != 0 ? string.Format(": {0}", Topic) : string.Format("{0}", Topic));
+                var t = Functions.StripControlCodes(Topic);
+                sb.Append(sb.Length != 0 ? string.Format(": {0}", t) : string.Format("{0}", t));
             }
             return sb.ToString();
         }        

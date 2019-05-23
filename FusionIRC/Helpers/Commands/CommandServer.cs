@@ -130,7 +130,7 @@ namespace FusionIRC.Helpers.Commands
                 return;
             }
             client.IsManualDisconnect = true;
-            if (client.IsConnecting)
+            if (client.IsConnecting || c.Reconnect.IsRetryingConnection)
             {
                 /* Cancel current connection */
                 client.CancelConnection();

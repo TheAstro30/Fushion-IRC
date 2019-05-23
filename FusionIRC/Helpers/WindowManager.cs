@@ -10,6 +10,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Linq;
 using FusionIRC.Forms;
+using FusionIRC.Forms.ChannelProperties;
 using FusionIRC.Forms.Child;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Helpers.Commands;
@@ -38,6 +39,9 @@ namespace FusionIRC.Helpers
 
         /* DCC file transfer manager window */
         public static FrmDccManager DccManagerWindow;
+
+        /* Channel properties window */
+        public static FrmChannelProperties ChannelProperties { get; set; }
 
         /* Main child window list */
         public static Dictionary<ClientConnection, List<FrmChildWindow>> Windows = new Dictionary<ClientConnection, List<FrmChildWindow>>();
@@ -321,6 +325,9 @@ namespace FusionIRC.Helpers
             client.Parser.OnInvite += Channel.OnInvite;
             client.Parser.OnCtcp += Ctcp.OnCtcp;
             client.Parser.OnCtcpReply += Ctcp.OnCtcpReply;
+            client.Parser.OnNotChannelOperator += Raw.OnNotChannelOperator;
+            client.Parser.OnModeListData += Channel.OnModeListData;
+            client.Parser.OnEndOfChannelProperties += Channel.OnEndOfChannelProperties;
         }
 
         private static void RemoveConnectionHandlers(ClientConnection client)
@@ -372,6 +379,9 @@ namespace FusionIRC.Helpers
             client.Parser.OnInvite -= Channel.OnInvite;
             client.Parser.OnCtcp -= Ctcp.OnCtcp;
             client.Parser.OnCtcpReply -= Ctcp.OnCtcpReply;
+            client.Parser.OnNotChannelOperator -= Raw.OnNotChannelOperator;
+            client.Parser.OnModeListData -= Channel.OnModeListData;
+            client.Parser.OnEndOfChannelProperties -= Channel.OnEndOfChannelProperties;
         }
     }
 }

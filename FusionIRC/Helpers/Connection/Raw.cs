@@ -34,5 +34,14 @@ namespace FusionIRC.Helpers.Connection
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
         }
+
+        public static void OnNotChannelOperator(ClientConnection client, string message)
+        {
+            if (WindowManager.ChannelProperties != null)
+            {
+                return;
+            }
+            OnRaw(client, message);            
+        }
     }
 }

@@ -133,6 +133,7 @@ namespace ircClient
             Parser.UserModeCharacters = string.Empty;
             Parser.UserModes = string.Empty;
             Parser.ChannelPrefixTypes = new ChannelTypes();
+            Parser.ChannelModes = new List<char>();
             /* Begin connection */
             IsConnecting = true;
             _sock.IsSsl = ssl;

@@ -81,13 +81,14 @@ namespace FusionIRC.Helpers.Connection
 
         public static void OnMotd(ClientConnection client, string text, bool isEnd)
         {
-            if (SettingsManager.Settings.Client.Show.PingPong)
+
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
             {
-                var c = WindowManager.GetConsoleWindow(client);
-                if (c == null)
-                {
-                    return;
-                }
+                return;
+            }
+            if (SettingsManager.Settings.Client.Show.Motd)
+            {
                 var tmd = new IncomingMessageData
                               {
                                   Message = ThemeMessage.MotdText,
@@ -116,6 +117,8 @@ namespace FusionIRC.Helpers.Connection
             ResolveLocalInfo(client);
             /* Finally process auto join/rejoin open channels */
             ProcessAutoJoin(client);
+            /* Make sure retry connection */
+            c.Reconnect.Cancel();
         }
 
         public static void OnLUsers(ClientConnection client, string text)

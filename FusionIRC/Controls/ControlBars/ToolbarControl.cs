@@ -363,7 +363,8 @@ namespace FusionIRC.Controls.ControlBars
             {
                 return;
             }
-            if (c.IsConnected || c.IsConnecting)
+            var console = WindowManager.GetConsoleWindow(c);
+            if (c.IsConnected || c.IsConnecting || (console != null && console.Reconnect.IsRetryingConnection) )
             {
                 if (_disconnect)
                 {

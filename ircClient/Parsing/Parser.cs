@@ -4,12 +4,20 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using ircClient.Parsing.Helpers;
 using ircCore.Utils;
 
 namespace ircClient.Parsing
 {
+    public enum ModeListType
+    {
+        Ban = 0,
+        Except = 1,
+        Invite = 2
+    }
+
     public class Parser
     {
         private readonly ClientConnection _client;
@@ -63,6 +71,11 @@ namespace ircClient.Parsing
         public event Action<ClientConnection, string> OnNetworkNameChanged;
         
         public event Action<ClientConnection, string, string> OnChannelModes;
+
+        public event Action<ClientConnection, ModeListType, string> OnModeListData;
+        public event Action<ClientConnection> OnEndOfChannelProperties;
+
+        public event Action<ClientConnection, string> OnNotChannelOperator;
        
         /* Public properties */
         public string JoinChannelsOnConnect { get; set; }
@@ -70,6 +83,7 @@ namespace ircClient.Parsing
         public string UserModeCharacters { get; set; }
         public string UserModes { get; set; }
         public ChannelTypes ChannelPrefixTypes { get; set; }
+        public List<char> ChannelModes { get; set; }
 
         public WhoisInfo Whois = new WhoisInfo();
 
@@ -78,6 +92,7 @@ namespace ircClient.Parsing
         {
             _client = client;
             ChannelPrefixTypes = new ChannelTypes();
+            ChannelModes = new List<char>();
         }
 
         /* Main parsing entry point */
@@ -250,6 +265,50 @@ namespace ircClient.Parsing
                     }
                     break;
 
+                case "482":
+                    /* Not a channel operator */                    
+                    if (OnNotChannelOperator != null)
+                    {
+                        OnNotChannelOperator(_client, ParseRaw(fourth));
+                    }
+                    if (OnEndOfChannelProperties != null)
+                    {
+                        OnEndOfChannelProperties(_client);
+                    }
+                    break;
+
+                case "346":
+                    /* Invite list */
+                    if (OnModeListData != null)
+                    {
+                        OnModeListData(_client, ModeListType.Invite, RemoveColon(fourth));
+                    }
+                    break;
+
+                case "348":
+                    /* Except list */
+                    if (OnModeListData != null)
+                    {
+                        OnModeListData(_client, ModeListType.Except, RemoveColon(fourth));
+                    }
+                    break;
+
+                case "367":
+                    /* Ban list */
+                    if (OnModeListData != null)
+                    {
+                        OnModeListData(_client, ModeListType.Ban, RemoveColon(fourth));
+                    }
+                    break;
+
+                case "368":
+                    /* End of ban list */
+                    if (OnEndOfChannelProperties != null)
+                    {
+                        OnEndOfChannelProperties(_client);
+                    }
+                    break;
+
                 case "376":
                 case "422":
                     /* End of MOTD/MOTD file missing */
@@ -408,6 +467,13 @@ namespace ircClient.Parsing
                         _client.UserInfo.Nick = tmp;
                         _client.Send(string.Format("NICK {0}", tmp));
                         _client.UserInfo.AlternateUsed = true;
+                    }
+                    break;
+
+                case "800":
+                    if (OnRaw != null)
+                    {
+                        OnRaw(_client, fourth);
                     }
                     break;
 
@@ -775,6 +841,7 @@ namespace ircClient.Parsing
             {
                 if (p == "IRCX")
                 {
+                    System.Diagnostics.Debug.Print("here");
                     _client.Send("IRCX");
                     UserModeCharacters = ".@+";
                     UserModes = "qov";
@@ -804,7 +871,11 @@ namespace ircClient.Parsing
 
                     case "CHANTYPES":
                         /* Fill out channel prefix types */
-                        ChannelPrefixTypes = new ChannelTypes(sections[0].ToCharArray());
+                        ChannelPrefixTypes = new ChannelTypes(sections[1].ToCharArray());
+                        break;
+
+                    case "CHANMODES":                        
+                        ChannelModes = new List<char>(sections[1].ToCharArray());
                         break;
                 }
             }
@@ -843,6 +914,13 @@ namespace ircClient.Parsing
             {
                 OnWho(_client, s[4], s[0], string.Format("{0}@{1}", s[1], s[2]));
             }
+        }
+
+        private static string ParseRaw(string data)
+        {
+            /* Move first word to end of string */
+            var i = data.IndexOf(' ');
+            return i == -1 ? data : string.Format("{0} {1}", RemoveColon(data.Substring(i + 1)), data.Substring(0, i));
         }
 
         /* Private methods */
