@@ -203,7 +203,7 @@ namespace ircCore.Utils.DirectX
                 }
                 _media = (IMediaControl)_graph;
                 _position = (IMediaPosition)_graph;
-                _audio = _graph as IBasicAudio;
+                _audio = _graph as IBasicAudio;                   
                 flag = true;
             }
             catch (Exception)

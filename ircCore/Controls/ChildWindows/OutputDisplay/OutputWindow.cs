@@ -528,8 +528,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         }
         
         protected override void OnMouseDoubleClick(MouseEventArgs e)
-        {
-            System.Diagnostics.Debug.Print("double-click " + AllowSpecialWordDoubleClick);
+        {            
             if (!string.IsNullOrEmpty(_url))
             {                
                 if (OnUrlDoubleClicked != null)

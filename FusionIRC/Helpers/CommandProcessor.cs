@@ -145,7 +145,7 @@ namespace FusionIRC.Helpers
                     break;
 
                 case "WRITE":
-                    CommandWrite.Write(args);
+                    CommandFiles.Write(args);
                     break;
 
                 case "WRITEINI":

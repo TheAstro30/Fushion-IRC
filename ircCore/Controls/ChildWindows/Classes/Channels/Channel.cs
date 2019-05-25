@@ -136,6 +136,15 @@ namespace ircCore.Controls.ChildWindows.Classes.Channels
             }
         }
 
+        public void ClearModes()
+        {
+            Modes.Clear();
+            if (OnSettingsChanged != null)
+            {
+                OnSettingsChanged(this);
+            }
+        }
+
         /* Private helper methods */
         private void ProcessKeyLimit(bool hasLimit, bool hasKey, IList<string> p)
         {

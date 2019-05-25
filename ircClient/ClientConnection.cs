@@ -130,6 +130,7 @@ namespace ircClient
             Server.Port = port;
             Server.IsSsl = ssl;
             /* Clear other parser variables */
+            Parser.IsAdministrator = false;
             Parser.UserModeCharacters = string.Empty;
             Parser.UserModes = string.Empty;
             Parser.ChannelPrefixTypes = new ChannelTypes();

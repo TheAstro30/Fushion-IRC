@@ -85,6 +85,8 @@ namespace ircClient.Parsing
         public ChannelTypes ChannelPrefixTypes { get; set; }
         public List<char> ChannelModes { get; set; }
 
+        public bool IsAdministrator { get; set; }
+
         public WhoisInfo Whois = new WhoisInfo();
 
         /* Constructor */
@@ -418,20 +420,23 @@ namespace ircClient.Parsing
                 case "474":
                 case "475":
                     /* These raws we take the first token and put it at the end */
-                    i = fourth.IndexOf(' ');
-                    if (i != -1)
+                    var raw = ParseRaw(fourth);
+                    if (!string.IsNullOrEmpty(raw) && OnRaw != null)
                     {
-                        var s = fourth.Substring(0, i).Trim();
-                        fourth = fourth.Substring(i).Trim();
-                        if (OnRaw != null)
-                        {
-                            OnRaw(_client, string.Format("{0}: {1}", RemoveColon(fourth), s));
-                        }
+                        OnRaw(_client, raw);
+                    }                  
+                    break;
+
+                case "381":
+                    /* You are an IRC administrator */
+                    IsAdministrator = true;
+                    if (OnRaw != null)
+                    {
+                        OnRaw(_client, string.Format("{0}", fourth.Replace(":", "")));
                     }
                     break;
 
-                case "331":
-                case "381":
+                case "331":                
                 case "396":
                 case "401":
                 case "437":
@@ -440,8 +445,8 @@ namespace ircClient.Parsing
                 case "472":
                 case "481":
                 case "491":
-                case "501":
-                    /* Other raws */
+                case "501":                    
+                    /* Other raws */                    
                     if (OnRaw != null)
                     {
                         OnRaw(_client, string.Format("{0}", fourth.Replace(":", "")));
@@ -840,8 +845,7 @@ namespace ircClient.Parsing
             foreach (var p in prot)
             {
                 if (p == "IRCX")
-                {
-                    System.Diagnostics.Debug.Print("here");
+                {                    
                     _client.Send("IRCX");
                     UserModeCharacters = ".@+";
                     UserModes = "qov";

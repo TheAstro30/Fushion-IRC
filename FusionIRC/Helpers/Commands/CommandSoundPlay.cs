@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using ircCore.Utils.DirectX;
+using ircScript.Classes.ScriptFunctions;
 
 namespace FusionIRC.Helpers.Commands
 {
@@ -33,35 +34,28 @@ namespace FusionIRC.Helpers.Commands
             {
                 return;
             }
-            string com;
-            string file;
             var i = args.IndexOf(' ');
             if (i > -1)
             {
                 /* Look at first word to see if it's a command */
-                com = args.Substring(0, i);
-                file = args.Substring(i + 1);
-            }
-            else
-            {
-                com = args;
-                file = com;
-            }
-            switch (com.ToUpper())
-            {
-                case "STOP":
-                    Sound.Stop();
-                    return;
+                var com = args.Substring(0, i);
+                switch (com.ToUpper())
+                {
+                    case "STOP":
+                        Sound.Stop();
+                        return;
 
-                case "PAUSE":
-                    Sound.Pause();
-                    return;
+                    case "PAUSE":
+                        Sound.Pause();
+                        return;
 
-                case "RESUME":
-                    Sound.Resume();
-                    return;
+                    case "RESUME":
+                        Sound.Resume();
+                        return;
+                }                
             }
-            Sound.Clip = file;
+            var file = Misc.ParseFilenameParamater(args);  
+            Sound.Clip = file[0];
             Sound.PlayAsync();        
         }
     }

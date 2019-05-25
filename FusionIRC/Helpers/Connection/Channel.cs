@@ -357,12 +357,10 @@ namespace FusionIRC.Helpers.Connection
 
         public static void OnModeListData(ClientConnection client, ModeListType type, string data)
         {
-            System.Diagnostics.Debug.Print("p " + data);
             if (WindowManager.ChannelProperties == null)
             {
                 return;                
             }
-            System.Diagnostics.Debug.Print("H");
             var sp = data.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
             if (sp.Length < 4)
             {
@@ -374,7 +372,6 @@ namespace FusionIRC.Helpers.Connection
                             SetByNick = sp[2],
                             Date = TimeFunctions.FormatAsciiTime(sp[3], "ddd dd/MM/yyyy h:nnt")
                         };
-            System.Diagnostics.Debug.Print("here " + p.Address);
             switch (type)
             {
                 case ModeListType.Invite:
@@ -393,8 +390,7 @@ namespace FusionIRC.Helpers.Connection
 
         public static void OnEndOfChannelProperties(ClientConnection client)
         {
-            System.Diagnostics.Debug.Print("end");
-            if (WindowManager.ChannelProperties == null)
+            if (WindowManager.ChannelProperties == null || WindowManager.ChannelProperties.Visible)
             {
                 return;
             }

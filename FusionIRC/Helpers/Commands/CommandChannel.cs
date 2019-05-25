@@ -35,8 +35,11 @@ namespace FusionIRC.Helpers.Commands
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             child.Output.AddLine(pmd.DefaultColor, pmd.Message);
-            /* Now we'd actually open the dialog... */                        
-            WindowManager.ChannelProperties = new FrmChannelProperties(client, chan, child.Modes);
+            /* Now we'd actually open the dialog... */
+            WindowManager.ChannelProperties = new FrmChannelProperties(client, chan,
+                                                                       client.Parser.IsAdministrator ||
+                                                                       child.Nicklist.IsOperator(client.UserInfo.Nick),
+                                                                       child.Modes);
             client.Send(string.Format("MODE {0} +b", chan));
             if (client.Parser.ChannelModes.Contains('e'))
             {

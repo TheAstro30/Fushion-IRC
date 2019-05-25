@@ -47,7 +47,6 @@ namespace FusionIRC.Helpers
             }
             if (SettingsManager.Settings.Connection.Options.RetryConnection)
             {
-                System.Diagnostics.Debug.Print("fuck " + _times);
                 IsRetryingConnection = true;
                 var t = SettingsManager.Settings.Connection.Options.RetryTimes;
                 if (t == 0)

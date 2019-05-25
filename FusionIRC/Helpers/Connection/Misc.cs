@@ -186,13 +186,18 @@ namespace FusionIRC.Helpers.Connection
         public static void UpdateChannelsOnDisconnect(ClientConnection client, ParsedMessageData message)
         {
             /* Here we either close all open windows or just clear the nicklist - dependant on settings */
-            foreach (var win in WindowManager.Windows[client].Where(win => win.WindowType == ChildWindowType.Channel).Where(win => !win.DisconnectedShown))
+            foreach (var win in WindowManager.Windows[client].Where(win => !win.DisconnectedShown))
             {
-                win.DisconnectedShown = true;
-                win.Nicklist.Clear();
-                win.Output.AddLine(message.DefaultColor, message.Message);
+                if (win.WindowType == ChildWindowType.Channel)
+                {
+                    win.DisconnectedShown = true;
+                    win.Nicklist.Clear();
+                    win.Output.AddLine(message.DefaultColor, message.Message);
+                }
                 /* Update treenode color */
                 WindowManager.SetWindowEvent(win, WindowManager.MainForm, WindowEvent.EventReceived);
+                /* Clear modes */
+                win.Modes.ClearModes();
             }
         }
 

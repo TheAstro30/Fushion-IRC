@@ -257,6 +257,25 @@ namespace ircCore.Controls.ChildWindows.Nicklist
             }
         }
 
+        public bool IsOperator(string nick)
+        {
+            /* Find if a nick is owner, op, halfop */
+            foreach (var n in _list.Where(n => n.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                switch (n.GetUserMode())
+                {
+                    case "!":
+                    case "~":
+                    case ".":
+                    case "&":
+                    case "@":
+                    case "%":
+                        return true;
+                }
+            }
+            return false;
+        }
+
         /* Public methods */               
         public void AddNicks(string nicks)
         {            
