@@ -180,6 +180,10 @@ namespace FusionIRC.Helpers
                     CommandText.ParseQuery(client, child, args);
                     break;
 
+                case "QUIT":
+                    CommandChannel.ParseQuit(client, args);
+                    break;
+
                 default:
                     /* Send command to server */
                     if (!client.IsConnected)

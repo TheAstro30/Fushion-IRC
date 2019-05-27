@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<script xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="npopups">
+  <data>Query:query $1</data>
+  <data>Whois:whois $1</data>
+  <data>-</data>
+  <data>Host Controls</data>
+  <data>.Op Selected (+o):mode $chan +ooooo $1 $2 $3 $4 $5</data>
+  <data>.Deop Selected (-o):mode $chan -ooooo $1 $2 $3 $4 $5</data>
+  <data>.-</data>
+  <data>.Voice Selected (+v):mode $chan +vvvvv $1 $2 $3 $4 $5</data>
+  <data>.Devoice Selected (-v):mode $chan -vvvvv $1 $2 $3 $4 $5</data>
+  <data>-</data>
+  <data>Popups</data>
+  <data>.Slap:me slaps $nick around with a dirty sock</data>
+  <data>.Random Slap:$read(scripts/randslap.txt)</data>
+</script>

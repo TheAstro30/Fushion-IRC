@@ -11,6 +11,7 @@ using FusionIRC.Forms.Misc;
 using ircClient;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
+using ircScript.Classes;
 
 namespace FusionIRC.Helpers.Commands
 {
@@ -148,6 +149,26 @@ namespace FusionIRC.Helpers.Commands
             var channel = args.Substring(0, i).Trim();
             args = args.Substring(i).Trim();
             client.Send(string.Format("TOPIC {0} :{1}", channel, args));
+        }
+
+        public static void ParseQuit(ClientConnection client, string args)
+        {
+            if (!client.IsConnected)
+            {
+                return;
+            }
+            client.IsManualDisconnect = true;
+            /* args takes precident */
+            var msg = !string.IsNullOrEmpty(args) ? args : SettingsManager.Settings.Client.Messages.QuitMessage;
+            if (string.IsNullOrEmpty(msg))
+            {
+                client.Send("QUIT");
+                return;
+            }
+            /* Process quit message as a script */
+            var s = new Script();
+            s.LineData.Add(msg);
+            client.Send(string.Format("QUIT :{0}", s.Parse(null)));
         }
     }
 }

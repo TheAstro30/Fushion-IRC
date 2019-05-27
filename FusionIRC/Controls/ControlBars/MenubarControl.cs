@@ -11,10 +11,13 @@ using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Forms;
 using FusionIRC.Forms.Child;
+using FusionIRC.Forms.Favorites;
+using FusionIRC.Forms.Favorites.Editing;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Helpers;
 using ircCore.Controls.Rendering;
 using ircCore.Forms;
+using ircCore.Settings.Channels;
 using ircCore.Settings.Networks;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
@@ -26,8 +29,11 @@ namespace FusionIRC.Controls.ControlBars
         private readonly Form _owner;
 
         private readonly ToolStripMenuItem _mnuFile;
+        private readonly ToolStripMenuItem _mnuFavorites;
         private readonly ToolStripMenuItem _mnuWindow;
         private readonly ToolStripMenuItem _mnuHelp;
+
+        public ToolStripMenuItem MenuCommands = new ToolStripMenuItem("Commands");
 
         public MenubarControl(Form owner)
         {
@@ -36,7 +42,7 @@ namespace FusionIRC.Controls.ControlBars
             RenderMode = ToolStripRenderMode.Professional;
             Renderer = renderer;
             GripStyle = ToolStripGripStyle.Visible;
-            Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            Font = new Font("Segoe UI", 9, FontStyle.Regular, GraphicsUnit.Point, 0);
             Tag = "MENUBAR";
             /* Menus */
             _mnuFile = new ToolStripMenuItem
@@ -55,11 +61,16 @@ namespace FusionIRC.Controls.ControlBars
                                                     new ToolStripSeparator(),
                                                     new ToolStripMenuItem("Exit", null, OnMenuFileClick, Keys.Alt | Keys.F4)
                                                 });
-            _mnuFile.DropDownOpening += OnMenuFileDropDownOpening;            
+            _mnuFile.DropDownOpening += OnMenuFileDropDownOpening;
+            _mnuFavorites = new ToolStripMenuItem
+                                {
+                                    Text = @"&Favorites"
+                                };                        
             _mnuWindow = new ToolStripMenuItem
                              {
                                  Text = @"&Window"
                              };
+
             _mnuHelp = new ToolStripMenuItem
                            {
                                Text = @"&Help"
@@ -70,10 +81,12 @@ namespace FusionIRC.Controls.ControlBars
                                                     new ToolStripSeparator(),
                                                     new ToolStripMenuItem("About FusionIRC...", null, OnMenuFileClick)
                                                 });
+            BuildFavoritesMenu();
+            _mnuFavorites.DropDownOpening += OnMenuFavoritesDropDownOpening;
             BuildWindowsMenu();
             _mnuWindow.DropDownOpening += OnMenuWindowDropDownOpening;
             /* Add all menus */
-            Items.AddRange(new[] { _mnuFile, _mnuWindow, _mnuHelp });           
+            Items.AddRange(new[] { _mnuFile, _mnuFavorites, MenuCommands, _mnuWindow, _mnuHelp });           
         }
 
         public void ConnectionUpdate(bool connected)
@@ -107,6 +120,12 @@ namespace FusionIRC.Controls.ControlBars
                                                new ToolStripSeparator(),
                                                new ToolStripMenuItem("Clear", null, OnMenuRecentServerClick)
                                            });
+        }
+
+        private void OnMenuFavoritesDropDownOpening(object sender, EventArgs e)
+        {
+            _mnuFavorites.DropDownItems.Clear();
+            BuildFavoritesMenu();
         }
 
         private void OnMenuWindowDropDownOpening(object sender, EventArgs e)
@@ -169,6 +188,58 @@ namespace FusionIRC.Controls.ControlBars
             ConnectToRecentServer(c, item);
         }
 
+        private void BuildFavoritesMenu()
+        {
+            var r = ChannelManager.Channels.Recent.Channels;
+            var channels = new ToolStripMenuItem("Recent channels...");
+            if (r.Count > 0)
+            {
+                foreach (var n in r)
+                {
+                    var net = new ToolStripMenuItem(n.Network);
+                    foreach (var c in n.Channel)
+                    {
+                        net.DropDownItems.Add(new ToolStripMenuItem(c.Name, null, OnMenuFavoriteClick, Keys.None));
+                    }
+                    channels.DropDownItems.Add(net);
+                }
+                channels.DropDownItems.AddRange(new ToolStripItem[]
+                                                    {
+                                                        new ToolStripSeparator(),
+                                                        new ToolStripMenuItem("Clear history", null, OnMenuFavoriteClick, Keys.None)
+                                                    });                    
+            }
+            else
+            {
+                channels.Enabled = false;                
+            }            
+            /* Add to menu */
+            _mnuFavorites.DropDownItems.AddRange(new ToolStripItem[]
+                                                     {
+                                                         channels,
+                                                         new ToolStripSeparator(),
+                                                         new ToolStripMenuItem("Add to favorites", null,
+                                                                               OnMenuFavoriteClick, Keys.None),
+                                                         new ToolStripMenuItem("Organize favorites", null,
+                                                                               OnMenuFavoriteClick, Keys.Alt | Keys.O)
+                                                     });
+            /* Append favorites to the end */
+            var count = 0;
+            foreach (var c in ChannelManager.Channels.Favorites.Favorite)
+            {
+                if (count == 0)
+                {
+                    _mnuFavorites.DropDownItems.Add(new ToolStripSeparator());
+                }
+                if (count > 20)
+                {
+                    break;
+                }
+                _mnuFavorites.DropDownItems.Add(new ToolStripMenuItem(c.Name, null, OnMenuFavoriteClick, Keys.None));
+                count++;
+            }
+        }
+
         private void BuildWindowsMenu()
         {
             _mnuWindow.DropDownItems.AddRange(new ToolStripItem[]
@@ -225,6 +296,55 @@ namespace FusionIRC.Controls.ControlBars
                         });
                     }
                 }
+            }
+        }
+
+        private void OnMenuFavoriteClick(object sender, EventArgs e)
+        {
+            var item = (ToolStripMenuItem)sender;
+            var c = WindowManager.GetActiveWindow();
+            if (c == null || item == null)
+            {
+                return;
+            }
+            switch (item.Text.ToUpper())
+            {
+                case "CLEAR HISTORY":
+                    ChannelManager.Channels.Recent.Channels.Clear();
+                    break;
+
+                case "ADD TO FAVORITES":
+                    using (var d = new FrmChannelEdit(DialogEditType.Add) {Channel = c.WindowType == ChildWindowType.Channel ? c.Tag.ToString() : string.Empty})
+                    {
+                        if (d.ShowDialog(_owner) == DialogResult.Cancel)
+                        {
+                            return;
+                        }
+                        var cd = new ChannelFavorites.ChannelFavoriteData
+                                     {
+                                         Name = d.Channel,
+                                         Password = d.Password,
+                                         Description = d.Description
+                                     };
+                        ChannelManager.Channels.Favorites.Favorite.Add(cd);
+                        ChannelManager.Channels.Favorites.Favorite.Sort();
+                    }
+                    break;
+
+                case "ORGANIZE FAVORITES":
+                    using (var d = new FrmFavorites(c.Client))
+                    {
+                        d.ShowDialog(_owner);
+                    }
+                    break;
+
+                default:
+                    /* Join the channel */
+                    if (c.Client.IsConnected)
+                    {
+                        c.Client.Send(string.Format("JOIN {0}", item.Text));
+                    }
+                    break;
             }
         }
 
@@ -323,12 +443,9 @@ namespace FusionIRC.Controls.ControlBars
                 if (font.SelectedFontDefault)
                 {
                     /* We now iterate all open windows and change the font of the same type */
-                    foreach (var win in WindowManager.Windows[c.Client])
+                    foreach (var win in WindowManager.Windows[c.Client].Where(win => win.WindowType == c.WindowType && win != c))
                     {
-                        if (win.WindowType == c.WindowType && win != c)
-                        {
-                            ChangeFont(win, font.SelectedFont);
-                        }
+                        ChangeFont(win, font.SelectedFont);
                     }
                 }
                 /* Update theme settings */

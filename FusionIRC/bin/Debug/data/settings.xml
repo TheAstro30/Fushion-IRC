@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <scripts>
+    <alias path="\test\testing script.XML" type="None" />
+    <event path="\scripts\events1.xml" type="None" />
+    <popup path="\scripts\mpopups.xml" type="Commands" />
+    <popup path="\scripts\spopups.xml" type="Console" />
+    <popup path="\scripts\cpopups.xml" type="Channel" />
+    <popup path="\scripts\npopups.xml" type="Nicklist" />
+  </scripts>
+</settings>

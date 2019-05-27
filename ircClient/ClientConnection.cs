@@ -42,6 +42,8 @@ namespace ircClient
         public bool IsConnecting { get; internal set; }
         public bool IsConnected { get; internal set; }
 
+        public bool MotdShown { get; set; }
+
         public bool IsWaitingToReconnect { get; set; }
         public bool IsManualDisconnect { get; set; }
 
@@ -68,6 +70,8 @@ namespace ircClient
         public event Action<ClientConnection, DnsResult> OnClientDnsFailed;
 
         public event Action<ClientConnection, string, string> OnClientIdentDaemonRequest;
+
+        public event Action<ClientConnection> OnClientBeginQuit;
 
         /* Constructor */
         public ClientConnection(ISynchronizeInvoke syncObject, SettingsUserInfo userInfo)
@@ -145,6 +149,7 @@ namespace ircClient
             {
                 OnClientBeginConnect(this);
             }
+            MotdShown = false;
         }
 
         /* Disconnection */
@@ -152,7 +157,10 @@ namespace ircClient
         {
             if (IsConnected)
             {
-                Send(string.Format("QUIT :{0}", SettingsManager.Settings.Client.Messages.QuitMessage));
+                if (OnClientBeginQuit != null)
+                {
+                    OnClientBeginQuit(this);
+                }
             }
             else
             {
@@ -164,7 +172,10 @@ namespace ircClient
         {
             if (IsConnected)
             {
-                Send(string.Format("QUIT :{0}", SettingsManager.Settings.Client.Messages.QuitMessage));
+                if (OnClientBeginQuit != null)
+                {
+                    OnClientBeginQuit(this);
+                }
             }
             else
             {

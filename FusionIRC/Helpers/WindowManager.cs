@@ -328,6 +328,7 @@ namespace FusionIRC.Helpers
             client.Parser.OnNotChannelOperator += Raw.OnNotChannelOperator;
             client.Parser.OnModeListData += Channel.OnModeListData;
             client.Parser.OnEndOfChannelProperties += Channel.OnEndOfChannelProperties;
+            client.OnClientBeginQuit += Channel.OnBeginQuit;
         }
 
         private static void RemoveConnectionHandlers(ClientConnection client)
@@ -382,6 +383,7 @@ namespace FusionIRC.Helpers
             client.Parser.OnNotChannelOperator -= Raw.OnNotChannelOperator;
             client.Parser.OnModeListData -= Channel.OnModeListData;
             client.Parser.OnEndOfChannelProperties -= Channel.OnEndOfChannelProperties;
+            client.OnClientBeginQuit += Channel.OnBeginQuit;
         }
     }
 }

@@ -9,6 +9,17 @@ using System.Xml.Serialization;
 
 namespace ircCore.Settings.SettingsBase.Structures
 {
+    public enum PopupType
+    {
+        None = 0,
+        Commands = 1,
+        Console = 2,
+        Channel = 3,
+        Nicklist = 4,
+        Private = 5,
+        DccChat = 6
+    }
+
     [Serializable]
     public class SettingsScripts
     {
@@ -16,6 +27,9 @@ namespace ircCore.Settings.SettingsBase.Structures
         {
             [XmlAttribute("path")]
             public string Path { get; set; }
+
+            [XmlAttribute("type")]
+            public PopupType Type { get; set; }
         }
 
         [XmlElement("alias")]
@@ -23,5 +37,8 @@ namespace ircCore.Settings.SettingsBase.Structures
 
         [XmlElement("event")]
         public List<SettingsScriptPath> Events = new List<SettingsScriptPath>();
+
+        [XmlElement("popup")]
+        public List<SettingsScriptPath> Popups = new List<SettingsScriptPath>();
     }
 }

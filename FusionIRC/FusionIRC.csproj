@@ -267,6 +267,7 @@
     <Compile Include="Helpers\Connection\Modes.cs" />
     <Compile Include="Helpers\MdiHelper.cs" />
     <Compile Include="Helpers\ReconnectOnDisconnect.cs" />
+    <Compile Include="Helpers\UserTimers.cs" />
     <Compile Include="Helpers\WindowManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

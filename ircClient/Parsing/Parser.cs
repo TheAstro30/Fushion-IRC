@@ -418,7 +418,7 @@ namespace ircClient.Parsing
                 case "471":
                 case "473":
                 case "474":
-                case "475":
+                case "475":                
                     /* These raws we take the first token and put it at the end */
                     var raw = ParseRaw(fourth);
                     if (!string.IsNullOrEmpty(raw) && OnRaw != null)
@@ -445,11 +445,27 @@ namespace ircClient.Parsing
                 case "472":
                 case "481":
                 case "491":
-                case "501":                    
+                case "501":
+                case "509":            
                     /* Other raws */                    
                     if (OnRaw != null)
                     {
-                        OnRaw(_client, string.Format("{0}", fourth.Replace(":", "")));
+                        OnRaw(_client, string.Format("{0}", RemoveColon(fourth)));
+                    }
+                    break;
+
+                case "391":
+                case "927":
+                    /* Other raws to be formatted <fourth>[0]: <fourth>[1-] */
+                    i = fourth.IndexOf(' ');
+                    if (i == -1)
+                    {
+                        return;
+                    }
+                    var text = RemoveColon(fourth);
+                    if (OnRaw != null)
+                    {
+                        OnRaw(_client, string.Format("{0}: {1}", text.Substring(0, i), text.Substring(i + 1)));
                     }
                     break;
 
@@ -934,7 +950,12 @@ namespace ircClient.Parsing
             {
                 return string.Empty;
             }
-            return data[0] == ':' ? data.Substring(1) : data;
+            if (data[0] == ':')
+            {
+                return data.Substring(1);
+            }
+            var index = data.IndexOf(':');
+            return index != -1 ? data.Remove(index, 1) : data;
         }
     }
 }

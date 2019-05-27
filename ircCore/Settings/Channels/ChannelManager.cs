@@ -3,7 +3,9 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
+using System;
 using System.IO;
+using System.Linq;
 using ircCore.Utils;
 using ircCore.Utils.Serialization;
 
@@ -25,7 +27,7 @@ namespace ircCore.Settings.Channels
 
         public static void Save()
         {
-            if (Channels.Favorites.Favorite.Count == 0 && Channels.Recent.Channel.Count == 0)
+            if (Channels.Favorites.Favorite.Count == 0 && Channels.Recent.Channels.Count == 0)
             {
                 /* No point saving or keeping an empty list */
                 if (File.Exists(FileName))
@@ -35,6 +37,30 @@ namespace ircCore.Settings.Channels
                 return;
             }
             XmlSerialize<Channels>.Save(FileName, Channels);
+        }
+
+        public static ChannelRecent.ChannelNetworkData GetNetwork(string network)
+        {
+            foreach (var n in Channels.Recent.Channels)
+            {
+                if (n.Network.Equals(network, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return n;
+                }
+            }
+            return null;
+        }
+
+        public static ChannelRecent.ChannelData GetChannel(ChannelRecent.ChannelNetworkData network, string channel)
+        {
+            foreach (var c in network.Channel)
+            {
+                if (c.Name.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return c;
+                }
+            }
+            return null;
         }
     }
 }

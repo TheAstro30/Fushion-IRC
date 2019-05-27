@@ -70,7 +70,7 @@ namespace FusionIRC.Controls.ControlBars
                                   ToolTipText = @"Connect"
                               };
             _btnConnect.Click += ToolbarButtonClick;
-            _btnConnectDrop = new ToolStripDropDownButton { Tag = "CONNECT" };
+            _btnConnectDrop = new ToolStripDropDownButton { Tag = "CONNECT" };            
             _btnConnectDrop.DropDownOpening += DropDownOpening;
             /* Connect to location button */
             _btnConnectToLocation = new ToolStripButton

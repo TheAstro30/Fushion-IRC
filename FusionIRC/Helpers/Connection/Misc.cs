@@ -100,10 +100,11 @@ namespace FusionIRC.Helpers.Connection
                 /* Update treenode color */
                 WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
             }
-            if (!isEnd)
+            if (!isEnd || client.MotdShown)
             {
                 return;
             }
+            client.MotdShown = true;
             /* Set invisible */
             if (client.UserInfo.Invisible)
             {
@@ -204,13 +205,13 @@ namespace FusionIRC.Helpers.Connection
         public static void UpdateRecentServers(ClientConnection client)
         {
             var servers = ServerManager.Servers.Recent.Server;
-            var index = servers.FindIndex(s => s.Address.Equals(client.Server.Address, StringComparison.InvariantCultureIgnoreCase));
-            if (index > -1)
+            var old = servers.FirstOrDefault(o => o.Address.Equals(client.Server.Address, StringComparison.InvariantCultureIgnoreCase));
+            if (old != null)
             {
-                servers.RemoveAt(index);
+                servers.Remove(old);
             }
             /* Lol... helps to actually add the damn thing if it doesn't exist */
-            servers.Insert(0, client.Server);
+            servers.Insert(0, new Server(client.Server));
             /* Keep the list length down */
             if (servers.Count > 25)
             {

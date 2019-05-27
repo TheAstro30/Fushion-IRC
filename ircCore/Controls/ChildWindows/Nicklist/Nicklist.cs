@@ -48,7 +48,7 @@ namespace ircCore.Controls.ChildWindows.Nicklist
         private string _keyWord;
         private string _rest;
 
-        public event Action OnNicklistRightClick;
+        public event Action<MouseEventArgs> OnNicklistRightClick;
         public event Action OnNicklistDoubleClick;
 
         public Nicklist()
@@ -531,7 +531,7 @@ namespace ircCore.Controls.ChildWindows.Nicklist
             }
             if (OnNicklistRightClick != null)
             {
-                OnNicklistRightClick();
+                OnNicklistRightClick(e);
             }
         }
 

@@ -5,11 +5,11 @@
  */
 using System;
 using System.Linq;
-using FusionIRC.Forms.ChannelProperties;
-using FusionIRC.Forms.ChannelProperties.Controls;
+using FusionIRC.Helpers.Commands;
 using ircClient;
 using ircClient.Parsing;
 using ircCore.Settings;
+using ircCore.Settings.Channels;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
 
@@ -122,6 +122,8 @@ namespace FusionIRC.Helpers.Connection
             client.Send(string.Format("WHO {0}{1}MODE {0}", channel, Environment.NewLine));
             /* Remember to unset the halt disconnect message bool */
             c.DisconnectedShown = false;
+            /* Add channel to history */
+            UpdateRecentChannels(client, channel);
         }
 
         public static void OnPartSelf(ClientConnection client, string channel)
@@ -396,6 +398,34 @@ namespace FusionIRC.Helpers.Connection
             }
             WindowManager.ChannelProperties.ShowDialog();
             WindowManager.ChannelProperties = null;
+        }
+
+        public static void OnBeginQuit(ClientConnection client)
+        {
+            CommandChannel.ParseQuit(client, string.Empty);
+        }
+
+        /* Private helper method */
+        private static void UpdateRecentChannels(ClientConnection client, string channel)
+        {
+            var net = !string.IsNullOrEmpty(client.Network) ? client.Network : client.Server.Address;
+            var network = ChannelManager.GetNetwork(net);
+            if (network != null)
+            {
+                var old = ChannelManager.GetChannel(network, channel);
+                if (old != null)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                network = new ChannelRecent.ChannelNetworkData { Network = net };
+                ChannelManager.Channels.Recent.Channels.Add(network);
+                ChannelManager.Channels.Recent.Channels.Sort();
+            }            
+            network.Channel.Add(new ChannelRecent.ChannelData {Name = channel});
+            network.Channel.Sort();           
         }
     }
 }

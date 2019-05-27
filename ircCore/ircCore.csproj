@@ -140,12 +140,6 @@
     </Compile>
     <Compile Include="Users\UserManager.cs" />
     <Compile Include="Users\UserList.cs" />
-    <Compile Include="Utils\DirectX\Forms\FrmVideoWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Utils\DirectX\Forms\FrmVideoWindow.Designer.cs">
-      <DependentUpon>FrmVideoWindow.cs</DependentUpon>
-    </Compile>
     <Compile Include="Utils\DirectX\Sound.cs" />
     <Compile Include="Utils\DirectX\Core\DsBugFix.cs" />
     <Compile Include="Utils\DirectX\Core\DsControl.cs" />
@@ -180,9 +174,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Utils\DirectX\Forms\FrmVideoWindow.resx">
-      <DependentUpon>FrmVideoWindow.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

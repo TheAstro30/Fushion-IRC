@@ -195,7 +195,7 @@ namespace ircCore.Utils.DirectX
                     return false;
                 }
                 o = Activator.CreateInstance(typeFromClsid);
-                _graph = (IGraphBuilder)o;
+                _graph = (IGraphBuilder) o;
                 o = null;
                 if (_graph.RenderFile(Clip, null) < 0)
                 {

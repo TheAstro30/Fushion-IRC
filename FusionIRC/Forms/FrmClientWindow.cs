@@ -13,6 +13,7 @@ using FusionIRC.Controls.SwitchView;
 using FusionIRC.Forms.Child;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Helpers;
+using FusionIRC.Helpers.Commands;
 using FusionIRC.Properties;
 using ircCore.Autos;
 using ircCore.Controls;
@@ -25,6 +26,8 @@ using ircCore.Settings.Theming;
 using ircCore.Users;
 using ircCore.Utils;
 using ircScript;
+using ircScript.Classes;
+using ircScript.Classes.Structures;
 
 namespace FusionIRC.Forms
 {
@@ -82,6 +85,9 @@ namespace FusionIRC.Forms
             ScriptManager.BuildScripts(ScriptType.Events, ScriptManager.EventData, ScriptManager.Events);
             /* Load variables */
             ScriptManager.LoadVariables(Functions.MainDir(@"\scripts\variables.xml"));
+            /* Load popups */
+            PopupManager.LoadMultiplePopups(SettingsManager.Settings.Scripts.Popups);
+            PopupManager.OnPopupItemClicked += OnPopupItemClicked;
             /* Main form initialization */
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             Text = @"FusionIRC";
@@ -208,12 +214,14 @@ namespace FusionIRC.Forms
             /* Show connect dialog */
             _timerConnect = new Timer {Interval = 10};
             _timerConnect.Tick += ShowConnectDialog;
-            _initialize = false;            
+            _initialize = false;          
         }
 
         /* Overrides */
         protected override void OnLoad(EventArgs e)
-        {
+        {            
+            /* Need to call the loading of the main menu popups separately */
+            PopupManager.BuildPopups(PopupType.Commands, PopupManager.CommandsRawData, MenuBar.MenuCommands.DropDownItems);
             /* Create our first connection */
             var w = WindowManager.AddWindow(null, ChildWindowType.Console, this, "Console", "Console", true);
             if (w != null)
@@ -253,7 +261,7 @@ namespace FusionIRC.Forms
             if (!_initialize)
             {
                 var w = SettingsManager.GetWindowByName("application");
-                if (WindowState == FormWindowState.Normal)
+                if (WindowState == FormWindowState.Normal && Visible)
                 {
                     w.Size = Size;
                     w.Position = Location;
@@ -295,7 +303,7 @@ namespace FusionIRC.Forms
             /* Disconnect each connection */
             foreach (var client in WindowManager.Windows.Where(client => client.Key.IsConnected))
             {
-                client.Key.Send(string.Format("QUIT :{0}", SettingsManager.Settings.Client.Messages.QuitMessage));
+                CommandChannel.ParseQuit(client.Key, string.Empty);
                 client.Key.Disconnect();
             }
             /* Get the first console window's user info data and copy it back to settings */
@@ -564,6 +572,40 @@ namespace FusionIRC.Forms
         {
             Focus();
             WindowManager.LastActiveChild.Activate();
+        }
+        
+        /* Main callback for all popup's used */
+        private static void OnPopupItemClicked(PopupData data)
+        {
+            var c = WindowManager.GetActiveWindow();
+            if (c == null)
+            {
+                return;
+            }
+            var s = new Script();
+            s.LineData.Add(data.LineData);
+            var e = new ScriptArgs
+                         {
+                             ChildWindow = c,
+                             ClientConnection = c.Client,
+                         };
+            string[] args = null;
+            switch (data.Type)
+            {
+                case PopupType.Channel:
+                case PopupType.Nicklist:
+                    e.Channel = c.Tag.ToString();
+                    e.Nick = c.Nicklist.SelectedNicks[0];
+                    args = c.Nicklist.SelectedNicks.ToArray();
+                    break;
+
+                case PopupType.Private:
+                case PopupType.DccChat:
+                    e.Nick = c.Tag.ToString();
+                    break;
+            }
+            CommandProcessor.Parse(c.Client, c, s.Parse(e, args));
+            c.Input.Focus();
         }
     }
 }

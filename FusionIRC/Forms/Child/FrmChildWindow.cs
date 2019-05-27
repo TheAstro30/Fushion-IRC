@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using FusionIRC.Forms.Warning;
 using FusionIRC.Helpers;
+using FusionIRC.Helpers.Commands;
 using FusionIRC.Properties;
 using ircClient;
 using ircCore.Controls;
@@ -158,6 +159,7 @@ namespace FusionIRC.Forms.Child
                                    ShowPrefix = true
                                };
                 Nicklist.OnNicklistDoubleClick += NicklistDoubleClickNick;
+                Nicklist.OnNicklistRightClick += NicklistRightClick;
                 /* Split control for nicklist */
                 _splitter = new SplitContainer
                                {
@@ -188,6 +190,7 @@ namespace FusionIRC.Forms.Child
             /* Callbacks */
             Output.OnUrlDoubleClicked += OutputUrlDoubleClicked;
             Output.OnSpecialWordDoubleClicked += OutputSpecialWordDoubleClicked;
+            Output.MouseDown += OutputMouseDown;
             Output.MouseUp += OutputMouseUp;
             Output.OnWordUnderMouse += OutputWordUnderMouse;
             Output.OnLineAdded += OutputOnLineAdded;
@@ -345,10 +348,7 @@ namespace FusionIRC.Forms.Child
                         e.Cancel = true;
                         return;
                     }
-                    if (Client.IsConnected)
-                    {
-                        Client.Send(string.Format("QUIT :{0}", SettingsManager.Settings.Client.Messages.QuitMessage));
-                    }
+                    CommandChannel.ParseQuit(Client, string.Empty);
                     WindowManager.RemoveAllWindowsOfConsole(Client);
                     break;
 
@@ -564,6 +564,33 @@ namespace FusionIRC.Forms.Child
             Output.AllowSpecialWordDoubleClick = false;
         }
 
+        private void OutputMouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Right)
+            {
+                return;
+            }
+            var p = new Point(Output.ClientRectangle.Left + e.X, Output.ClientRectangle.Top + e.Y);
+            switch (WindowType)
+            {
+                case ChildWindowType.Console:
+                    PopupManager.Console.Show(Output, p);
+                    break;
+
+                case ChildWindowType.Channel:
+                    PopupManager.Channel.Show(Output, p);
+                    break;
+
+                case ChildWindowType.Private:
+                    PopupManager.Private.Show(Output, p);
+                    break;
+
+                case ChildWindowType.DccChat:
+                    PopupManager.DccChat.Show(Output, p);
+                    break;
+            }
+        }        
+
         private void OutputMouseUp(object sender, MouseEventArgs e)
         {
             Input.Focus();
@@ -735,6 +762,12 @@ namespace FusionIRC.Forms.Child
             CommandProcessor.Parse(Client, this, s.Parse(scriptArgs, nick.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)));
         }
 
+        private void NicklistRightClick(MouseEventArgs e)
+        {
+            var p = new Point(Nicklist.ClientRectangle.Left + e.X, Nicklist.ClientRectangle.Top + e.Y);
+            PopupManager.Nicklist.Show(Nicklist, p);
+        }
+
         private void SplitterMoving(object sender, SplitterCancelEventArgs e)
         {
             /* Save the nicklist width */
@@ -767,17 +800,27 @@ namespace FusionIRC.Forms.Child
             Client.Connect(s.Address, s.Port, s.IsSsl);
         }
 
-        private void ParseCommandLineAsScript(string line)
+        private void ParseCommandLineAsScript(string line, string[] args = null)
+        {
+            var e = new ScriptArgs
+                        {
+                            ClientConnection = Client,
+                            Channel = WindowType != ChildWindowType.Console ? Tag.ToString() : string.Empty,
+                            ChildWindow = this,
+                            Nick =
+                                WindowType == ChildWindowType.Private || WindowType == ChildWindowType.DccChat
+                                    ? Tag.ToString()
+                                    : string.Empty
+                        };
+            ParseCommandLineAsScript(e, line, args);
+        }
+
+        private void ParseCommandLineAsScript(ScriptArgs e, string line, string[] args)
         {
             /* Used with //command <args> from input window */
             var script = new Script();
             script.LineData.Add(line);
-            var args = new ScriptArgs
-                           {
-                               ClientConnection = Client,
-                               Channel = WindowType != ChildWindowType.Console ? Tag.ToString() : string.Empty                               
-                           };
-            CommandProcessor.Parse(Client, this, script.Parse(args));
+            CommandProcessor.Parse(Client, this, script.Parse(e, args));
         }
 
         private void TimerFocus(object sender, EventArgs e)

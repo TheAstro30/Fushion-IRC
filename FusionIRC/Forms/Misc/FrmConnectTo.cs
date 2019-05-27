@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using FusionIRC.Forms.Child;
 using FusionIRC.Helpers;
+using FusionIRC.Helpers.Commands;
 using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
@@ -416,7 +417,7 @@ namespace FusionIRC.Forms.Misc
                     {
                         return;
                     }
-                    _console.Client.Send(string.Format("QUIT :{0}", SettingsManager.Settings.Client.Messages.QuitMessage));
+                    CommandChannel.ParseQuit(_console.Client, string.Empty);                    
                     _console.Client.Disconnect();
                     _txtNick.Enabled = true;
                     _txtAlternate.Enabled = true;

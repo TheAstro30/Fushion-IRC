@@ -47,15 +47,35 @@ namespace ircCore.Settings.Channels
     public class ChannelRecent
     {
         [Serializable]
-        public class ChannelData
+        public class ChannelData : IComparable<ChannelData>
         {
             [XmlAttribute("name")]
             public string Name { get; set; }
+
+            public int CompareTo(ChannelData other)
+            {
+                return Name.CompareTo(other.Name);
+            }
+        }
+
+        [Serializable]
+        public class ChannelNetworkData : IComparable<ChannelNetworkData>
+        {
+            [XmlAttribute("network")]
+            public string Network { get; set; }
+
+            [XmlElement("channel")]
+            public List<ChannelData> Channel = new List<ChannelData>();
+
+            public int CompareTo(ChannelNetworkData other)
+            {
+                return Network.CompareTo(other.Network);
+            }
         }
 
         /* I would probably change this class later to organize channels by network... */
-        [XmlElement("channel")]
-        public List<ChannelData> Channel = new List<ChannelData>(); 
+        [XmlElement("channels")]
+        public List<ChannelNetworkData> Channels = new List<ChannelNetworkData>(); 
     }
 
     [Serializable, XmlRoot("channels")]
