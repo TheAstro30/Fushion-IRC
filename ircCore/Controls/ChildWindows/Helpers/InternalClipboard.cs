@@ -63,7 +63,7 @@ namespace ircCore.Controls.ChildWindows.Helpers
                 /* Load clipboard data until it actually loads */
                 try
                 {
-                    Clipboard.SetText(!String.IsNullOrEmpty(_newData) ? _newData : _data);
+                    Clipboard.SetText(!string.IsNullOrEmpty(_newData) ? _newData : _data);
                     bSuccess = true;
                     _data = null;
                     _newData = null;

@@ -11,6 +11,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using FusionIRC.Helpers;
 using FusionIRC.Properties;
 using ircCore.Controls.Rendering;
 using ircCore.Settings;
@@ -43,6 +44,7 @@ namespace FusionIRC.Forms.ScriptEditor
 
         private readonly List<ScriptData> _aliases = new List<ScriptData>();
         private readonly List<ScriptData> _events = new List<ScriptData>();
+        private readonly List<ScriptData> _popups = new List<ScriptData>();
         
         private readonly List<ScriptFileNode> _files = new List<ScriptFileNode>();
         private readonly bool _initialize;
@@ -292,6 +294,8 @@ namespace FusionIRC.Forms.ScriptEditor
             {
                 NewScript(ScriptType.Events);
             }
+            /* Popups */
+            _popups = PopupManager.Popups.Clone();
             /* Here we can cheat with displaying variables by creating them as new script file -
              * we leave the data blank as this gets "imported" when the viewing file is switched to %variables */
             _variables = new ScriptData
@@ -308,6 +312,7 @@ namespace FusionIRC.Forms.ScriptEditor
                                 {
                                     new ScriptFileNode {Name = "Aliases", Data = _aliases, Type = ScriptType.Aliases},
                                     new ScriptFileNode {Name = "Events", Data = _events, Type = ScriptType.Events},
+                                    new ScriptFileNode {Name = "Popups", Data = _popups, Type = ScriptType.Popups},
                                     _varNode
                                 });
 
@@ -464,14 +469,15 @@ namespace FusionIRC.Forms.ScriptEditor
             switch (dd.Text.ToUpper())
             {
                 case "&FILE":
-                    var node = GetNodeType() != ScriptType.Variables;
+                    var nodeType = GetNodeType();
+                    var node = nodeType != ScriptType.Variables && nodeType != ScriptType.Popups;
                     var type = _tvFiles.SelectedObject != null && _tvFiles.SelectedObject.GetType() != typeof(ScriptFileNode);
                     _mnuFile.DropDownItems[0].Enabled = node;
                     _mnuFile.DropDownItems[2].Enabled = node;
                     /* Cannot unload/save as the root item! */
                     _mnuFile.DropDownItems[3].Enabled = node && type;
                     _mnuFile.DropDownItems[6].Enabled = node && type;                    
-                    /* Cannot move variables or root items */
+                    /* Cannot move variables/popups or root items */
                     _mnuFile.DropDownItems[9].Enabled = node && type;
                     _mnuFile.DropDownItems[10].Enabled = node && type;
                     break;
@@ -797,18 +803,33 @@ namespace FusionIRC.Forms.ScriptEditor
             _currentEditingScript.RawScriptData = new List<string>(_txtEdit.Lines);
             /* Save current editing file */
             var type = GetNodeType();
+            SettingsScripts.SettingsScriptPath file;
             switch (type)
             {
                 case ScriptType.Variables:
                     RebuildVariables(_currentEditingScript);
                     break;
 
+                case ScriptType.Popups:
+                    file = ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Popups,
+                                                           _currentEditingScript);
+                    PopupManager.SavePopup(_currentEditingScript, Functions.MainDir(file.Path));
+                    if (file.Type == PopupType.Commands)
+                    {
+                        PopupManager.BuildPopups(PopupType.Commands, _currentEditingScript,
+                                                 ((FrmClientWindow)WindowManager.MainForm).MenuBar.MenuCommands
+                                                     .DropDownItems);
+                    }
+                    break;
+
                 default:
                     /* Renaming of scripts happens elsewhere and does not need this flag set to true
                      * nor the file deleted - just rename file and change the Name flag */
-                    var file = type == ScriptType.Aliases
-                              ? ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Aliases, _currentEditingScript)
-                              : ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Events, _currentEditingScript);
+                    file = type == ScriptType.Aliases
+                               ? ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Aliases,
+                                                                 _currentEditingScript)
+                               : ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Events,
+                                                                 _currentEditingScript);
                     //ScriptManager.SaveScript(_currentEditingScript, Functions.MainDir(string.Format(@"\scripts\{0}.xml", _currentEditingScript.Name)));                    
                     ScriptManager.SaveScript(_currentEditingScript, Functions.MainDir(file.Path));
                     break;
@@ -860,23 +881,35 @@ namespace FusionIRC.Forms.ScriptEditor
             if (_currentEditingScript != null && _currentEditingScript.ContentsChanged)
             {
                 _currentEditingScript.RawScriptData = new List<string>(_txtEdit.Lines);
-            }            
+            }
             foreach (var file in _files)
             {
                 foreach (var s in file.Data.Where(s => s.ContentsChanged))
                 {
+                    SettingsScripts.SettingsScriptPath f;
                     switch (file.Type)
                     {
                         case ScriptType.Variables:
                             RebuildVariables(s);
                             break;
 
+                        case ScriptType.Popups:
+                            f = ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Popups, s);
+                            PopupManager.SavePopup(s, Functions.MainDir(f.Path));
+                            if (f.Type == PopupType.Commands)
+                            {
+                                PopupManager.BuildPopups(PopupType.Commands, _currentEditingScript,
+                                                         ((FrmClientWindow) WindowManager.MainForm).MenuBar.MenuCommands
+                                                             .DropDownItems);
+                            }
+                            break;
+
                         default:
                             /* Renaming of scripts happens elsewhere and does not need this flag set to true
                              * nor the file deleted - just rename file and change the Name flag */
-                            var f = file.Type == ScriptType.Aliases
-                                        ? ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Aliases, s)
-                                        : ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Events, s);
+                            f = file.Type == ScriptType.Aliases
+                                    ? ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Aliases, s)
+                                    : ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Events, s);
                             //ScriptManager.SaveScript(s, Functions.MainDir(string.Format(@"\scripts\{0}.xml", s.Name)));
                             ScriptManager.SaveScript(s, Functions.MainDir(f.Path));
                             break;
@@ -951,9 +984,11 @@ namespace FusionIRC.Forms.ScriptEditor
             /* Make sure to clone these lists back to master lists (adding of new files/renaming) */
             ScriptManager.AliasData = _aliases.Clone();
             ScriptManager.EventData = _events.Clone();
+            PopupManager.Popups = _popups.Clone();
             /* Build script data */
             ScriptManager.BuildScripts(ScriptType.Aliases, ScriptManager.AliasData, ScriptManager.Aliases);
-            ScriptManager.BuildScripts(ScriptType.Events, ScriptManager.EventData, ScriptManager.Events);            
+            ScriptManager.BuildScripts(ScriptType.Events, ScriptManager.EventData, ScriptManager.Events);
+            PopupManager.ReBuildAllPopups();
             UpdateStatusInfo();
         }
 
@@ -994,6 +1029,10 @@ namespace FusionIRC.Forms.ScriptEditor
 
                 case ScriptType.Events:
                     file = ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Events, _currentEditingScript);
+                    break;
+
+                case ScriptType.Popups:
+                    file = ScriptManager.GetScriptFilePath(SettingsManager.Settings.Scripts.Popups, _currentEditingScript);
                     break;
 
                 default:

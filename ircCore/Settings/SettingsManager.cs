@@ -53,5 +53,43 @@ namespace ircCore.Settings
             }
             return d;
         }
+
+        public static void CreatePopupList()
+        {
+            Settings.Scripts.Popups.Clear();
+            Settings.Scripts.Popups.AddRange(new[]
+                                                 {
+                                                     new SettingsScripts.SettingsScriptPath
+                                                         {
+                                                             Path = @"\scripts\menubar.xml",
+                                                             Type = PopupType.Commands
+                                                         },
+                                                     new SettingsScripts.SettingsScriptPath
+                                                         {
+                                                             Path = @"\scripts\console.xml",
+                                                             Type = PopupType.Console
+                                                         },
+                                                     new SettingsScripts.SettingsScriptPath
+                                                         {
+                                                             Path = @"\scripts\channel.xml",
+                                                             Type = PopupType.Channel
+                                                         },
+                                                     new SettingsScripts.SettingsScriptPath
+                                                         {
+                                                             Path = @"\scripts\nicklist.xml",
+                                                             Type = PopupType.Nicklist
+                                                         },
+                                                     new SettingsScripts.SettingsScriptPath
+                                                         {
+                                                             Path = @"\scripts\private.xml",
+                                                             Type = PopupType.Private
+                                                         },
+                                                     new SettingsScripts.SettingsScriptPath
+                                                         {
+                                                             Path = @"\scripts\dcc-chat.xml",
+                                                             Type = PopupType.DccChat
+                                                         }
+                                                 });
+        }
     }
 }

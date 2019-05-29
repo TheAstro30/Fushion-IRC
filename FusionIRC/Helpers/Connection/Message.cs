@@ -77,7 +77,7 @@ namespace FusionIRC.Helpers.Connection
                         {
                             ChildWindow = c,
                             ClientConnection = client,
-                            Nick = nick,
+                            Nick = nick, 
                             Channel = c.Tag.ToString()
                         };
             Events.Execute("text", e, text);

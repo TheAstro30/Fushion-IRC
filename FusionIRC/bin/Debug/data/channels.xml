@@ -62,4 +62,19 @@
     <favorite name="#WobblyWorld" description="" password="" />
     <favorite name="#WorldChat" description="" password="" />
   </favorites>
+  <recent>
+    <channels network="DragonIRC">
+      <channel name="#Adults" />
+      <channel name="#dragonsrealm" />
+    </channels>
+    <channels network="XAIM">
+      <channel name="#Adults" />
+      <channel name="#AllNiteCafe" />
+      <channel name="#Beginner" />
+      <channel name="#main" />
+      <channel name="#test" />
+      <channel name="#tets]" />
+      <channel name="#tits" />
+    </channels>
+  </recent>
 </channels>

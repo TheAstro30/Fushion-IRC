@@ -3,15 +3,11 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
-
-using System;
-using System.Collections.Generic;
-using FusionIRC.Forms;
+using System.Windows.Forms;
 using FusionIRC.Forms.Child;
 using FusionIRC.Helpers.Commands;
 using ircClient;
 using ircClient.Parsing.Helpers;
-using ircCore.Settings.Theming;
 using ircScript.Classes.Helpers;
 
 namespace FusionIRC.Helpers
@@ -182,6 +178,10 @@ namespace FusionIRC.Helpers
 
                 case "QUIT":
                     CommandChannel.ParseQuit(client, args);
+                    break;
+
+                case "EXIT":
+                    Application.Exit();
                     break;
 
                 default:

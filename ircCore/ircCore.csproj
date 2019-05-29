@@ -152,6 +152,7 @@
     <Compile Include="Utils\DirectX\Core\QEdit.cs" />
     <Compile Include="Utils\DnsResult.cs" />
     <Compile Include="Utils\Functions.cs" />
+    <Compile Include="Utils\InternalAddressList.cs" />
     <Compile Include="Utils\ListExtensions.cs" />
     <Compile Include="Controls\ChildWindows\Classes\Logger.cs" />
     <Compile Include="Utils\Serialization\BinarySerialize.cs" />

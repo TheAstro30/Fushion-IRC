@@ -77,7 +77,7 @@ namespace ircScript.Controls.SyntaxHighlight.Commands
             {
                 C = s[0];
             }
-            if (String.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(s))
             {
                 throw new ArgumentOutOfRangeException();
             }

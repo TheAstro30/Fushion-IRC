@@ -232,7 +232,7 @@ namespace ircCore.Settings.Networks
 
         public NetworkData GetNetworkByName(string name)
         {
-            return Networks.Network.FirstOrDefault(o => String.Compare(o.NetworkName, name, StringComparison.InvariantCultureIgnoreCase) == 0);
+            return Networks.Network.FirstOrDefault(o => string.Compare(o.NetworkName, name, StringComparison.InvariantCultureIgnoreCase) == 0);
         }
 
         public NetworkData GetNetworkByServer(ServerData server)

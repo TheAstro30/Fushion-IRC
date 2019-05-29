@@ -5,6 +5,7 @@
  */
 using System;
 using System.Collections.Generic;
+using ircCore.Settings.SettingsBase.Structures;
 using ircScript.Classes.Parsers;
 using ircScript.Classes.Structures;
 
@@ -16,6 +17,8 @@ namespace ircScript.Classes
         private ScriptVariables _localVariables = new  ScriptVariables();
 
         /* Public properties */
+        public PopupType PopupType { get; set; }
+
         public ScriptEventParams EventParams = new ScriptEventParams();
 
         public string Name { get; set; }
@@ -36,6 +39,11 @@ namespace ircScript.Classes
          * but the code looks messy as SHIT) - so, having a direct return value option is a better
          * solution in that instance.
          */
+        public string Parse()
+        {
+            return Parse(null, null);
+        }
+
         public string Parse(ScriptArgs e)
         {
             return Parse(e, null);
@@ -48,7 +56,7 @@ namespace ircScript.Classes
             var parser = new ScriptParser(_localVariables);
             var conditional = new ScriptConditionalParser();
             var br = false;
-            var finalResult = string.Empty;
+            var finalResult = string.Empty;            
             /* Parse each line - conditions then finally check for return/break */
             for (var l = 0; l < LineData.Count; l++)
             {
@@ -108,6 +116,11 @@ namespace ircScript.Classes
             }
             /* Short, but sweet :P */
             return finalResult;
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }

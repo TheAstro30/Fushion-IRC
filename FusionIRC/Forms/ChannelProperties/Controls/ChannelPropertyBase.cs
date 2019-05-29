@@ -13,6 +13,7 @@ using FusionIRC.Forms.ChannelProperties.Editing;
 using FusionIRC.Helpers;
 using ircClient;
 using ircCore.Utils;
+using ircScript.Classes.ScriptFunctions;
 using libolv;
 
 namespace FusionIRC.Forms.ChannelProperties.Controls
@@ -172,7 +173,7 @@ namespace FusionIRC.Forms.ChannelProperties.Controls
                 {
                     return;
                 }
-                mask = Functions.CheckAddress(d.Mask);
+                mask = Address.CheckIrcAddress(d.Mask);
             }
             if (GetChannelUserData(mask) != null)
             {

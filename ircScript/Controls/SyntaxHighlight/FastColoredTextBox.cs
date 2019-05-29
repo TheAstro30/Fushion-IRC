@@ -2673,12 +2673,12 @@ namespace ircScript.Controls.SyntaxHighlight
                             + "<!--StartFragment-->";
 
             const string htmlEnd = "<!--EndFragment-->\r\n</body>\r\n</html>\r\n";
-            var beginSample = String.Format(begin, 0, 0, 0, 0);
+            var beginSample = string.Format(begin, 0, 0, 0, 0);
             var countBegin = enc.GetByteCount(beginSample);
             var countHtmlBegin = enc.GetByteCount(htmlBegin);
             var countHtml = enc.GetByteCount(html);
             var countHtmlEnd = enc.GetByteCount(htmlEnd);
-            var htmlTotal = String.Format(
+            var htmlTotal = string.Format(
                 begin
                 , countBegin
                 , countBegin + countHtmlBegin + countHtml + countHtmlEnd

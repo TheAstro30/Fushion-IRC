@@ -62,7 +62,7 @@ namespace ircCore.Utils
         public static string ConvertToUtf8(string text, bool processUtf8)
         {
             /* This checks if the whole string contains unicode then returns the result */
-            if (!String.IsNullOrEmpty(text))
+            if (!string.IsNullOrEmpty(text))
             {
                 if (!processUtf8) { return text; }
                 var s = new StringBuilder();
@@ -208,7 +208,7 @@ namespace ircCore.Utils
             var pwz = Marshal.StringToHGlobalUni(st);
             var cwch = MultiByteToWideChar(cpg, flags, pwz, -1, IntPtr.Zero, 0);
             var stBuffer = new string((char)0, cwch + 1);
-            if (!String.IsNullOrEmpty(stBuffer))
+            if (!string.IsNullOrEmpty(stBuffer))
             {
                 var pwzBuffer = Marshal.StringToHGlobalUni(stBuffer);
                 MultiByteToWideChar(cpg, flags, pwz, -1, pwzBuffer, stBuffer.Length);
@@ -228,7 +228,7 @@ namespace ircCore.Utils
             var pwz = Marshal.StringToHGlobalUni(st);
             var cwch = WideCharToMultiByte(cpg, flags, pwz, -1, IntPtr.Zero, 0, 0, 0);
             var stBuffer = new string((char)0, cwch + 1);
-            if (!String.IsNullOrEmpty(stBuffer))
+            if (!string.IsNullOrEmpty(stBuffer))
             {
                 var pwzBuffer = Marshal.StringToHGlobalUni(stBuffer);
                 WideCharToMultiByte(cpg, flags, pwz, -1, pwzBuffer, stBuffer.Length, 0, 0);

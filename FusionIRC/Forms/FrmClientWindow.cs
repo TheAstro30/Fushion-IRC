@@ -86,6 +86,10 @@ namespace FusionIRC.Forms
             /* Load variables */
             ScriptManager.LoadVariables(Functions.MainDir(@"\scripts\variables.xml"));
             /* Load popups */
+            if (SettingsManager.Settings.Scripts.Popups.Count < 6)
+            {
+                SettingsManager.CreatePopupList();
+            }
             PopupManager.LoadMultiplePopups(SettingsManager.Settings.Scripts.Popups);
             PopupManager.OnPopupItemClicked += OnPopupItemClicked;
             /* Main form initialization */
@@ -214,14 +218,14 @@ namespace FusionIRC.Forms
             /* Show connect dialog */
             _timerConnect = new Timer {Interval = 10};
             _timerConnect.Tick += ShowConnectDialog;
-            _initialize = false;          
+            _initialize = false;
         }
 
         /* Overrides */
         protected override void OnLoad(EventArgs e)
         {            
             /* Need to call the loading of the main menu popups separately */
-            PopupManager.BuildPopups(PopupType.Commands, PopupManager.CommandsRawData, MenuBar.MenuCommands.DropDownItems);
+            PopupManager.BuildPopups(PopupType.Commands, PopupManager.Popups[0], MenuBar.MenuCommands.DropDownItems);
             /* Create our first connection */
             var w = WindowManager.AddWindow(null, ChildWindowType.Console, this, "Console", "Console", true);
             if (w != null)
@@ -575,28 +579,29 @@ namespace FusionIRC.Forms
         }
         
         /* Main callback for all popup's used */
-        private static void OnPopupItemClicked(PopupData data)
+        private static void OnPopupItemClicked(Script s)
         {
             var c = WindowManager.GetActiveWindow();
             if (c == null)
             {
                 return;
             }
-            var s = new Script();
-            s.LineData.Add(data.LineData);
+            string[] args = null;
             var e = new ScriptArgs
                          {
                              ChildWindow = c,
                              ClientConnection = c.Client,
                          };
-            string[] args = null;
-            switch (data.Type)
+            switch (s.PopupType)
             {
                 case PopupType.Channel:
                 case PopupType.Nicklist:
                     e.Channel = c.Tag.ToString();
-                    e.Nick = c.Nicklist.SelectedNicks[0];
-                    args = c.Nicklist.SelectedNicks.ToArray();
+                    if (c.Nicklist.SelectedNicks.Count > 0)
+                    {
+                        e.Nick = c.Nicklist.SelectedNicks[0];
+                        args = c.Nicklist.SelectedNicks.ToArray();
+                    }
                     break;
 
                 case PopupType.Private:
@@ -604,8 +609,22 @@ namespace FusionIRC.Forms
                     e.Nick = c.Tag.ToString();
                     break;
             }
-            CommandProcessor.Parse(c.Client, c, s.Parse(e, args));
+            s.LineParsed += PopupLineParsed;
+            s.ParseCompleted += PopupParseCompleted;
+            s.Parse(e, args);
             c.Input.Focus();
+        }
+
+        private static void PopupLineParsed(Script s, ScriptArgs e, string lineData)
+        {
+            System.Diagnostics.Debug.Print(lineData);
+            CommandProcessor.Parse(e.ClientConnection, (FrmChildWindow) e.ChildWindow, lineData);
+        }
+
+        private static void PopupParseCompleted(Script s)
+        {
+            s.LineParsed -= PopupLineParsed;
+            s.ParseCompleted -= PopupParseCompleted;
         }
     }
 }

@@ -61,13 +61,14 @@ namespace FusionIRC.Forms.ChannelProperties
 
         public FrmChannelProperties(ClientConnection client, string channel, bool isOperator, ChannelBase modes)
         {
-            Font = new Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            ClientSize = new Size(382, 420);
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
             MaximizeBox = false;
             MinimizeBox = false;
             ShowIcon = false;
             ShowInTaskbar = false;
-            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            StartPosition = FormStartPosition.CenterParent;
             Text = @"Channel properties:";
 
             _lblTopic = new Label
@@ -250,7 +251,7 @@ namespace FusionIRC.Forms.ChannelProperties
             _btnOk = new Button
                          {
                              DialogResult = DialogResult.OK,
-                             Location = new Point(214, 384),
+                             Location = new Point(214, 386),
                              Size = new Size(75, 23),
                              TabIndex = 3,
                              Text = @"OK",
@@ -260,7 +261,7 @@ namespace FusionIRC.Forms.ChannelProperties
             _btnClose = new Button
                             {
                                 DialogResult = DialogResult.Cancel,
-                                Location = new Point(295, 384),
+                                Location = new Point(295, 386),
                                 Size = new Size(75, 23),
                                 TabIndex = 4,
                                 Text = @"Close",

@@ -4,6 +4,8 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System.Globalization;
+using System.Windows.Forms;
+using ircScript.Forms;
 
 namespace ircScript.Classes.ScriptFunctions
 {
@@ -24,6 +26,18 @@ namespace ircScript.Classes.ScriptFunctions
                                };
             }
             return new[] { args };
+        }
+
+        public static string ParseInput(string prompt, string text = null)
+        {
+            using (var input = new FrmInput{Prompt = prompt,InputText = text})
+            {
+                if (input.ShowDialog() == DialogResult.OK && !string.IsNullOrEmpty(input.InputText))
+                {
+                    return input.InputText;
+                }
+            }
+            return string.Empty;
         }
     }
 }

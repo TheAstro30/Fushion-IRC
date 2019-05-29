@@ -55,6 +55,8 @@ namespace ircClient
 
         public int ConnectionId { get; set; }
 
+        public InternalAddressList Ial = new InternalAddressList();
+
         public event Action<ClientConnection> OnClientBeginConnect;
         public event Action<ClientConnection> OnClientConnected;
         public event Action<ClientConnection> OnClientDisconnected;

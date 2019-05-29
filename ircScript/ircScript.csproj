@@ -45,7 +45,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\Helpers\CommandHash.cs" />
-    <Compile Include="Classes\Popup.cs" />
+    <Compile Include="Classes\ScriptFunctions\Address.cs" />
+    <Compile Include="Forms\FrmInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PopupManager.cs" />
     <Compile Include="Classes\ScriptFunctions\Calc.cs" />
     <Compile Include="Classes\ScriptFunctions\Base64Encoding.cs" />
     <Compile Include="Classes\ScriptFunctions\FileFunctions.cs" />

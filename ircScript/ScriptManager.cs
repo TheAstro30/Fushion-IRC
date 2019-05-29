@@ -19,7 +19,8 @@ namespace ircScript
     {
         Aliases = 0,
         Events = 1,
-        Variables = 2
+        Popups = 2,
+        Variables = 3
     }
 
     public static class ScriptManager

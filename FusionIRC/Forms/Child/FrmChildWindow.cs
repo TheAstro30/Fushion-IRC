@@ -25,6 +25,7 @@ using ircCore.Settings.Networks;
 using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
+using ircScript;
 using ircScript.Classes;
 using ircScript.Classes.Structures;
 
@@ -47,7 +48,7 @@ namespace FusionIRC.Forms.Child
 
         public Logger Logger = new Logger();
 
-        public Channel Modes = new Channel();
+        public Channel Modes = new Channel();        
 
         /* Public properties */
         public ChildWindowType WindowType { get; private set; }
@@ -353,13 +354,17 @@ namespace FusionIRC.Forms.Child
                     break;
 
                 case ChildWindowType.Channel:
-                    if (Client.IsConnected && !AutoClose)
+                    if (Client.IsConnected)
                     {
-                        /* Part channel if closing it */
-                        var p = SettingsManager.Settings.Client.Messages.PartMessage;
-                        Client.Send(!string.IsNullOrEmpty(p)
-                                        ? string.Format("PART {0} :{1}", Tag, p)
-                                        : string.Format("PART {0}", Tag));
+                        if (!AutoClose)
+                        {
+                            /* Part channel if closing it */
+                            var p = SettingsManager.Settings.Client.Messages.PartMessage;
+                            Client.Send(!string.IsNullOrEmpty(p)
+                                            ? string.Format("PART {0} :{1}", Tag, p)
+                                            : string.Format("PART {0}", Tag));
+                        }
+                        Client.Ial.RemoveChannel(Tag.ToString());
                     }
                     break;
             }
@@ -757,9 +762,9 @@ namespace FusionIRC.Forms.Child
                                      Channel = Tag.ToString(),
                                      ChildWindow = this,
                                      ClientConnection = Client,
-                                     Nick = nick,
-                                 };            
-            CommandProcessor.Parse(Client, this, s.Parse(scriptArgs, nick.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)));
+                                     Nick = nick
+                                 };
+            CommandProcessor.Parse(Client, this, s.Parse(scriptArgs, new[] {nick}));
         }
 
         private void NicklistRightClick(MouseEventArgs e)
@@ -812,12 +817,6 @@ namespace FusionIRC.Forms.Child
                                     ? Tag.ToString()
                                     : string.Empty
                         };
-            ParseCommandLineAsScript(e, line, args);
-        }
-
-        private void ParseCommandLineAsScript(ScriptArgs e, string line, string[] args)
-        {
-            /* Used with //command <args> from input window */
             var script = new Script();
             script.LineData.Add(line);
             CommandProcessor.Parse(Client, this, script.Parse(e, args));

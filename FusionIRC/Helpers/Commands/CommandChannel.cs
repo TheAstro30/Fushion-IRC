@@ -12,6 +12,7 @@ using ircClient;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircScript.Classes;
+using ircScript.Classes.Structures;
 
 namespace FusionIRC.Helpers.Commands
 {
@@ -168,7 +169,7 @@ namespace FusionIRC.Helpers.Commands
             /* Process quit message as a script */
             var s = new Script();
             s.LineData.Add(msg);
-            client.Send(string.Format("QUIT :{0}", s.Parse(null)));
+            client.Send(string.Format("QUIT :{0}", s.Parse()));
         }
     }
 }

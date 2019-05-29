@@ -95,7 +95,7 @@ namespace ircScript.Classes.Parsers
                     var id = value.Replace("$", "");
                     /* Is it an alias or an internal identifier? (Args aren't required here) */
                     var script = ScriptManager.GetScript(ScriptManager.Aliases, id);
-                    return script != null ? script.Parse(e, null) : ParseInternalIdentifier(e, id.ToUpper(), null);
+                    return script != null ? script.Parse(e) : ParseInternalIdentifier(e, id.ToUpper(), null);
             }
         }
 
@@ -138,7 +138,7 @@ namespace ircScript.Classes.Parsers
                 }
                 /* Check if it's an alias */
                 var script = ScriptManager.GetScript(ScriptManager.Aliases, p.Id);
-                rec = script != null ? script.Parse(e, rec.Split(new[] {','})) : ParseInternalIdentifier(e, p.Id.ToUpper(), rec);
+                rec = script != null ? script.Parse(e, rec.Split(new[] { ',' })) : ParseInternalIdentifier(e, p.Id.ToUpper(), rec);
             }
             /* Return final result */
             return rec;
@@ -179,13 +179,33 @@ namespace ircScript.Classes.Parsers
                 }
             }
             switch (id)
-            {        
+            {    
+                case "INPUT":
+                    return argList.Length > 1 ? Misc.ParseInput(argList[0], argList[1]) : Misc.ParseInput(argList[0]);
+
                 case "IIF":
                     /* $iif(condition,true part,false part) */
                     if (argList.Length == 3)
                     {
                         var con = new ScriptConditionalParser();                        
                         return con.ParseConditional(argList[0]) ? argList[1] : argList[2];
+                    }
+                    return string.Empty;
+
+                case "ADDRESS":
+                    var address = e.ClientConnection.Ial.Get(argList[0]);
+                    if (!string.IsNullOrEmpty(address))
+                    {
+                        if (argList.Length == 2)
+                        {
+                            return !int.TryParse(argList[1], out i)
+                                       ? string.Empty
+                                       : Address.GetIrcAddressMask(e.ClientConnection.Ial.Get(argList[0]), i);
+                        }
+                        if (argList.Length == 1)
+                        {
+                            return address;
+                        }
                     }
                     return string.Empty;
 

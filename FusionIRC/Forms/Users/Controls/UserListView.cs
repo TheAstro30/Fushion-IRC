@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using FusionIRC.Forms.Users.Editing;
 using ircCore.Users;
 using ircCore.Utils;
+using ircScript.Classes.ScriptFunctions;
 using libolv;
 
 namespace FusionIRC.Forms.Users.Controls
@@ -218,7 +219,7 @@ namespace FusionIRC.Forms.Users.Controls
                         }
                         /* If someone types just a persons nick (no address/no wildcards), we need to convert this
                          * to a wildcard string */
-                        user.Address = Functions.CheckAddress(user.Address);
+                        user.Address = Address.CheckIrcAddress(user.Address);
                         UserManager.UserList.Ignore.Users.Add(user);
                     }
                     break;

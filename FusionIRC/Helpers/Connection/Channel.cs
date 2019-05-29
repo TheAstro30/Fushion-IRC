@@ -100,6 +100,8 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
+            /* Update IAL */
+            client.Ial.Add(nick, address, channel);
         }
 
         public static void OnJoinSelf(ClientConnection client, string channel)
@@ -123,7 +125,7 @@ namespace FusionIRC.Helpers.Connection
             /* Remember to unset the halt disconnect message bool */
             c.DisconnectedShown = false;
             /* Add channel to history */
-            UpdateRecentChannels(client, channel);
+            UpdateRecentChannels(client, channel);            
         }
 
         public static void OnPartSelf(ClientConnection client, string channel)
@@ -134,7 +136,7 @@ namespace FusionIRC.Helpers.Connection
                 return;
             }
             c.AutoClose = true;
-            c.Close();
+            c.Close();            
         }
 
         public static void OnPartUser(ClientConnection client, string nick, string address, string channel, string text)
@@ -159,6 +161,8 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
+            /* Update IAL */
+            client.Ial.Remove(nick, channel);
         }
 
         public static void OnNames(ClientConnection client, string channel, string names)
@@ -179,6 +183,7 @@ namespace FusionIRC.Helpers.Connection
                 return;
             }
             c.Nicklist.UpdateNickAddress(nick, address);
+            client.Ial.Add(nick, address, channel);
         }
 
         public static void OnNick(ClientConnection client, string nick, string newNick)
@@ -245,6 +250,8 @@ namespace FusionIRC.Helpers.Connection
                     c.DisplayNode.Text = c.ToString();
                 }
             }
+            /* Update IAL */
+            client.Ial.Update(nick, newNick);
         }
 
         public static void OnQuit(ClientConnection client, string nick, string address, string msg)
@@ -267,6 +274,8 @@ namespace FusionIRC.Helpers.Connection
                 /* Update treenode color */
                 WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
             }
+            /* Update IAL */
+            client.Ial.Remove(nick);
         }
 
         public static void OnKickSelf(ClientConnection client, string nick, string channel, string msg)

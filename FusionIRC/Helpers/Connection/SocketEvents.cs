@@ -109,15 +109,10 @@ namespace FusionIRC.Helpers.Connection
             /* Iterate all open channels and clear nick list (or close it's window) */
             Misc.UpdateChannelsOnDisconnect(client, pmd);
             client.UserInfo.AlternateUsed = false;
+            /* Remove IAL */
+            client.Ial.Clear();
             /* Notification */
             ((TrayIcon) WindowManager.MainForm).ShowNotificationPopup(client.Network, "Disconnect from network", 50);
-            if (client.IsManualDisconnect)
-            {
-                client.IsManualDisconnect = false;
-                return;
-            }
-            /* Now we process re-connection code if the server wasn't manually disconnected by the user */
-            c.Reconnect.BeginReconnect();
             /* Process event script */
             var e = new ScriptArgs
                         {
@@ -125,6 +120,13 @@ namespace FusionIRC.Helpers.Connection
                             ClientConnection = client
                         };
             Events.Execute("disconnect", e);
+            if (client.IsManualDisconnect)
+            {
+                client.IsManualDisconnect = false;
+                return;
+            }
+            /* Now we process re-connection code if the server wasn't manually disconnected by the user */
+            c.Reconnect.BeginReconnect();            
         }
 
         public static void OnClientConnectionError(ClientConnection client, string error)
@@ -151,22 +153,27 @@ namespace FusionIRC.Helpers.Connection
                 Misc.UpdateChannelsOnDisconnect(client, pmd);
             }
             client.UserInfo.AlternateUsed = false;
-            /* Notification */
-            ((TrayIcon) WindowManager.MainForm).ShowNotificationPopup(client.Network, "Disconnect from network", 50);
+            if (client.IsConnected)
+            {
+                /* Remove IAL */
+                client.Ial.Clear();
+                /* Notification */
+                ((TrayIcon) WindowManager.MainForm).ShowNotificationPopup(client.Network, "Disconnect from network", 50);
+                /* Process event script */
+                var e = new ScriptArgs
+                            {
+                                ChildWindow = c,
+                                ClientConnection = client
+                            };
+                Events.Execute("disconnect", e);
+            }
             if (client.IsManualDisconnect)
             {
                 client.IsManualDisconnect = false;
                 return;
             }            
             /* Now we process re-connection code if the server wasn't manually disconnected by the user */
-            c.Reconnect.BeginReconnect();
-            /* Process event script */
-            var e = new ScriptArgs
-                        {
-                            ChildWindow = c,
-                            ClientConnection = client
-                        };
-            Events.Execute("disconnect", e);
+            c.Reconnect.BeginReconnect();            
         }
 
         public static void OnClientSslInvalidCertificate(ClientConnection client, X509Certificate certificate)
