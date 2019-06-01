@@ -145,7 +145,7 @@ namespace FusionIRC.Forms
                                  ShowRootLines = false,
                                  Size = new Size(160, 554),
                                  BackColor = ThemeManager.GetColor(ThemeColor.SwitchTreeBackColor),
-                                 ForeColor = ThemeManager.GetColor(ThemeColor.SwitchTreeForeColor),
+                                 ForeColor = ThemeManager.GetColor(ThemeColor.SwitchTreeForeColor),                                 
                                  TabIndex = 0
                              };
             /* Treeview icons */
@@ -155,10 +155,13 @@ namespace FusionIRC.Forms
                                             Resources.status.ToBitmap(),
                                             Resources.channel.ToBitmap(),
                                             Resources.query.ToBitmap(),
-                                            Resources.dcc_chat.ToBitmap()
+                                            Resources.dcc_chat.ToBitmap(),
+                                            Resources.notifyGroup.ToBitmap(),
+                                            Resources.notify.ToBitmap()
                                         });
             SwitchView.ImageList = _images;
             SwitchView.AfterSelect += SwitchViewAfterSelect;
+            SwitchView.NodeMouseDoubleClick += SwitchViewNodeDoubleClick;
             /* Splitter */
             _switchViewSplitter = new Splitter
                                       {
@@ -218,7 +221,12 @@ namespace FusionIRC.Forms
             /* Show connect dialog */
             _timerConnect = new Timer {Interval = 10};
             _timerConnect.Tick += ShowConnectDialog;
-            _initialize = false;
+            /* UserManager */
+            UserManager.NotifyAdded += SendWatchCommand;
+            UserManager.NotifyRemoved += SendWatchCommand;
+            UserManager.NotifyEdited += SendWatchCommand;
+            UserManager.NotifyCleared += SendWatchCommand;
+            _initialize = false;            
         }
 
         /* Overrides */
@@ -230,7 +238,7 @@ namespace FusionIRC.Forms
             var w = WindowManager.AddWindow(null, ChildWindowType.Console, this, "Console", "Console", true);
             if (w != null)
             {
-                w.DisplayNode.Text = string.Format("{0}: {1}", "Console", w.Client.UserInfo.Nick);              
+                w.DisplayNode.Text = string.Format("{0}: {1}", "Console", w.Client.UserInfo.Nick);
             }
             _timerConnect.Enabled = true;
             base.OnLoad(e);            
@@ -456,15 +464,41 @@ namespace FusionIRC.Forms
             {
                 return;
             }
-            var t = SwitchView.SelectedNode;                                   
-            var win = (FrmChildWindow)t.Tag;
-            if (win == null)
-            {               
+            var t = SwitchView.SelectedNode;
+            if (!(t.Tag is FrmChildWindow))
+            {
                 return;
             }
+            var win = (FrmChildWindow)t.Tag;
             win.Restore();
             _mdi.ActivateChild(win);
-            win.MyActivate();            
+            win.MyActivate();
+        }
+
+        private void SwitchViewNodeDoubleClick(object sender, EventArgs e)
+        {
+            var t = SwitchView.SelectedNode;
+            if (!(t.Tag is User))
+            {
+                return;
+            }
+            var root = t.Parent.Parent;
+            if (root == null)
+            {
+                return;
+            }
+            var c = ((FrmChildWindow)root.Tag).Client;
+            if (!c.IsConnected)
+            {
+                return;
+            }
+            var u = (User)t.Tag;
+            /* See if we have an open query/private chat with this fucker */
+            var w = WindowManager.GetWindow(c, u.Nick);
+            if (w == null)
+            {
+                WindowManager.AddWindow(c, ChildWindowType.Private, this, u.Nick, u.Nick, true);
+            }
         }
 
         /* MDI context menu */
@@ -625,6 +659,23 @@ namespace FusionIRC.Forms
         {
             s.LineParsed -= PopupLineParsed;
             s.ParseCompleted -= PopupParseCompleted;
+        }
+
+        /* UserManager callbacks */
+        private static void SendWatchCommand(string data)
+        {
+            foreach (var c in WindowManager.Windows.Where(c => c.Key.IsConnected))
+            {
+                if (c.Key.Parser.AllowsWatch)
+                {
+                    c.Key.Send(string.Format("WATCH {0}", data));
+                }
+                else
+                {
+                    /* This is left open for using a ISON timer */
+                    continue;
+                }
+            }
         }
     }
 }

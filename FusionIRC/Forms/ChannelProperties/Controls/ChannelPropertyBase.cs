@@ -11,6 +11,7 @@ using System.Text;
 using System.Windows.Forms;
 using FusionIRC.Forms.ChannelProperties.Editing;
 using FusionIRC.Helpers;
+using FusionIRC.Helpers.Commands;
 using ircClient;
 using ircCore.Utils;
 using ircScript.Classes.ScriptFunctions;
@@ -234,7 +235,7 @@ namespace FusionIRC.Forms.ChannelProperties.Controls
             }
             _lvList.SetObjects(_list);
             /* Send string to server */
-            _client.Send(string.Format("MODE {0} -{1} {2}", _chan, new String(_mode, count), s));
+            CommandMode.ParseOddModes(_client, _chan, new string(_mode, count), s.ToString());
         }
 
         private ChannelPropertyData GetChannelUserData(string mask)

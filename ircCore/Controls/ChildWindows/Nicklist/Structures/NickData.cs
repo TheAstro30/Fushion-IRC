@@ -25,7 +25,7 @@ namespace ircCore.Controls.ChildWindows.Nicklist.Structures
         private readonly List<string> _userModes = new List<string>();
 
         public string Nick { get; set; }
-        public string Address { get; set; }
+        //public string Address { get; set; }
 
         public bool AddUserMode(string modeChar)
         {

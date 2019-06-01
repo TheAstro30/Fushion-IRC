@@ -182,7 +182,6 @@ namespace FusionIRC.Helpers.Connection
             {
                 return;
             }
-            c.Nicklist.UpdateNickAddress(nick, address);
             client.Ial.Add(nick, address, channel);
         }
 

@@ -25,7 +25,11 @@ namespace ircScript.Controls
 
         private readonly Regex _identifierPrefix =
             new Regex(
-                @"\$input|\$\+|\$me|\$chan|\$nick|\$active|\$gettok|\$addtok|\$deltok|\$cid|\$asctime|\$ctime|\$duration|\$calc|\$iif|\$encode|\$decode|\$appdir|\$chr|\$asc|\$readini|\$read|\$server|\$network");
+                @"\$input|\$\+|\$me|\$chan|\$nick|\$active|\$gettok|" +
+                @"\$addtok|\$deltok|\$cid|\$asctime|\$ctime|\$duration|" +
+                @"\$calc|\$iif|\$encode|\$decode|\$appdir|\$chr|\$asc|\$readini|" +
+                @"\$read|\$server|\$network|\$address|\$comchan|" +
+                @"\$len|\$left|\$mid|\$right|\$upper|\$lower");
 
         private readonly Regex _commandPrefix = new Regex(@"\b(set|var|inc|dec|unset|echo|writeini|write)\b",
                                                           RegexOptions.IgnoreCase | RegexOptions.Compiled);

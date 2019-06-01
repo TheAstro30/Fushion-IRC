@@ -46,6 +46,7 @@ namespace FusionIRC.Helpers.Connection
                             ChildWindow = c,
                             ClientConnection = client,
                             Nick = nick,
+                            Address = address,
                             Channel = c.Tag.ToString()
                         };
             Events.Execute("text", e, text);
@@ -78,6 +79,7 @@ namespace FusionIRC.Helpers.Connection
                             ChildWindow = c,
                             ClientConnection = client,
                             Nick = nick, 
+                            Address = address,
                             Channel = c.Tag.ToString()
                         };
             Events.Execute("text", e, text);
@@ -114,6 +116,7 @@ namespace FusionIRC.Helpers.Connection
                             ChildWindow = c,
                             ClientConnection = client,
                             Nick = nick,
+                            Address = address,
                             Channel = c.Tag.ToString()
                         };
             Events.Execute("action", e, text);
@@ -146,6 +149,7 @@ namespace FusionIRC.Helpers.Connection
                             ChildWindow = c,
                             ClientConnection = client,
                             Nick = nick,
+                            Address = address,
                             Channel = c.Tag.ToString()
                         };
             Events.Execute("action", e, text);
@@ -175,11 +179,6 @@ namespace FusionIRC.Helpers.Connection
                 return;
             }
             var channel = string.Empty;
-            //if (target.Equals(client.UserInfo.Nick, StringComparison.InvariantCultureIgnoreCase))
-            //{
-            //    /* It's my nick - I will be using this later */
-            //}
-            //else if (target[0] == client.Parser.ChannelPrefixTypes.MatchChannelType(target[0]))
             if (target.Length > 0 && target[0] == client.Parser.ChannelPrefixTypes.MatchChannelType(target[0]))
             {
                 /* It's to a channel - I will be using this later */
@@ -217,6 +216,7 @@ namespace FusionIRC.Helpers.Connection
                             ChildWindow = !string.IsNullOrEmpty(channel) ? WindowManager.GetWindow(c.Client, channel) : null,
                             ClientConnection = client,
                             Nick = nick,
+                            Address = address,
                             Channel = channel
                         };
             Events.Execute("notice", e, text);

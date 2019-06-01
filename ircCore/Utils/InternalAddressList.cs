@@ -38,7 +38,9 @@ namespace ircCore.Utils
                 }
                 return;
             }
+            /* Add to ial */
             var d = new IalData {Nick = nick, Address = address};
+            d.Channels.Add(channel);
             Add(new KeyValuePair<string, IalData>(nick, d));
         }
 
@@ -114,6 +116,13 @@ namespace ircCore.Utils
             }
         }
 
+        public List<string> Channels(string nick)
+        {
+            /* NOTE: will return null if nick doesn't exist */
+            var n = GetIal(nick);
+            return n == null ? null : n.Channels;
+        }
+
         /* Private helper functions */
         private IalData GetIal(string nick)
         {
@@ -121,8 +130,12 @@ namespace ircCore.Utils
         }
 
         private static string GetChannel(IalData ial, string channel)
-        {
-            return ial.Channels.Any(c => c.Equals(channel, StringComparison.InvariantCultureIgnoreCase)) ? string.Empty : channel;
+        {            
+            foreach (var c in ial.Channels.Where(c => c.Equals(channel, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                return c;
+            }
+            return string.Empty;
         }
     }
 }

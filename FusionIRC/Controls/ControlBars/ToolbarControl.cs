@@ -6,6 +6,7 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using FusionIRC.Forms;
 using FusionIRC.Forms.Autos;
 using FusionIRC.Forms.Favorites;
 using FusionIRC.Forms.Misc;

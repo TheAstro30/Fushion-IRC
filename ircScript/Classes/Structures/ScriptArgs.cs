@@ -19,6 +19,8 @@ namespace ircScript.Classes.Structures
 
         public string Nick { get; set; }
 
+        public string Address { get; set; }
+
         public string Channel { get; set; }
     }
 }

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <scripts>
+    <popup path="\scripts\menubar.xml" type="Commands" />
+    <popup path="\scripts\console.xml" type="Console" />
+    <popup path="\scripts\channel.xml" type="Channel" />
+    <popup path="\scripts\nicklist.xml" type="Nicklist" />
+    <popup path="\scripts\private.xml" type="Private" />
+    <popup path="\scripts\dcc-chat.xml" type="DccChat" />
+  </scripts>
+</settings>

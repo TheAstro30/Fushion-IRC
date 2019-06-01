@@ -46,6 +46,8 @@
   <ItemGroup>
     <Compile Include="Classes\Helpers\CommandHash.cs" />
     <Compile Include="Classes\ScriptFunctions\Address.cs" />
+    <Compile Include="Classes\ScriptFunctions\Channel.cs" />
+    <Compile Include="Classes\ScriptFunctions\StringManipulation.cs" />
     <Compile Include="Forms\FrmInput.cs">
       <SubType>Form</SubType>
     </Compile>

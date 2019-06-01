@@ -206,7 +206,13 @@ namespace ircCore.Controls.ChildWindows.Input.ColorBox
                 return;
             }
             var sp = lines.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
-            int start;
+            if (SelectionLength != 0)
+            {
+                /* Delete selected text */
+                var s = Clipboard.GetText();
+                Cut();
+                Clipboard.SetText(s);
+            }
             if (AllowMultiLinePaste && sp.Length > 1)
             {
                 if (ConfirmPaste && sp.Length >= ConfirmPasteLines)
@@ -219,8 +225,7 @@ namespace ircCore.Controls.ChildWindows.Input.ColorBox
                 IsMultiLinePaste = true;
                 foreach (var s in sp)
                 {
-                    start = SelectionStart;
-                    Text = Text.Substring(0, start) + s + Text.Substring(start);
+                    Text = Text.Substring(0, SelectionStart) + s + Text.Substring(SelectionStart);
                     var eKey = new KeyEventArgs(Keys.Return);
                     OnKeyDown(eKey);
                 }
@@ -228,8 +233,8 @@ namespace ircCore.Controls.ChildWindows.Input.ColorBox
             }
             else
             {
-                start = SelectionStart;
-                Text = Text.Substring(0, start) + sp[0] + Text.Substring(start);
+                var start = SelectionStart;
+                Text = Text.Substring(0, SelectionStart) + sp[0] + Text.Substring(SelectionStart);
                 SelectionStart = start + sp[0].Length;
             }
         }

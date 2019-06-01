@@ -124,7 +124,7 @@ namespace FusionIRC.Forms.Users.Controls
                                        Width = 120,
                                        ImageGetter = delegate { return 0; }
                                    };
-                    _list.AddObjects(UserManager.UserList.Notify.Users);
+                    _list.AddObjects(UserManager.GetNotifyList());
                     break;
 
                 case UserListType.Ignore:
@@ -136,7 +136,7 @@ namespace FusionIRC.Forms.Users.Controls
                                        Width = 300,
                                        ImageGetter = delegate { return 1; }
                                    };
-                    _list.AddObjects(UserManager.UserList.Ignore.Users);
+                    _list.AddObjects(UserManager.GetIgnoreList());
                     break;
             }
 
@@ -204,7 +204,7 @@ namespace FusionIRC.Forms.Users.Controls
                         {
                             return;
                         }
-                        UserManager.UserList.Notify.Users.Add(user); 
+                        UserManager.AddNotify(user);
                     }
                     break;
 
@@ -220,7 +220,7 @@ namespace FusionIRC.Forms.Users.Controls
                         /* If someone types just a persons nick (no address/no wildcards), we need to convert this
                          * to a wildcard string */
                         user.Address = Address.CheckIrcAddress(user.Address);
-                        UserManager.UserList.Ignore.Users.Add(user);
+                        UserManager.AddIgnore(user);
                     }
                     break;
             }
@@ -237,14 +237,23 @@ namespace FusionIRC.Forms.Users.Controls
             }
             switch (_userListType)
             {
-                case UserListType.Notify:
+                case UserListType.Notify:                    
+                    var old = user.Nick;
                     using (var edit = new FrmAddNotify(DialogEditType.Edit))
                     {
                         edit.Text = @"Edit current user on notify list";
                         edit.User = user;
-                        if (edit.ShowDialog(this) == DialogResult.OK && !string.IsNullOrEmpty(user.Nick))
+                        if (edit.ShowDialog(this) == DialogResult.OK)
                         {
-                            _list.RefreshObject(user);
+                            if (!string.IsNullOrEmpty(user.Nick))
+                            {
+                                _list.RefreshObject(user);
+                                UserManager.EditNotify(old, user.Nick);
+                            }
+                            else
+                            {
+                                user.Nick = old;
+                            }
                         }
                     }
                     break;
@@ -273,11 +282,11 @@ namespace FusionIRC.Forms.Users.Controls
             switch (_userListType)
             {
                 case UserListType.Notify:
-                    UserManager.UserList.Notify.Users.Remove(user);
+                    UserManager.RemoveNotify(user);
                     break;
 
                 case UserListType.Ignore:
-                    UserManager.UserList.Ignore.Users.Remove(user);
+                    UserManager.RemoveIgnore(user);
                     break;
             }
             _list.RemoveObject(user);
@@ -289,11 +298,11 @@ namespace FusionIRC.Forms.Users.Controls
             switch (_userListType)
             {
                 case UserListType.Notify:
-                    UserManager.UserList.Notify.Users = new List<User>();
+                    UserManager.ClearNotify();
                     break;
 
                 case UserListType.Ignore:
-                    UserManager.UserList.Ignore.Users = new List<User>();
+                    UserManager.ClearIgnore();
                     break;
             }
             _list.ClearObjects();

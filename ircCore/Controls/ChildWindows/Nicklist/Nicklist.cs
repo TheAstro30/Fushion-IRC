@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using ircCore.Controls.ChildWindows.Nicklist.Helpers;
 using ircCore.Controls.ChildWindows.Nicklist.Structures;
+using ircCore.Utils;
 using libolv;
 using libolv.Implementation.Events;
 using libolv.Rendering.Styles;
@@ -202,6 +203,8 @@ namespace ircCore.Controls.ChildWindows.Nicklist
             }
         }
 
+        public InternalAddressList Ial { get; set; } /* Internal address list */
+
         public bool ShowPrefix
         {
             get { return _showPrefix; }
@@ -310,7 +313,7 @@ namespace ircCore.Controls.ChildWindows.Nicklist
         {
             var nd = new NickData
                          {
-                             Nick = nick, Address = address
+                             Nick = nick
                          };
             /* Double check the nick isn't already in the list */
             if (_list.FirstOrDefault(o => o.Nick == nd.Nick) == null)
@@ -319,15 +322,6 @@ namespace ircCore.Controls.ChildWindows.Nicklist
             }
             _list.Sort(_nickComparer);
             UpdateNicklist();
-        }
-
-        public void UpdateNickAddress(string nick, string address)
-        {
-            var nd = _list.FirstOrDefault(o => o.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase));
-            if (nd != null)
-            {
-                nd.Address = address;                
-            }
         }
 
         public void RemoveNick(string nick)
@@ -411,12 +405,6 @@ namespace ircCore.Controls.ChildWindows.Nicklist
         {
             var n = _list.FirstOrDefault(o => o.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase));
             return n != null ? n.GetUserMode() : string.Empty;
-        }
-
-        public string GetAddress(string nick)
-        {
-            var n = _list.FirstOrDefault(o => o.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase));
-            return n != null ? string.Format("{0}!{1}", n.Nick, n.Address) : string.Empty;
         }
 
         /* Tab completion */
@@ -547,14 +535,18 @@ namespace ircCore.Controls.ChildWindows.Nicklist
             }
         }
 
-        private static void OnCellToolTipShowing(object sender, ToolTipShowingEventArgs e)
+        private void OnCellToolTipShowing(object sender, ToolTipShowingEventArgs e)
         {
             var nd = (NickData) e.Model;
             var um = nd.GetAllUserModes();
             e.Title = nd.Nick;
+            /* We now get the address from IAL - this way we're not storing addresses of nick names TWICE, and IAL
+             * should have really been implemented in the first place */
+            var n = Ial.Get(nd.Nick);
+            var address = n.Split('!'); /* We don't need the nick part... */
             e.Text = !string.IsNullOrEmpty(um)
-                         ? string.Format("Address: {0}\r\n{1} ({2})", nd.Address, nd.GetUserModeString(), um)
-                         : string.Format("Address: {0}\r\n{1}", nd.Address, nd.GetUserModeString());
+                         ? string.Format("Address: {0}\r\n{1} ({2})", address[1], nd.GetUserModeString(), um)
+                         : string.Format("Address: {0}\r\n{1}", address[1], nd.GetUserModeString());
             e.IsBalloon = true;
             e.Handled = true;
         }

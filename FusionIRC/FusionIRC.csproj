@@ -250,6 +250,7 @@
     <Compile Include="Helpers\Commands\CommandCtcp.cs" />
     <Compile Include="Helpers\Commands\CommandDns.cs" />
     <Compile Include="Helpers\Commands\CommandFiles.cs" />
+    <Compile Include="Helpers\Commands\CommandMode.cs" />
     <Compile Include="Helpers\Commands\CommandNick.cs" />
     <Compile Include="Helpers\Commands\CommandChannel.cs" />
     <Compile Include="Helpers\Commands\CommandServer.cs" />
@@ -339,6 +340,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Wave\cork.wav" />
+    <None Include="Icons\Dialog\notifyGroup.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

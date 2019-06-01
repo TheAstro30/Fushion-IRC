@@ -8,6 +8,7 @@ using FusionIRC.Forms.Child;
 using FusionIRC.Helpers.Commands;
 using ircClient;
 using ircClient.Parsing.Helpers;
+using ircCore.Settings.Theming;
 using ircScript.Classes.Helpers;
 
 namespace FusionIRC.Helpers
@@ -183,6 +184,26 @@ namespace FusionIRC.Helpers
                 case "EXIT":
                     Application.Exit();
                     break;
+
+                case "MODE":
+                    CommandMode.ParseModes(client, args);
+                    break;
+
+                case "KICK":
+                    CommandChannel.ParseKick(client, args);
+                    break;
+
+                //case "SMODE":
+                //    if (child.WindowType == ChildWindowType.Channel)
+                //    {
+                //        var i = args.IndexOf(' ');
+                //        if (i > -1)
+                //        {
+                //            args = args.Substring(0, i);
+                //        }
+                //        CommandMode.MassMode(client, child.Tag.ToString(), child.Nicklist.SelectedNicks, args);
+                //    }
+                //    break;
 
                 default:
                     /* Send command to server */

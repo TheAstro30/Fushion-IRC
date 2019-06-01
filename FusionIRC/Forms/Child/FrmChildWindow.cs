@@ -157,7 +157,8 @@ namespace FusionIRC.Forms.Child
                                    Dock = DockStyle.Fill,
                                    Images = ThemeManager.GetNicklistImages(),
                                    ShowIcons = true, /* Change these two lines to the Theme.cs */
-                                   ShowPrefix = true
+                                   ShowPrefix = true,
+                                   Ial = Client.Ial
                                };
                 Nicklist.OnNicklistDoubleClick += NicklistDoubleClickNick;
                 Nicklist.OnNicklistRightClick += NicklistRightClick;
@@ -825,10 +826,17 @@ namespace FusionIRC.Forms.Child
         private void TimerFocus(object sender, EventArgs e)
         {
             _focus.Enabled = false;
-            CurrentWindowEvent = WindowEvent.None;
-            if (DisplayNode != null)
+            if (NoActivate)
             {
-                ((FrmClientWindow) MdiParent).SwitchView.SelectedNode = DisplayNode;
+                NoActivate = false;
+                return;
+            }         
+            CurrentWindowEvent = WindowEvent.None;
+            var ctl = ((FrmClientWindow) MdiParent).SwitchView;
+            if (DisplayNode != null && DisplayNode != ctl.SelectedNode)
+            {
+                /* Only set SelectedNode if it's not already currently set to this DisplayNode */
+                ctl.SelectedNode = DisplayNode;
             }
             Input.Focus();
         }

@@ -11,6 +11,7 @@ using System.Text;
 using System.Windows.Forms;
 using FusionIRC.Forms.ChannelProperties.Controls;
 using FusionIRC.Helpers;
+using FusionIRC.Helpers.Commands;
 using ircClient;
 using ircCore.Controls;
 using ircCore.Controls.ChildWindows.Classes.Channels;
@@ -431,7 +432,7 @@ namespace FusionIRC.Forms.ChannelProperties
                 }
             }
             /* Send modes to channel */
-            _client.Send(string.Format("MODE {0} {1} {2}", _chan, s, secondary.ToString().Trim()));
+            CommandMode.ParseOddModes(_client, _chan, s.ToString(), secondary.ToString().Trim());
             /* Set topic */
             if (_txtTopic.Text.Equals(_originalTopic))
             {

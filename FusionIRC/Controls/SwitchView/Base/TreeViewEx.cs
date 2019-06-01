@@ -21,6 +21,16 @@ namespace FusionIRC.Controls.SwitchView.Base
             DrawMode = TreeViewDrawMode.OwnerDrawText;
         }
 
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                var parms = base.CreateParams;
+                parms.Style |= 0x80;  /* Turn on TVS_NOTOOLTIPS - hides default node tooltips */
+                return parms;
+            }
+        }
+
         protected override void OnDrawNode(DrawTreeNodeEventArgs e)
         {
             var font = e.Node.NodeFont ?? e.Node.TreeView.Font;

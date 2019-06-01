@@ -5,6 +5,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using ircCore.Utils;
@@ -75,6 +76,9 @@ namespace ircScript.Classes.Parsers
                 case "$NICK":
                     return e.Nick;
 
+                case "$ADDRESS":
+                    return e.Address;
+
                 case "$APPDIR":
                     return Functions.MainDir(string.Empty, true, true);
 
@@ -89,6 +93,12 @@ namespace ircScript.Classes.Parsers
 
                 case "$NETWORK":
                     return e.ClientConnection.Network;
+
+                case "$TICKS":
+                    return ((long)Environment.TickCount).ToString();
+
+                case "$PI":
+                    return Math.PI.ToString();
 
                 default:
                     /* Check if it's an alias */                    
@@ -267,6 +277,74 @@ namespace ircScript.Classes.Parsers
 
                 case "HGET":
                     return argList.Length == 2 ? CommandHash.HashGet(argList) : string.Empty;
+
+                case "COMCHAN":
+                    if (argList.Length < 2 || !int.TryParse(argList[1], out i))
+                    {
+                        return string.Empty;
+                    }
+                    return Channel.ParseComChan(e.ClientConnection, argList[0], i);
+
+                case "MD5":
+                    if (argList.Length == 1)
+                    {
+                        var md5 = new MD5CryptoServiceProvider();
+                        var origBytes = Encoding.Default.GetBytes(argList[0]);
+                        var newBytes = md5.ComputeHash(origBytes);
+                        return BitConverter.ToString(newBytes).ToLower().Replace("-", string.Empty);
+                    }
+                    break;       
+         
+                case "SQRT":
+                    return argList.Length == 1 && int.TryParse(argList[0], out i)
+                               ? Math.Round(Math.Sqrt(Convert.ToDouble(i)), 6).ToString()
+                               : string.Empty;
+
+                case "LEFT":
+                    if (argList.Length == 2 && int.TryParse(argList[1], out i))
+                    {
+                        return StringManipulation.Left(argList[0], i);
+                    }
+                    return string.Empty;
+
+                case "RIGHT":
+                    if (argList.Length == 2 && int.TryParse(argList[1], out i))
+                    {
+                        return StringManipulation.Right(argList[0], i);
+                    }
+                    return string.Empty;
+
+                case "MID":
+                    switch (argList.Length)
+                    {
+                        case 2:
+                            if (int.TryParse(argList[1], out i))
+                            {
+                                return StringManipulation.Mid(argList[0], i, -1);
+                            }
+                            break;
+
+                        case 3:
+                            if (int.TryParse(argList[1], out i))
+                            {
+                                int l;
+                                if (int.TryParse(argList[2], out l))
+                                {
+                                    return StringManipulation.Mid(argList[0], i, l);
+                                }
+                            }
+                            break;
+                    }
+                    return string.Empty;
+
+                case "LEN":
+                    return argList.Length == 1 ? argList[0].Length.ToString() : string.Empty;
+
+                case "UPPER":
+                    return argList.Length == 1 ? argList[0].ToUpper() : string.Empty;
+
+                case "LOWER":
+                    return argList.Length == 1 ? argList[0].ToLower() : string.Empty;
             }
             return string.Empty;
         }

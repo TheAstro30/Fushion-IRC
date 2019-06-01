@@ -530,7 +530,8 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         protected override void OnMouseDoubleClick(MouseEventArgs e)
         {            
             if (!string.IsNullOrEmpty(_url))
-            {                
+            {
+                MarkingData = null;
                 if (OnUrlDoubleClicked != null)
                 {
                     OnUrlDoubleClicked(_url);

@@ -7,12 +7,10 @@ using System;
 using System.Collections.Generic;
 using FusionIRC.Forms.ChannelProperties;
 using FusionIRC.Forms.Child;
-using FusionIRC.Forms.Misc;
 using ircClient;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircScript.Classes;
-using ircScript.Classes.Structures;
 
 namespace FusionIRC.Helpers.Commands
 {
@@ -170,6 +168,35 @@ namespace FusionIRC.Helpers.Commands
             var s = new Script();
             s.LineData.Add(msg);
             client.Send(string.Format("QUIT :{0}", s.Parse()));
+        }
+
+        public static void ParseKick(ClientConnection client, string args)
+        {
+            /* Some servers require a : before the message */
+            if (string.IsNullOrEmpty(args))
+            {
+                return;
+            }            
+            var i = args.IndexOf(' ');
+            if (i == -1)
+            {
+                return;
+            }
+            var channel = args.Substring(0, i);
+            args = args.Substring(i + 1);
+            string nick;
+            var msg = string.Empty;
+            i = args.IndexOf(' ');
+            if (i == -1)
+            {
+                nick = args;                
+            }
+            else
+            {
+                nick = args.Substring(0, i);
+                msg = args.Substring(i + 1);
+            }
+            client.Send(string.Format("KICK {0} {1} :{2}", channel, nick, msg));
         }
     }
 }

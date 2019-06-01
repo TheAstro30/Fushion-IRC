@@ -33,9 +33,12 @@ namespace ircCore.Controls
         /* Public properties */
         public bool NoDeactivate { get; set; }
 
+        public bool NoActivate { get; set; }
+
         /* Public activation mehtods */
         public void ShowWithoutActive()
         {
+            NoActivate = true;
             var topWindow = GetTopWindow(Parent.Handle);
             SendMessage(topWindow, UmsgDonothide, IntPtr.Zero, IntPtr.Zero);
             Show();

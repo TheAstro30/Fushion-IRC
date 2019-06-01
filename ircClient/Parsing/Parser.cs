@@ -76,6 +76,9 @@ namespace ircClient.Parsing
         public event Action<ClientConnection> OnEndOfChannelProperties;
 
         public event Action<ClientConnection, string> OnNotChannelOperator;
+
+        public event Action<ClientConnection, string, string> OnWatchOnline;
+        public event Action<ClientConnection, string> OnWatchOffline;
        
         /* Public properties */
         public string JoinChannelsOnConnect { get; set; }
@@ -84,8 +87,11 @@ namespace ircClient.Parsing
         public string UserModes { get; set; }
         public ChannelTypes ChannelPrefixTypes { get; set; }
         public List<char> ChannelModes { get; set; }
+        public int ModeLength { get; set; }
 
         public bool IsAdministrator { get; set; }
+
+        public bool AllowsWatch { get; set; }
 
         public WhoisInfo Whois = new WhoisInfo();
 
@@ -454,6 +460,36 @@ namespace ircClient.Parsing
                     }
                     break;
 
+                case "604":
+                    /* Watch online */
+                    i = fourth.IndexOf(' ');
+                    if (i == -1)
+                    {
+                        return;
+                    }
+                    var watch = fourth.Substring(0, i);
+                    var rest = new List<string>(fourth.Substring(i + 1).Split(' '));
+                    if (OnWatchOnline != null)
+                    {
+                        OnWatchOnline(_client, watch,
+                                      rest.Count > 1 ? string.Format("{0}@{1}", rest[0], rest[1]) : string.Empty);
+                    }
+                    break;
+
+                case "602":
+                case "605":
+                    /* Stopped watching/Watch offline - address is irrelevant at this point */
+                    i = fourth.IndexOf(' ');
+                    if (i == -1)
+                    {
+                        return;
+                    }
+                    if (OnWatchOffline != null)
+                    {
+                        OnWatchOffline(_client, fourth.Substring(0, i));
+                    }
+                    break;
+                    
                 case "391":
                 case "927":
                     /* Other raws to be formatted <fourth>[0]: <fourth>[1-] */
@@ -467,6 +503,10 @@ namespace ircClient.Parsing
                     {
                         OnRaw(_client, string.Format("{0}: {1}", text.Substring(0, i), text.Substring(i + 1)));
                     }
+                    break;
+
+                case "303":
+                    /* ISON */
                     break;
 
                 case "353":
@@ -896,6 +936,20 @@ namespace ircClient.Parsing
 
                     case "CHANMODES":                        
                         ChannelModes = new List<char>(sections[1].ToCharArray());
+                        break;
+
+                    case "MODES":
+                        /* Mode length */
+                        int i;
+                        if (!int.TryParse(sections[1], out i))
+                        {
+                            i = 6;
+                        }
+                        ModeLength = i;
+                        break;
+
+                    case "WATCH":
+                        AllowsWatch = true;
                         break;
                 }
             }
