@@ -5,6 +5,7 @@
  */
 using System;
 using System.Linq;
+using System.Media;
 using FusionIRC.Helpers.Commands;
 using ircClient;
 using ircClient.Parsing;
@@ -411,6 +412,59 @@ namespace FusionIRC.Helpers.Connection
         public static void OnBeginQuit(ClientConnection client)
         {
             CommandChannel.ParseQuit(client, string.Empty);
+        }
+
+        /* Channel list */
+        public static void OnBeginChannelList(ClientConnection client)
+        {
+            var net = !string.IsNullOrEmpty(client.Network) ? client.Network : client.Server.Address;
+            var n = ChannelManager.GetChannelListFromNetwork(net) ?? new ChannelListBase { Network = net };
+            /* Open the window */
+            var w = WindowManager.GetWindow(client, "channel list");
+            if (w == null)
+            {
+                w = WindowManager.AddWindow(client, ChildWindowType.ChanList, WindowManager.MainForm,
+                                            string.Format("{0} - Channel List: 0 listed",
+                                                          !string.IsNullOrEmpty(client.Network)
+                                                              ? client.Network
+                                                              : client.Server.Address),
+                                            "Channel List", true);
+            }
+            else
+            {
+                w.ChanList.Channels.Clear();
+                w.ChanList.ClearObjects();                
+            }
+            n.List = w.ChanList.Channels;
+        }    
+
+        public static void OnChannelListData(ClientConnection client, string channel, int users, string topic)
+        {
+            var w = WindowManager.GetWindow(client, "channel list");
+            if (w == null || channel == "*")
+            {
+                /* Window was closed before the data came in */
+                return;
+            }
+            
+            var c = new ChannelListData
+                        {
+                            Name = channel,
+                            Users = users,
+                            Topic = Functions.StripControlCodes(topic)
+                        };
+            w.ChanList.AddChannel(c);
+            /* Update title bar */
+            w.Text = string.Format("{0} - Channel List: {1} listed",
+                                   !string.IsNullOrEmpty(client.Network) ? client.Network : client.Server.Address,
+                                   w.ChanList.Channels.Count);
+        }
+
+        public static void OnEndChannelList(ClientConnection client)
+        {
+            /* End of channel list - we can sort the list */
+            SystemSounds.Beep.Play();
+            ChannelManager.Save();
         }
 
         /* Private helper method */

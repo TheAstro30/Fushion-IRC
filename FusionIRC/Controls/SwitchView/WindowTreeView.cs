@@ -20,7 +20,7 @@ namespace FusionIRC.Controls.SwitchView
     {
         /* Treeview SwitchView window - simplified */
         private const int InitialToolTipDelay = 500;
-        private const int MaxToolTipDisplayTime = 2000;
+        private const int MaxToolTipDisplayTime = 5000;        
 
         private readonly ToolTip _toolTip;
         private readonly Timer _timer;
@@ -61,6 +61,7 @@ namespace FusionIRC.Controls.SwitchView
                 case ChildWindowType.Channel:
                 case ChildWindowType.Private:
                 case ChildWindowType.DccChat:
+                case ChildWindowType.ChanList:
                     var c = WindowManager.GetConsoleWindow(window.Client);
                     if (c != null)
                     {
@@ -107,9 +108,12 @@ namespace FusionIRC.Controls.SwitchView
                             if (!window.NoActivate)
                             {
                                 /* Just insert it at the bottom */
-                                SelectedNode = rootNode[0].Nodes.Add(window.Handle.ToString(), window.ToString(),
-                                                                     iconIndex,
-                                                                     iconIndex);
+                                window.DisplayNode = rootNode[0].Nodes.Add(window.Handle.ToString(), window.ToString(),
+                                                                           iconIndex,
+                                                                           iconIndex);
+                                window.DisplayNode.Tag = window;
+                                window.DisplayNodeRoot = window.DisplayNode;
+                                SelectedNode = window.DisplayNode;
                             }
                         }
                         rootNode[0].Expand();
@@ -128,22 +132,32 @@ namespace FusionIRC.Controls.SwitchView
             }
         }
 
-        public void AddNotify(ClientConnection client, User user)
+        /* Notify nicks */
+        public void AddNotify(ClientConnection client, string nick, string address)
         {
+            var u = UserManager.IsNotify(nick);
             var c = WindowManager.GetConsoleWindow(client);
-            if (c == null)
+            if (u == null || c == null)
             {
                 return;
             }
             var rootNode = Nodes.Find(c.Handle.ToString(), true);
             if (rootNode[0].Nodes.IndexOfKey("NOTIFY") == -1)
             {
-                rootNode[0].Nodes.Insert(3, new TreeNodeEx("NOTIFY", "Notify", 4, 4));
+                rootNode[0].Nodes.Insert(3, new TreeNodeEx("NOTIFY", "Notify", 5, 5));
             }
             var subNodes = rootNode[0].Nodes.Find("NOTIFY", true);
             if (subNodes.Length > 0)
             {
-                var node = ((TreeNodeEx)subNodes[0]).AddSorted(user.Nick, user.Nick, 5, 5);
+                /* We create a NEW user class and update it's details from the master list so we're not modifying
+                 * the master list - this way, each server connection can have different addresses (vhosts, etc) */
+                var user = new User
+                               {
+                                   Nick = nick,
+                                   Address = address,
+                                   Note = u.Note
+                               };
+                var node = ((TreeNodeEx)subNodes[0]).AddSorted(user.Nick, user.Nick, 6, 6);
                 node.Tag = user;
                 subNodes[0].Expand();
                 subNodes[0].Text = string.Format("Notify ({0})", subNodes[0].Nodes.Count);
@@ -151,7 +165,7 @@ namespace FusionIRC.Controls.SwitchView
             rootNode[0].Expand();
         }
 
-        public void RemoveNotify(ClientConnection client, User user)
+        public void RemoveNotify(ClientConnection client, string nick)
         {
             var c = WindowManager.GetConsoleWindow(client);
             if (c == null)
@@ -160,13 +174,14 @@ namespace FusionIRC.Controls.SwitchView
             }
             var rootNode = Nodes.Find(c.Handle.ToString(), true);
             var subNodes = rootNode[0].Nodes.Find("NOTIFY", true);
-            if (subNodes.Length > 0)
+            if (subNodes.Length == 0)
             {
-                foreach (var n in from TreeNodeEx n in subNodes[0].Nodes where n.Tag == user select n)
-                {
-                    subNodes[0].Nodes.Remove(n);
-                    break;
-                }
+                return;
+            }
+            foreach (var n in from TreeNodeEx n in subNodes[0].Nodes where ((User)n.Tag).Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase) select n)
+            {
+                subNodes[0].Nodes.Remove(n);
+                break;
             }
             if (subNodes[0].Nodes.Count == 0)
             {
@@ -189,7 +204,7 @@ namespace FusionIRC.Controls.SwitchView
         private void ToolTipTimer(object sender, EventArgs e)
         {
             _timer.Enabled = false;
-            var title = string.Empty;
+            string title;
             var msg = string.Empty;
             if (_toolTipNode.Tag is FrmChildWindow)
             {
@@ -224,8 +239,9 @@ namespace FusionIRC.Controls.SwitchView
             else if (_toolTipNode.Tag is User)
             {
                 var u = (User) _toolTipNode.Tag;
+                var notify = UserManager.IsNotify(u.Nick);
                 title = !string.IsNullOrEmpty(u.Address) ? string.Format("{0} ({1})", u.Nick, u.Address) : u.Nick;
-                msg = !string.IsNullOrEmpty(u.Note) ? string.Format("Online - {0}", u.Note) : "Online";
+                msg = notify != null && !string.IsNullOrEmpty(notify.Note) ? string.Format("Online - {0}", notify.Note) : "Online";
             }
             else
             {
@@ -233,15 +249,15 @@ namespace FusionIRC.Controls.SwitchView
             }
             if (_timer.Interval == InitialToolTipDelay)
             {
-                /* This is the closest I can get it to show with the arrow pointing to just above the mouse pointer */
-                var mousePos = PointToClient(MousePosition);
+                /* This is the closest I can get it to show with the arrow pointing to just above the mouse pointer */                
+                var mousePos = PointToClient(Cursor.Position);
                 /* Show the ToolTip if the mouse is still over the same node. */
                 if (_toolTipNode.Bounds.Contains(mousePos))
                 {
                     /* Node location in treeView coordinates. */
                     var loc = mousePos;// _toolTipNode.Bounds.Location;
                     /* Node location in client coordinates - this isn't exactly correct */
-                    var offset = _toolTipNode.Bounds.Height/2;
+                    var offset = _toolTipNode.Bounds.Height/2;                    
                     loc.Offset(-Location.X - offset, -Location.Y - offset);
                     /* Set tooltip title and show the tip */
                     _toolTip.ToolTipTitle = title;

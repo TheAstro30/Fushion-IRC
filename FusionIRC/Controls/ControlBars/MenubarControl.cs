@@ -431,6 +431,10 @@ namespace FusionIRC.Controls.ControlBars
         /* Private methods */
         private void ChangeFont(FrmChildWindow c)
         {
+            if (c.WindowType == ChildWindowType.ChanList)
+            {
+                return;
+            }
             var def = string.Format("Set as default {0} window font",Functions.EnumUtils.GetDescriptionFromEnumValue(c.WindowType).ToLower());
             using (var font = new FrmFont { SelectedFont = c.Output.Font, SelectedFontDefaultText = def })
             {

@@ -250,4 +250,7 @@
   <data name="notifyGroup" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Icons\Dialog\notifyGroup.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="list" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\ChildWindows\list.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

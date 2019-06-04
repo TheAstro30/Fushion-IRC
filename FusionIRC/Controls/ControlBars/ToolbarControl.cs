@@ -6,7 +6,6 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using FusionIRC.Forms;
 using FusionIRC.Forms.Autos;
 using FusionIRC.Forms.Favorites;
 using FusionIRC.Forms.Misc;
@@ -256,6 +255,14 @@ namespace FusionIRC.Controls.ControlBars
                     break;
 
                 case "CHANLIST":
+                    if (!console.Client.IsConnected)
+                    {
+                        return;
+                    }
+                    using (var ch = new FrmChannelList(c))
+                    {
+                        ch.ShowDialog(_owner);
+                    }
                     break;
 
                 case "FAVORITES":

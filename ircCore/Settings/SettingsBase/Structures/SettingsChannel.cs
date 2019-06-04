@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace ircCore.Settings.SettingsBase.Structures
@@ -11,6 +12,18 @@ namespace ircCore.Settings.SettingsBase.Structures
     [Serializable]
     public class SettingsChannel
     {
+        public class SettingsChannelList
+        {
+            [XmlAttribute("minimum")]
+            public int Minimum { get; set; }
+
+            [XmlAttribute("maximum")]
+            public int Maximum { get; set; }
+
+            [XmlElement("match")]
+            public List<string> Match = new List<string>();            
+        }
+
         [XmlAttribute("keepChannelsOpen")]
         public bool KeepChannelsOpen { get; set; }
 
@@ -25,5 +38,8 @@ namespace ircCore.Settings.SettingsBase.Structures
 
         [XmlAttribute("joinChannelsOnInvite")]
         public bool JoinChannelsOnInvite { get; set; }
+
+        [XmlElement("channelsList")]
+        public SettingsChannelList ChannelList = new SettingsChannelList();
     }
 }

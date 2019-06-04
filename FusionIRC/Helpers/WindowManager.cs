@@ -92,7 +92,7 @@ namespace FusionIRC.Helpers
             }
             /* Show and return the new window */
             if (win != null)
-            {
+            {                
                 if (manualOpen)
                 {
                     win.Show();
@@ -104,7 +104,7 @@ namespace FusionIRC.Helpers
                 /* Add to tree view as well */
                 ((FrmClientWindow)mdiOwner).SwitchView.AddWindow(win);
                 if (win.DisplayNodeRoot != null)
-                {
+                {                    
                     /* Update the window type count */
                     var count = GetChildWindowCount(win);
                     win.DisplayNodeRoot.Text = win.WindowType == ChildWindowType.Channel
@@ -138,18 +138,19 @@ namespace FusionIRC.Helpers
             Windows[client].Remove(window);
             /* Update treeview */
             ((FrmClientWindow)window.MdiParent).SwitchView.RemoveWindow(window);
-            if (window.DisplayNodeRoot != null)
+            if (window.DisplayNodeRoot == null)
             {
-                /* Update the window type count */
-                var count = GetChildWindowCount(window);
-                window.DisplayNodeRoot.Text = window.WindowType == ChildWindowType.Channel
-                                                    ? string.Format("Channels ({0})", count)
-                                                    : window.WindowType == ChildWindowType.Private
-                                                          ? string.Format("Queries ({0})", count)
-                                                          : window.WindowType == ChildWindowType.DccChat
-                                                                ? string.Format("Chats ({0})", count)
-                                                                : window.DisplayNodeRoot.Text;
-            }            
+                return;
+            }
+            /* Update the window type count */
+            var count = GetChildWindowCount(window);
+            window.DisplayNodeRoot.Text = window.WindowType == ChildWindowType.Channel
+                                              ? string.Format("Channels ({0})", count)
+                                              : window.WindowType == ChildWindowType.Private
+                                                    ? string.Format("Queries ({0})", count)
+                                                    : window.WindowType == ChildWindowType.DccChat
+                                                          ? string.Format("Chats ({0})", count)
+                                                          : window.DisplayNodeRoot.Text;
         }
 
         public static void RemoveAllWindowsOfConsole(ClientConnection client)
@@ -329,8 +330,11 @@ namespace FusionIRC.Helpers
             client.Parser.OnModeListData += Channel.OnModeListData;
             client.Parser.OnEndOfChannelProperties += Channel.OnEndOfChannelProperties;
             client.OnClientBeginQuit += Channel.OnBeginQuit;
-            client.Parser.OnWatchOnline += Misc.OnWatchOnline;
-            client.Parser.OnWatchOffline += Misc.OnWatchOffline;
+            client.Parser.OnWatchOnline += Notify.OnWatchOnline;
+            client.Parser.OnWatchOffline += Notify.OnWatchOffline;
+            client.Parser.OnBeginChannelList += Channel.OnBeginChannelList;
+            client.Parser.OnChannelListData += Channel.OnChannelListData;
+            client.Parser.OnEndChannelList += Channel.OnEndChannelList;
         }
 
         private static void RemoveConnectionHandlers(ClientConnection client)
@@ -386,8 +390,11 @@ namespace FusionIRC.Helpers
             client.Parser.OnModeListData -= Channel.OnModeListData;
             client.Parser.OnEndOfChannelProperties -= Channel.OnEndOfChannelProperties;
             client.OnClientBeginQuit -= Channel.OnBeginQuit;
-            client.Parser.OnWatchOnline -= Misc.OnWatchOnline;
-            client.Parser.OnWatchOffline -= Misc.OnWatchOffline;
+            client.Parser.OnWatchOnline -= Notify.OnWatchOnline;
+            client.Parser.OnWatchOffline -= Notify.OnWatchOffline;
+            client.Parser.OnBeginChannelList -= Channel.OnBeginChannelList;
+            client.Parser.OnChannelListData -= Channel.OnChannelListData;
+            client.Parser.OnEndChannelList -= Channel.OnEndChannelList;
         }
     }
 }

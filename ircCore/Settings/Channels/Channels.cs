@@ -9,13 +9,37 @@ using System.Xml.Serialization;
 
 namespace ircCore.Settings.Channels
 {
-    public class ChannelList
+    [Serializable]
+    public class ChannelListData
     {
+        [XmlAttribute("name")]
         public string Name { get; set; }
 
+        [XmlAttribute("users")]
         public int Users { get; set; }
 
+        [XmlAttribute("topic")]
         public string Topic { get; set; }
+    }
+
+    [Serializable]
+    public class ChannelListBase : IComparable
+    {
+        [XmlAttribute("network")]
+        public string Network { get; set; }
+
+        [XmlElement("list")]
+        public List<ChannelListData> List = new List<ChannelListData>();
+
+        public int CompareTo(object obj)
+        {
+            return string.Compare(Network, ((ChannelListBase)obj).Network, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public override string ToString()
+        {
+            return Network;
+        }
     }
 
     [Serializable]
@@ -86,5 +110,8 @@ namespace ircCore.Settings.Channels
 
         [XmlElement("recent")]
         public ChannelRecent Recent = new ChannelRecent();
+
+        [XmlElement("channelList")]
+        public List<ChannelListBase> ChannelList = new List<ChannelListBase>(); 
     }
 }

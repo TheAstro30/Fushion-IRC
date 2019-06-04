@@ -85,9 +85,9 @@
   </networks>
   <recent>
     <server address="irc.dragonirc.com" port="6667" ssl="false" />
+    <server address="irc.freenode.org" port="6667" ssl="false" />
     <server address="localhost" port="6667" ssl="false" />
     <server address="saturn.dragonirc.com" port="7000" ssl="false" />
-    <server address="irc.freenode.org" port="6667" ssl="false" />
     <server address="irc.gamesurge.net" port="6667" ssl="false" />
     <server address="irc.efnet.org" port="6667" ssl="false" />
   </recent>

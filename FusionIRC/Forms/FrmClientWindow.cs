@@ -156,6 +156,7 @@ namespace FusionIRC.Forms
                                             Resources.channel.ToBitmap(),
                                             Resources.query.ToBitmap(),
                                             Resources.dcc_chat.ToBitmap(),
+                                            Resources.list.ToBitmap(),
                                             Resources.notifyGroup.ToBitmap(),
                                             Resources.notify.ToBitmap()
                                         });

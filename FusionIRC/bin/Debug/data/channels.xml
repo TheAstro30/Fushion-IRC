@@ -62,4 +62,63 @@
     <favorite name="#WobblyWorld" description="" password="" />
     <favorite name="#WorldChat" description="" password="" />
   </favorites>
+  <recent>
+    <channels network="DragonIRC">
+      <channel name="#Adults" />
+      <channel name="#Australia" />
+      <channel name="#dragonsrealm" />
+      <channel name="#fuck" />
+      <channel name="#GrooveHitzRadio" />
+      <channel name="#test" />
+    </channels>
+    <channels network="freenode">
+      <channel name="#hurd" />
+    </channels>
+    <channels network="XAIM">
+      <channel name="#Adults" />
+      <channel name="#AllNiteCafe" />
+      <channel name="#Beginner" />
+      <channel name="#main" />
+      <channel name="#nIX" />
+      <channel name="#test" />
+      <channel name="#tets]" />
+      <channel name="#tits" />
+      <channel name="#๏̯͡๏﴿" />
+    </channels>
+  </recent>
+  <channelList network="DragonIRC">
+    <list name="#Anime" users="9" topic="[+ntr] Because what's an IRC network without an Anime Channel! | Anime News: | Watch Anime Legally. Say &quot;no&quot; to 'less than legal' sites." />
+    <list name="#Australia" users="9" topic="[+ntr] [&gt;|&lt;* *,*]Welcome to #Australia! Enjoy your stay and remember to have fun! - English Only! Mirrored (Relay) To another network so be nice please or you will be removed (Currently being resetup)" />
+    <list name="#idlerpg" users="9" topic="[+ntr]" />
+    <list name="#news" users="8" topic="[+ntr] *** Welcome To Channel #News Informing you of important topics every day" />
+    <list name="#helpdesk" users="7" topic="[+ntr] Welcome to #HelpDesk - DragonIRC Network Support Channel | Need Help and no one is around? Our Ticket System: http://helpdesk.dragonirc.com/ | TechService Status: Offline Type .help for cmds | New Feature: Direct Support via Discord Now" />
+    <list name="#uno" users="7" topic="[+ntr] Welcome to #Uno, Uno eggdrop is online to play type !Uno to start and read !unocmds - if no one around bot will VS you in 1v1 combat" />
+    <list name="#aRebels" users="6" topic="[+ntr]" />
+    <list name="#MusicStudio" users="5" topic="[+ntr] Just a channel. Nothing to see here | There's two musicians in here" />
+    <list name="#EmailServ" users="4" topic="[+ntr] DragonsRealms Email Hosting Services - Need some help making a Terms of use policy - Eggdrop Status: Offline - Website Status: Offline(Pending) - Email Status: Online - WebMail Status: Online - Url: http://dragonsrealms.com/webmail &lt;--To Remeber easier," />
+    <list name="#theastro30" users="4" topic="[+ntr] URL: https://www.youtube.com/user/TheAstro30 For all the latest videos" />
+    <list name="#AllNiteCafe" users="3" topic="[+ntr] *** Welcome To Channel #AllNiteCafe *** English only! No religion/politics!" />
+    <list name="#Discord" users="3" topic="[+ntr] *** Welcome To Channel #Discord *** English only! No religion/politics! | One Discord Bot Online, Second Discord Bot Online in #HelpDesk and via Discord | Server: https://discord.gg/WJPfdUU :D ( app : https://discordapp.com/download )" />
+    <list name="#pokeworld" users="3" topic="[+ntr] &lt;&gt; Welcome to #PokeWorld! The IRC Pokemon Experience. You can begin by typing `Register to begin your Pokemon Journey! | `Help to understand The Game &lt;&gt; | New Command Added !Wildsfix to fix the Wild issue Enjoy PokemonWorld :D" />
+    <list name="#Adults" users="2" topic="[+ntr] Adult entertainment, 18+ ONLY!" />
+    <list name="#Hosting-RSS" users="2" topic="[+ntr] ....::: Welcome To #Hosting-RSS :::.... - Online Offers eg: Shared Hosting/VPS Hosting/Dedi Hosting from RSS Feeds via online forums 24/7 :D - Channel is on +m - no talking" />
+    <list name="#irchra" users="2" topic="" />
+    <list name="#looneybin" users="2" topic="[+ntr]  Welcome to #looneybin :))" />
+    <list name="#Neverland" users="2" topic="[+ntr] Not everyone.. finds love in life here." />
+    <list name="#ThePenisFoundation" users="2" topic="[+ntr] Welcome to the PENIS Foundation. Having a penis is optional and is not a pre-requisit" />
+    <list name="#track" users="2" topic="[+ntr]" />
+    <list name="#wavefm" users="2" topic="[+ntr] Moved to #WaveSoundFM :D - website coming soon" />
+    <list name="#whatever" users="2" topic="[+ntr] RACIST!" />
+    <list name="#Big5BattleShip" users="1" topic="" />
+    <list name="#EQ-RSS" users="1" topic="[+ntr] -=-Welcome To #EARTHQUAKE RSS FEEDS DAILY 24/7 AROUND THE WORLD-=-" />
+    <list name="#FreshChat" users="1" topic="[+nt]" />
+    <list name="#Games_War" users="1" topic="" />
+    <list name="#Games_Yahtzee" users="1" topic="" />
+    <list name="#IRCHrstats" users="1" topic="" />
+    <list name="#Microsoft" users="1" topic="[+ntr] Welcome to Microsoft - new news; X-Box 1 superseded by Windows 10" />
+    <list name="#test" users="1" topic="[+ntr] 💖 This is a test channel for FusionIRC 💖" />
+    <list name="#TriviaClub" users="1" topic="[+ntr] Welcome to TriviaClub, sit back, relax, have fun, answer some questions and make friends, good luck and enjoy" />
+    <list name="#wetnwild" users="1" topic="[+r] (¯`•._)(Welcome to #WeTnWiLd .... Sydney,s WetnWild Sydney is open from Now till March next yr for more info go to thier official site www.wetnwildsydney.com.au/ (¯`•._)" />
+    <list name="#WorldCup" users="1" topic="[+ntr] *** Welcome To Channel #WorldCup *** English only! | FIFA World Cup Russia 2018 | Closed Channel till next world cup" />
+  </channelList>
 </channels>

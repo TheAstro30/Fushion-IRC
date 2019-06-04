@@ -1,6 +1,55 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <userInfo nick="_Astro" alternative="Astro" ident="Astro" realname="Astro" invisible="true" />
+  <connection address="saphira.us.dragonirc.com" port="6667" channels="" newWindow="false" isSsl="false" showConnectDialog="false" sslAcceptRequests="true" sslAutoAcceptInvalidCertificates="false">
+    <options defaultPort="6667" reconnect="true" retryConnection="true" retryTimes="5" retryDelay="6" nextServer="true" />
+    <identd enable="false" showRequests="false" system="UNIX" port="113" />
+    <localInfo lookupMethod="Socket">
+      <hostInfo address="192.168.15.102" hostName="JASON-LAPTOP.netgear.com" />
+    </localInfo>
+  </connection>
+  <windows childrenMaximized="false" switchTreeWidth="160" nicklistWidth="130">
+    <search direction="Up" matchCase="false" />
+    <caching output="500" input="100" chatSearch="25" />
+    <window name="application" size="1100,657" position="135,43" maximized="false" />
+    <window name="console" size="730,255" position="-1,-1" maximized="false" />
+    <window name="dcc-manager" size="613,301" position="200,183" maximized="false" />
+    <window name="editor" size="920,537" position="259,145" maximized="false" />
+    <window name="channel" size="646,372" position="-1,-1" maximized="false" />
+    <window name="private" size="610,233" position="-1,-1" maximized="false" />
+    <window name="theme" size="0,0" position="432,139" maximized="false" />
+    <window name="chat" size="556,439" position="52,52" maximized="false" />
+    <window name="chan-list" size="628,331" position="71,57" maximized="false" />
+    <mdiBackground layout="None" />
+  </windows>
+  <client>
+    <appearance>
+      <controlBars>
+        <control name="menubar" visible="true" position="0,0" dock="Top" />
+        <control name="toolbar" visible="true" position="0,24" dock="Top" />
+      </controlBars>
+    </appearance>
+    <confirmation clientClose="Connected" consoleClose="Connected" url="true" paste="true" pasteLines="10" />
+    <tabs settings="CLIENTCONFIRM" userList="0" autoList="0" theme="0" />
+    <channels keepChannelsOpen="true" joinOpenChannelsOnConnect="true" showFavoritesDialogOnConnect="false" rejoinChannelsOnKick="true" joinChannelsOnInvite="false">
+      <channelsList minimum="0" maximum="100" />
+    </channels>
+    <logging path="\logs" loggingType="Both" reloadType="Both" createFolder="true" dateByDay="true" stripCodes="false" />
+    <messages stripCodes="false" quit="$read(data\quits.txt)" part="" finger="" command="/" spacing="Paragraph" padding="1" />
+    <show pingPong="true" motd="true" notices="true" />
+    <trayIcon alwaysShow="true" hideMinimized="true" icon="" showNotifications="true" />
+  </client>
+  <mouse console="lusers" channel="channel" query="whois $1" nickList="query $1" />
+  <themes currentTheme="0">
+    <theme name="Default" path="\themes\default.thm" />
+  </themes>
+  <editor splitSize="134" syntaxHighlight="true" lineNumbering="true" zoom="100" last="aliases">
+    <colors keyWord="Blue" identifier="DarkCyan" customerIdentifier="DeepPink" variable="Red" command="BlueViolet" comment="Green" misc="Brown" />
+  </editor>
   <scripts>
+    <alias path="\test\test.XML" type="None" />
+    <alias path="\scripts\aliases.xml" type="None" />
+    <event path="\scripts\events1.xml" type="None" />
     <popup path="\scripts\menubar.xml" type="Commands" />
     <popup path="\scripts\console.xml" type="Console" />
     <popup path="\scripts\channel.xml" type="Channel" />

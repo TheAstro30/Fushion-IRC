@@ -873,6 +873,7 @@ namespace FusionIRC.Forms.ScriptEditor
             _currentEditingScript.Name = name;
             ScriptManager.SaveScript(_currentEditingScript, fileName);
             oldFile.Path = Functions.MainDir(fileName);
+            _tvFiles.RefreshObjects(_files);
         }
 
         private void SaveAll()

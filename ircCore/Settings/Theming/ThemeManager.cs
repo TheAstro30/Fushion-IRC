@@ -25,7 +25,10 @@ namespace ircCore.Settings.Theming
         Private = 2,
 
         [Description("Chat")]
-        DccChat = 3
+        DccChat = 3,
+
+        [Description("Channel List")]
+        ChanList = 4
     }
 
     public enum ThemeColor

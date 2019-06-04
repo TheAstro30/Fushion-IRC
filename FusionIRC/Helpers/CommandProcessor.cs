@@ -8,7 +8,6 @@ using FusionIRC.Forms.Child;
 using FusionIRC.Helpers.Commands;
 using ircClient;
 using ircClient.Parsing.Helpers;
-using ircCore.Settings.Theming;
 using ircScript.Classes.Helpers;
 
 namespace FusionIRC.Helpers

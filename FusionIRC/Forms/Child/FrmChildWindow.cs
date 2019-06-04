@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Media;
@@ -17,10 +18,12 @@ using ircClient;
 using ircCore.Controls;
 using ircCore.Controls.ChildWindows.Classes;
 using ircCore.Controls.ChildWindows.Classes.Channels;
+using ircCore.Controls.ChildWindows.Classes.Channels.List;
 using ircCore.Controls.ChildWindows.Input;
 using ircCore.Controls.ChildWindows.Nicklist;
 using ircCore.Controls.ChildWindows.OutputDisplay;
 using ircCore.Settings;
+using ircCore.Settings.Channels;
 using ircCore.Settings.Networks;
 using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
@@ -28,6 +31,7 @@ using ircCore.Utils;
 using ircScript;
 using ircScript.Classes;
 using ircScript.Classes.Structures;
+using libolv;
 
 namespace FusionIRC.Forms.Child
 {
@@ -44,6 +48,10 @@ namespace FusionIRC.Forms.Child
         private readonly bool _initialize;
         private readonly string _windowChildName;
 
+        private readonly OlvColumn _colChan;
+        private readonly OlvColumn _colUsers;
+        private readonly OlvColumn _colTopic;
+
         public ReconnectOnDisconnect Reconnect;
 
         public Logger Logger = new Logger();
@@ -57,6 +65,8 @@ namespace FusionIRC.Forms.Child
         public InputWindow Input { get; set; }
         public Nicklist Nicklist { get; set; }
 
+        public ChannelList ChanList { get; set; }
+         
         /* Nodes used by the switch treeview - much easier to keep track of/update from here */
         public TreeNode DisplayNodeRoot { get; set; }
         public TreeNode DisplayNode { get; set; }
@@ -107,100 +117,166 @@ namespace FusionIRC.Forms.Child
             /* Constructor where we pass what type of window this is - then we know what controls to create ;) */
             Client = client;
             WindowType = type;           
-            /* Next line is used for getting/setting window size/position & background image */
-            _windowChildName = type == ChildWindowType.Console
-                                   ? "console"
-                                   : type == ChildWindowType.Channel
-                                         ? "channel"
-                                         : type == ChildWindowType.Private ? "private" : "chat";            
-            /* Controls */
-            Input = new InputWindow
-                        {
-                            BackColor = ThemeManager.GetColor(ThemeColor.InputWindowBackColor),
-                            ForeColor = ThemeManager.GetColor(ThemeColor.InputWindowForeColor),
-                            Font = ThemeManager.CurrentTheme.ThemeFonts[type],
-                            MaximumHistoryCache = SettingsManager.Settings.Windows.Caching.Input,
-                            ConfirmPaste = SettingsManager.Settings.Client.Confirmation.ConfirmPaste,
-                            ConfirmPasteLines = SettingsManager.Settings.Client.Confirmation.PasteLines
-                        };
-
-            Output = new OutputWindow
-                         {                             
-                             BackColor = ThemeManager.GetColor(ThemeColor.OutputWindowBackColor),
-                             LineMarkerColor = ThemeManager.GetColor(ThemeColor.OutputWindowLineMarkerColor),
-                             Font = ThemeManager.CurrentTheme.ThemeFonts[type],
-                             LinePaddingPixels = SettingsManager.Settings.Client.Messages.LinePadding,
-                             LineSpacingStyle = SettingsManager.Settings.Client.Messages.LineSpacing,                             
-                             MaximumLines = SettingsManager.Settings.Windows.Caching.Output
-                         };
-
-            /* Backgrounds */
-            var bg = ThemeManager.GetBackground(type);
-            if (!string.IsNullOrEmpty(bg.Path))
+            /* This is used for getting/setting window size/position */
+            switch (WindowType)
             {
-                var file = Functions.MainDir(bg.Path);
-                if (File.Exists(file))
+                case ChildWindowType.Console:
+                    _windowChildName = "console";
+                    break;
+
+                case ChildWindowType.Channel:
+                    _windowChildName = "channel";
+                    break;
+
+                case ChildWindowType.Private:
+                    _windowChildName = "private";
+                    break;
+
+                case ChildWindowType.DccChat:
+                    _windowChildName = "chat";
+                    break;
+
+                default:
+                    _windowChildName = "chan-list";
+                    break;
+            }          
+            /* Controls */
+            if (type != ChildWindowType.ChanList)
+            {
+                Input = new InputWindow
+                            {
+                                BackColor = ThemeManager.GetColor(ThemeColor.InputWindowBackColor),
+                                ForeColor = ThemeManager.GetColor(ThemeColor.InputWindowForeColor),
+                                Font = ThemeManager.CurrentTheme.ThemeFonts[type],
+                                MaximumHistoryCache = SettingsManager.Settings.Windows.Caching.Input,
+                                ConfirmPaste = SettingsManager.Settings.Client.Confirmation.ConfirmPaste,
+                                ConfirmPasteLines = SettingsManager.Settings.Client.Confirmation.PasteLines
+                            };
+
+                Output = new OutputWindow
+                             {
+                                 BackColor = ThemeManager.GetColor(ThemeColor.OutputWindowBackColor),
+                                 LineMarkerColor = ThemeManager.GetColor(ThemeColor.OutputWindowLineMarkerColor),
+                                 Font = ThemeManager.CurrentTheme.ThemeFonts[type],
+                                 LinePaddingPixels = SettingsManager.Settings.Client.Messages.LinePadding,
+                                 LineSpacingStyle = SettingsManager.Settings.Client.Messages.LineSpacing,
+                                 MaximumLines = SettingsManager.Settings.Windows.Caching.Output
+                             };
+
+                /* Backgrounds */
+                var bg = ThemeManager.GetBackground(type);
+                if (!string.IsNullOrEmpty(bg.Path))
                 {
-                    Output.BackgroundImage = (Bitmap)Image.FromFile(file);
-                    Output.BackgroundImageLayout = bg.LayoutStyle;
+                    var file = Functions.MainDir(bg.Path);
+                    if (File.Exists(file))
+                    {
+                        Output.BackgroundImage = (Bitmap) Image.FromFile(file);
+                        Output.BackgroundImageLayout = bg.LayoutStyle;
+                    }
                 }
-            }
-            if (type == ChildWindowType.Channel)
-            {                
-                Nicklist = new Nicklist
-                               {
-                                   BackColor = ThemeManager.GetColor(ThemeColor.NicklistBackColor),
-                                   ForeColor = ThemeManager.GetColor(ThemeColor.NicklistForeColor),
-                                   Font = ThemeManager.CurrentTheme.ThemeFonts[type],
-                                   UserModes = Client.Parser.UserModes,
-                                   UserModeCharacters = Client.Parser.UserModeCharacters,
-                                   Dock = DockStyle.Fill,
-                                   Images = ThemeManager.GetNicklistImages(),
-                                   ShowIcons = true, /* Change these two lines to the Theme.cs */
-                                   ShowPrefix = true,
-                                   Ial = Client.Ial
-                               };
-                Nicklist.OnNicklistDoubleClick += NicklistDoubleClickNick;
-                Nicklist.OnNicklistRightClick += NicklistRightClick;
-                /* Split control for nicklist */
-                _splitter = new SplitContainer
-                               {
-                                   FixedPanel = FixedPanel.Panel2,
-                                   Location = new Point(0, 0),
-                                   Panel1MinSize = 250,                                   
-                                   SplitterWidth = 1
-                               };
-                _splitter.Panel1.Controls.Add(Output);
-                _splitter.Panel2MinSize = 80;
-                _splitter.Panel2.Controls.Add(Nicklist);                
-                _splitter.SplitterMoving += SplitterMoving;
-                /* Only add splitter to controls, not the output window */
-                Output.Dock = DockStyle.Fill;
-                Controls.AddRange(new Control[] {Input, _splitter});
+                if (type == ChildWindowType.Channel)
+                {
+                    Nicklist = new Nicklist
+                                   {
+                                       BackColor = ThemeManager.GetColor(ThemeColor.NicklistBackColor),
+                                       ForeColor = ThemeManager.GetColor(ThemeColor.NicklistForeColor),
+                                       Font = ThemeManager.CurrentTheme.ThemeFonts[type],
+                                       UserModes = Client.Parser.UserModes,
+                                       UserModeCharacters = Client.Parser.UserModeCharacters,
+                                       Dock = DockStyle.Fill,
+                                       Images = ThemeManager.GetNicklistImages(),
+                                       ShowIcons = true,
+                                       /* Change these two lines to the Theme.cs */
+                                       ShowPrefix = true,
+                                       Ial = Client.Ial
+                                   };
+                    Nicklist.OnNicklistDoubleClick += NicklistDoubleClickNick;
+                    Nicklist.OnNicklistRightClick += NicklistRightClick;
+                    /* Split control for nicklist */
+                    _splitter = new SplitContainer
+                                    {
+                                        FixedPanel = FixedPanel.Panel2,
+                                        Location = new Point(0, 0),
+                                        Panel1MinSize = 250,
+                                        SplitterWidth = 1
+                                    };
+                    _splitter.Panel1.Controls.Add(Output);
+                    _splitter.Panel2MinSize = 80;
+                    _splitter.Panel2.Controls.Add(Nicklist);
+                    _splitter.SplitterMoving += SplitterMoving;
+                    /* Only add splitter to controls, not the output window */
+                    Output.Dock = DockStyle.Fill;
+                    Controls.AddRange(new Control[] {Input, _splitter});
+                }
+                else
+                {
+                    Controls.AddRange(new Control[] {Input, Output});
+                }
+                /* Callbacks */
+                Output.OnUrlDoubleClicked += OutputUrlDoubleClicked;
+                Output.OnSpecialWordDoubleClicked += OutputSpecialWordDoubleClicked;
+                Output.MouseDown += OutputMouseDown;
+                Output.MouseUp += OutputMouseUp;
+                Output.OnWordUnderMouse += OutputWordUnderMouse;
+                Output.OnLineAdded += OutputOnLineAdded;
+                Output.OnWindowDoubleClicked += OutputDoubleClicked;
+                Input.TabKeyPress += InputTabKeyPress;
+                Input.KeyDown += InputKeyDown;
+                Input.MouseWheel += InputMouseWheel;
+                Modes.OnSettingsChanged += ChannelSettingsChanged;
+                /* Set up window background */
+                var bd = ThemeManager.GetBackground(type);
+                if (bd != null && File.Exists(bd.Path))
+                {
+                    Output.BackgroundImage = (Bitmap)Image.FromFile(bd.Path);
+                    Output.BackgroundImageLayout = bd.LayoutStyle;
+                }            
             }
             else
             {
-                Controls.AddRange(new Control[] { Input, Output });
-            }
-            /* Set up window background */
-            var bd = ThemeManager.GetBackground(type);
-            if (bd != null && File.Exists(bd.Path))
-            {
-                Output.BackgroundImage = (Bitmap)Image.FromFile(bd.Path);
-                Output.BackgroundImageLayout = bd.LayoutStyle;
-            }
-            /* Callbacks */
-            Output.OnUrlDoubleClicked += OutputUrlDoubleClicked;
-            Output.OnSpecialWordDoubleClicked += OutputSpecialWordDoubleClicked;
-            Output.MouseDown += OutputMouseDown;
-            Output.MouseUp += OutputMouseUp;
-            Output.OnWordUnderMouse += OutputWordUnderMouse;
-            Output.OnLineAdded += OutputOnLineAdded;
-            Output.OnWindowDoubleClicked += OutputDoubleClicked;
-            Input.TabKeyPress += InputTabKeyPress;
-            Input.KeyDown += InputKeyDown;
-            Input.MouseWheel += InputMouseWheel;
-            Modes.OnSettingsChanged += ChannelSettingsChanged;
+                StartPosition = FormStartPosition.Manual; /* This will need to move later when I finally do proper window positions */
+                ChanList = new ChannelList
+                               {
+                                   Font = new Font("Segeo UI Semibold", 9),
+                                   FullRowSelect = true,
+                                   HeaderStyle = ColumnHeaderStyle.Nonclickable,
+                                   HideSelection = false,
+                                   Location = new Point(3, 65),
+                                   MultiSelect = false,
+                                   Size = new Size(294, 267),
+                                   TabIndex = 0,
+                                   UseCompatibleStateImageBehavior = false,
+                                   EmptyListMsg = @"No channels listed",
+                                   View = View.Details
+                               };
+                _colChan = new OlvColumn("Channel:", "Name")
+                               {
+                                   CellPadding = null,
+                                   IsEditable = false,
+                                   Sortable = false,
+                                   Width = 120
+                               };
+                _colUsers = new OlvColumn("Users:", "Users")
+                                {
+                                    CellPadding = null,
+                                    IsEditable = false,
+                                    Sortable = false,
+                                    Width = 50
+                                };
+                _colTopic = new OlvColumn("Topic:", "Topic")
+                                {
+                                    CellPadding = null,
+                                    IsEditable = false,
+                                    Sortable = false,
+                                    Width = 120,
+                                    FillsFreeSpace = true
+                                };
+                ChanList.AllColumns.AddRange(new[] {_colChan, _colUsers, _colTopic});
+                ChanList.Columns.AddRange(new ColumnHeader[] {_colChan, _colUsers, _colTopic});
+                Controls.Add(ChanList);
+                /* Handler */
+                ChanList.DoubleClick += OnChanListDoubleClick;
+            }            
             /* Window properties */
             BackColor = Color.FromArgb(190, 190, 190);            
             ShowInTaskbar = false;
@@ -277,6 +353,10 @@ namespace FusionIRC.Forms.Child
                         Output.LoadBuffer(file);
                         Logger.CreateLog();
                     }
+                    break;
+
+                case ChildWindowType.ChanList:
+                    Icon = Resources.list;
                     break;
             }
             OnResize(new EventArgs());            
@@ -385,6 +465,12 @@ namespace FusionIRC.Forms.Child
                     /* I think this is remarked out so I could modify WindowManger to get specific positions for
                      * chat windows named a certain name, eg: #dragonsrealm = this position in the MDI window, all
                      * other windows, assume default position ... etc. */
+                    switch (WindowType)
+                    {
+                        case ChildWindowType.ChanList:
+                            w.Position = Location;
+                            break;
+                    }
                     //w.Position = Location;
                 }
             }
@@ -393,13 +479,19 @@ namespace FusionIRC.Forms.Child
 
         protected override void OnResizeBegin(EventArgs e)
         {
-            Output.UserResize = true;
+            if (WindowType != ChildWindowType.ChanList)
+            {
+                Output.UserResize = true;
+            }
             base.OnResizeBegin(e);
         }
 
         protected override void OnResizeEnd(EventArgs e)
         {
-            Output.UserResize = false;
+            if (WindowType != ChildWindowType.ChanList)
+            {
+                Output.UserResize = false;
+            }
             base.OnResizeEnd(e);
         }
 
@@ -411,22 +503,32 @@ namespace FusionIRC.Forms.Child
                 /* We don't do anything - can cause application lock-up */
                 return;
             }
-            var height = ClientRectangle.Height - Input.ClientRectangle.Height - 1;
-            if (WindowType == ChildWindowType.Channel)
+            if (WindowType != ChildWindowType.ChanList)
             {
-                /* Set up our splitter */
-                _splitter.SetBounds(0, 0, ClientRectangle.Width, height);
-                Input.SetBounds(0, _splitter.ClientRectangle.Height + 1, ClientRectangle.Width, Input.ClientRectangle.Height);
-                if (WindowState == FormWindowState.Normal)
+                var height = ClientRectangle.Height - Input.ClientRectangle.Height - 1;
+                if (WindowType == ChildWindowType.Channel)
                 {
-                    _splitter.SplitterDistance = ClientRectangle.Width - SettingsManager.Settings.Windows.NicklistWidth;
+                    /* Set up our splitter */
+                    _splitter.SetBounds(0, 0, ClientRectangle.Width, height);
+                    Input.SetBounds(0, _splitter.ClientRectangle.Height + 1, ClientRectangle.Width,
+                                    Input.ClientRectangle.Height);
+                    if (WindowState == FormWindowState.Normal)
+                    {
+                        _splitter.SplitterDistance = ClientRectangle.Width -
+                                                     SettingsManager.Settings.Windows.NicklistWidth;
+                    }
+                }
+                else
+                {
+                    /* Normal window, no nicklist/splitter */
+                    Output.SetBounds(0, 0, ClientRectangle.Width, height);
+                    Input.SetBounds(0, Output.ClientRectangle.Height + 1, ClientRectangle.Width,
+                                    Input.ClientRectangle.Height);
                 }
             }
             else
             {
-                /* Normal window, no nicklist/splitter */
-                Output.SetBounds(0, 0, ClientRectangle.Width, height);
-                Input.SetBounds(0, Output.ClientRectangle.Height + 1, ClientRectangle.Width, Input.ClientRectangle.Height);
+                ChanList.SetBounds(0, 0, ClientRectangle.Width, ClientRectangle.Height);
             }
             /* Update settings */
             if (_initialize)
@@ -747,6 +849,17 @@ namespace FusionIRC.Forms.Child
             Output.MouseWheelScroll(e);
         }
 
+        /* Channel list */
+        private void OnChanListDoubleClick(object sender, EventArgs e)
+        {
+            if (ChanList.SelectedObject == null || !Client.IsConnected)
+            {
+                return;
+            }
+            var c = (ChannelListData) ChanList.SelectedObject;
+            Client.Send(string.Format("JOIN {0}", c.Name));
+        }
+
         /* Nick list callbacks */
         private void NicklistDoubleClickNick()
         {
@@ -837,6 +950,10 @@ namespace FusionIRC.Forms.Child
             {
                 /* Only set SelectedNode if it's not already currently set to this DisplayNode */
                 ctl.SelectedNode = DisplayNode;
+            }
+            if (WindowType == ChildWindowType.ChanList)
+            {
+                return;
             }
             Input.Focus();
         }

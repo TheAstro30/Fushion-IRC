@@ -4,8 +4,8 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using ircCore.Utils;
 using ircCore.Utils.Serialization;
 
@@ -58,6 +58,18 @@ namespace ircCore.Settings.Channels
                 if (c.Name.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                 {
                     return c;
+                }
+            }
+            return null;
+        }
+
+        public static ChannelListBase GetChannelListFromNetwork(string network)
+        {
+            foreach (var n in Channels.ChannelList)
+            {
+                if (n.Network.Equals(network, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return n;
                 }
             }
             return null;

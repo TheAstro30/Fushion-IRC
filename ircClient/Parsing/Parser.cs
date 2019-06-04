@@ -79,6 +79,10 @@ namespace ircClient.Parsing
 
         public event Action<ClientConnection, string, string> OnWatchOnline;
         public event Action<ClientConnection, string> OnWatchOffline;
+
+        public event Action<ClientConnection> OnBeginChannelList;
+        public event Action<ClientConnection, string, int, string> OnChannelListData;
+        public event Action<ClientConnection> OnEndChannelList;
        
         /* Public properties */
         public string JoinChannelsOnConnect { get; set; }
@@ -273,6 +277,36 @@ namespace ircClient.Parsing
                     }
                     break;
 
+                case "321":
+                    /* Channel list */
+                    if (OnBeginChannelList != null)
+                    {
+                        OnBeginChannelList(_client);
+                    }
+                    break;
+
+                case "322": 
+                    var p = new List<string>(fourth.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries));
+                    if (p.Count < 3)
+                    {
+                        return;
+                    }
+                    var chan = p[0];
+                    int.TryParse(p[1], out i);
+                    p.RemoveRange(0, 2);
+                    if (OnChannelListData != null)
+                    {
+                        OnChannelListData(_client, chan, i, RemoveColon(string.Join(" ", p)));
+                    }
+                    break;
+
+                case "323":                    
+                    if (OnEndChannelList != null)
+                    {
+                        OnEndChannelList(_client);
+                    }
+                    break;
+
                 case "482":
                     /* Not a channel operator */                    
                     if (OnNotChannelOperator != null)
@@ -421,6 +455,7 @@ namespace ircClient.Parsing
                 case "404":
                 case "421":
                 case "432":
+                case "461":
                 case "471":
                 case "473":
                 case "474":

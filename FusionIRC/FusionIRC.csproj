@@ -75,6 +75,12 @@
     <Compile Include="Forms\ChannelProperties\Editing\FrmMaskEdit.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\Misc\FrmChannelList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Misc\FrmChannelList.Designer.cs">
+      <DependentUpon>FrmChannelList.cs</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\ChannelPropertyData.cs" />
     <Compile Include="Forms\ChannelProperties\Controls\ChannelPropertyBase.cs">
       <SubType>UserControl</SubType>
@@ -257,6 +263,7 @@
     <Compile Include="Helpers\Commands\CommandSoundPlay.cs" />
     <Compile Include="Helpers\Commands\CommandText.cs" />
     <Compile Include="Helpers\Connection\Events.cs" />
+    <Compile Include="Helpers\Connection\Notify.cs" />
     <Compile Include="Helpers\Connection\Raw.cs" />
     <Compile Include="Helpers\Connection\Channel.cs" />
     <Compile Include="Helpers\Connection\Ctcp.cs" />
@@ -272,6 +279,9 @@
     <Compile Include="Helpers\WindowManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Forms\Misc\FrmChannelList.resx">
+      <DependentUpon>FrmChannelList.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Misc\FrmDccManager.resx">
       <DependentUpon>FrmDccManager.cs</DependentUpon>
     </EmbeddedResource>
@@ -341,6 +351,7 @@
   <ItemGroup>
     <None Include="Wave\cork.wav" />
     <None Include="Icons\Dialog\notifyGroup.ico" />
+    <None Include="Icons\ChildWindows\list.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

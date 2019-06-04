@@ -124,6 +124,9 @@ namespace ircCore.Settings.SettingsBase
             Mouse.Channel = "channel";
             Mouse.Query = "whois $1";
             Mouse.Nicklist = "query $1";
+            /* Channels */
+            Client.Channels.ChannelList.Minimum = 3;
+            Client.Channels.ChannelList.Minimum = 1000;
             /* Create a blank theme */
             Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = @"\themes\default.thm"});            
         }

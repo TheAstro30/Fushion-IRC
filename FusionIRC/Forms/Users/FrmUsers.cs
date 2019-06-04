@@ -57,7 +57,7 @@ namespace FusionIRC.Forms.Users
             _images = new ImageList { ColorDepth = ColorDepth.Depth32Bit, ImageSize = new Size(16, 16) };
             _images.Images.AddRange(new Image[]
                                         {
-                                            Properties.Resources.notify.ToBitmap(),
+                                            Properties.Resources.notifyGroup.ToBitmap(),
                                             Properties.Resources.ignored.ToBitmap()
                                         });
 
@@ -110,6 +110,8 @@ namespace FusionIRC.Forms.Users
                             };
 
             Controls.AddRange(new Control[] {_tabUsers, _btnClose});
+
+            AcceptButton = _btnClose;
 
             _tabUsers.SelectedIndexChanged += TabSelectedIndexChanged;
         }

@@ -51,6 +51,9 @@
     </Compile>
     <Compile Include="Controls\ChildWindows\Classes\Channels\Channel.cs" />
     <Compile Include="Controls\ChildWindows\Classes\Channels\ChannelBase.cs" />
+    <Compile Include="Controls\ChildWindows\Classes\Channels\List\ChannelList.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\ChildWindows\Classes\Channels\ModeComparer.cs" />
     <Compile Include="Controls\ChildWindows\Helpers\ControlByte.cs" />
     <Compile Include="Controls\ChildWindows\Input\InputWindow.cs">

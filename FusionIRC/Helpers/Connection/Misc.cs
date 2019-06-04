@@ -5,7 +5,6 @@
  */
 using System;
 using System.Linq;
-using FusionIRC.Forms;
 using FusionIRC.Forms.Favorites;
 using FusionIRC.Forms.Misc;
 using ircClient;
@@ -298,30 +297,6 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
-        }
-
-        public static void OnWatchOnline(ClientConnection client, string nick, string address)
-        {
-            System.Diagnostics.Debug.Print("NICK " + nick + " is online: " + address);
-            var u = UserManager.IsNotify(nick);
-            if (u == null)
-            {
-                return;
-            }
-            u.Address = address;
-            ((FrmClientWindow)WindowManager.MainForm).SwitchView.AddNotify(client, u);
-        }
-
-        public static void OnWatchOffline(ClientConnection client, string nick)
-        {
-            /* User buggered off, so we now need to remove them from the notify list */
-            System.Diagnostics.Debug.Print("NICK " + nick + " buggered off");
-            var u = UserManager.IsNotify(nick);
-            if (u == null)
-            {
-                return;
-            }
-            ((FrmClientWindow)WindowManager.MainForm).SwitchView.RemoveNotify(client, u);
         }
     }
 }

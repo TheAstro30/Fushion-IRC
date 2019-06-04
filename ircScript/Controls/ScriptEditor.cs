@@ -34,7 +34,8 @@ namespace ircScript.Controls
         private readonly Regex _commandPrefix = new Regex(@"\b(set|var|inc|dec|unset|echo|writeini|write)\b",
                                                           RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        private readonly Regex _ircCommandPrefix = new Regex(@"\b(me|say|amsg|ame|msg|join|part|quit|nick|kick|mode|ignore)\b");
+        private readonly Regex _ircCommandPrefix =
+            new Regex(@"\b(me|say|amsg|ame|msg|join|part|quit|nick|kick|mode|ignore|notify|query)\b");
 
         private static readonly SolidBrush CommentBrush = new SolidBrush(Color.Green);
         private static readonly SolidBrush KeywordBrush = new SolidBrush(Color.Blue);
