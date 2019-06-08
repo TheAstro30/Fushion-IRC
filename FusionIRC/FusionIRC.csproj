@@ -38,6 +38,9 @@
   <PropertyGroup>
     <ApplicationIcon>mainicon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -65,6 +68,9 @@
     </Compile>
     <Compile Include="Controls\SwitchView\WindowTreeView.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Autos\Controls\AutomationPerform.cs">
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Forms\Autos\Controls\AutomationsListView.cs">
       <SubType>UserControl</SubType>
@@ -130,10 +136,10 @@
     <Compile Include="Forms\Misc\FrmPart.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ScriptEditor\FrmColors.cs">
+    <Compile Include="Forms\Scripting\FrmColors.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ScriptEditor\FrmScript.cs">
+    <Compile Include="Forms\Scripting\FrmScript.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Settings\Controls\Base\BaseControlRenderer.cs">
@@ -352,6 +358,9 @@
     <None Include="Wave\cork.wav" />
     <None Include="Icons\Dialog\notifyGroup.ico" />
     <None Include="Icons\ChildWindows\list.ico" />
+    <None Include="Icons\Dialog\autoPerform.ico" />
+    <None Include="Icons\Dialog\aboutDialog.ico" />
+    <None Include="Icons\Dialog\autoConnect.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

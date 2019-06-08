@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<userList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <notify>
-    <user nick="DRACO" address="~DRACO@Owner.DragonIRC.com" note="cool dude ;)" />
-    <user nick="TheAstro30" address="~TheAstro3@Staff.DragonIRC.com" note="cocksucker" />
-  </notify>
-  <ignore />
-</userList>

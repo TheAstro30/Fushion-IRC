@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Autos\AutoList.cs" />
+    <Compile Include="Autos\Automations.cs" />
     <Compile Include="Autos\AutomationsManager.cs" />
     <Compile Include="Controls\ChildWindow.cs">
       <SubType>Form</SubType>

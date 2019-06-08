@@ -495,6 +495,7 @@ namespace ircClient.Parsing
                     }
                     break;
 
+                case "600":
                 case "604":
                     /* Watch online */
                     i = fourth.IndexOf(' ');
@@ -511,6 +512,7 @@ namespace ircClient.Parsing
                     }
                     break;
 
+                case "601":
                 case "602":
                 case "605":
                     /* Stopped watching/Watch offline - address is irrelevant at this point */

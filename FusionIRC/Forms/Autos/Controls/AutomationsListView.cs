@@ -3,13 +3,13 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
-
 using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using FusionIRC.Forms.Autos.Editing;
 using FusionIRC.Forms.Misc;
+using FusionIRC.Properties;
 using ircCore.Autos;
 using ircCore.Utils;
 using libolv;
@@ -40,6 +40,7 @@ namespace FusionIRC.Forms.Autos.Controls
         public AutomationsListView(AutomationsManager.AutomationType autoType)
         {
             _autoType = autoType;
+            var offsetY = autoType == AutomationsManager.AutomationType.Connect ? 37 : 0;
             /* Controls */
             _chkEnable = new CheckBox
                              {
@@ -57,7 +58,8 @@ namespace FusionIRC.Forms.Autos.Controls
                                   AutoSize = true,
                                   Location = new Point(3, 31),
                                   Size = new Size(55, 15),
-                                  Text = @"Network:"
+                                  Text = @"Network:",
+                                  Visible = autoType != AutomationsManager.AutomationType.Connect
                               };
 
             _cmbNetwork = new ComboBox
@@ -66,6 +68,7 @@ namespace FusionIRC.Forms.Autos.Controls
                                   FormattingEnabled = true,
                                   Location = new Point(64, 28),
                                   Size = new Size(152, 23),
+                                  Visible = autoType != AutomationsManager.AutomationType.Connect,
                                   TabIndex = 1
                               };
 
@@ -75,6 +78,7 @@ namespace FusionIRC.Forms.Autos.Controls
                               Size = new Size(75, 23),
                               TabIndex = 2,
                               Text = @"New",
+                              Visible = autoType != AutomationsManager.AutomationType.Connect,
                               UseVisualStyleBackColor = true
                           };
 
@@ -85,6 +89,7 @@ namespace FusionIRC.Forms.Autos.Controls
                                  TabIndex = 3,
                                  Text = @"Remove",
                                  UseVisualStyleBackColor = true,
+                                 Visible = autoType != AutomationsManager.AutomationType.Connect,
                                  Enabled = false
                              };
 
@@ -94,7 +99,7 @@ namespace FusionIRC.Forms.Autos.Controls
                                FullRowSelect = true,
                                HeaderStyle = ColumnHeaderStyle.Nonclickable,
                                HideSelection = false,
-                               Location = new Point(3, 65),
+                               Location = new Point(3, 65 - offsetY),
                                MultiSelect = false,
                                Size = new Size(294, 267),
                                TabIndex = 4,
@@ -104,6 +109,31 @@ namespace FusionIRC.Forms.Autos.Controls
 
             switch (_autoType)
             {
+                case AutomationsManager.AutomationType.Connect:
+                    _chkEnable.Text = @"Enable auto-connect on start-up";
+                    _chkEnable.Checked = AutomationsManager.Automations.Connect.Enable;
+                    _colItem = new OlvColumn("Server:", "Item")
+                                   {
+                                       CellPadding = null,
+                                       IsEditable = false,
+                                       Sortable = false,
+                                       Width = 120,
+                                       FillsFreeSpace = true,
+                                       ImageGetter = delegate { return 0; }
+                                   };
+                    _colValue = new OlvColumn("Port:", "Value")
+                                    {
+                                        CellPadding = null,
+                                        IsEditable = false,
+                                        Sortable = false,
+                                        Width = 80
+                                    };
+                    if (AutomationsManager.Automations.Connect.Network.Count == 0)
+                    {
+                        AutomationsManager.Automations.Connect.Network.Add(new AutoList.AutoNetworkData {Name = "All"});
+                    }
+                    break;
+
                 case AutomationsManager.AutomationType.Join:
                     _chkEnable.Text = @"Enable auto-join";
                     _chkEnable.Checked = AutomationsManager.Automations.Join.Enable;
@@ -113,8 +143,15 @@ namespace FusionIRC.Forms.Autos.Controls
                                        IsEditable = false,
                                        Sortable = false,
                                        Width = 120,
-                                       ImageGetter = delegate { return 0; }
-                                   };          
+                                       ImageGetter = delegate { return 1; }
+                                   };
+                    _colValue = new OlvColumn("Password:", "Value")
+                                    {
+                                        CellPadding = null,
+                                        IsEditable = false,
+                                        Sortable = false,
+                                        Width = 300
+                                    };
                     break;
 
                 case AutomationsManager.AutomationType.Identify:
@@ -126,19 +163,17 @@ namespace FusionIRC.Forms.Autos.Controls
                                        IsEditable = false,
                                        Sortable = false,
                                        Width = 120,
-                                       ImageGetter = delegate { return 1; }
+                                       ImageGetter = delegate { return 2; }
                                    };
+                    _colValue = new OlvColumn("Password:", "Value")
+                                    {
+                                        CellPadding = null,
+                                        IsEditable = false,
+                                        Sortable = false,
+                                        Width = 300
+                                    };
                     break;
-            }
-
-            _colValue = new OlvColumn("Password:", "Value")
-                            {
-                                CellPadding = null,
-                                IsEditable = false,
-                                Sortable = false,
-                                Width = 300
-                            };
-
+            }            
             _imageList = new ImageList
                              {
                                  ColorDepth = ColorDepth.Depth32Bit,
@@ -146,8 +181,9 @@ namespace FusionIRC.Forms.Autos.Controls
                              };
             _imageList.Images.AddRange(new[]
                                            {
-                                               Properties.Resources.autoJoin.ToBitmap(),
-                                               Properties.Resources.identify.ToBitmap()
+                                               Resources.autoConnect.ToBitmap(),
+                                               Resources.autoJoin.ToBitmap(),
+                                               Resources.identify.ToBitmap()
                                            });
 
             _olvData.SmallImageList = _imageList;
@@ -159,7 +195,7 @@ namespace FusionIRC.Forms.Autos.Controls
             /* Editing */
             _btnAdd = new Button
                           {
-                              Location = new Point(303, 65),
+                              Location = new Point(303, 65 - offsetY),
                               Size = new Size(75, 23),
                               TabIndex = 5,
                               Text = @"Add",
@@ -169,7 +205,7 @@ namespace FusionIRC.Forms.Autos.Controls
 
             _btnEdit = new Button
                            {
-                               Location = new Point(303, 94),
+                               Location = new Point(303, 94 - offsetY),
                                Size = new Size(75, 23),
                                TabIndex = 6,
                                Text = @"Edit",
@@ -179,7 +215,7 @@ namespace FusionIRC.Forms.Autos.Controls
 
             _btnDelete = new Button
                              {
-                                 Location = new Point(303, 158),
+                                 Location = new Point(303, 158 - offsetY),
                                  Size = new Size(75, 23),
                                  TabIndex = 7,
                                  Text = @"Delete",
@@ -189,7 +225,7 @@ namespace FusionIRC.Forms.Autos.Controls
 
             _btnClear = new Button
                             {
-                                Location = new Point(303, 187),
+                                Location = new Point(303, 187 - offsetY),
                                 Size = new Size(75, 23),
                                 TabIndex = 8,
                                 Text = @"Clear",
@@ -219,12 +255,11 @@ namespace FusionIRC.Forms.Autos.Controls
             _btnEdit.Click += ButtonClickHandler;
             _btnDelete.Click += ButtonClickHandler;
             _btnClear.Click += ButtonClickHandler;
-
             /* Fill combo with stored networks and update listview */
             _cmbNetwork.Items.AddRange(AutomationsManager.GetAllNetworks(_autoType));
             if (_cmbNetwork.Items.Count > 0)
             {
-                _cmbNetwork.SelectedIndex = 0;                
+                _cmbNetwork.SelectedIndex = 0;
             }
         }
 
@@ -233,6 +268,10 @@ namespace FusionIRC.Forms.Autos.Controls
         {
             switch (_autoType)
             {
+                case AutomationsManager.AutomationType.Connect:
+                    AutomationsManager.Automations.Connect.Enable = _chkEnable.Checked;
+                    break;
+
                 case AutomationsManager.AutomationType.Join:
                     AutomationsManager.Automations.Join.Enable = _chkEnable.Checked;
                     break;
@@ -302,7 +341,7 @@ namespace FusionIRC.Forms.Autos.Controls
         private void BuildList()
         {
             _olvData.ClearObjects();
-            if (_cmbNetwork.Items.Count == 0)
+            if (_autoType != AutomationsManager.AutomationType.Connect && _cmbNetwork.Items.Count == 0)
             {
                 _btnRemove.Enabled = false;
                 _btnAdd.Enabled = false;
@@ -310,6 +349,7 @@ namespace FusionIRC.Forms.Autos.Controls
                 return;
             }
             var nd = AutomationsManager.GetAutomationByNetwork(_autoType, _cmbNetwork.Text);
+
             _olvData.AddObjects(nd.Data);
             _btnRemove.Enabled = true;
             _btnAdd.Enabled = true;
@@ -319,7 +359,7 @@ namespace FusionIRC.Forms.Autos.Controls
         /* Add/remove network */
         private void AddNetwork()
         {
-            using (var network = new FrmNetwork())
+            using (var network = new FrmNetwork(true))
             {
                 if (network.ShowDialog(this) != DialogResult.OK)
                 {
@@ -332,7 +372,6 @@ namespace FusionIRC.Forms.Autos.Controls
                     switch (_autoType)
                     {
                         case AutomationsManager.AutomationType.Join:
-
                             AutomationsManager.Automations.Join.Network.Add(nd);
                             break;
 
@@ -346,10 +385,12 @@ namespace FusionIRC.Forms.Autos.Controls
                 else
                 {
                     /* No point adding it if it already exists, just select it in the combo box */
-                    var index = _cmbNetwork.Items.Cast<object>().TakeWhile(n => !n.ToString().Equals(nd.Name, StringComparison.InvariantCultureIgnoreCase)).Count();
+                    var index =
+                        _cmbNetwork.Items.Cast<object>().TakeWhile(
+                            n => !n.ToString().Equals(nd.Name, StringComparison.InvariantCultureIgnoreCase)).Count();
                     _cmbNetwork.SelectedIndex = index;
-                }                
-            }            
+                }
+            }
         }
 
         private void RemoveNetwork()
@@ -402,6 +443,12 @@ namespace FusionIRC.Forms.Autos.Controls
             {
                 switch (_autoType)
                 {
+                    case AutomationsManager.AutomationType.Connect:
+                        edit.Text = @"Add server to auto-connect";
+                        edit.ItemLabelText = @"Server address:";
+                        edit.ValueLabelText = @"Optional port:";
+                        break;
+
                     case AutomationsManager.AutomationType.Join:
                         edit.Text = @"Add channel to auto-join";
                         edit.ItemLabelText = @"Channel name:";
@@ -419,10 +466,16 @@ namespace FusionIRC.Forms.Autos.Controls
                     return;
                 }
                 /* We should now be able to add this data to "nd" */
+                var v = Functions.GetFirstWord(edit.Value);
+                int i;
+                if (!int.TryParse(v, out i))
+                {
+                    i = 6667;
+                }
                 var data = new AutoList.AutoData
                                {
                                    Item = Functions.GetFirstWord(edit.Item),
-                                   Value = Functions.GetFirstWord(edit.Value)
+                                   Value = _autoType != AutomationsManager.AutomationType.Connect ? v : i.ToString()
                                };
                 nd.Data.Add(data);
                 _olvData.AddObject(data);
@@ -443,14 +496,20 @@ namespace FusionIRC.Forms.Autos.Controls
             {
                 switch (_autoType)
                 {
+                    case AutomationsManager.AutomationType.Connect:
+                        edit.Text = @"Edit server on auto-connect";
+                        edit.ItemLabelText = @"Server address:";
+                        edit.ValueLabelText = @"Optional port:";
+                        break;
+
                     case AutomationsManager.AutomationType.Join:
-                        edit.Text = @"Edit channel to auto-join";
+                        edit.Text = @"Edit channel on auto-join";
                         edit.ItemLabelText = @"Channel name:";
                         edit.ValueLabelText = @"Optional password:";
                         break;
 
                     case AutomationsManager.AutomationType.Identify:
-                        edit.Text = @"Edit nick name to auto-identify";
+                        edit.Text = @"Edit nick name on auto-identify";
                         edit.ItemLabelText = @"Nick name:";
                         edit.ValueLabelText = @"Password:";
                         break;
@@ -463,8 +522,14 @@ namespace FusionIRC.Forms.Autos.Controls
                     return;
                 }
                 /* Update item */
+                var v = Functions.GetFirstWord(edit.Value);
+                int i;
+                if (!int.TryParse(v, out i))
+                {
+                    i = 6667;
+                }
                 d.Item = Functions.GetFirstWord(edit.Item);
-                d.Value = Functions.GetFirstWord(edit.Value);
+                d.Value = _autoType != AutomationsManager.AutomationType.Connect ? v : i.ToString();
                 /* Update display */
                 _olvData.RefreshObject(data);
                 _btnEdit.Enabled = false;

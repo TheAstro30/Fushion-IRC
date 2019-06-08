@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using ircCore.Controls;
 using ircCore.Settings;
 
-namespace FusionIRC.Forms.ScriptEditor
+namespace FusionIRC.Forms.Scripting
 {
     public sealed class FrmColors : FormEx
     {

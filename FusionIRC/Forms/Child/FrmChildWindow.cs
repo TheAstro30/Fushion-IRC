@@ -4,7 +4,6 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Media;
@@ -842,6 +841,7 @@ namespace FusionIRC.Forms.Child
             }
             Input.Text = !string.IsNullOrEmpty(rest) ? string.Format("{0} {1}", s, rest) : string.Format("{0}", s);
             Input.SelectionStart = i;
+            Input.ScrollToCaret();
         }
 
         private void InputMouseWheel(object sender, MouseEventArgs e)

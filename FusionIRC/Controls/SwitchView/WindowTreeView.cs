@@ -189,6 +189,22 @@ namespace FusionIRC.Controls.SwitchView
             }
         }
 
+        public void RemoveNotifyNode(ClientConnection client)
+        {
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null)
+            {
+                return;
+            }
+            var rootNode = Nodes.Find(c.Handle.ToString(), true);
+            var subNodes = rootNode[0].Nodes.Find("NOTIFY", true);
+            if (subNodes.Length == 0)
+            {
+                return;
+            }
+            rootNode[0].Nodes.Remove(subNodes[0]);
+        }
+
         /* Callbacks */
         private void OnNodeMouseHover(object sender, TreeNodeMouseHoverEventArgs e)
         {

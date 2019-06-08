@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
+using FusionIRC.Forms;
 using FusionIRC.Forms.Warning;
 using ircClient;
 using ircCore.Controls;
@@ -111,6 +112,8 @@ namespace FusionIRC.Helpers.Connection
             client.UserInfo.AlternateUsed = false;
             /* Remove IAL */
             client.Ial.Clear();
+            /* Notify */
+            ((FrmClientWindow) WindowManager.MainForm).SwitchView.RemoveNotifyNode(client);
             /* Notification */
             ((TrayIcon) WindowManager.MainForm).ShowNotificationPopup(client.Network, "Disconnect from network", 50);
             /* Process event script */
@@ -157,6 +160,8 @@ namespace FusionIRC.Helpers.Connection
             {
                 /* Remove IAL */
                 client.Ial.Clear();
+                /* Notify */
+                ((FrmClientWindow) WindowManager.MainForm).SwitchView.RemoveNotifyNode(client);
                 /* Notification */
                 ((TrayIcon) WindowManager.MainForm).ShowNotificationPopup(client.Network, "Disconnect from network", 50);
                 /* Process event script */

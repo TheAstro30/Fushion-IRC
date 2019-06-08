@@ -5,5 +5,8 @@
   <data>.MOTD:motd</data>
   <data>.Time:time</data>
   <data>-</data>
+  <data>Join Channel:join $input(Enter the name of the channel to join:,#)</data>
+  <data>Part Channel:part $input(Enter the name of the channel to part:,#)</data>
+  <data>-</data>
   <data>Quit IRC:quit</data>
 </script>

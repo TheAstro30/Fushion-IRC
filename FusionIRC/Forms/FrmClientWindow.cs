@@ -234,7 +234,8 @@ namespace FusionIRC.Forms
         protected override void OnLoad(EventArgs e)
         {            
             /* Need to call the loading of the main menu popups separately */
-            PopupManager.BuildPopups(PopupType.Commands, PopupManager.Popups[0], MenuBar.MenuCommands.DropDownItems);
+            MenuBar.MenuCommands.Visible = PopupManager.BuildPopups(PopupType.Commands, PopupManager.Popups[0],
+                                                                    MenuBar.MenuCommands.DropDownItems);
             /* Create our first connection */
             var w = WindowManager.AddWindow(null, ChildWindowType.Console, this, "Console", "Console", true);
             if (w != null)
@@ -592,12 +593,27 @@ namespace FusionIRC.Forms
         private void ShowConnectDialog(object sender, EventArgs e)
         {
             _timerConnect.Enabled = false;
-            if (!SettingsManager.Settings.Connection.ShowConnectDialog)
+            var w = WindowManager.GetActiveWindow();
+            if (w == null)
             {
                 return;
             }
-            var w = WindowManager.GetActiveWindow();
-            if (w == null)
+            /* Auto-connect */
+            if (AutomationsManager.Automations.Connect.Enable)
+            {
+                var n = AutomationsManager.GetAutomationByNetwork(AutomationsManager.AutomationType.Connect, "All");
+                if (n != null)
+                {
+                    for (var i = 0; i <= n.Data.Count - 1; i++)
+                    {
+                        CommandProcessor.Parse(w.Client, w,
+                                               i == 0
+                                                   ? string.Format("SERVER {0}:{1}", n.Data[i].Item, n.Data[i].Value)
+                                                   : string.Format("SERVER -M {0}:{1}", n.Data[i].Item, n.Data[i].Value));
+                    }
+                }
+            }
+            if (!SettingsManager.Settings.Connection.ShowConnectDialog)
             {
                 return;
             }

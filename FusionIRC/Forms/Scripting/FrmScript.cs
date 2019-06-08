@@ -21,7 +21,7 @@ using ircScript;
 using ircScript.Classes.Structures;
 using libolv;
 
-namespace FusionIRC.Forms.ScriptEditor
+namespace FusionIRC.Forms.Scripting
 {
     public sealed class FrmScript : Form
     {
@@ -816,9 +816,8 @@ namespace FusionIRC.Forms.ScriptEditor
                     PopupManager.SavePopup(_currentEditingScript, Functions.MainDir(file.Path));
                     if (file.Type == PopupType.Commands)
                     {
-                        PopupManager.BuildPopups(PopupType.Commands, _currentEditingScript,
-                                                 ((FrmClientWindow)WindowManager.MainForm).MenuBar.MenuCommands
-                                                     .DropDownItems);
+                        var menu = ((FrmClientWindow) WindowManager.MainForm).MenuBar.MenuCommands;
+                        menu.Visible = PopupManager.BuildPopups(PopupType.Commands, _currentEditingScript, menu.DropDownItems);
                     }
                     break;
 
@@ -899,9 +898,8 @@ namespace FusionIRC.Forms.ScriptEditor
                             PopupManager.SavePopup(s, Functions.MainDir(f.Path));
                             if (f.Type == PopupType.Commands)
                             {
-                                PopupManager.BuildPopups(PopupType.Commands, _currentEditingScript,
-                                                         ((FrmClientWindow) WindowManager.MainForm).MenuBar.MenuCommands
-                                                             .DropDownItems);
+                                var menu = ((FrmClientWindow) WindowManager.MainForm).MenuBar.MenuCommands;
+                                menu.Visible = PopupManager.BuildPopups(PopupType.Commands, _currentEditingScript, menu.DropDownItems);
                             }
                             break;
 

@@ -160,7 +160,9 @@ namespace FusionIRC.Helpers.Connection
             /* Check ignored */
             if (nick.Equals("nickserv", StringComparison.InvariantCultureIgnoreCase) && text.Contains("nickname is registered") && AutomationsManager.Automations.Identify.Enable)
             {
-                var n = AutomationsManager.GetAutomationByNetwork(AutomationsManager.AutomationType.Identify,
+                /* ALL takes priority */
+                var n = AutomationsManager.GetAutomationByNetwork(AutomationsManager.AutomationType.Identify, "All") ??
+                        AutomationsManager.GetAutomationByNetwork(AutomationsManager.AutomationType.Identify,
                                                                   client.Network);
                 if (n != null)
                 {

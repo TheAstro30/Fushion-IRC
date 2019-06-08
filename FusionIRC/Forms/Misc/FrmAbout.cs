@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Media;
 using System.Reflection;
 using System.Windows.Forms;
+using FusionIRC.Properties;
 using ircCore.Controls;
 
 namespace FusionIRC.Forms.Misc
@@ -42,7 +43,7 @@ namespace FusionIRC.Forms.Misc
                                BorderStyle = BorderStyle.Fixed3D,
                                Location = new Point(12, 12),
                                Size = new Size(68, 68),
-                               BackgroundImage = Properties.Resources.about_dialog_1
+                               BackgroundImage = Resources.aboutDialog.ToBitmap()
                            };
 
             _lblFusion = new Label

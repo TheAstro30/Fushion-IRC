@@ -71,12 +71,12 @@ namespace FusionIRC.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Bitmap about_dialog_1 {
+        internal static System.Drawing.Icon aboutDialog {
             get {
-                object obj = ResourceManager.GetObject("about_dialog_1", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                object obj = ResourceManager.GetObject("aboutDialog", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
         
@@ -103,9 +103,29 @@ namespace FusionIRC.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon autoConnect {
+            get {
+                object obj = ResourceManager.GetObject("autoConnect", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon autoJoin {
             get {
                 object obj = ResourceManager.GetObject("autoJoin", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon autoPerform {
+            get {
+                object obj = ResourceManager.GetObject("autoPerform", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

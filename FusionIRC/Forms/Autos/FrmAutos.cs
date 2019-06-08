@@ -7,6 +7,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using FusionIRC.Forms.Autos.Controls;
+using FusionIRC.Properties;
 using ircCore.Autos;
 using ircCore.Controls;
 using ircCore.Settings;
@@ -16,10 +17,16 @@ namespace FusionIRC.Forms.Autos
     public sealed class FrmAutos : FormEx
     {        
         private readonly TabControl _tabAutos;
+        private readonly TabPage _tabConnect;
         private readonly TabPage _tabJoin;
         private readonly TabPage _tabIdentify;
+        private readonly TabPage _tabPerform;
+
+        private readonly AutomationsListView _autoConnect;
         private readonly AutomationsListView _autoJoin;
         private readonly AutomationsListView _autoIdentify;
+        private readonly AutomationPerform _autoPerform;
+
         private readonly Button _btnClose;
 
         private readonly ImageList _images;
@@ -40,8 +47,10 @@ namespace FusionIRC.Forms.Autos
             _images = new ImageList { ColorDepth = ColorDepth.Depth32Bit, ImageSize = new Size(16, 16) };
             _images.Images.AddRange(new Image[]
                                         {
-                                            Properties.Resources.autoJoin.ToBitmap(),
-                                            Properties.Resources.identify.ToBitmap()
+                                            Resources.autoConnect.ToBitmap(),
+                                            Resources.autoJoin.ToBitmap(),
+                                            Resources.identify.ToBitmap(),
+                                            Resources.autoPerform.ToBitmap()
                                         });
 
             _tabAutos = new TabControl
@@ -52,6 +61,26 @@ namespace FusionIRC.Forms.Autos
                                 ImageList = _images,
                                 TabIndex = 0
                             };
+
+            /* Auto connect tab */
+            _tabConnect = new TabPage
+                              {
+                                  Location = new Point(4, 22),
+                                  Padding = new Padding(3),
+                                  Size = new Size(389, 342),
+                                  TabIndex = 0,
+                                  Text = @"Connect",
+                                  UseVisualStyleBackColor = true,
+                                  ImageIndex = 0
+                              };
+            _autoConnect = new AutomationsListView(AutomationsManager.AutomationType.Connect)
+                               {
+                                   Dock = DockStyle.Fill,
+                                   Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, ((0))),
+                                   Location = new Point(3, 3),
+                                   Size = new Size(383, 336)
+                               };
+            _tabConnect.Controls.Add(_autoConnect);
             
             /* Auto join tab */
             _tabJoin = new TabPage
@@ -59,10 +88,10 @@ namespace FusionIRC.Forms.Autos
                                Location = new Point(4, 22),
                                Padding = new Padding(3),
                                Size = new Size(389, 342),
-                               TabIndex = 0,
+                               TabIndex = 1,
                                Text = @"Join",
                                UseVisualStyleBackColor = true,
-                               ImageIndex = 0
+                               ImageIndex = 1
                            };
 
             _autoJoin = new AutomationsListView(AutomationsManager.AutomationType.Join)
@@ -80,10 +109,10 @@ namespace FusionIRC.Forms.Autos
                                    Location = new Point(4, 22),
                                    Padding = new Padding(3),
                                    Size = new Size(389, 342),
-                                   TabIndex = 1,
+                                   TabIndex = 2,
                                    Text = @"Identify",
                                    UseVisualStyleBackColor = true,
-                                   ImageIndex = 1
+                                   ImageIndex = 2
                                };
 
             _autoIdentify = new AutomationsListView(AutomationsManager.AutomationType.Identify)
@@ -95,8 +124,29 @@ namespace FusionIRC.Forms.Autos
                                 };
             _tabIdentify.Controls.Add(_autoIdentify);
 
+            /* Auto perform tab */
+            _tabPerform = new TabPage
+                              {
+                                  Location = new Point(4, 22),
+                                  Padding = new Padding(3),
+                                  Size = new Size(389, 342),
+                                  TabIndex = 3,
+                                  Text = @"Perform",
+                                  UseVisualStyleBackColor = true,
+                                  ImageIndex = 3
+                              };
+
+            _autoPerform = new AutomationPerform
+                               {
+                                   Dock = DockStyle.Fill,
+                                   Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, ((0))),
+                                   Location = new Point(3, 3),
+                                   Size = new Size(383, 336)
+                               };
+            _tabPerform.Controls.Add(_autoPerform);
+
             /* Add tab pages to tab control */
-            _tabAutos.Controls.AddRange(new Control[] {_tabJoin, _tabIdentify});
+            _tabAutos.Controls.AddRange(new Control[] {_tabConnect, _tabJoin, _tabIdentify, _tabPerform});
             _tabAutos.SelectedIndex = SettingsManager.Settings.Client.Tabs.AutoList;
 
             _btnClose = new Button
@@ -104,7 +154,7 @@ namespace FusionIRC.Forms.Autos
                                 DialogResult = DialogResult.OK,
                                 Location = new Point(334, 386),
                                 Size = new Size(75, 23),
-                                TabIndex = 0,
+                                TabIndex = 4,
                                 Text = @"Close",
                                 UseVisualStyleBackColor = true
                             };

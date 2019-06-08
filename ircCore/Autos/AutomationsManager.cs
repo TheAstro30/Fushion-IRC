@@ -15,8 +15,10 @@ namespace ircCore.Autos
         /* Mangaement class for automations such as auto join, identify, etc. */
         public enum AutomationType
         {
-            Join = 0,
-            Identify = 1
+            Connect = 0,
+            Join = 1,
+            Identify = 2,
+            Perform = 3
         }
 
         public static Automations Automations = new Automations();
@@ -38,23 +40,42 @@ namespace ircCore.Autos
         {
             switch (type)
             {
+                case AutomationType.Connect:
+                    return Automations.Connect.Network.ToArray();
+
                 case AutomationType.Join:
                     return Automations.Join.Network.ToArray();
                     
-                default:
+                case AutomationType.Identify:
                     return Automations.Identify.Network.ToArray();
-            }            
+
+                case AutomationType.Perform:
+                    return Automations.Perform.Network.ToArray();
+            }
+            return null;
         }
 
         public static AutoList.AutoNetworkData GetAutomationByNetwork(AutomationType type, string network)
-        {            
+        {
             switch (type)
             {
+                case AutomationType.Connect:
+                    return Automations.Connect.Network.Count > 0 ? Automations.Connect.Network[0] : null;
+
                 case AutomationType.Join:
-                    return Automations.Join.Network.FirstOrDefault(n => n.Name.Equals(network, StringComparison.InvariantCultureIgnoreCase));
+                    return
+                        Automations.Join.Network.FirstOrDefault(
+                            n => n.Name.Equals(network, StringComparison.InvariantCultureIgnoreCase));
 
                 case AutomationType.Identify:
-                    return Automations.Identify.Network.FirstOrDefault(n => n.Name.Equals(network, StringComparison.InvariantCultureIgnoreCase));
+                    return
+                        Automations.Identify.Network.FirstOrDefault(
+                            n => n.Name.Equals(network, StringComparison.InvariantCultureIgnoreCase));
+
+                case AutomationType.Perform:
+                    return
+                        Automations.Perform.Network.FirstOrDefault(
+                            n => n.Name.Equals(network, StringComparison.InvariantCultureIgnoreCase));
             }
             return null;
         }

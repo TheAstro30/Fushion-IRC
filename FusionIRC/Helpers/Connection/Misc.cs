@@ -15,6 +15,8 @@ using ircCore.Settings.Networks;
 using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
 using ircCore.Users;
+using ircScript.Classes;
+using ircScript.Classes.Structures;
 
 namespace FusionIRC.Helpers.Connection
 {
@@ -117,15 +119,18 @@ namespace FusionIRC.Helpers.Connection
             UpdateRecentServers(client);
             /* Resolve local IP */
             ResolveLocalInfo(client);
-            /* Finally process auto join/rejoin open channels */
+            /* Process auto join/rejoin open channels */
             ProcessAutoJoin(client);
+            /* Process auto-perform */
+            ProcessAutoPerform(client);
             /* Make sure retry connection */
             c.Reconnect.Cancel();
             /* Send notify */
             if (client.Parser.AllowsWatch)
             {
                 var nicks = UserManager.GetNotifyList();
-                client.Send(string.Format("WATCH +{0}",string.Join(" ", nicks.Select(o => o.Nick).ToArray()).Replace(" ", " +")));
+                System.Diagnostics.Debug.Print(string.Format("WATCH +{0}", string.Join(" ", nicks.Select(o => o.Nick).ToArray()).Replace(" ", " +")));
+                client.Send(string.Format("WATCH +{0}", string.Join(" ", nicks.Select(o => o.Nick).ToArray()).Replace(" ", " +")));
             }
         }
 
@@ -209,7 +214,31 @@ namespace FusionIRC.Helpers.Connection
             }
         }
 
-        public static void UpdateRecentServers(ClientConnection client)
+        public static void OnClientIdentDaemonRequest(ClientConnection client, string remoteHost, string data)
+        {
+            if (!SettingsManager.Settings.Connection.Identd.ShowRequests)
+            {
+                return;
+            }
+            var c = WindowManager.GetConsoleWindow(client);
+            if (c == null || c.WindowType != ChildWindowType.Console)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+            {
+                Message = ThemeMessage.InfoText,
+                TimeStamp = DateTime.Now,
+                Text = string.Format("Identd request: ({0}) {1}", remoteHost, data)
+            };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
+        }
+
+        /* Private helper methods */
+        private static void UpdateRecentServers(ClientConnection client)
         {
             var servers = ServerManager.Servers.Recent.Server;
             var old = servers.FirstOrDefault(o => o.Address.Equals(client.Server.Address, StringComparison.InvariantCultureIgnoreCase));
@@ -226,7 +255,7 @@ namespace FusionIRC.Helpers.Connection
             }
         }
 
-        public static void ResolveLocalInfo(ClientConnection client)
+        private static void ResolveLocalInfo(ClientConnection client)
         {
             switch (SettingsManager.Settings.Connection.LocalInfo.LookupMethod)
             {
@@ -240,7 +269,7 @@ namespace FusionIRC.Helpers.Connection
             }
         }
 
-        public static void ProcessAutoJoin(ClientConnection client)
+        private static void ProcessAutoJoin(ClientConnection client)
         {
             /* Join any open channels */
             if (SettingsManager.Settings.Client.Channels.JoinOpenChannelsOnConnect)
@@ -253,9 +282,11 @@ namespace FusionIRC.Helpers.Connection
             /* Process auto-join ... */
             if (AutomationsManager.Automations.Join.Enable)
             {
-                var join = AutomationsManager.GetAutomationByNetwork(AutomationsManager.AutomationType.Join,
+                /* ALL takes priority */
+                var join = AutomationsManager.GetAutomationByNetwork(AutomationsManager.AutomationType.Join, "All") ??
+                           AutomationsManager.GetAutomationByNetwork(AutomationsManager.AutomationType.Join,
                                                                      client.Network);
-                if (@join != null)
+                if (join != null)
                 {
                     foreach (var j in @join.Data)
                     {
@@ -276,27 +307,34 @@ namespace FusionIRC.Helpers.Connection
             }
         }
 
-        public static void OnClientIdentDaemonRequest(ClientConnection client, string remoteHost, string data)
+        private static void ProcessAutoPerform(ClientConnection client)
         {
-            if (!SettingsManager.Settings.Connection.Identd.ShowRequests)
+            if (!AutomationsManager.Automations.Perform.Enable)
             {
                 return;
             }
-            var c = WindowManager.GetConsoleWindow(client);
-            if (c == null || c.WindowType != ChildWindowType.Console)
+            var nd = AutomationsManager.GetAutomationByNetwork(AutomationsManager.AutomationType.Perform, "All") ??
+                     AutomationsManager.GetAutomationByNetwork(AutomationsManager.AutomationType.Perform, client.Network);
+            if (nd == null || nd.Commands.Count == 0)
             {
                 return;
             }
-            var tmd = new IncomingMessageData
-                          {
-                              Message = ThemeMessage.InfoText,
-                              TimeStamp = DateTime.Now,
-                              Text = string.Format("Identd request: ({0}) {1}", remoteHost, data)
-                          };
-            var pmd = ThemeManager.ParseMessage(tmd);
-            c.Output.AddLine(pmd.DefaultColor, pmd.Message);
-            /* Update treenode color */
-            WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
+            var child = WindowManager.GetConsoleWindow(client);
+            foreach (var com in nd.Commands)
+            {
+                if (string.IsNullOrEmpty(com))
+                {
+                    continue;                    
+                }
+                var e = new ScriptArgs
+                            {
+                                ClientConnection = client,
+                                ChildWindow = child
+                            };
+                var script = new Script();
+                script.LineData.Add(com);
+                CommandProcessor.Parse(client, child , script.Parse(e));
+            }
         }
     }
 }

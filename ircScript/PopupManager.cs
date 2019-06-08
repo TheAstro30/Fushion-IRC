@@ -77,7 +77,7 @@ namespace ircScript
             BuildPopups(PopupType.DccChat, Popups[5], DccChat.Items);
         }
 
-        public static void BuildPopups(PopupType type, ScriptData data, ToolStripItemCollection popup)
+        public static bool BuildPopups(PopupType type, ScriptData data, ToolStripItemCollection popup)
         {
             /* This code is "borrowed" from my previous IRC client, dIRC7 - thing is, it may be ugly, but it works
              * and serves the purpose, so why change it? */            
@@ -208,6 +208,7 @@ namespace ircScript
                     lastNode = toolStripMenuItem;
                 }
             }
+            return popup.Count > 0;
         }
 
         /* Click callback */

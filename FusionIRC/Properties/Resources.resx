@@ -223,9 +223,6 @@
   <data name="editReplace" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Icons\Dialog\editReplace.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="about_dialog_1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\about-dialog-1.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="cork" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Wave\cork.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -252,5 +249,14 @@
   </data>
   <data name="list" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Icons\ChildWindows\list.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="aboutDialog" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\Dialog\aboutDialog.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="autoPerform" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\Dialog\autoPerform.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="autoConnect" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Icons\Dialog\autoConnect.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

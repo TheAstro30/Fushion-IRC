@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using ircCore.Controls;
@@ -21,7 +22,7 @@ namespace FusionIRC.Forms.Misc
 
         public string Network { get; private set; }
 
-        public FrmNetwork()
+        public FrmNetwork(bool showAllOption)
         {           
             /* Form code */
             ClientSize = new Size(215, 234);
@@ -79,7 +80,12 @@ namespace FusionIRC.Forms.Misc
             AcceptButton = _btnOk;          
 
             /* Output all installed IRC servers to listbox */
-            _lstNetwork.Items.AddRange(ServerManager.GetAllNetworks());
+            var arr = new List<object>(ServerManager.GetAllNetworks());
+            if (showAllOption)
+            {
+                arr.Insert(0, "All");
+            }
+            _lstNetwork.Items.AddRange(arr.ToArray());
             _lstNetwork.SelectedIndexChanged += OnSelectedIndexChanged;
             _lstNetwork.DoubleClick += OnItemDoubleClicked;
         }

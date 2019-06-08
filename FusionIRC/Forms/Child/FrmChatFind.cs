@@ -131,6 +131,7 @@ namespace FusionIRC.Forms.Child
                                TabIndex = 5,
                                Tag = "FIND",
                                Text = @"Find",
+                               Enabled = false,
                                UseVisualStyleBackColor = true
                            };
 
@@ -157,6 +158,8 @@ namespace FusionIRC.Forms.Child
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = @"Find Text";
+            /* Combo handler */
+            _cmbSearch.TextChanged += ComboTextChanged;
             /* Initialize settings for each control */
             _cmbSearch.Items.AddRange(SettingsManager.Settings.Windows.Search.History.ToArray());
             if (_cmbSearch.Items.Count > 0)
@@ -248,10 +251,16 @@ namespace FusionIRC.Forms.Child
             }
         }
 
+        private void ComboTextChanged(object sender, EventArgs e)
+        {
+            _btnFind.Enabled = !string.IsNullOrEmpty(_cmbSearch.Text);
+        }
+
         private void FindWord(string matchString, bool directionDown, bool matchCase)
         {
             if (string.IsNullOrEmpty(matchString) || _child.Output == null || _child.Output.TextData.Wrapped.Count == 0)
             {
+                SystemSounds.Beep.Play();
                 return;
             }
             int currentPointer;
