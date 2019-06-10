@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using FusionIRC.Forms.Settings.Controls.Base;
 using FusionIRC.Forms.Settings.Controls.Client;
 using FusionIRC.Forms.Settings.Controls.Connection;
+using FusionIRC.Forms.Settings.Controls.Dcc;
 using FusionIRC.Forms.Settings.Controls.Mouse;
 using FusionIRC.Helpers;
 using ircCore.Controls;
@@ -39,6 +40,8 @@ namespace FusionIRC.Forms.Settings
         private readonly ClientLogging _clientLogging;
         private readonly ClientSystemTray _clientSystemTray;
         private readonly ClientConfirm _clientConfirm;
+
+        private readonly DccOptions _dccOptions;
 
         private readonly MouseDoubleClick _mouseDoubleClick;
 
@@ -113,7 +116,8 @@ namespace FusionIRC.Forms.Settings
             _clientConfirm = new ClientConfirm { Location = new Point(168, 12), Visible = false };
             /* Mouse */
             _mouseDoubleClick = new MouseDoubleClick {Location = new Point(168, 12), Visible = false};
-
+            /* DCC */
+            _dccOptions = new DccOptions {Location = new Point(168, 12), Visible = false};
 
             Controls.AddRange(new Control[]
                                   {
@@ -131,7 +135,8 @@ namespace FusionIRC.Forms.Settings
                                       _clientLogging,
                                       _clientSystemTray,
                                       _clientConfirm,
-                                      _mouseDoubleClick
+                                      _mouseDoubleClick,
+                                      _dccOptions
                                   });
             /* Connection */
             _connectionServers.OnSettingsChanged += OnSettingsChanged;
@@ -147,6 +152,8 @@ namespace FusionIRC.Forms.Settings
             _clientConfirm.OnSettingsChanged += OnSettingsChanged;
             /* Mouse */
             _mouseDoubleClick.OnSettingsChanged += OnSettingsChanged;
+            /* DCC */
+            _dccOptions.OnSettingsChanged += OnSettingsChanged;
 
             BuildTreeMenuNodes();
 
@@ -164,7 +171,7 @@ namespace FusionIRC.Forms.Settings
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            if (_btnApply.Enabled)
+            if (_btnApply.Enabled && DialogResult != DialogResult.Cancel)
             {
                 /* Settings not saved yet */
                 SaveSettings();
@@ -204,7 +211,7 @@ namespace FusionIRC.Forms.Settings
             }
             switch (btn.Text.ToUpper())
             {
-                case "APPLY":
+                case "APPLY":                    
                     SaveSettings();
                     break;
             }
@@ -282,6 +289,16 @@ namespace FusionIRC.Forms.Settings
                                                                            }
                                                                    });
             _tvMenu.Nodes[2].Tag = _mouseDoubleClick;
+            /* DCC... */
+            _tvMenu.Nodes.Add("DCC", "DCC").Nodes.AddRange(new[]
+                                                               {
+                                                                   new TreeNode("Options")
+                                                                       {
+                                                                           Tag = _dccOptions,
+                                                                           Name = "DCCOPTIONS"
+                                                                       }
+                                                               });
+            _tvMenu.Nodes[3].Tag = _dccOptions;
         }
 
         private void OnSettingsChanged(ISettings control)

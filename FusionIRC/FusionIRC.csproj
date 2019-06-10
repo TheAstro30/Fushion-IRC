@@ -87,6 +87,15 @@
     <Compile Include="Forms\Misc\FrmChannelList.Designer.cs">
       <DependentUpon>FrmChannelList.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Settings\Controls\Dcc\DccOptions.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Dcc\DccOptions.Designer.cs">
+      <DependentUpon>DccOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Settings\Editing\FrmAddExtension.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Helpers\ChannelPropertyData.cs" />
     <Compile Include="Forms\ChannelProperties\Controls\ChannelPropertyBase.cs">
       <SubType>UserControl</SubType>
@@ -262,6 +271,7 @@
     <Compile Include="Helpers\Commands\CommandCtcp.cs" />
     <Compile Include="Helpers\Commands\CommandDns.cs" />
     <Compile Include="Helpers\Commands\CommandFiles.cs" />
+    <Compile Include="Helpers\Commands\CommandMisc.cs" />
     <Compile Include="Helpers\Commands\CommandMode.cs" />
     <Compile Include="Helpers\Commands\CommandNick.cs" />
     <Compile Include="Helpers\Commands\CommandChannel.cs" />
@@ -311,6 +321,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Connection\ConnectionOptions.resx">
       <DependentUpon>ConnectionOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Settings\Controls\Dcc\DccOptions.resx">
+      <DependentUpon>DccOptions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Mouse\MouseDoubleClick.resx">
       <DependentUpon>MouseDoubleClick.cs</DependentUpon>

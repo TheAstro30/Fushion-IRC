@@ -52,7 +52,8 @@ namespace FusionIRC.Helpers
             if (type == ChildWindowType.Console)
             {
                 /* Create a new dictionary entry */
-                var connection = new ClientConnection(mdiOwner, SettingsManager.Settings.UserInfo) {ConnectionId = Windows.Count + 1};
+                var connection = new ClientConnection(mdiOwner, SettingsManager.Settings.UserInfo)
+                                     {ConnectionId = GetHighestConnectionId()};
                 win = new FrmChildWindow(connection, type, mdiOwner)
                           {
                               Text = string.Format("{0}: {1}", text, connection.UserInfo.Nick),
@@ -276,6 +277,12 @@ namespace FusionIRC.Helpers
         }
 
         /* Private methods */
+        private static int GetHighestConnectionId()
+        {
+            /* This method checks the dictionary of ClientConnection.ConnectionId and returns the highest + 1 */
+            return Windows.Count > 0 ? Windows.Max(t => t.Key.ConnectionId) + 1 : 1;
+        }
+
         private static void AddConnectionHandlers(ClientConnection client)
         {
             /* Add the callback handlers to ConnectionCallbackManager */

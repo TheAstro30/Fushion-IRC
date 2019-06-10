@@ -8,6 +8,7 @@ using FusionIRC.Forms.Child;
 using FusionIRC.Helpers.Commands;
 using ircClient;
 using ircClient.Parsing.Helpers;
+using ircCore.Utils;
 using ircScript.Classes.Helpers;
 
 namespace FusionIRC.Helpers
@@ -190,6 +191,14 @@ namespace FusionIRC.Helpers
 
                 case "KICK":
                     CommandChannel.ParseKick(client, args);
+                    break;
+
+                case "NOTIFY":
+                    CommandMisc.Notify(client, UserListType.Notify, args);
+                    break;
+
+                case "IGNORE":
+                    CommandMisc.Ignore(client, UserListType.Ignore, args);
                     break;
 
                 //case "SMODE":

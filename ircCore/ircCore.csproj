@@ -127,6 +127,7 @@
     <Compile Include="Settings\SettingsBase\Structures\SettingsConfirmation.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsConnection.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsConnectionOptions.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsDcc.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsEditor.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsFind.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsIdentd.cs" />

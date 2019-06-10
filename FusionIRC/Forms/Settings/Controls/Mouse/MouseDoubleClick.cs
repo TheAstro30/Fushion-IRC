@@ -45,6 +45,7 @@ namespace FusionIRC.Forms.Settings.Controls.Mouse
             SettingsManager.Settings.Mouse.Channel = txtChannel.Text;
             SettingsManager.Settings.Mouse.Query = txtQuery.Text;
             SettingsManager.Settings.Mouse.Nicklist = txtNicklist.Text;
+            SettingsChanged = false;
         }
 
         /* Callback */

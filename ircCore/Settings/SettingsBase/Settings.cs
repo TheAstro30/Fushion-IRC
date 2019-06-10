@@ -30,6 +30,9 @@ namespace ircCore.Settings.SettingsBase
         [XmlElement("mouse")]
         public SettingsMouse Mouse = new SettingsMouse();
 
+        [XmlElement("dcc")]
+        public SettingsDcc Dcc = new SettingsDcc();
+
         [XmlElement("themes")]
         public SettingsTheme Themes = new SettingsTheme();
 
@@ -124,6 +127,40 @@ namespace ircCore.Settings.SettingsBase
             Mouse.Channel = "channel";
             Mouse.Query = "whois $1";
             Mouse.Nicklist = "query $1";
+            /* DCC */
+            Dcc.Options.General.MinimumPort = 1024;
+            Dcc.Options.General.MaximumPort = 5000;
+            Dcc.Options.General.PacketSize = 4096;
+            Dcc.Options.Timeouts.GetSendRequest = 120;
+            Dcc.Options.Timeouts.GetSendTransfer = 120;
+            Dcc.Options.Timeouts.ChatConnection = 120;
+            Dcc.Options.Filter.FilterMethod = DccFilterMethod.AcceptOnly;
+            Dcc.Options.Filter.ShowRejectionDialog = true;
+            Dcc.Options.Filter.Extension.AddRange(new[]
+                                                      {
+                                                          new SettingsDcc.SettingsDccOptions.SettingsDccFilter.
+                                                              SettingsDccExtension {Name = "*.avi"},
+                                                          new SettingsDcc.SettingsDccOptions.SettingsDccFilter.
+                                                              SettingsDccExtension {Name = "*.bmp"},
+                                                          new SettingsDcc.SettingsDccOptions.SettingsDccFilter.
+                                                              SettingsDccExtension {Name = "*.gif"},
+                                                          new SettingsDcc.SettingsDccOptions.SettingsDccFilter.
+                                                              SettingsDccExtension {Name = "*.log"},
+                                                          new SettingsDcc.SettingsDccOptions.SettingsDccFilter.
+                                                              SettingsDccExtension {Name = "*.mp2"},
+                                                          new SettingsDcc.SettingsDccOptions.SettingsDccFilter.
+                                                              SettingsDccExtension {Name = "*.mp3"},
+                                                          new SettingsDcc.SettingsDccOptions.SettingsDccFilter.
+                                                              SettingsDccExtension {Name = "*.mp4"},
+                                                          new SettingsDcc.SettingsDccOptions.SettingsDccFilter.
+                                                              SettingsDccExtension {Name = "*.png"},
+                                                          new SettingsDcc.SettingsDccOptions.SettingsDccFilter.
+                                                              SettingsDccExtension {Name = "*.rar"},
+                                                          new SettingsDcc.SettingsDccOptions.SettingsDccFilter.
+                                                              SettingsDccExtension {Name = "*.txt"},
+                                                          new SettingsDcc.SettingsDccOptions.SettingsDccFilter.
+                                                              SettingsDccExtension {Name = "*.zip"}
+                                                      });
             /* Channels */
             Client.Channels.ChannelList.Minimum = 3;
             Client.Channels.ChannelList.Minimum = 1000;

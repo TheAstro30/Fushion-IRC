@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <servers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <networks>
-    <network name="AustNode" last="0">
-      <server address="irc.austnode.org" portRange="6667,+6697" description="Random server" />
-    </network>
     <network name="DALnet" last="0">
       <server address="au.dal.net" portRange="6665-6668,7000" description="AU server" />
       <server address="eu.dal.net" portRange="6665-6668,7000" description="EU server" />
@@ -86,4 +83,12 @@
       <server address="vancouver.bc.ca.undernet.org" portRange="6667" description="CA, BC, Vancouver" />
     </network>
   </networks>
+  <recent>
+    <server address="irc.dragonirc.com" port="6667" ssl="false" />
+    <server address="localhost" port="6667" ssl="false" />
+    <server address="saturn.dragonirc.com" port="7000" ssl="false" />
+    <server address="irc.freenode.org" port="6667" ssl="false" />
+    <server address="irc.gamesurge.net" port="6667" ssl="false" />
+    <server address="irc.efnet.org" port="6667" ssl="false" />
+  </recent>
 </servers>

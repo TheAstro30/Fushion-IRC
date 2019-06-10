@@ -54,18 +54,19 @@ namespace ircCore.Users
             AddNotify(nick, null);           
         }
 
-        public static void AddNotify(string nick, string note)
+        public static bool AddNotify(string nick, string note)
         {
             var u = IsNotify(nick);
             if (u != null)
             {
                 /* Just update notes field */
                 u.Note = note;
-                return;
+                return false;
             }
             /* Create new entry */
             u = new User {Nick = nick, Note = note};
-            AddNotify(u);            
+            AddNotify(u);
+            return true;
         }
 
         public static void AddNotify(User data)
@@ -77,14 +78,15 @@ namespace ircCore.Users
             }
         }
 
-        public static void RemoveNotify(string nick)
+        public static bool RemoveNotify(string nick)
         {
             var u = IsNotify(nick);
             if (u == null)
             {
-                return;
+                return false;
             }
             RemoveNotify(u);
+            return true;
         }
 
         public static void RemoveNotify(User data)
@@ -133,14 +135,15 @@ namespace ircCore.Users
         }
 
         /* Ignore functions */
-        public static void AddIgnore(string addressMask)
+        public static bool AddIgnore(string addressMask)
         {
             if (IsIgnored(addressMask))
             {
-                return;
+                return false;
             }
             var u = new User {Address = addressMask};
             AddIgnore(u);
+            return true;
         }
 
         public static void AddIgnore(User data)
@@ -148,13 +151,14 @@ namespace ircCore.Users
             _users.Ignore.Users.Add(data);
         }
 
-        public static void RemoveIgnore(string addressMask)
+        public static bool RemoveIgnore(string addressMask)
         {
             foreach (var u in _users.Ignore.Users.Where(u => u.Address == addressMask))
             {
                 RemoveIgnore(u);
-                break;
+                return true;
             }
+            return false;
         }
 
         public static void RemoveIgnore(User data)

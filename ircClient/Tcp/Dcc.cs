@@ -3,6 +3,7 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
+using System;
 using System.ComponentModel;
 using ircCore.Dcc;
 

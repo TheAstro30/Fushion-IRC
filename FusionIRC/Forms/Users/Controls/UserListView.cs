@@ -5,7 +5,6 @@
  */
 using System;
 using System.Drawing;
-using System.Collections.Generic;
 using System.Windows.Forms;
 using FusionIRC.Forms.Users.Editing;
 using ircCore.Users;

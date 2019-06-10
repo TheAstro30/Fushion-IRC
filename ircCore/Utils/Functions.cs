@@ -162,9 +162,7 @@ namespace ircCore.Utils
             /* Failed */
             return allowEmptyPath ? sFolder : string.Empty;
         }
-        
-        
-
+               
         public static bool IsNumeric(string s)
         {
             if (!string.IsNullOrEmpty(s))

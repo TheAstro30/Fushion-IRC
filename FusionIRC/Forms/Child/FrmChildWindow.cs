@@ -14,6 +14,7 @@ using FusionIRC.Helpers;
 using FusionIRC.Helpers.Commands;
 using FusionIRC.Properties;
 using ircClient;
+using ircClient.Tcp;
 using ircCore.Controls;
 using ircCore.Controls.ChildWindows.Classes;
 using ircCore.Controls.ChildWindows.Classes.Channels;
@@ -65,6 +66,8 @@ namespace FusionIRC.Forms.Child
         public Nicklist Nicklist { get; set; }
 
         public ChannelList ChanList { get; set; }
+
+        public Dcc Dcc { get; private set; } /* Used only in the window class for DCC chat */
          
         /* Nodes used by the switch treeview - much easier to keep track of/update from here */
         public TreeNode DisplayNodeRoot { get; set; }

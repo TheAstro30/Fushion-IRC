@@ -1,0 +1,108 @@
+﻿/* FusionIRC IRC Client
+ * Written by Jason James Newland
+ * Copyright (C) 2016 - 2019
+ * Provided AS-IS with no warranty expressed or implied
+ */
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Xml.Serialization;
+using ircCore.Utils;
+
+namespace ircCore.Settings.SettingsBase.Structures
+{
+    public enum DccFilterMethod
+    {
+        [Description("Disabled")]
+        Disabled = 0,
+
+        [Description("Accept only")]
+        AcceptOnly = 1,
+
+        [Description("Ignore only")]
+        IgnoreOnly = 2
+    }
+
+    [Serializable]
+    public class SettingsDcc
+    {
+        public class SettingsDccRequests
+        {
+            
+        }
+
+        public class SettingsDccOptions
+        {
+            public class SettingsDccGeneral
+            {
+                [XmlAttribute("minPort")]
+                public int MinimumPort { get; set; }
+
+                [XmlAttribute("maxPort")]
+                public int MaximumPort { get; set; }
+
+                [XmlAttribute("randomize")]
+                public bool Randomize { get; set; }
+
+                [XmlAttribute("bind")]
+                public bool BindToIp { get; set; }
+
+                [XmlAttribute("ip")]
+                public string BindIpAddress { get; set; }
+
+                [XmlAttribute("packetSize")]
+                public int PacketSize { get; set; }
+            }
+
+            public class SettingsDccTimeouts
+            {
+                [XmlAttribute("getSendRequest")]
+                public int GetSendRequest { get; set; }
+
+                [XmlAttribute("getSendTransfer")]
+                public int GetSendTransfer { get; set; }
+
+                [XmlAttribute("chatConnection")]
+                public int ChatConnection { get; set; }
+            }
+
+            public class SettingsDccFilter
+            {
+                public class SettingsDccExtension : IComparable<SettingsDccExtension>
+                {
+                    [XmlAttribute("name")]
+                    public string Name { get; set; }
+
+                    public int CompareTo(SettingsDccExtension other)
+                    {
+                        return Name.CompareTo(other.Name);
+                    }
+                }
+
+                [XmlAttribute("filterMethod")]
+                public DccFilterMethod FilterMethod { get; set; }
+
+                [XmlAttribute("showRejectionDialog")]
+                public bool ShowRejectionDialog { get; set; }
+
+                [XmlElement("extension")]
+                public List<SettingsDccExtension> Extension = new List<SettingsDccExtension>();
+            }
+
+            [XmlElement("general")]
+            public SettingsDccGeneral General = new SettingsDccGeneral();
+
+            [XmlElement("timeouts")]
+            public SettingsDccTimeouts Timeouts = new SettingsDccTimeouts();
+
+            [XmlElement("filter")]
+            public SettingsDccFilter Filter = new SettingsDccFilter();
+        }
+
+        [XmlElement("requests")]
+        public SettingsDccRequests Requests = new SettingsDccRequests();
+
+        [XmlElement("options")]
+        public SettingsDccOptions Options = new SettingsDccOptions();
+    }
+}

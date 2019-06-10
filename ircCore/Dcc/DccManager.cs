@@ -35,11 +35,6 @@ namespace ircCore.Dcc
         public List<DccFile> FileData = new List<DccFile>();        
     }
 
-    public class DccTest
-    {
-        public string FileName { get; set; }
-    }
-
     [Serializable]
     public class DccFile
     {

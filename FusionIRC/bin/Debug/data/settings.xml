@@ -1,9 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <client>
-    <messages stripCodes="false" quit="$read(data\quits.txt)" part="" finger="" command="/" spacing="Paragraph" padding="1" />
-    <trayIcon alwaysShow="true" hideMinimized="false" icon="" showNotifications="true" />
-  </client>
   <scripts>
     <alias path="\scripts\aliases.xml" type="None" />
     <popup path="\scripts\menubar.xml" type="Commands" />
