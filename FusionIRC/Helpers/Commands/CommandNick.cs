@@ -52,6 +52,11 @@ namespace FusionIRC.Helpers.Commands
             console.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(console, WindowManager.MainForm, WindowEvent.EventReceived);
+            /* Update title bar of console window and node text */
+            var sp = console.DisplayNode.Text.Split(' ');
+            sp[1] = nick;
+            console.DisplayNode.Text = string.Join(" ", sp);
+            console.Text = console.DisplayNode.Text;
         }
     }
 }

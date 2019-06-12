@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
-using ircCore.Utils;
 
 namespace ircCore.Settings.SettingsBase.Structures
 {
@@ -96,7 +95,24 @@ namespace ircCore.Settings.SettingsBase.Structures
             public SettingsDccTimeouts Timeouts = new SettingsDccTimeouts();
 
             [XmlElement("filter")]
-            public SettingsDccFilter Filter = new SettingsDccFilter();
+            public SettingsDccFilter Filter = new SettingsDccFilter();            
+        }
+
+        public class SettingsDccHistory
+        {
+            public class SettingsDccHistoryData
+            {
+                [XmlAttribute("nick")]
+                public string Nick { get; set; }
+
+                public override string ToString()
+                {
+                    return Nick;
+                }
+            }
+
+            [XmlElement("data")]
+            public List<SettingsDccHistoryData> Data = new List<SettingsDccHistoryData>();
         }
 
         [XmlElement("requests")]
@@ -104,5 +120,8 @@ namespace ircCore.Settings.SettingsBase.Structures
 
         [XmlElement("options")]
         public SettingsDccOptions Options = new SettingsDccOptions();
+
+        [XmlElement("history")]
+        public SettingsDccHistory History = new SettingsDccHistory();
     }
 }

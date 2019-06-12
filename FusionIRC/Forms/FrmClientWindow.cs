@@ -11,13 +11,13 @@ using System.Windows.Forms;
 using FusionIRC.Controls.ControlBars;
 using FusionIRC.Controls.SwitchView;
 using FusionIRC.Forms.Child;
+using FusionIRC.Forms.DirectClientConnection;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Helpers;
 using FusionIRC.Helpers.Commands;
 using FusionIRC.Properties;
 using ircCore.Autos;
 using ircCore.Controls;
-using ircCore.Dcc;
 using ircCore.Settings;
 using ircCore.Settings.Channels;
 using ircCore.Settings.Networks;
@@ -177,14 +177,21 @@ namespace FusionIRC.Forms
             _switchViewSplitter.SplitterMoved += SwitchViewSplitterMoved;
             /* Add controls */
             Controls.AddRange(new Control[]
-                                  {_switchViewSplitter, SwitchView, _dockLeft, _dockRight, _dockTop, _dockBottom});
+                                  {
+                                      _switchViewSplitter,
+                                      SwitchView,
+                                      _dockLeft,
+                                      _dockRight, 
+                                      _dockTop, 
+                                      _dockBottom
+                                  });
             /* Adjust splitter */
             _switchViewSplitter.SplitPosition = SettingsManager.Settings.Windows.SwitchTreeWidth;
             /* Setup toolbar */
             ToolBar = new ToolbarControl(this);
             SetDockControl(ToolBar);
             /* Setup menubar */
-            MenuBar = new MenubarControl(this);
+            MenuBar = new MenubarControl(this);            
             SetDockControl(MenuBar);
             ToolBar.MenuBar = MenuBar;
             MainMenuStrip = MenuBar;
@@ -218,16 +225,12 @@ namespace FusionIRC.Forms
                 TrayAlwaysShowIcon = true;
                 TrayNotifyIcon.Visible = true;
             }
-            NotificationShow += OnNotificationShow;
             /* Show connect dialog */
             _timerConnect = new Timer {Interval = 10};
             _timerConnect.Tick += ShowConnectDialog;
             /* UserManager */
-            UserManager.NotifyAdded += SendWatchCommand;
-            UserManager.NotifyRemoved += SendWatchCommand;
-            UserManager.NotifyEdited += SendWatchCommand;
-            UserManager.NotifyCleared += SendWatchCommand;
-            _initialize = false;            
+            UserManager.NotifyChanged += SendWatchCommand;
+            _initialize = false;      
         }
 
         /* Overrides */
@@ -621,12 +624,6 @@ namespace FusionIRC.Forms
             {
                 connect.ShowDialog(this);
             }
-        }
-
-        private void OnNotificationShow()
-        {
-            Focus();
-            WindowManager.LastActiveChild.Activate();
         }
         
         /* Main callback for all popup's used */

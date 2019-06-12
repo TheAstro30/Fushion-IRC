@@ -6,11 +6,21 @@
 using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
-using ircCore.Utils;
-using ircCore.Utils.Serialization;
 
 namespace ircCore.Dcc
 {
+    public enum DccType
+    {
+        DccChat = 0,
+        DccFileTransfer = 1
+    }
+
+    public enum DccChatType
+    {
+        Send = 0,
+        Receive = 1
+    }
+
     public enum DccFileType
     {
         Download = 0,
@@ -32,7 +42,7 @@ namespace ircCore.Dcc
     {
         /* This class stores recent file history - obviously we need to have a maximum number of stored files */
         [XmlElement("fileData")]
-        public List<DccFile> FileData = new List<DccFile>();        
+        public List<DccFile> FileData = new List<DccFile>();
     }
 
     [Serializable]
@@ -72,47 +82,6 @@ namespace ircCore.Dcc
         public string SpeedToString
         {
             get { return string.Format("{0}kb/s", Speed); }
-        }
-    }
-
-    public static class DccManager
-    {
-        public static DccTransferData DccTransfers = new DccTransferData();
-
-        public static void Load()
-        {
-            /* Load settings from disk */
-            if (!XmlSerialize<DccTransferData>.Load(Functions.MainDir(@"\data\transfers.xml"), ref DccTransfers))
-            {
-                DccTransfers = new DccTransferData();
-            }
-        }
-
-        public static void Save()
-        {
-            /* Save settings to disk */
-            XmlSerialize<DccTransferData>.Save(Functions.MainDir(@"\data\transfers.xml"), DccTransfers);
-        }
-
-        public static void Add(DccFile file)
-        {
-            /* Check the total number of transfers, remove first entry if greater than maximum */
-            if (DccTransfers.FileData.Count > 100)
-            {
-                DccTransfers.FileData.RemoveAt(0);
-            }
-            DccTransfers.FileData.Add(file);
-            /* Sort list by uploads/downloads (type - downloads first, then by filename) */
-            DccTransfers.FileData.Sort((x, y) =>
-                                           {
-                                               var result = x.FileType.CompareTo(y.FileType);
-                                               return result != 0 ? result : x.FileName.CompareTo(y.FileName);
-                                           });
-        }
-
-        public static void Clear()
-        {
-            DccTransfers.FileData.Clear();
         }
     }
 }

@@ -280,21 +280,16 @@ namespace FusionIRC.Controls.ControlBars
                                                                   Checked = child == active
                                                               }
                                                       });
-                foreach (var c in from TreeNode w in n.Nodes from TreeNode c in w.Nodes select c)
+                foreach (var c in (from TreeNode w in n.Nodes from TreeNode c in w.Nodes select c).Where(c => (c.Tag is FrmChildWindow)))
                 {
-                    child = (FrmChildWindow)c.Tag;
-                    if (child == null)
-                    {
-                        continue;
-                    }
-                    if (c.Tag is FrmChildWindow)
-                    {
-                        _mnuWindow.DropDownItems.Add(new ToolStripMenuItem(Functions.TruncateString(child.Text, 100), null, OnMenuWindowClick)
-                        {
-                            Tag = child,
-                            Checked = child == active
-                        });
-                    }
+                    child = (FrmChildWindow) c.Tag;
+                    _mnuWindow.DropDownItems.Add(new ToolStripMenuItem(
+                                                     Functions.TruncateString(child.Text, 100), null,
+                                                     OnMenuWindowClick)
+                                                     {
+                                                         Tag = child,
+                                                         Checked = child == active
+                                                     });
                 }
             }
         }

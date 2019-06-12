@@ -114,7 +114,7 @@ namespace ircCore.Controls.Notification
 
             _frmPopup = new FrmPopup(this)
                             {
-                                TopMost = true,
+                                //TopMost = true,
                                 FormBorderStyle = FormBorderStyle.None,
                                 StartPosition = FormStartPosition.Manual,
                             };

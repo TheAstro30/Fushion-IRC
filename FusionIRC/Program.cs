@@ -6,7 +6,6 @@
 using System;
 using System.Windows.Forms;
 using FusionIRC.Forms;
-using FusionIRC.Forms.Misc;
 
 namespace FusionIRC
 {
@@ -15,18 +14,9 @@ namespace FusionIRC
         [STAThread]
         public static void Main()
         {
-            AppDomain.CurrentDomain.UnhandledException += UnhandledException;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FrmClientWindow());
-        }
-
-        private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            using (var f = new FrmException((Exception)e.ExceptionObject))
-            {
-                f.ShowDialog();
-            }
         }
     }
 }

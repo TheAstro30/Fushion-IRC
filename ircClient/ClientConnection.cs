@@ -359,11 +359,8 @@ namespace ircClient
             var second = string.Empty;
             var third = string.Empty;
             var fourth = string.Empty;
-            var s = Utf8.ConvertToUtf8(_sockData[0], true);
-            if (SettingsManager.Settings.Client.Messages.StripCodes)
-            {
-                s = Functions.StripControlCodes(s);
-            }
+            var s = Functions.StripControlCodes(Utf8.ConvertToUtf8(_sockData[0], true),
+                                                SettingsManager.Settings.Client.Messages.StripCodes);
             _sockData.RemoveAt(0);
             if (string.IsNullOrEmpty(s))
             {

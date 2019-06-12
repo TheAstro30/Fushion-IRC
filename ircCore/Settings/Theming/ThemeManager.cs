@@ -196,7 +196,19 @@ namespace ircCore.Settings.Theming
         InfoText = 44,
 
         [Description("Normal Text")]
-        EchoText = 45
+        EchoText = 45,
+
+        [Description("DCC Chat Connecting Text")]
+        DccChatConnectingText = 46,
+
+        [Description("DCC Chat Connected Text")]
+        DccChatConnectedText = 47,
+
+        [Description("DCC Chat Disconnected Text")]
+        DccChatDisconnectedText = 48,
+
+        [Description("DCC Chat Connection Error Text")]
+        DccChatConnectionErrorText = 49
     }
 
     public enum ThemeNicklistImage

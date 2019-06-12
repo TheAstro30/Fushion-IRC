@@ -83,6 +83,9 @@ namespace ircClient.Parsing
         public event Action<ClientConnection> OnBeginChannelList;
         public event Action<ClientConnection, string, int, string> OnChannelListData;
         public event Action<ClientConnection> OnEndChannelList;
+
+        public event Action<ClientConnection, string, string, string, string> OnDccChat;
+        public event Action<ClientConnection, string, string, string, string, string, string> OnDccSend;
        
         /* Public properties */
         public string JoinChannelsOnConnect { get; set; }
@@ -747,8 +750,30 @@ namespace ircClient.Parsing
                             break;
 
                         case "DCC":
-                            /* Place holder */
-                            System.Diagnostics.Debug.Print("DCC " + t);
+                            var sp = t.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+                            if (t.Length < 4)
+                            {
+                                return;
+                            }
+                            switch (sp[0].ToUpper())
+                            {
+                                case "CHAT":
+                                    /* CHAT chat 2130706433 1024 */
+                                    if (OnDccChat != null)
+                                    {
+                                        OnDccChat(_client, n[0], n.Length > 1 ? n[1] : string.Empty, sp[2], sp[3]);
+                                    }
+                                    break;
+
+                                case "SEND":
+                                    /* SEND file 3232239462 1024 5618 */
+                                    if (OnDccSend != null)
+                                    {
+                                        OnDccSend(_client, n[0], n.Length > 1 ? n[1] : string.Empty, sp[1], sp[2],
+                                                  sp[3], sp.Length > 4 ? sp[4] : "0");
+                                    }
+                                    break;
+                            }                            
                             break;
 
                         case "ACTION":

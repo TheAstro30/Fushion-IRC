@@ -238,7 +238,7 @@ namespace FusionIRC.Controls.SwitchView
                         break;
 
                     case ChildWindowType.Channel:
-                        var topic = Functions.StripControlCodes(t.Modes.Topic);
+                        var topic = Functions.StripControlCodes(t.Modes.Topic, true);
                         if (string.IsNullOrEmpty(topic))
                         {
                             topic = "None";

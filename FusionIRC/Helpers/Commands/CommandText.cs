@@ -39,7 +39,7 @@ namespace FusionIRC.Helpers.Commands
 
         public static void ParseAction(ClientConnection client, FrmChildWindow child, string args)
         {
-            if (child.WindowType == ChildWindowType.Console || !client.IsConnected)
+            if (child.WindowType == ChildWindowType.Console || child.WindowType != ChildWindowType.DccChat ? !client.IsConnected : !child.Dcc.IsConnected)
             {
                 return;
             }
@@ -48,20 +48,31 @@ namespace FusionIRC.Helpers.Commands
                               Message =
                                   child.WindowType == ChildWindowType.Channel
                                       ? ThemeMessage.ChannelSelfActionText
-                                      : child.WindowType == ChildWindowType.Private
+                                      : child.WindowType == ChildWindowType.Private ||
+                                        child.WindowType == ChildWindowType.DccChat
                                             ? ThemeMessage.PrivateSelfActionText
                                             : ThemeMessage.ChannelSelfActionText,
                               TimeStamp = DateTime.Now,
                               Nick = client.UserInfo.Nick,
-                              Prefix = child.WindowType == ChildWindowType.Channel ? child.Nicklist.GetNickPrefix(client.UserInfo.Nick) : string.Empty,
+                              Prefix =
+                                  child.WindowType == ChildWindowType.Channel
+                                      ? child.Nicklist.GetNickPrefix(client.UserInfo.Nick)
+                                      : string.Empty,
                               Text = args
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             child.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(child, WindowManager.MainForm, WindowEvent.MessageReceived);
-            var action = string.Format("PRIVMSG {0} :{1}ACTION {2}{3}", child.Tag, (char)1, args, (char)1);
-            client.Send(action);
+            if (child.WindowType != ChildWindowType.DccChat)
+            {
+                var action = string.Format("PRIVMSG {0} :{1}ACTION {2}{3}", child.Tag, (char) 1, args, (char) 1);
+                client.Send(action);
+            }
+            else
+            {
+                child.Dcc.Send(string.Format("{0}ACTION {1}{2}", (char) 1, args, (char) 1));
+            }
         }
 
         public static void ParseAme(ClientConnection client, string args)

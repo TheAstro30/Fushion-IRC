@@ -13,7 +13,7 @@ using ircScript.Classes.Helpers;
 
 namespace FusionIRC.Helpers
 {
-    public static class CommandProcessor
+    internal static class CommandProcessor
     {
         /* Main parsing entry point */
         public static void Parse(ClientConnection client, FrmChildWindow child, string data)

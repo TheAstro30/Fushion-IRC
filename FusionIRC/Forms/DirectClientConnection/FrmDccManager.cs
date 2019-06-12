@@ -6,13 +6,15 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using FusionIRC.Helpers;
+using FusionIRC.Properties;
 using ircCore.Dcc;
 using ircCore.Settings;
 using libolv;
 using libolv.Implementation.Events;
 using libolv.Rendering.Renderers;
 
-namespace FusionIRC.Forms.Misc
+namespace FusionIRC.Forms.DirectClientConnection
 {
     public partial class FrmDccManager : Form
     {
@@ -35,12 +37,13 @@ namespace FusionIRC.Forms.Misc
         {
             _initialize = true;
             InitializeComponent();
+            Icon = Resources.dccManager;
             /* Image list */
             _imageList = new ImageList {ColorDepth = ColorDepth.Depth32Bit, ImageSize = new Size(16, 16)};
             _imageList.Images.AddRange(new[]
                                            {
-                                               Properties.Resources.dccDown.ToBitmap(),
-                                               Properties.Resources.dccUp.ToBitmap()
+                                               Resources.dccDown.ToBitmap(),
+                                               Resources.dccUp.ToBitmap()
                                            });
 
             olvFiles.SmallImageList = _imageList;
@@ -152,7 +155,7 @@ namespace FusionIRC.Forms.Misc
         public void AddFile(DccFile file)
         {
             /* Add to DCC file manager list and update this list */
-            DccManager.Add(file);
+            DccManager.AddFile(file);
             olvFiles.SetObjects(DccManager.DccTransfers.FileData);
             olvFiles.SelectedObject = file;
             /* If the form is currently hidden, show it */

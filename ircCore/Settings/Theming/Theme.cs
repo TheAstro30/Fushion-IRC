@@ -31,7 +31,7 @@ namespace ircCore.Settings.Theming
         }
 
         private const string Rgb = "#FFFFFF,#000000,#00007F,#009300,#FF0000,#7F0000,#9C009C,#FC7F00,#FFFF00,#00FC00,#009393,#00FFFF,#0000FC,#FF00FF,#7F7F7F,#D2D2D2";
-        private const string DefaultColors = "0,4,0,1,0,1,0,1";
+        private const string DefaultColors = "0,15,0,1,0,1,0,1";
 
         /* Public properties */
         public bool ThemeChanged { get; set; }
@@ -132,6 +132,10 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.DnsLookupReplyText, new ThemeMessageData { DefaultColor = 6, MessageFormat = "$ts * DNS Look-up: $dnsip ($dnshost)" });
             Messages.Add(ThemeMessage.InfoText, new ThemeMessageData { DefaultColor = 2, MessageFormat = "$ts * $text" });
             Messages.Add(ThemeMessage.EchoText, new ThemeMessageData { DefaultColor = 1, MessageFormat = "$text" });
+            Messages.Add(ThemeMessage.DccChatConnectingText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * DCC chat with $nick - establishing connection..." });
+            Messages.Add(ThemeMessage.DccChatConnectedText, new ThemeMessageData { DefaultColor = 3, MessageFormat = "$ts * Connection established" });
+            Messages.Add(ThemeMessage.DccChatDisconnectedText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts * DCC session closed." });
+            Messages.Add(ThemeMessage.DccChatConnectionErrorText, new ThemeMessageData { DefaultColor = 4, MessageFormat = "$ts * DCC connection error ($text)" });
             /* Image list... */
             NicklistImages.Add(ThemeNicklistImage.Owner, Properties.Resources.owner.ToBitmap());
             NicklistImages.Add(ThemeNicklistImage.Protected, Properties.Resources.prot.ToBitmap());

@@ -451,7 +451,7 @@ namespace FusionIRC.Helpers.Connection
                         {
                             Name = channel,
                             Users = users,
-                            Topic = Functions.StripControlCodes(topic)
+                            Topic = Functions.StripControlCodes(topic, true)
                         };
             w.ChanList.AddChannel(c);
             /* Update title bar */

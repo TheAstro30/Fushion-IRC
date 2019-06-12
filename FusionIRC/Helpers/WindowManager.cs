@@ -12,14 +12,13 @@ using System.Linq;
 using FusionIRC.Forms;
 using FusionIRC.Forms.ChannelProperties;
 using FusionIRC.Forms.Child;
-using FusionIRC.Forms.Misc;
+using FusionIRC.Forms.DirectClientConnection;
 using FusionIRC.Helpers.Commands;
 using FusionIRC.Helpers.Connection;
 using ircClient;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
-using Message = FusionIRC.Helpers.Connection.Message;
 
 namespace FusionIRC.Helpers
 {
@@ -30,7 +29,7 @@ namespace FusionIRC.Helpers
         MessageReceived = 2
     }
 
-    public static class WindowManager
+    internal static class WindowManager
     {
         public static Form MainForm { get; set; }
 
@@ -315,11 +314,11 @@ namespace FusionIRC.Helpers
             client.Parser.OnPartSelf += Channel.OnPartSelf;
             client.Parser.OnNames += Channel.OnNames;
             client.Parser.OnWho += Channel.OnWho;
-            client.Parser.OnTextChannel += Message.OnTextChannel;
-            client.Parser.OnTextSelf += Message.OnTextSelf;
-            client.Parser.OnActionChannel += Message.OnActionChannel;
-            client.Parser.OnActionSelf += Message.OnActionSelf;            
-            client.Parser.OnNotice += Message.OnNotice;
+            client.Parser.OnTextChannel += Messages.OnTextChannel;
+            client.Parser.OnTextSelf += Messages.OnTextSelf;
+            client.Parser.OnActionChannel += Messages.OnActionChannel;
+            client.Parser.OnActionSelf += Messages.OnActionSelf;            
+            client.Parser.OnNotice += Messages.OnNotice;
             client.Parser.OnNick += Channel.OnNick;
             client.Parser.OnQuit += Channel.OnQuit;
             client.Parser.OnKickSelf += Channel.OnKickSelf;
@@ -328,7 +327,7 @@ namespace FusionIRC.Helpers
             client.Parser.OnModeChannel += Modes.OnModeChannel;
             client.Parser.OnRaw += Raw.OnRaw;
             client.Parser.OnUserInfo += Misc.OnUserInfo;
-            client.Parser.OnWallops += Message.OnWallops;
+            client.Parser.OnWallops += Messages.OnWallops;
             client.Parser.OnWhois += Misc.OnWhois;
             client.Parser.OnInvite += Channel.OnInvite;
             client.Parser.OnCtcp += Ctcp.OnCtcp;
@@ -342,6 +341,8 @@ namespace FusionIRC.Helpers
             client.Parser.OnBeginChannelList += Channel.OnBeginChannelList;
             client.Parser.OnChannelListData += Channel.OnChannelListData;
             client.Parser.OnEndChannelList += Channel.OnEndChannelList;
+            client.Parser.OnDccChat += DccManager.OnDccChat;
+            client.Parser.OnDccSend += DccManager.OnDccSend;
         }
 
         private static void RemoveConnectionHandlers(ClientConnection client)
@@ -375,11 +376,11 @@ namespace FusionIRC.Helpers
             client.Parser.OnPartSelf -= Channel.OnPartSelf;
             client.Parser.OnNames -= Channel.OnNames;
             client.Parser.OnWho -= Channel.OnWho;
-            client.Parser.OnTextChannel -= Message.OnTextChannel;
-            client.Parser.OnTextSelf -= Message.OnTextSelf;
-            client.Parser.OnActionChannel -= Message.OnActionChannel;
-            client.Parser.OnActionSelf -= Message.OnActionSelf;            
-            client.Parser.OnNotice -= Message.OnNotice;
+            client.Parser.OnTextChannel -= Messages.OnTextChannel;
+            client.Parser.OnTextSelf -= Messages.OnTextSelf;
+            client.Parser.OnActionChannel -= Messages.OnActionChannel;
+            client.Parser.OnActionSelf -= Messages.OnActionSelf;            
+            client.Parser.OnNotice -= Messages.OnNotice;
             client.Parser.OnNick -= Channel.OnNick;
             client.Parser.OnQuit -= Channel.OnQuit;
             client.Parser.OnKickSelf -= Channel.OnKickSelf;
@@ -388,7 +389,7 @@ namespace FusionIRC.Helpers
             client.Parser.OnModeChannel -= Modes.OnModeChannel;
             client.Parser.OnRaw -= Raw.OnRaw;
             client.Parser.OnUserInfo -= Misc.OnUserInfo;
-            client.Parser.OnWallops -= Message.OnWallops;
+            client.Parser.OnWallops -= Messages.OnWallops;
             client.Parser.OnWhois -= Misc.OnWhois;
             client.Parser.OnInvite -= Channel.OnInvite;
             client.Parser.OnCtcp -= Ctcp.OnCtcp;
@@ -402,6 +403,8 @@ namespace FusionIRC.Helpers
             client.Parser.OnBeginChannelList -= Channel.OnBeginChannelList;
             client.Parser.OnChannelListData -= Channel.OnChannelListData;
             client.Parser.OnEndChannelList -= Channel.OnEndChannelList;
+            client.Parser.OnDccChat -= DccManager.OnDccChat;
+            client.Parser.OnDccSend -= DccManager.OnDccSend;
         }
     }
 }

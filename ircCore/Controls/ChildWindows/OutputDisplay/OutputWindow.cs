@@ -48,7 +48,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         private readonly Timer _wrapUpdate;
         private readonly Timer _update;
         private bool _incomingText;
-
+        
         private readonly bool _initialized;
 
         /* Public events */
@@ -716,6 +716,10 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
 
         public void SaveBuffer(string file)
         {
+            if (TextData.Lines.Count == 0)
+            {
+                return;
+            }
             var t = GetLineMarker();
             if (t != -1)
             {

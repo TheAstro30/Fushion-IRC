@@ -185,6 +185,7 @@ namespace FusionIRC.Forms.Settings.Controls.Dcc
                     btnDelete.Enabled = false;
                     break;
             }
+            SettingsChanged = true;
             if (OnSettingsChanged != null)
             {
                 OnSettingsChanged(this);

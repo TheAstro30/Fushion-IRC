@@ -3,6 +3,12 @@
   <data>Query:query $1</data>
   <data>Whois:whois $1</data>
   <data>-</data>
+  <data>Add to Notify:notify $1</data>
+  <data>Remove from Notify:notify -r $1</data>
+  <data>-</data>
+  <data>Ignore:ignore $1</data>
+  <data>Unignore:ignore -r $1</data>
+  <data>-</data>
   <data>Host Controls</data>
   <data>.Op Selected (+o):mode $chan +ooooo $1 $2 $3 $4 $5</data>
   <data>.Deop Selected (-o):mode $chan -ooooo $1 $2 $3 $4 $5</data>

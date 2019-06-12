@@ -101,7 +101,7 @@ namespace FusionIRC.Forms.Autos.Controls
                                HideSelection = false,
                                Location = new Point(3, 65 - offsetY),
                                MultiSelect = false,
-                               Size = new Size(294, 267),
+                               Size = new Size(294, 267 + offsetY),
                                TabIndex = 4,
                                UseCompatibleStateImageBehavior = false,
                                View = View.Details

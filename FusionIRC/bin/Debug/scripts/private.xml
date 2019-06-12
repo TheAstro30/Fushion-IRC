@@ -1,4 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <script xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="private">
   <data>Whois:whois $nick</data>
+  <data>-</data>
+  <data>Add to Notify:notify $nick</data>
+  <data>Remove from Notify:notify -r $nick</data>
+  <data>-</data>
+  <data>Ignore:ignore $nick</data>
+  <data>Unignore:ignore -r $nick</data>
+  <data>-</data>
+  <data>Popups</data>
+  <data>.Slap:me slaps $nick around with a dirty sock</data>
+  <data>.Random Slap:$read(scripts/randslap.txt)</data>
 </script>

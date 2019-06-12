@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -215,9 +216,9 @@ namespace ircCore.Utils
             return b.ToString();
         }
 
-        public static string StripControlCodes(string text)
+        public static string StripControlCodes(string text, bool strip)
         {
-            return string.IsNullOrEmpty(text) ? string.Empty : RegExAllCodes.Replace(text, "");
+            return strip ? string.IsNullOrEmpty(text) ? string.Empty : RegExAllCodes.Replace(text, "") : text;
         }
 
         public static string TruncateString(string text, int length)
@@ -261,6 +262,24 @@ namespace ircCore.Utils
             _frmColor = null;
         }
 
+        public static string FormatBytes(string bytes)
+        {
+            string[] sizes = { " Bytes", " KB", " MB", " GB", " TB", " PB" };
+            double b;
+            if (!double.TryParse(bytes, out b))
+            {
+                return "0 Bytes";
+            }
+            for (var i = sizes.Length - 1; i >= 0; i--)
+            {
+                if (b >= Math.Pow(1024, i))
+                {
+                    return ThreeNonZeroDigits(b / Math.Pow(1024, i)) + sizes[i];
+                }
+            }
+            return "0 Bytes";
+        }
+
         /* Private methods */
         private static void CopyDirectory(string srcFolder, string destFolder)
         {
@@ -276,6 +295,11 @@ namespace ircCore.Utils
                     File.Copy(s, destFolder + @"\" + strTemp);
                 }
             }
+        }
+
+        private static string ThreeNonZeroDigits(double value)
+        {
+            return value >= 100 ? Math.Round(value).ToString() : value.ToString(value >= 10 ? "0.0" : "0.00");
         }
     }
 }

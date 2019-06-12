@@ -1,6 +1,4 @@
-﻿using libolv;
-
-namespace FusionIRC.Forms.Misc
+﻿namespace FusionIRC.Forms.DirectClientConnection
 {
     partial class FrmDccManager
     {
@@ -30,7 +28,6 @@ namespace FusionIRC.Forms.Misc
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmDccManager));
             this.olvFiles = new libolv.ObjectListView();
             ((System.ComponentModel.ISupportInitialize)(this.olvFiles)).BeginInit();
             this.SuspendLayout();
@@ -56,7 +53,6 @@ namespace FusionIRC.Forms.Misc
             this.ClientSize = new System.Drawing.Size(597, 262);
             this.Controls.Add(this.olvFiles);
             this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(613, 301);
             this.Name = "FrmDccManager";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;

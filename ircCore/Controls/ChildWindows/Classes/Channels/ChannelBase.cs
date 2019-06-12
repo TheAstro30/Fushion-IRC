@@ -41,7 +41,7 @@ namespace ircCore.Controls.ChildWindows.Classes.Channels
             }
             if (!string.IsNullOrEmpty(Topic))
             {
-                var t = Functions.StripControlCodes(Topic);
+                var t = Functions.StripControlCodes(Topic, true);
                 sb.Append(sb.Length != 0 ? string.Format(": {0}", t) : string.Format("{0}", t));
             }
             return sb.ToString();

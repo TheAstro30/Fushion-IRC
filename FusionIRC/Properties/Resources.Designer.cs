@@ -232,9 +232,49 @@ namespace FusionIRC.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon dccChat {
+            get {
+                object obj = ResourceManager.GetObject("dccChat", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon dccChatRequest {
+            get {
+                object obj = ResourceManager.GetObject("dccChatRequest", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon dccDown {
             get {
                 object obj = ResourceManager.GetObject("dccDown", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon dccManager {
+            get {
+                object obj = ResourceManager.GetObject("dccManager", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon dccSend {
+            get {
+                object obj = ResourceManager.GetObject("dccSend", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -285,16 +325,6 @@ namespace FusionIRC.Properties {
         internal static System.Drawing.Icon editReplace {
             get {
                 object obj = ResourceManager.GetObject("editReplace", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon error {
-            get {
-                object obj = ResourceManager.GetObject("error", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -355,6 +385,16 @@ namespace FusionIRC.Properties {
         internal static System.Drawing.Icon list {
             get {
                 object obj = ResourceManager.GetObject("list", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon logs {
+            get {
+                object obj = ResourceManager.GetObject("logs", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

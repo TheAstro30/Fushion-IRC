@@ -7,6 +7,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using FusionIRC.Forms.Autos;
+using FusionIRC.Forms.DirectClientConnection;
 using FusionIRC.Forms.Favorites;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Forms.Scripting;
@@ -16,7 +17,9 @@ using FusionIRC.Forms.Users;
 using FusionIRC.Helpers;
 using FusionIRC.Properties;
 using ircCore.Controls.Rendering;
+using ircCore.Settings;
 using ircCore.Settings.Networks;
+using ircCore.Utils;
 
 namespace FusionIRC.Controls.ControlBars
 {
@@ -37,7 +40,13 @@ namespace FusionIRC.Controls.ControlBars
         private readonly ToolStripButton _btnPart;
         private readonly ToolStripButton _btnSettings;
         private readonly ToolStripButton _btnTheme;
+
+        private readonly ToolStripButton _btnSend;
+        private readonly ToolStripButton _btnChat;
         private readonly ToolStripButton _btnDcc;
+        
+        private readonly ToolStripButton _btnLogs;
+        
         private readonly ToolStripButton _btnUsers;
         private readonly ToolStripButton _btnAutos;
         private readonly ToolStripButton _btnAbout;
@@ -152,6 +161,26 @@ namespace FusionIRC.Controls.ControlBars
                                 ToolTipText = @"Theme manager"
                             };
             _btnTheme.Click += ToolbarButtonClick;
+            /* DCC send button */
+            _btnSend = new ToolStripButton
+                           {
+                               Image = Resources.dccSend.ToBitmap(),
+                               ImageScaling = ToolStripItemImageScaling.None,
+                               Size = new Size(32, 32),
+                               Tag = "SEND",
+                               ToolTipText = @"DCC send file"
+                           };
+            _btnSend.Click += ToolbarButtonClick;
+            /* DCC chat button */
+            _btnChat = new ToolStripButton
+                           {
+                               Image = Resources.dccChat.ToBitmap(),
+                               ImageScaling = ToolStripItemImageScaling.None,
+                               Size = new Size(32, 32),
+                               Tag = "CHAT",
+                               ToolTipText = @"Open DCC chat session"
+                           };
+            _btnChat.Click += ToolbarButtonClick;
             /* DCC manager button */
             _btnDcc = new ToolStripButton
                           {
@@ -162,6 +191,16 @@ namespace FusionIRC.Controls.ControlBars
                               ToolTipText = @"DCC transfer manager"
                           };
             _btnDcc.Click += ToolbarButtonClick;
+            /* View logs button */
+            _btnLogs = new ToolStripButton
+                           {
+                               Image = Resources.logs.ToBitmap(),
+                               ImageScaling = ToolStripItemImageScaling.None,
+                               Size = new Size(32, 32),
+                               Tag = "LOGS",
+                               ToolTipText = @"View logs"
+                           };
+            _btnLogs.Click += ToolbarButtonClick;            
             /* Automations button */
             _btnAutos = new ToolStripButton
                             {
@@ -195,9 +234,12 @@ namespace FusionIRC.Controls.ControlBars
             /* Add the buttons to the toolbar */
             Items.AddRange(new ToolStripItem[]
                                {
-                                   _btnConnect, _btnConnectDrop, _btnConnectToLocation, new ToolStripSeparator(), _btnSettings, _btnTheme,
-                                   _btnAliases, new ToolStripSeparator(), _btnChanList, _btnFavorites, _btnJoin, _btnPart, 
-                                   new ToolStripSeparator(), _btnDcc, _btnUsers, _btnAutos, new ToolStripSeparator(), _btnAbout
+                                   _btnConnect, _btnConnectDrop, _btnConnectToLocation, new ToolStripSeparator(),
+                                   _btnSettings, _btnTheme,
+                                   _btnAliases, new ToolStripSeparator(), _btnChanList, _btnFavorites, _btnJoin,
+                                   _btnPart,
+                                   new ToolStripSeparator(), _btnSend, _btnChat, _btnDcc, new ToolStripSeparator(),
+                                   _btnLogs, _btnUsers, _btnAutos, new ToolStripSeparator(), _btnAbout
                                });
 
             _tmrCheck = new Timer
@@ -300,8 +342,26 @@ namespace FusionIRC.Controls.ControlBars
                     }
                     break;
 
+                case "SEND":
+                case "CHAT":
+                    if (c.IsConnected)
+                    {
+                        using (var dcc = new FrmDccNicks())
+                        {
+                            if (dcc.ShowDialog(_owner) == DialogResult.Cancel)
+                            {
+                                return;
+                            }
+                        }
+                    }
+                    break;
+
                 case "DCC":
                     WindowManager.DccManagerWindow.Show(_owner);
+                    break;
+
+                case "LOGS":
+                    Functions.OpenProcess(Functions.MainDir(SettingsManager.Settings.Client.Logging.LogPath));
                     break;
 
                 case "USERS":

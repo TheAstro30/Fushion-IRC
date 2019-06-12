@@ -19,11 +19,8 @@ namespace ircCore.Users
 
         private static readonly string FileName = Functions.MainDir(@"\data\users.xml");
 
-        /* Events raised by this class for notify nicks */
-        public static event Action<string> NotifyAdded;
-        public static event Action<string> NotifyRemoved;
-        public static event Action<string> NotifyEdited;
-        public static event Action<string> NotifyCleared;
+        /* Event raised by this class for notify nicks */
+        public static event Action<string> NotifyChanged;
         
         /* Load/save functions */
         public static void Load()
@@ -72,9 +69,9 @@ namespace ircCore.Users
         public static void AddNotify(User data)
         {
             _users.Notify.Users.Add(data);
-            if (NotifyAdded != null)
+            if (NotifyChanged != null)
             {
-                NotifyAdded(string.Format("+{0}", data.Nick));
+                NotifyChanged(string.Format("+{0}", data.Nick));
             }
         }
 
@@ -92,9 +89,9 @@ namespace ircCore.Users
         public static void RemoveNotify(User data)
         {
             _users.Notify.Users.Remove(data);
-            if (NotifyRemoved != null)
+            if (NotifyChanged != null)
             {
-                NotifyRemoved(string.Format("-{0}", data.Nick));
+                NotifyChanged(string.Format("-{0}", data.Nick));
             }
         }
 
@@ -106,9 +103,9 @@ namespace ircCore.Users
                 /* Nick part for this user was never changed, we don't have to bother the server */
                 return;
             }
-            if (NotifyEdited != null)
+            if (NotifyChanged != null)
             {
-                NotifyEdited(string.Format("-{0} +{1}", oldNick, newNick));
+                NotifyChanged(string.Format("-{0} +{1}", oldNick, newNick));
             }
         }
 
@@ -117,10 +114,10 @@ namespace ircCore.Users
             var u = string.Format("-{0}",
                                   string.Join(" ", _users.Notify.Users.Select(o => o.Nick).ToArray()).Replace(" ",
                                                                                                                 " -"));
-            _users.Notify.Users.Clear();         
-            if (NotifyCleared != null)
+            _users.Notify.Users.Clear();
+            if (NotifyChanged != null)
             {
-                NotifyCleared(u);
+                NotifyChanged(u);
             }
         }
 

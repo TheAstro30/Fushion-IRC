@@ -81,6 +81,15 @@
     <Compile Include="Forms\ChannelProperties\Editing\FrmMaskEdit.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\DirectClientConnection\FrmDccConfirm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\DirectClientConnection\FrmDccNicks.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\DirectClientConnection\FrmDccReject.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\Misc\FrmChannelList.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -124,16 +133,13 @@
     <Compile Include="Forms\Misc\FrmConnectTo.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\Misc\FrmDccManager.cs">
+    <Compile Include="Forms\DirectClientConnection\FrmDccManager.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\Misc\FrmDccManager.Designer.cs">
+    <Compile Include="Forms\DirectClientConnection\FrmDccManager.Designer.cs">
       <DependentUpon>FrmDccManager.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Favorites\FrmFavorites.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\Misc\FrmException.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Misc\FrmJoin.cs">
@@ -283,12 +289,13 @@
     <Compile Include="Helpers\Connection\Raw.cs" />
     <Compile Include="Helpers\Connection\Channel.cs" />
     <Compile Include="Helpers\Connection\Ctcp.cs" />
-    <Compile Include="Helpers\Connection\Message.cs" />
+    <Compile Include="Helpers\Connection\Messages.cs" />
     <Compile Include="Helpers\Connection\Dns.cs" />
     <Compile Include="Helpers\Connection\LocalInfo.cs" />
     <Compile Include="Helpers\Connection\Misc.cs" />
     <Compile Include="Helpers\Connection\SocketEvents.cs" />
     <Compile Include="Helpers\Connection\Modes.cs" />
+    <Compile Include="Helpers\DccManager.cs" />
     <Compile Include="Helpers\MdiHelper.cs" />
     <Compile Include="Helpers\ReconnectOnDisconnect.cs" />
     <Compile Include="Helpers\UserTimers.cs" />
@@ -298,7 +305,7 @@
     <EmbeddedResource Include="Forms\Misc\FrmChannelList.resx">
       <DependentUpon>FrmChannelList.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Misc\FrmDccManager.resx">
+    <EmbeddedResource Include="Forms\DirectClientConnection\FrmDccManager.resx">
       <DependentUpon>FrmDccManager.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientCaching.resx">
@@ -374,6 +381,11 @@
     <None Include="Icons\Dialog\autoPerform.ico" />
     <None Include="Icons\Dialog\aboutDialog.ico" />
     <None Include="Icons\Dialog\autoConnect.ico" />
+    <None Include="Icons\Toolbar\logs.ico" />
+    <None Include="Icons\Dialog\dccManager.ico" />
+    <None Include="Icons\Toolbar\dccChat.ico" />
+    <None Include="Icons\Toolbar\dccSend.ico" />
+    <None Include="Icons\Dialog\dccChatRequest.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

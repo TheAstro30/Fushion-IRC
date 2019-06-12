@@ -67,7 +67,8 @@ namespace FusionIRC.Forms.Child
 
         public ChannelList ChanList { get; set; }
 
-        public Dcc Dcc { get; private set; } /* Used only in the window class for DCC chat */
+        /* Used only in the window class for DCC chat - callbacks attached to THIS window */
+        public Dcc Dcc { get; private set; }
          
         /* Nodes used by the switch treeview - much easier to keep track of/update from here */
         public TreeNode DisplayNodeRoot { get; set; }
@@ -118,7 +119,7 @@ namespace FusionIRC.Forms.Child
             _initialize = true;            
             /* Constructor where we pass what type of window this is - then we know what controls to create ;) */
             Client = client;
-            WindowType = type;           
+            WindowType = type; 
             /* This is used for getting/setting window size/position */
             switch (WindowType)
             {
@@ -303,10 +304,19 @@ namespace FusionIRC.Forms.Child
             {
                 WindowState = FormWindowState.Maximized;
             }
+            /* Reconnect on disconnect */
             Reconnect = new ReconnectOnDisconnect(Client);
             Reconnect.OnReconnectCancel += OnReconnectCancel;
             Reconnect.OnReconnectTimer += OnReconnectTimer;
             Reconnect.OnConnectionTry += OnConnectionTry;
+            /* DCC chat */
+            Dcc = new Dcc(this);
+            Dcc.OnDccConnecting += OnDccConnecting;
+            Dcc.OnDccConnected += OnDccConnected;
+            Dcc.OnDccDisconnected += OnDccDisconnected;
+            Dcc.OnDccError += OnDccError;
+            Dcc.OnDccChatText += OnDccChatText;
+            Dcc.OnDccChatAction += OnDccChatAction;
             _initialize = false;            
         }
         
@@ -448,6 +458,13 @@ namespace FusionIRC.Forms.Child
                                             : string.Format("PART {0}", Tag));
                         }
                         Client.Ial.RemoveChannel(Tag.ToString());
+                    }
+                    break;
+
+                case ChildWindowType.DccChat:
+                    if (Dcc.IsConnected)
+                    {
+                        Dcc.Disconnect();
                     }
                     break;
             }
@@ -739,9 +756,7 @@ namespace FusionIRC.Forms.Child
                     Logger.CreateLog();
                 }
             }
-            Logger.WriteLog(SettingsManager.Settings.Client.Logging.StripCodes
-                                ? Functions.StripControlCodes(text)
-                                : text);
+            Logger.WriteLog(Functions.StripControlCodes(text, SettingsManager.Settings.Client.Logging.StripCodes));
         }
 
         private void InputKeyDown(object sender, KeyEventArgs e)
@@ -755,7 +770,7 @@ namespace FusionIRC.Forms.Child
                         return;
                     }
                     var s = Input.Text;
-                    Input.Text = string.Empty;                    
+                    Input.Text = string.Empty;  
                     /* Send text to server */
                     char c;
                     char.TryParse(SettingsManager.Settings.Client.Messages.CommandCharacter, out c);
@@ -772,16 +787,27 @@ namespace FusionIRC.Forms.Child
                             CommandProcessor.Parse(Client, this, s);
                             return;
                         }
-                        if (!Client.IsConnected)
+                        if (WindowType != ChildWindowType.DccChat)
                         {
-                            return;
+                            if (!Client.IsConnected)
+                            {
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            if (!Dcc.IsConnected)
+                            {
+                                return;
+                            }
                         }
                         var tmd = new IncomingMessageData
                                       {
                                           Message =
                                               WindowType == ChildWindowType.Channel
                                                   ? ThemeMessage.ChannelSelfText
-                                                  : WindowType == ChildWindowType.Private
+                                                  : WindowType == ChildWindowType.Private ||
+                                                    WindowType == ChildWindowType.DccChat
                                                         ? ThemeMessage.PrivateSelfText
                                                         : ThemeMessage.ChannelSelfText,
                                           TimeStamp = DateTime.Now,
@@ -794,7 +820,14 @@ namespace FusionIRC.Forms.Child
                                       };
                         var pmd = ThemeManager.ParseMessage(tmd);
                         Output.AddLine(pmd.DefaultColor, pmd.Message);
-                        Client.Send(string.Format("PRIVMSG {0} :{1}", Tag, Utf8.ConvertFromUtf8(s, true)));
+                        if (WindowType != ChildWindowType.DccChat)
+                        {
+                            Client.Send(string.Format("PRIVMSG {0} :{1}", Tag, Utf8.ConvertFromUtf8(s, true)));
+                        }
+                        else
+                        {
+                            Dcc.Send(Utf8.ConvertFromUtf8(s, true));
+                        }
                         return;
                     }
                     /* Console window */
@@ -937,6 +970,91 @@ namespace FusionIRC.Forms.Child
             var script = new Script();
             script.LineData.Add(line);
             CommandProcessor.Parse(Client, this, script.Parse(e, args));
+        }
+
+        /* DCC chat callbacks */
+        private void OnDccConnecting(Dcc dcc)
+        {
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.DccChatConnectingText,
+                              TimeStamp = DateTime.Now,
+                              Nick = Tag.ToString().Substring(1)
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(this, WindowManager.MainForm, WindowEvent.EventReceived);
+        }
+
+        private void OnDccConnected(Dcc dcc)
+        {
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.DccChatConnectedText,
+                              TimeStamp = DateTime.Now
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(this, WindowManager.MainForm, WindowEvent.EventReceived);
+        }
+
+        private void OnDccDisconnected(Dcc dcc)
+        {
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.DccChatDisconnectedText,
+                              TimeStamp = DateTime.Now
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(this, WindowManager.MainForm, WindowEvent.EventReceived);
+        }
+
+        private void OnDccError(Dcc dcc, string description)
+        {
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.DccChatConnectionErrorText,
+                              TimeStamp = DateTime.Now,
+                              Text = description
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(this, WindowManager.MainForm, WindowEvent.EventReceived);
+        }
+
+        private void OnDccChatText(Dcc dcc, string text)
+        {
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.PrivateText,
+                              TimeStamp = DateTime.Now,
+                              Nick = Tag.ToString().Substring(1),
+                              Text = text
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(this, WindowManager.MainForm, WindowEvent.MessageReceived);
+        }
+
+        private void OnDccChatAction(Dcc dcc, string text)
+        {
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.PrivateActionText,
+                              TimeStamp = DateTime.Now,
+                              Nick = Tag.ToString().Substring(1),
+                              Text = text
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            Output.AddLine(pmd.DefaultColor, pmd.Message);
+            /* Update treenode color */
+            WindowManager.SetWindowEvent(this, WindowManager.MainForm, WindowEvent.MessageReceived);
         }
 
         private void TimerFocus(object sender, EventArgs e)

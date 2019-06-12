@@ -104,7 +104,7 @@
     <Compile Include="Controls\TrayIcon.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dcc\DccManager.cs" />
+    <Compile Include="Dcc\DccFile.cs" />
     <Compile Include="Forms\FrmColorIndex.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -29,8 +29,6 @@ namespace ircCore.Controls
 
         private readonly List<PopupNotifier> _popups = new List<PopupNotifier>();
 
-        public event Action NotificationShow;
-
         public NotifyIcon TrayNotifyIcon { get; set; }
 
         public bool TrayHideOnMinimize { get; set; }
@@ -135,10 +133,6 @@ namespace ircCore.Controls
             _popups.Add(p);
             p.Disappear += PopupDisappear;
             p.Popup();
-            if (NotificationShow != null)
-            {
-                NotificationShow();
-            }
         }
 
         /* Callbacks */

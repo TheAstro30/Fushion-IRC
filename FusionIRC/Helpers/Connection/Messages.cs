@@ -13,7 +13,7 @@ using ircScript.Classes.Structures;
 
 namespace FusionIRC.Helpers.Connection
 {
-    internal static class Message
+    internal static class Messages
     {
         public static void OnTextChannel(ClientConnection client, string nick, string address, string channel, string text)
         {

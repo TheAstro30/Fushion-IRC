@@ -18,20 +18,24 @@ namespace FusionIRC.Helpers.Commands
         public static void Notify(ClientConnection client, UserListType type, string args)
         {
             var sp = new List<string>(args.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries));
-            if (sp.Count < 1)
+            if (sp.Count == 0)
             {
                 return;
             }
             var remove = false;
-            string nick;
+            var flush = false;
+            var nick = string.Empty;
             switch (sp[0].ToUpper())
             {
                 case "-R":
                     remove = true;
-                    nick = sp[1];
-                    for (var i = 1; i >=0; i--)
+                    if (sp.Count > 1)
                     {
-                        sp.RemoveAt(i);
+                        nick = sp[1];
+                        for (var i = 1; i >= 0; i--)
+                        {
+                            sp.RemoveAt(i);
+                        }
                     }
                     break;
 
@@ -42,7 +46,12 @@ namespace FusionIRC.Helpers.Commands
             }          
             if (remove)
             {
-                if (!UserManager.RemoveNotify(nick))
+                if (string.IsNullOrEmpty(nick))
+                {
+                    UserManager.ClearNotify();
+                    flush = true;
+                }
+                else if (!UserManager.RemoveNotify(nick))
                 {
                     return;
                 }
@@ -54,23 +63,24 @@ namespace FusionIRC.Helpers.Commands
                     return;
                 }
             }
-            AddRemoveNotifyIgnore(client, type, nick, remove);
+            AddRemoveNotifyIgnore(client, type, nick, remove, flush);
         }
 
         public static void Ignore(ClientConnection client, UserListType type, string args)
         {
             var sp = args.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-            if (sp.Length < 1)
+            if (sp.Length == 0)
             {
                 return;
             }
             var remove = false;
+            var flush = false;
             string address;
             switch (sp[0].ToUpper())
             {
                 case "-R":
                     remove = true;
-                    address = Address.CheckIrcAddress(sp[1]);
+                    address = sp.Length > 1 ? Address.CheckIrcAddress(sp[1]) : string.Empty;
                     break;
 
                 default:
@@ -79,7 +89,12 @@ namespace FusionIRC.Helpers.Commands
             }   
             if (remove)
             {
-                if (!UserManager.RemoveIgnore(address))
+                if (string.IsNullOrEmpty(address))
+                {
+                    UserManager.ClearIgnore();
+                    flush = true;
+                }
+                else if (!UserManager.RemoveIgnore(address))
                 {
                     return;
                 }
@@ -91,11 +106,11 @@ namespace FusionIRC.Helpers.Commands
                     return;
                 }
             }
-            AddRemoveNotifyIgnore(client, type, address, remove);
+            AddRemoveNotifyIgnore(client, type, address, remove, flush);
         }
 
         /* Private helper functions */
-        private static void AddRemoveNotifyIgnore(ClientConnection client, UserListType type, string nick, bool remove)
+        private static void AddRemoveNotifyIgnore(ClientConnection client, UserListType type, string nick, bool remove, bool flush)
         {
             var c = WindowManager.GetConsoleWindow(client);
             if (c == null)
@@ -106,8 +121,13 @@ namespace FusionIRC.Helpers.Commands
                           {
                               Message = ThemeMessage.InfoText,
                               TimeStamp = DateTime.Now,
-                              Text = string.Format(remove ? "Removed {0} from {1} list" : "Added {0} to {1} list", nick,
-                                                   type == UserListType.Ignore ? "ignore" : "notify")
+                              Text =
+                                  !flush
+                                      ? string.Format(remove ? "Removed {0} from {1} list" : "Added {0} to {1} list",
+                                                      nick,
+                                                      type == UserListType.Ignore ? "ignore" : "notify")
+                                      : string.Format("{0} list flushed",
+                                                      type == UserListType.Ignore ? "Ignore" : "Notify")
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
