@@ -12,10 +12,12 @@ using FusionIRC.Controls.ControlBars;
 using FusionIRC.Controls.SwitchView;
 using FusionIRC.Forms.Child;
 using FusionIRC.Forms.DirectClientConnection;
+using FusionIRC.Forms.DirectClientConnection.Helper;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Helpers;
 using FusionIRC.Helpers.Commands;
 using FusionIRC.Properties;
+using ircClient.Tcp;
 using ircCore.Autos;
 using ircCore.Controls;
 using ircCore.Settings;
@@ -75,8 +77,6 @@ namespace FusionIRC.Forms
             AutomationsManager.Load();
             /* Channel manager */
             ChannelManager.Load();
-            /* DCC File transfers manager */
-            DccManager.Load();
             /* Load scripts */
             ScriptManager.LoadMultipleScripts(SettingsManager.Settings.Scripts.Aliases, ScriptManager.AliasData);
             ScriptManager.LoadMultipleScripts(SettingsManager.Settings.Scripts.Events, ScriptManager.EventData);
@@ -209,9 +209,7 @@ namespace FusionIRC.Forms
             _mdiMenu.Opening += MdiMenuOpening;
             BuildMdiMenu();
             /* Set this window background */
-            SetNewMdiBackground();
-            /* Create DCC file manager window */
-            WindowManager.DccManagerWindow = new FrmDccManager();
+            SetNewMdiBackground();            
             /* Tray icon */
             TrayNotifyIcon.Text = @"FusionIRC IRC Client";
             var ico = Functions.MainDir(SettingsManager.Settings.Client.TrayIcon.Icon);
@@ -230,7 +228,7 @@ namespace FusionIRC.Forms
             _timerConnect.Tick += ShowConnectDialog;
             /* UserManager */
             UserManager.NotifyChanged += SendWatchCommand;
-            _initialize = false;      
+            _initialize = false;               
         }
 
         /* Overrides */
@@ -343,8 +341,6 @@ namespace FusionIRC.Forms
             AutomationsManager.Save();
             /* Channel manager */
             ChannelManager.Save();
-            /* DCC File transfers manager */
-            DccManager.Save();
             /* Save variables */
             ScriptManager.SaveVariables(Functions.MainDir(@"\scripts\variables.xml"));
             base.OnFormClosing(e);

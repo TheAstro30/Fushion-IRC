@@ -36,7 +36,7 @@ namespace ircScript
                 switch (s.Type)
                 {                        
                     case PopupType.Commands:
-                        LoadPopup(s, "menubar", Commands.DropDownItems);
+                        LoadPopup(s, "menubar", Commands.DropDownItems);                        
                         break;
 
                     case PopupType.Console:

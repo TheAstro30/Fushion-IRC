@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using FusionIRC.Forms.Autos;
 using FusionIRC.Forms.DirectClientConnection;
+using FusionIRC.Forms.DirectClientConnection.Helper;
 using FusionIRC.Forms.Favorites;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Forms.Scripting;
@@ -352,12 +353,14 @@ namespace FusionIRC.Controls.ControlBars
                             {
                                 return;
                             }
+                            CommandProcessor.Parse(c, WindowManager.GetActiveWindow(),
+                                                   string.Format("DCC {0} {1}", btn.Tag.ToString(), dcc.NickName));
                         }
                     }
                     break;
 
                 case "DCC":
-                    WindowManager.DccManagerWindow.Show(_owner);
+                    DccManager.DccManagerWindow.Show(_owner);
                     break;
 
                 case "LOGS":

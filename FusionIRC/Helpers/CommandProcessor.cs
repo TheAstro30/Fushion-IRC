@@ -200,6 +200,10 @@ namespace FusionIRC.Helpers
                 case "IGNORE":
                     CommandMisc.Ignore(client, UserListType.Ignore, args);
                     break;
+                    
+                case "DCC":
+                    CommandDcc.Parse(client, args);
+                    break;
 
                 //case "SMODE":
                 //    if (child.WindowType == ChildWindowType.Channel)

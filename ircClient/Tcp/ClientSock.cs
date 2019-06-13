@@ -403,8 +403,13 @@ namespace ircClient.Tcp
             {
                 return;
             }
-            var byt = _byteData[0];
+            var byt = _byteData[0];            
             _byteData.RemoveAt(0);
+            if (byt == null)
+            {
+                Debug.Print("SOCKET: byt parameter is null");
+                return;
+            }
             bytes = new byte[byt.Length];
             byt.CopyTo(bytes, 0);
         }

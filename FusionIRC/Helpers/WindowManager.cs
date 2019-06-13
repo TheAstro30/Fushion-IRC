@@ -12,7 +12,7 @@ using System.Linq;
 using FusionIRC.Forms;
 using FusionIRC.Forms.ChannelProperties;
 using FusionIRC.Forms.Child;
-using FusionIRC.Forms.DirectClientConnection;
+using FusionIRC.Forms.DirectClientConnection.Helper;
 using FusionIRC.Helpers.Commands;
 using FusionIRC.Helpers.Connection;
 using ircClient;
@@ -35,9 +35,6 @@ namespace FusionIRC.Helpers
 
         /* If form is minimized and hidden, ActiveMDIChild will return NULL */
         public static FrmChildWindow LastActiveChild { get; set; }
-
-        /* DCC file transfer manager window */
-        public static FrmDccManager DccManagerWindow;
 
         /* Channel properties window */
         public static FrmChannelProperties ChannelProperties { get; set; }

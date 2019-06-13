@@ -71,7 +71,7 @@ namespace FusionIRC.Helpers.Commands
             }
             else
             {
-                child.Dcc.Send(string.Format("{0}ACTION {1}{2}", (char) 1, args, (char) 1));
+                child.Dcc.ChatSendText(string.Format("{0}ACTION {1}{2}", (char) 1, args, (char) 1));
             }
         }
 

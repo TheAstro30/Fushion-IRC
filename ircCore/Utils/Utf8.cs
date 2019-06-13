@@ -39,7 +39,10 @@ namespace ircCore.Utils
         /* ASCII character helper */
         public static char AsciiChr(int charCode)
         {
-            if (charCode >= 0 && charCode <= 127) { return (char)charCode; }
+            if (charCode >= 0 && charCode <= 127)
+            {
+                return (char)charCode;
+            }
             var encoding = Encoding.GetEncoding(Thread.CurrentThread.CurrentCulture.TextInfo.ANSICodePage);
             var array = new char[2];
             var array2 = new byte[2];
@@ -64,7 +67,10 @@ namespace ircCore.Utils
             /* This checks if the whole string contains unicode then returns the result */
             if (!string.IsNullOrEmpty(text))
             {
-                if (!processUtf8) { return text; }
+                if (!processUtf8)
+                {
+                    return text;
+                }
                 var s = new StringBuilder();
                 if (text.Contains(" "))
                 {
@@ -100,7 +106,10 @@ namespace ircCore.Utils
         {
             /* This checks if the whole string contains unicode then reverses it */
             var s = new StringBuilder();
-            if (!processUtf8) { return text; }
+            if (!processUtf8)
+            {
+                return text;
+            }
             if (text.Contains(" "))
             {
                 /* ChrW(160) causes a weird character to be displayed, so we replace it temporarily to
@@ -163,6 +172,7 @@ namespace ircCore.Utils
                             case 0xfc:
                                 utf8ByteSize = 5;
                                 break;
+
                             default:
                                 if ((bytArray[readPosition] & 0xf8) == 0xf8)
                                 {
@@ -182,7 +192,10 @@ namespace ircCore.Utils
                                 }
                                 break;
                         }
-                        if (readPosition + utf8ByteSize >= readSize) { break; }
+                        if (readPosition + utf8ByteSize >= readSize)
+                        {
+                            break;
+                        }
                         for (var i = (readPosition + 1); i <= (readPosition + utf8ByteSize); i++)
                         {
                             if (!(bytArray[i] >= 0x80 & bytArray[i] <= 0xbf))
@@ -193,7 +206,10 @@ namespace ircCore.Utils
                         isUtf8 += 1;
                         readPosition = readPosition + utf8ByteSize + 1;
                     }
-                    else { readPosition += 1; }
+                    else
+                    {
+                        readPosition += 1;
+                    }
                 }
                 return ((reverse && isUtf8 > 0) || isUtf8 > 0);
             }
@@ -204,7 +220,10 @@ namespace ircCore.Utils
         private static string AtoW(string st, Cp cpg, int flags)
         {
             /* ANSI to UNICODE conversion, via a given codepage. */
-            if (cpg == Cp.CpUnknown) { cpg = GetACP(); }
+            if (cpg == Cp.CpUnknown)
+            {
+                cpg = GetACP();
+            }
             var pwz = Marshal.StringToHGlobalUni(st);
             var cwch = MultiByteToWideChar(cpg, flags, pwz, -1, IntPtr.Zero, 0);
             var stBuffer = new string((char)0, cwch + 1);
@@ -224,7 +243,10 @@ namespace ircCore.Utils
         private static string WtoA(string st, Cp cpg, int flags)
         {
             /* UNICODE to ANSI conversion, via a given codepage */
-            if (cpg == Cp.CpUnknown) { cpg = GetACP(); }
+            if (cpg == Cp.CpUnknown)
+            {
+                cpg = GetACP();
+            }
             var pwz = Marshal.StringToHGlobalUni(st);
             var cwch = WideCharToMultiByte(cpg, flags, pwz, -1, IntPtr.Zero, 0, 0, 0);
             var stBuffer = new string((char)0, cwch + 1);

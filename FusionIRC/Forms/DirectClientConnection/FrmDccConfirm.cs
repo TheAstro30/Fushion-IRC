@@ -7,8 +7,8 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using FusionIRC.Properties;
+using ircClient.Tcp;
 using ircCore.Controls;
-using ircCore.Dcc;
 using ircCore.Settings;
 
 namespace FusionIRC.Forms.DirectClientConnection

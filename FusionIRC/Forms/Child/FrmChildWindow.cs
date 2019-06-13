@@ -9,6 +9,7 @@ using System.IO;
 using System.Media;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using FusionIRC.Forms.DirectClientConnection.Helper;
 using FusionIRC.Forms.Warning;
 using FusionIRC.Helpers;
 using FusionIRC.Helpers.Commands;
@@ -466,6 +467,7 @@ namespace FusionIRC.Forms.Child
                     {
                         Dcc.Disconnect();
                     }
+                    DccManager.RemovePort(Dcc.Port);
                     break;
             }
             /* Remove the window from the client */
@@ -572,7 +574,8 @@ namespace FusionIRC.Forms.Child
         public override string ToString()
         {
             /* Return readable text for the tree nodes of the "switch view" */
-            return Tag.ToString();
+            var text = Tag.ToString();
+            return text[0] == '=' ? string.Format("Chat {0}", text.Substring(1)) : text;
         }
 
         /* Channel modes class */
@@ -826,7 +829,7 @@ namespace FusionIRC.Forms.Child
                         }
                         else
                         {
-                            Dcc.Send(Utf8.ConvertFromUtf8(s, true));
+                            Dcc.ChatSendText(Utf8.ConvertFromUtf8(s, true));
                         }
                         return;
                     }

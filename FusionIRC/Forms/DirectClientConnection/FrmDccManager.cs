@@ -4,12 +4,14 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using FusionIRC.Helpers;
+using FusionIRC.Forms.DirectClientConnection.Helper;
 using FusionIRC.Properties;
-using ircCore.Dcc;
+using ircClient.Tcp;
 using ircCore.Settings;
+using ircCore.Utils;
 using libolv;
 using libolv.Implementation.Events;
 using libolv.Rendering.Renderers;
@@ -30,12 +32,17 @@ namespace FusionIRC.Forms.DirectClientConnection
 
         private readonly ImageList _imageList;
 
+        private readonly List<Dcc> _transfers;
+
+        private readonly ContextMenuStrip _popupFile;
+
         private readonly bool _initialize;
         
         /* Constructor - create ObjectListView and columns */
-        public FrmDccManager()
+        public FrmDccManager(List<Dcc> transfers)
         {
             _initialize = true;
+            _transfers = transfers;
             InitializeComponent();
             Icon = Resources.dccManager;
             /* Image list */
@@ -55,7 +62,7 @@ namespace FusionIRC.Forms.DirectClientConnection
                                    IsVisible = true,
                                    Width = 150,
                                    /* Delegate to allow images upload/download in list */
-                                   ImageGetter = row => (int) ((DccFile) row).FileType,
+                                   ImageGetter = row => (int) ((Dcc) row).DccFileType,
                                    FillsFreeSpace = true
                                };            
 
@@ -83,7 +90,7 @@ namespace FusionIRC.Forms.DirectClientConnection
                                 Sortable = false,
                                 IsEditable = false,
                                 IsVisible = true,
-                                Width = 60
+                                Width = 70
                             };
 
             _colStatus = new OlvColumn("Status:", "Status")
@@ -99,14 +106,19 @@ namespace FusionIRC.Forms.DirectClientConnection
             olvFiles.RebuildColumns();
 
             olvFiles.CellToolTipShowing += OnCellToolTipShowing;
+            olvFiles.MouseUp += OnListMouseUp;
+
+            _popupFile = new ContextMenuStrip();
+            BuildPopup();
+            _popupFile.Opening += OnPopupOpening;
 
             /* Set window position and size */
             var w = SettingsManager.GetWindowByName("dcc-manager");
             Size = w.Size;
             Location = w.Position;
             WindowState = w.Maximized ? FormWindowState.Maximized : FormWindowState.Normal;
-            
-            LoadFiles();
+
+            olvFiles.SetObjects(_transfers);
             _initialize = false;
         }
 
@@ -152,11 +164,10 @@ namespace FusionIRC.Forms.DirectClientConnection
         }
 
         /* Public exposed method called via static method */
-        public void AddFile(DccFile file)
+        public void AddTransfer(Dcc file)
         {
             /* Add to DCC file manager list and update this list */
-            DccManager.AddFile(file);
-            olvFiles.SetObjects(DccManager.DccTransfers.FileData);
+            olvFiles.SetObjects(_transfers);
             olvFiles.SelectedObject = file;
             /* If the form is currently hidden, show it */
             if (!Visible)
@@ -168,32 +179,137 @@ namespace FusionIRC.Forms.DirectClientConnection
         public void UpdateTransferData()
         {
             /* Used to update the list output (if visible) to show progress, speed, etc. changes */
-            olvFiles.RefreshObjects(DccManager.DccTransfers.FileData);
+            olvFiles.RefreshObjects(_transfers);
         }
 
         /* Private methods */
-        private void LoadFiles()
+        private void OnListMouseUp(object sender, MouseEventArgs e)
         {
-            if (DccManager.DccTransfers.FileData.Count == 0)
+            if (e.Button == MouseButtons.Right)
             {
-                return;
-            }
-            olvFiles.SetObjects(DccManager.DccTransfers.FileData);
+                var p = new Point(ClientRectangle.Left + e.X, ClientRectangle.Top + e.Y);
+                _popupFile.Show(olvFiles, p);
+            }            
+        }
+
+        private void OnPopupOpening(object sender, EventArgs e)
+        {
+            _popupFile.Items.Clear();
+            BuildPopup();            
         }
 
         private static void OnCellToolTipShowing(object sender, ToolTipShowingEventArgs e)
         {
             /* Tooltip handler */
-            var data = (DccFile) e.Model;
+            var data = (Dcc) e.Model;
             e.Title = data.FileName;
             e.Text = data.Status == DccFileStatus.Downloading || data.Status == DccFileStatus.Uploading
                          ? string.Format(
                              "DCC type: {0}\r\nUser name: {1}\r\nStatus: {2}\r\nCompleted: {3}%\r\nSpeed: {4}",
-                             data.FileType, data.UserNameToString, data.Status, data.Progress, data.SpeedToString)
-                         : string.Format("DCC type: {0}\r\nUser name: {1}\r\nStatus: {2}", data.FileType,
+                             data.DccFileType, data.UserNameToString, data.Status, data.Progress, data.SpeedToString)
+                         : string.Format("DCC type: {0}\r\nUser name: {1}\r\nStatus: {2}", data.DccFileType,
                                          data.UserNameToString, data.Status);
             e.IsBalloon = true;
             e.Handled = true;
+        }
+
+        private void OnPopupMenuItemClick(object sender, EventArgs e)
+        {
+            var t = (ToolStripMenuItem) sender;
+            if (t == null)
+            {
+                return;
+            }
+            Dcc dcc;
+            switch (t.Name)
+            {
+                case "OPEN":
+                    dcc = (Dcc)olvFiles.SelectedObject;
+                    Functions.OpenProcess(string.Format(@"{0}\{1}", dcc.DccFolder, dcc.FileName));
+                    break;
+
+                case "OPENLOCATION":
+                    dcc = (Dcc)olvFiles.SelectedObject;
+                    Functions.OpenProcess(dcc.DccFolder);
+                    break;
+
+                case "CANCEL":
+                    dcc = (Dcc) olvFiles.SelectedObject;
+                    dcc.Disconnect();
+                    break;
+
+                case "REMOVE":
+                    dcc = (Dcc) olvFiles.SelectedObject;
+                    dcc.Disconnect();
+                    _transfers.Remove(dcc);
+                    olvFiles.RemoveObject(dcc);
+                    break;
+
+                case "RESEND":
+                    break;
+
+                case "CLEAR":
+                    for (var i = _transfers.Count - 1; i >= 0; i--)
+                    {
+                        dcc = _transfers[i];
+                        DccManager.RemovePort(dcc.Port);
+                        DccManager.RemoveTransfer(dcc);
+                    }
+                    olvFiles.SetObjects(_transfers);
+                    break;
+            }
+        }
+
+        private void BuildPopup()
+        {
+            if (olvFiles.SelectedObject != null)
+            {
+                var dcc = (Dcc) olvFiles.SelectedObject;
+                if (dcc.DccFileType == DccFileType.Download)
+                {
+                    switch (dcc.Status)
+                    {
+                        case DccFileStatus.Completed:
+                            _popupFile.Items.AddRange(new ToolStripItem[]
+                                                          {
+                                                              new ToolStripMenuItem("Open file", null,
+                                                                                    OnPopupMenuItemClick,
+                                                                                    "OPEN"),
+                                                              new ToolStripMenuItem("Open file location", null,
+                                                                                    OnPopupMenuItemClick, "OPENLOCATION"),
+                                                              new ToolStripSeparator()
+                                                          });
+                            break;
+
+                        case DccFileStatus.Waiting:
+                        case DccFileStatus.Downloading:
+                            _popupFile.Items.Add(new ToolStripMenuItem("Cancel", null, OnPopupMenuItemClick, "CANCEL"));
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (dcc.Status)
+                    {
+                        case DccFileStatus.Waiting:
+                        case DccFileStatus.Uploading:
+                            _popupFile.Items.Add(new ToolStripMenuItem("Cancel", null, OnPopupMenuItemClick, "CANCEL"));
+                            break;
+
+                        case DccFileStatus.Failed:
+                            _popupFile.Items.Add(new ToolStripMenuItem("Resend", null, OnPopupMenuItemClick, "RESEND"));
+                            break;
+                    }
+                }
+                _popupFile.Items.Add(new ToolStripMenuItem("Remove", null, OnPopupMenuItemClick, "REMOVE"));
+            }
+            else
+            {
+                _popupFile.Items.AddRange(new ToolStripItem[]
+                                              {
+                                                  new ToolStripMenuItem("Clear", null, OnPopupMenuItemClick, "CLEAR")
+                                              });
+            }
         }
     }
 }

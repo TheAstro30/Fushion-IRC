@@ -136,6 +136,10 @@ namespace ircCore.Utils
             {
                 Directory.CreateDirectory(_mainFolder + @"\scripts");
             }
+            if (!Directory.Exists(_mainFolder + @"\downloads"))
+            {
+                Directory.CreateDirectory(_mainFolder + @"\downloads");
+            }
         }
 
         public static string MainDir(string path)
