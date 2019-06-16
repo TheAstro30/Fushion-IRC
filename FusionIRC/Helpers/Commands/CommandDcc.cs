@@ -40,7 +40,7 @@ namespace FusionIRC.Helpers.Commands
             {
                 case "SEND":
                     /* Send new file */
-                    using (var ofd = new OpenFileDialog { Multiselect = false, Title = string.Format("Send {0} a file", sp[1]) })
+                    using (var ofd = new OpenFileDialog { Multiselect = false, Title = string.Format("Send {0} a file", sp[1]), Filter = @"All Files (*.*)|*.*"})
                     {
                         if (ofd.ShowDialog(WindowManager.MainForm) == DialogResult.Cancel)
                         {
@@ -48,19 +48,32 @@ namespace FusionIRC.Helpers.Commands
                         }
                         /* Create a new DCC file object */
                         var fs = new FileInfo(ofd.FileName);
-                        var dcc = new Dcc(DccManager.DccManagerWindow)
+                        var file = Path.GetFileName(ofd.FileName);
+                        var path = Path.GetDirectoryName(ofd.FileName);
+                        var dcc = DccManager.GetTransfer(sp[1], file );
+                        if (dcc == null)
+                        {
+                            dcc = new Dcc(DccManager.DccManagerWindow)
                                       {
+                                          Client = client,
                                           UserName = sp[1],
-                                          FileName = Path.GetFileName(ofd.FileName),
-                                          DccFolder = Path.GetDirectoryName(ofd.FileName),
+                                          FileName = file,
+                                          DccFolder = path,
                                           DccType = DccType.DccFileTransfer,
                                           DccFileType = DccFileType.Upload,
-                                          FileSize = (uint)fs.Length,
+                                          FileSize = (uint) fs.Length,
                                           Port = port
                                       };
-                        dcc.OnDccTransferProgress += DccManager.OnDccTransferProgress;
-                        DccManager.AddPort(port);                        
-                        DccManager.AddTransfer(dcc);
+                            dcc.OnDccTransferProgress += DccManager.OnDccTransferProgress;
+                            DccManager.AddPort(port);
+                            DccManager.AddTransfer(dcc);
+                        }
+                        else
+                        {
+                            DccManager.RemovePort(dcc.Port);
+                            dcc.Port = port;
+                            DccManager.AddPort(port);
+                        }
                         dcc.BeginConnect();
                         /* Send notification to user */
                         var fl = dcc.FileName.Replace(" ", "_");

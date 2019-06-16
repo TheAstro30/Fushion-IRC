@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using FusionIRC.Forms.DirectClientConnection.Helper;
 using FusionIRC.Properties;
@@ -26,6 +27,7 @@ namespace FusionIRC.Forms.DirectClientConnection
         private readonly OlvColumn _colUserName;
         private readonly OlvColumn _colProgress;
         private readonly OlvColumn _colSpeed;
+        private readonly OlvColumn _colRemain;
         private readonly OlvColumn _colStatus;
 
         private readonly BarRenderer _barRenderer;
@@ -93,6 +95,14 @@ namespace FusionIRC.Forms.DirectClientConnection
                                 Width = 70
                             };
 
+            _colRemain = new OlvColumn("ETA:", "RemainingToString")
+                             {
+                                 Sortable = false,
+                                 IsEditable = false,
+                                 IsVisible = true,
+                                 Width = 80
+                             };
+
             _colStatus = new OlvColumn("Status:", "Status")
                              {
                                  Sortable = false,
@@ -101,8 +111,8 @@ namespace FusionIRC.Forms.DirectClientConnection
                                  Width = 90
                              };
 
-            olvFiles.AllColumns.AddRange(new[] {_colFileName, _colUserName, _colProgress, _colSpeed, _colStatus});
-            olvFiles.Columns.AddRange(new[] {_colFileName, _colUserName, _colProgress, _colSpeed, _colStatus});
+            olvFiles.AllColumns.AddRange(new[] {_colFileName, _colUserName, _colProgress, _colSpeed, _colRemain, _colStatus});
+            olvFiles.Columns.AddRange(new[] {_colFileName, _colUserName, _colProgress, _colSpeed, _colRemain, _colStatus});
             olvFiles.RebuildColumns();
 
             olvFiles.CellToolTipShowing += OnCellToolTipShowing;
@@ -220,32 +230,37 @@ namespace FusionIRC.Forms.DirectClientConnection
             {
                 return;
             }
-            Dcc dcc;
+            var dcc = (Dcc)olvFiles.SelectedObject;
             switch (t.Name)
             {
                 case "OPEN":
-                    dcc = (Dcc)olvFiles.SelectedObject;
                     Functions.OpenProcess(string.Format(@"{0}\{1}", dcc.DccFolder, dcc.FileName));
                     break;
 
                 case "OPENLOCATION":
-                    dcc = (Dcc)olvFiles.SelectedObject;
                     Functions.OpenProcess(dcc.DccFolder);
                     break;
 
                 case "CANCEL":
-                    dcc = (Dcc) olvFiles.SelectedObject;
                     dcc.Disconnect();
                     break;
 
                 case "REMOVE":
-                    dcc = (Dcc) olvFiles.SelectedObject;
                     dcc.Disconnect();
                     _transfers.Remove(dcc);
                     olvFiles.RemoveObject(dcc);
                     break;
 
                 case "RESEND":
+                    var add = SettingsManager.Settings.Connection.LocalInfo.HostInfo.Address;
+                    var ip = DccManager.IpConvert(add, false);
+                    var fs = new FileInfo(string.Format(@"{0}\{1}", dcc.DccFolder, dcc.FileName));
+                    var file = dcc.FileName.Replace(" ", "_");
+                    dcc.Client.Send(
+                        string.Format(
+                            "NOTICE {0} :DCC Send {1} ({2}){3}PRIVMSG {0} :\u0001DCC SEND {1} {4} {5} {6}\u0001",
+                            dcc.UserName, file, add, Environment.NewLine, ip, dcc.Port, fs.Length));
+                    dcc.BeginConnect();
                     break;
 
                 case "CLEAR":

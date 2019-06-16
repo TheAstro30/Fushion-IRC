@@ -5,7 +5,7 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -60,7 +60,7 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
             var w = WindowManager.GetWindow(client, n) ??
                     WindowManager.AddWindow(client, ChildWindowType.DccChat, WindowManager.MainForm,
                                             string.Format("Chat {0}", nick), n, true);
-            /* Which it shouldn't... */
+            /* Setup structure */
             AddPort(p);
             w.Dcc.Port = p;
             w.Dcc.Address = add;
@@ -71,8 +71,6 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
 
         public static void OnDccSend(ClientConnection client, string nick, string address, string file, string ip, string port, string length)
         {
-            Debug.Print("DCC SEND " + nick + " " + address + " " + file + " " + ip + " " + port + " " +
-                                           length);
             /* Check current DCC filter settings to see if this file is acceptable to download */
             var f = CheckFilter(file);
             var ignore = false;
@@ -101,21 +99,59 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
                                 {
                                     return;
                                 }
-                                var dcc = new Dcc(DccManagerWindow)
+                                /* Check if the file already exists */
+                                var path = Functions.MainDir(@"\downloads");
+                                var fullPath = string.Format(@"{0}\{1}", path, file);
+                                var fs = new FileInfo(fullPath);
+                                var resume = false;
+                                if (File.Exists(fullPath))
+                                {                                    
+                                    var type = fs.Length < i ? DccWriteMode.Resume : DccWriteMode.SaveAs;
+                                    using (var de = new FrmDccExists(type, fullPath))
+                                    {
+                                        if (de.ShowDialog(DccManagerWindow) == DialogResult.Cancel)
+                                        {
+                                            return;
+                                        }
+                                        file = Path.GetFileName(de.FileName);
+                                        path = Path.GetDirectoryName(de.FileName);
+                                        resume = de.WriteMode == DccWriteMode.Resume;
+                                    }
+                                }
+                                var dcc = GetTransfer(nick, file);
+                                if (dcc == null)
+                                {
+                                    dcc = new Dcc(DccManagerWindow)
                                               {
+                                                  Client = client,
                                                   DccType = DccType.DccFileTransfer,
                                                   DccFileType = DccFileType.Download,
                                                   UserName = nick,
                                                   Address = IpConvert(ip, true),
                                                   Port = p,
-                                                  DccFolder = Functions.MainDir(@"\downloads"),
-                                                  FileName = file,
+                                                  DccFolder = path,
+                                                  FileName = file,                                                  
                                                   FileSize = i
                                               };
-                                dcc.OnDccTransferProgress += OnDccTransferProgress;
-                                AddDccHistory(nick);
-                                AddPort(p);
-                                AddTransfer(dcc);
+                                    dcc.OnDccTransferProgress += OnDccTransferProgress;
+                                    AddDccHistory(nick);
+                                    AddPort(p);
+                                    AddTransfer(dcc);
+                                }
+                                dcc.IsResume = resume;
+                                if (resume)
+                                {
+                                    /* We request the sender to resume */                                    
+                                    client.Send(string.Format("PRIVMSG {0} :\u0001DCC RESUME \"{1}\" {2} {3}\u0001",
+                                                              nick, file, port, fs.Length));
+                                }
+                                /* Make sure the current port hasn't changed, sometimes mIRC changes the port when resending */
+                                if (dcc.Port != p)
+                                {
+                                    RemovePort(dcc.Port);
+                                    dcc.Port = p;
+                                    AddPort(p);
+                                }
                                 dcc.BeginConnect();
                             }
                         }
@@ -143,6 +179,29 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
             }
         }
 
+        public static void OnDccAcceptResume(ClientConnection client, bool get, string nick, string file, string port, string position)
+        {
+            /* Get resume */
+            uint i;
+            int p;
+            var dcc = GetTransfer(nick, get ? file : file.Replace("_", " "));
+            if (dcc == null || !uint.TryParse(position, out i) || !int.TryParse(port, out p))
+            {
+                return;
+            }
+            dcc.FilePos = i;
+            if (get)
+            {                
+                dcc.BeginGetResume();
+            }
+            else
+            {
+                /* Send DCC ACCEPT handshake */
+                dcc.BeginSendResume();
+                client.Send(string.Format("PRIVMSG {0} :\x0001DCC ACCEPT \"{1}\" {2} {3}\x0001", nick, file, port, position));
+            }
+        }
+
         public static void OnDccTransferProgress(Dcc dcc)
         {
             DccManagerWindow.UpdateTransferData();
@@ -162,24 +221,20 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
             DccManagerWindow.AddTransfer(file);
         }
 
+        public static Dcc GetTransfer(string nick, string fileName)
+        {
+            /* Get current DCC object by both nick and filename */
+            return
+                DccTransfers.FirstOrDefault(
+                    d =>
+                    d.UserName.Equals(nick, StringComparison.InvariantCultureIgnoreCase) &&
+                    d.FileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase));
+        }
+
         public static void RemoveTransfer(Dcc file)
         {
             file.OnDccTransferProgress -= OnDccTransferProgress;
             DccTransfers.Remove(file);
-        }
-
-        public static void AddDccHistory(string nick)
-        {
-            var list = SettingsManager.Settings.Dcc.History.Data;
-            foreach (var n in list.Where(n => n.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase)))
-            {
-                /* Insert at top of list */                    
-                list.Insert(0, new SettingsDcc.SettingsDccHistory.SettingsDccHistoryData { Nick = n.Nick });
-                list.Remove(n);
-                return;
-            }
-            /* Insert at bottom of list */
-            list.Add(new SettingsDcc.SettingsDccHistory.SettingsDccHistoryData {Nick = nick});
         }
 
         public static void AddPort(int port)
@@ -233,7 +288,7 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
             if (!reverseToIp)
             {
                 /* Convert to "long" */
-                if (String.IsNullOrEmpty(address))
+                if (string.IsNullOrEmpty(address))
                 {
                     return "0";
                 }
@@ -249,6 +304,20 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
             }
             /* Convert back to decimal/string */
             return IPAddress.Parse(address).ToString();
+        }
+
+        public static void AddDccHistory(string nick)
+        {
+            var list = SettingsManager.Settings.Dcc.History.Data;
+            foreach (var n in list.Where(n => n.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                /* Insert at top of list */
+                list.Insert(0, new SettingsDcc.SettingsDccHistory.SettingsDccHistoryData { Nick = n.Nick });
+                list.Remove(n);
+                return;
+            }
+            /* Insert at bottom of list */
+            list.Add(new SettingsDcc.SettingsDccHistory.SettingsDccHistoryData { Nick = nick });
         }
 
         /* Private helper methods */

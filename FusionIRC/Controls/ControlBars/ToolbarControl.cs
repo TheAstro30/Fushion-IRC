@@ -35,7 +35,7 @@ namespace FusionIRC.Controls.ControlBars
         private readonly ToolStripDropDownButton _btnConnectDrop;
         private readonly ToolStripButton _btnConnectToLocation;
         private readonly ToolStripButton _btnChanList;
-        private readonly ToolStripButton _btnAliases;
+        private readonly ToolStripButton _btnScripts;
         private readonly ToolStripButton _btnFavorites;
         private readonly ToolStripButton _btnJoin;
         private readonly ToolStripButton _btnPart;
@@ -45,7 +45,8 @@ namespace FusionIRC.Controls.ControlBars
         private readonly ToolStripButton _btnSend;
         private readonly ToolStripButton _btnChat;
         private readonly ToolStripButton _btnDcc;
-        
+
+        private readonly ToolStripButton _btnDownloads;
         private readonly ToolStripButton _btnLogs;
         
         private readonly ToolStripButton _btnUsers;
@@ -102,16 +103,16 @@ namespace FusionIRC.Controls.ControlBars
                                    ToolTipText = @"Channels list"
                                };
             _btnChanList.Click += ToolbarButtonClick;
-            /* Aliases */
-            _btnAliases = new ToolStripButton
+            /* Scripts */
+            _btnScripts = new ToolStripButton
                               {
                                   Image = Resources.aliases.ToBitmap(),
                                   ImageScaling = ToolStripItemImageScaling.None,
                                   Size = new Size(32, 32),
-                                  Tag = "ALIASES",
+                                  Tag = "SCRIPTS",
                                   ToolTipText = @"Script editor"
                               };
-            _btnAliases.Click += ToolbarButtonClick;
+            _btnScripts.Click += ToolbarButtonClick;
             /* Favorites */
             _btnFavorites = new ToolStripButton
                                 {
@@ -192,6 +193,16 @@ namespace FusionIRC.Controls.ControlBars
                               ToolTipText = @"DCC transfer manager"
                           };
             _btnDcc.Click += ToolbarButtonClick;
+            /* View downloads button */
+            _btnDownloads = new ToolStripButton
+                                {
+                                    Image = Resources.downloads.ToBitmap(),
+                                    ImageScaling = ToolStripItemImageScaling.None,
+                                    Size = new Size(32, 32),
+                                    Tag = "DOWNLOADS",
+                                    ToolTipText = @"View downloads"
+                                };
+            _btnDownloads.Click += ToolbarButtonClick;  
             /* View logs button */
             _btnLogs = new ToolStripButton
                            {
@@ -235,12 +246,30 @@ namespace FusionIRC.Controls.ControlBars
             /* Add the buttons to the toolbar */
             Items.AddRange(new ToolStripItem[]
                                {
-                                   _btnConnect, _btnConnectDrop, _btnConnectToLocation, new ToolStripSeparator(),
-                                   _btnSettings, _btnTheme,
-                                   _btnAliases, new ToolStripSeparator(), _btnChanList, _btnFavorites, _btnJoin,
+                                   _btnConnect,
+                                   _btnConnectDrop,
+                                   _btnConnectToLocation, 
+                                   new ToolStripSeparator(),
+                                   _btnSettings,
+                                   _btnTheme,
+                                   _btnScripts,
+                                   new ToolStripSeparator(),
+                                   _btnChanList,
+                                   _btnFavorites,
+                                   _btnJoin,
                                    _btnPart,
-                                   new ToolStripSeparator(), _btnSend, _btnChat, _btnDcc, new ToolStripSeparator(),
-                                   _btnLogs, _btnUsers, _btnAutos, new ToolStripSeparator(), _btnAbout
+                                   new ToolStripSeparator(),
+                                   _btnSend,
+                                   _btnChat,
+                                   _btnDcc, 
+                                   new ToolStripSeparator(),
+                                   _btnDownloads, 
+                                   _btnLogs, 
+                                   new ToolStripSeparator(), 
+                                   _btnUsers, 
+                                   _btnAutos, 
+                                   new ToolStripSeparator(),
+                                   _btnAbout
                                });
 
             _tmrCheck = new Timer
@@ -286,7 +315,7 @@ namespace FusionIRC.Controls.ControlBars
                     }
                     break;
 
-                case "ALIASES":
+                case "SCRIPTS":
                     var edit = WindowManager.FindClientWindow(@"FusionIRC - Script Editor");
                     if (edit != null)
                     {
@@ -354,13 +383,17 @@ namespace FusionIRC.Controls.ControlBars
                                 return;
                             }
                             CommandProcessor.Parse(c, WindowManager.GetActiveWindow(),
-                                                   string.Format("DCC {0} {1}", btn.Tag.ToString(), dcc.NickName));
+                                                   string.Format("DCC {0} {1}", btn.Tag, dcc.NickName));
                         }
                     }
                     break;
 
                 case "DCC":
                     DccManager.DccManagerWindow.Show(_owner);
+                    break;
+
+                case "DOWNLOADS":
+                    Functions.OpenProcess(Functions.MainDir(@"\downloads"));
                     break;
 
                 case "LOGS":

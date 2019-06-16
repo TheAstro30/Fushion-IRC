@@ -98,7 +98,6 @@ namespace ircScript.Classes.Parsers
                             {
                                 if (!ParseConditional(sp[1]))
                                 {
-                                    System.Diagnostics.Debug.Print(sp[1]);
                                     sw.Execute = false;
                                     _processCode = false;
                                 }

@@ -340,6 +340,7 @@ namespace FusionIRC.Helpers
             client.Parser.OnEndChannelList += Channel.OnEndChannelList;
             client.Parser.OnDccChat += DccManager.OnDccChat;
             client.Parser.OnDccSend += DccManager.OnDccSend;
+            client.Parser.OnDccAcceptResume += DccManager.OnDccAcceptResume;
         }
 
         private static void RemoveConnectionHandlers(ClientConnection client)
@@ -402,6 +403,7 @@ namespace FusionIRC.Helpers
             client.Parser.OnEndChannelList -= Channel.OnEndChannelList;
             client.Parser.OnDccChat -= DccManager.OnDccChat;
             client.Parser.OnDccSend -= DccManager.OnDccSend;
+            client.Parser.OnDccAcceptResume -= DccManager.OnDccAcceptResume;
         }
     }
 }

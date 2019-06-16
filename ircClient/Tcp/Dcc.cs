@@ -39,7 +39,15 @@ namespace ircClient.Tcp
         Uploading = 2,
         Completed = 3,
         Cancelled = 4,
-        Failed = 5
+        Failed = 5,
+        Timeout = 6
+    }
+
+    public enum DccWriteMode
+    {
+        Overwrite = 0,
+        SaveAs = 1,
+        Resume = 2
     }
 
     public class Dcc
@@ -52,13 +60,13 @@ namespace ircClient.Tcp
         private BinaryWriter _fileWrite;
 
         private FileStream _fileInput;
-        private BinaryReader _fileReader;
-
-        private uint _filePos;
-        private uint _bytesTotal;
+        private BinaryReader _fileReader;       
 
         private readonly Timer _timerSpeed;
         private int _speed;
+
+        private readonly Timer _timerTimeOut;
+        private int _timeOut;
 
         /* Events raised by this class */
         public event Action<Dcc> OnDccConnecting;
@@ -76,6 +84,11 @@ namespace ircClient.Tcp
 
         public bool IsConnected { get; set; }
 
+        /* Yes, child windows already have ClientConnection attached to them, however ... this class as a file
+         * transfer is created independantly from a child window, so - in order for "Resend" to work, this class
+         * needs to know which ClientConnection it was created on :) */
+        public ClientConnection Client { get; set; }
+
         public DccType DccType { get; set; }
         public DccChatType DccChatType { get; set; }
 
@@ -89,6 +102,9 @@ namespace ircClient.Tcp
         public uint FileSize { get; set; }
         public double Progress { get; set; }
         public int Speed { get; set; }
+        public uint FilePos { get; set; }
+        public uint BytesTotal { get; set; }
+        public int Remaining { get; set; }
 
         public bool IsResume { get; set; }
         
@@ -99,7 +115,12 @@ namespace ircClient.Tcp
 
         public string SpeedToString
         {
-            get { return string.Format("{0}/s", Functions.FormatBytes(Speed.ToString())); }
+            get { return IsConnected ? string.Format("{0}/s", Functions.FormatBytes(Speed.ToString())) : "--"; }
+        }
+
+        public string RemainingToString
+        {
+            get { return IsConnected ? FormatTime(Remaining) : "--"; }
         }
 
         /* Constructor */
@@ -110,6 +131,8 @@ namespace ircClient.Tcp
             /* Timer */
             _timerSpeed = new Timer {Interval = 1000};
             _timerSpeed.Tick += TimerSpeed;
+            _timerTimeOut = new Timer {Interval = 1000};
+            _timerTimeOut.Tick += TimerTimeOut;
             /* Socket handlers */
             _sock.OnDisconnected += OnSocketDisconnected;
             _sock.OnError += OnSocketError;
@@ -122,10 +145,9 @@ namespace ircClient.Tcp
         public void BeginConnect()
         {
             /* Called when connecting to the remote host */
-            if (IsConnected)
-            {
-                _sock.Close();                
-            }
+            _timeOut = 0;
+            _timerTimeOut.Enabled = true;
+            _sock.Close();              
             switch (DccType)
             {
                 case DccType.DccChat:
@@ -157,19 +179,15 @@ namespace ircClient.Tcp
                     switch (DccFileType)
                     {
                         case DccFileType.Download:
+                            /* Prepare file output */
+                            _fileOutput = new FileStream(string.Format(@"{0}\{1}", DccFolder, FileName),
+                                                         !IsResume ? FileMode.Create : FileMode.Append,
+                                                         FileAccess.Write, FileShare.ReadWrite | FileShare.Delete);
+                            _fileWrite = new BinaryWriter(_fileOutput);
                             if (!IsResume)
-                            {
-                                /* Prepare file output */
-                                _fileOutput = new FileStream(string.Format(@"{0}\{1}", DccFolder, FileName),
-                                                             FileMode.Create,
-                                                             FileAccess.Write, FileShare.ReadWrite | FileShare.Delete);
-                                _fileWrite = new BinaryWriter(_fileOutput);
+                            {                                
                                 /* Connect to host */
                                 _sock.Connect(Address, Port);
-                            }
-                            else
-                            {
-                                /* This will be implemented later */
                             }
                             break;
 
@@ -180,8 +198,8 @@ namespace ircClient.Tcp
                                                         FileShare.ReadWrite);
                             _fileReader = new BinaryReader(_fileInput);
                             /* Create socket as server */
-                            _filePos = 0;
-                            _bytesTotal = 0;
+                            FilePos = 0;
+                            BytesTotal = 0;
                             _sock.LocalPort = Port;
                             /* Binding */
                             if (SettingsManager.Settings.Dcc.Options.General.BindToIp)
@@ -192,8 +210,26 @@ namespace ircClient.Tcp
                             _sock.Listen();
                             break;
                     }
+                    Status = DccFileStatus.Waiting;
+                    if (OnDccTransferProgress != null)
+                    {
+                        OnDccTransferProgress(this);
+                    }
                     break;
             }
+        }
+
+        public void BeginGetResume()
+        {
+            Progress = Percentage();
+            BytesTotal = FilePos;
+            _sock.Connect(Address, Port);
+        }
+
+        public void BeginSendResume()
+        {
+            Progress = Percentage();
+            _fileReader.BaseStream.Position = FilePos;
         }
 
         public void Disconnect()
@@ -219,6 +255,8 @@ namespace ircClient.Tcp
                                 _fileReader.Close();
                             }
                             _timerSpeed.Enabled = false;
+                            _timeOut = 0;
+                            _timerTimeOut.Enabled = false;
                             Status = DccFileStatus.Cancelled;
                             if (OnDccTransferProgress != null)
                             {
@@ -242,6 +280,7 @@ namespace ircClient.Tcp
         /* Socket callbacks */
         private void OnSocketDisconnected(ClientSock sock)
         {
+            IsConnected = false;
             switch (DccType)
             {
                 case DccType.DccFileTransfer:
@@ -255,45 +294,19 @@ namespace ircClient.Tcp
                         _fileInput.Close();
                         _fileReader.Close();
                     }
-                    _timerSpeed.Enabled = false;
-                    switch (DccFileType)
-                    {
-                        case DccFileType.Download:
-                            if (_bytesTotal == FileSize)
-                            {
-                                /* Success */
-                                System.Diagnostics.Debug.Print("DCC get success");
-                                Status = DccFileStatus.Completed;
-                            }
-                            else
-                            {
-                                /* Failed */
-                                System.Diagnostics.Debug.Print("DCC get failed");
-                                Status = DccFileStatus.Failed;
-                            }
-                            break;
-
-                        case DccFileType.Upload:
-                            if (_bytesTotal == FileSize)
-                            {
-                                /* Success */
-                                System.Diagnostics.Debug.Print("DCC send success");
-                                Status = DccFileStatus.Completed;
-                            }
-                            else
-                            {
-                                /* Failed */
-                                System.Diagnostics.Debug.Print("DCC send failed");
-                                Status = DccFileStatus.Failed;
-                            }
-                            break;
-                    }
+                    _timerSpeed.Enabled = false;                    
                     Progress = Percentage();
-                    if (OnDccTransferProgress != null)
+                    if (Status != DccFileStatus.Timeout)
                     {
-                        OnDccTransferProgress(this);
+                        Status = BytesTotal == FileSize ? DccFileStatus.Completed : DccFileStatus.Failed;
+                        if (OnDccTransferProgress != null)
+                        {
+                            OnDccTransferProgress(this);
+                        }
                     }
                     /* Timeout timer */
+                    _timeOut = 0;
+                    _timerTimeOut.Enabled = false;
                     break;
 
                 case DccType.DccChat:
@@ -302,17 +315,26 @@ namespace ircClient.Tcp
                         OnDccDisconnected(this);
                     }
                     break;
-            }
-            IsConnected = false;
+            }            
         }
 
         private void OnSocketError(ClientSock sock, string description)
-        {            
+        {
+            IsConnected = false;
             switch (DccType)
             {
                 case DccType.DccFileTransfer:
+                    _timeOut = 0;
+                    _timerTimeOut.Enabled = false;
                     _timerSpeed.Enabled = false;
-                    Status = DccFileStatus.Failed;
+                    if (Status != DccFileStatus.Timeout)
+                    {
+                        Status = DccFileStatus.Failed;
+                        if (OnDccTransferProgress != null)
+                        {
+                            OnDccTransferProgress(this);
+                        }
+                    }
                     break;
 
                 case DccType.DccChat:
@@ -322,7 +344,6 @@ namespace ircClient.Tcp
                     }
                     break;
             }
-            IsConnected = false;
         }
 
         private void OnSocketConnected(ClientSock sock)
@@ -336,9 +357,15 @@ namespace ircClient.Tcp
                         case DccFileType.Download:
                             _timerSpeed.Enabled = true;
                             /* Timeout timer disable */
+                            _timeOut = 0;
+                            _timerTimeOut.Enabled = false;
+                            Status = DccFileStatus.Downloading;
+                            if (OnDccTransferProgress != null)
+                            {
+                                OnDccTransferProgress(this);
+                            }
                             break;
-                    }
-                    Status = DccFileStatus.Downloading;
+                    }                    
                     break;
 
                 case DccType.DccChat:
@@ -358,7 +385,14 @@ namespace ircClient.Tcp
             {
                 case DccType.DccFileTransfer:
                     Status = DccFileStatus.Uploading;
+                    if (OnDccTransferProgress != null)
+                    {
+                        OnDccTransferProgress(this);
+                    }
                     _timerSpeed.Enabled = true;
+                    /* Timeout timer disable */
+                    _timeOut = 0;
+                    _timerTimeOut.Enabled = false;
                     /* Send first packet of data to remote client */
                     SendPacket();
                     break;
@@ -397,32 +431,30 @@ namespace ircClient.Tcp
                     break;
 
                 case DccType.DccFileTransfer:
-                    byte[] bytes = { };
+                    byte[] bytes = {};
                     switch (DccFileType)
                     {
                         case DccFileType.Download:
-                            /* Receiving file */
+                            /* Receiving file */ 
+                            if (_fileWrite == null)
+                            {
+                                return;
+                            }
                             _sock.GetData(ref bytes);
-                            _bytesTotal += (uint)bytes.Length;
+                            BytesTotal += (uint)bytes.Length;
                             /* Dump to file */
                             _fileWrite.Write(bytes);
-                            /* Are we at the end of file? */
-                            if (_bytesTotal >= FileSize)
-                            {
-                                /* Transfer complete (begin socket close) */
-                                
-                            }
-                            /* Confirm bytes sent */
-                            _sock.SendData(PutBytes(_bytesTotal));
+                            /* Confirm bytes sent (total bytes) */
+                            _sock.SendData(PutBytes(BytesTotal));
                             _speed += bytesTotal;
                             break;
 
                         case DccFileType.Upload:
                             /* Sending file, we get the confirm bytes */
                             _sock.GetData(ref bytes);
-                            _bytesTotal = GetBytes(bytes);
+                            BytesTotal = GetBytes(bytes);
                             _speed += SettingsManager.Settings.Dcc.Options.General.PacketSize;
-                            if (_bytesTotal == _filePos)
+                            if (BytesTotal == FilePos)
                             {
                                 /* Send more data */
                                 SendPacket();
@@ -443,9 +475,9 @@ namespace ircClient.Tcp
             var buffSize = SettingsManager.Settings.Dcc.Options.General.PacketSize;
             /* Get a data packet within the reading stream by our send buffer size
                (was orignally FilePos + 1) */
-            if (FileSize - _filePos < buffSize)
+            if (FileSize - FilePos < buffSize)
             {
-                buffSize = (int)(FileSize - _filePos);
+                buffSize = (int)(FileSize - FilePos);
             }
             /* No more to send, wait for remote client */
             if (buffSize == 0)
@@ -453,7 +485,7 @@ namespace ircClient.Tcp
                 return;
             }
             var bytes = _fileReader.ReadBytes(buffSize);
-            _filePos += (uint)buffSize;
+            FilePos += (uint)buffSize;
             if (_sock.GetState != WinsockStates.Connected)
             {
                 _timerSpeed.Enabled = false;
@@ -484,8 +516,18 @@ namespace ircClient.Tcp
         private double Percentage()
         {
             /* This shouldn't fail but can sometimes return Infinaty */
-            var percent = ((float)_bytesTotal / FileSize) * 100;
+            var percent = ((float)BytesTotal / FileSize) * 100;
             return (int)percent >= 0 ? Math.Round(percent, 1) : 0;
+        }
+
+        private static string FormatTime(int seconds)
+        {
+            var t = TimeSpan.FromSeconds(seconds);
+            return seconds >= 3600
+                       ? string.Format("{0}h {1}m {2}s", t.Hours, t.Minutes, t.Seconds)
+                       : seconds >= 60
+                             ? string.Format("{0}m {1}s", t.Minutes, t.Seconds)
+                             : string.Format("{0}s", t.Seconds);
         }
 
         /* Timers */
@@ -493,11 +535,32 @@ namespace ircClient.Tcp
         {
             Progress = Percentage();
             Speed = _speed;
+            if (Speed > 0)
+            {
+                Remaining = (int)((FileSize - BytesTotal) / Speed);
+            } 
             if (OnDccTransferProgress != null)
             {
                 OnDccTransferProgress(this);
             }
             _speed = 0;
+        }
+
+        private void TimerTimeOut(object sender, EventArgs e)
+        {
+            if (_timeOut >= SettingsManager.Settings.Dcc.Options.Timeouts.GetSendTransfer)
+            {
+                _timeOut = 0;
+                _timerTimeOut.Enabled = false;
+                _sock.Close();
+                Status = DccFileStatus.Timeout;
+                if (OnDccTransferProgress != null)
+                {
+                    OnDccTransferProgress(this);
+                }
+                return;
+            }
+            _timeOut++;
         }
     }
 }

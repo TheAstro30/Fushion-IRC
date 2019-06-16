@@ -28,6 +28,7 @@ using ircCore.Settings.Channels;
 using ircCore.Settings.Networks;
 using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
+using ircCore.Users;
 using ircCore.Utils;
 using ircScript;
 using ircScript.Classes;
@@ -700,6 +701,11 @@ namespace FusionIRC.Forms.Child
             {
                 return;
             }
+            /* Bring window to front */
+            if (this != WindowManager.LastActiveChild)
+            {
+                Activate();
+            }
             var p = new Point(Output.ClientRectangle.Left + e.X, Output.ClientRectangle.Top + e.Y);
             switch (WindowType)
             {
@@ -922,6 +928,16 @@ namespace FusionIRC.Forms.Child
 
         private void NicklistRightClick(MouseEventArgs e)
         {
+            /* At least one nick name must be selected */
+            if (Nicklist.SelectedNicks.Count == 0)
+            {
+                return;
+            }
+            /* Bring window to front */
+            if (this != WindowManager.LastActiveChild)
+            {
+                Activate();
+            }
             var p = new Point(Nicklist.ClientRectangle.Left + e.X, Nicklist.ClientRectangle.Top + e.Y);
             PopupManager.Nicklist.Show(Nicklist, p);
         }
@@ -1032,11 +1048,17 @@ namespace FusionIRC.Forms.Child
 
         private void OnDccChatText(Dcc dcc, string text)
         {
+            var nick = Tag.ToString().Substring(1);
+            var ial = Client.Ial.Get(nick);
+            if (UserManager.IsIgnored(!string.IsNullOrEmpty(ial) ? ial : nick))
+            {
+                return;
+            }
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.PrivateText,
                               TimeStamp = DateTime.Now,
-                              Nick = Tag.ToString().Substring(1),
+                              Nick = nick,
                               Text = text
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
@@ -1047,11 +1069,17 @@ namespace FusionIRC.Forms.Child
 
         private void OnDccChatAction(Dcc dcc, string text)
         {
+            var nick = Tag.ToString().Substring(1);
+            var ial = Client.Ial.Get(nick);
+            if (UserManager.IsIgnored(!string.IsNullOrEmpty(ial) ? ial : nick))
+            {
+                return;
+            }
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.PrivateActionText,
                               TimeStamp = DateTime.Now,
-                              Nick = Tag.ToString().Substring(1),
+                              Nick = nick,
                               Text = text
                           };
             var pmd = ThemeManager.ParseMessage(tmd);

@@ -86,6 +86,7 @@ namespace ircClient.Parsing
 
         public event Action<ClientConnection, string, string, string, string> OnDccChat;
         public event Action<ClientConnection, string, string, string, string, string, string> OnDccSend;
+        public event Action<ClientConnection, bool, string, string, string, string> OnDccAcceptResume;
        
         /* Public properties */
         public string JoinChannelsOnConnect { get; set; }
@@ -384,11 +385,17 @@ namespace ircClient.Parsing
                 case "310":
                 case "313":
                 case "316":
-                case "330":
+                case "320":
                 case "378":
                 case "379":
+                case "671":
                     /* Whois replies */
                     Whois.OtherInfo.Add(fourth.Replace(":", ""));
+                    break;
+
+                case "330":
+                    /* Whois <nick> <nick> :is logged in as */
+                    Whois.OtherInfo.Add(ParseRaw(fourth));
                     break;
 
                 case "317":
@@ -755,7 +762,8 @@ namespace ircClient.Parsing
                             {
                                 return;
                             }
-                            switch (sp[0].ToUpper())
+                            var com = sp[0].ToUpper();
+                            switch (com)
                             {
                                 case "CHAT":
                                     /* CHAT chat 2130706433 1024 */
@@ -771,6 +779,15 @@ namespace ircClient.Parsing
                                     {
                                         OnDccSend(_client, n[0], n.Length > 1 ? n[1] : string.Empty, sp[1], sp[2],
                                                   sp[3], sp.Length > 4 ? sp[4] : "0");
+                                    }
+                                    break;
+
+                                case "ACCEPT":
+                                case "RESUME":
+                                    /* Remote client has accepted a resume request or is requesting a resume request */
+                                    if (OnDccAcceptResume != null)
+                                    {
+                                        OnDccAcceptResume(_client, com == "ACCEPT", n[0], sp[1].Replace("\"", string.Empty), sp[2], sp[3]);
                                     }
                                     break;
                             }                            

@@ -84,6 +84,9 @@
     <Compile Include="Forms\DirectClientConnection\FrmDccConfirm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\DirectClientConnection\FrmDccExists.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\DirectClientConnection\FrmDccNicks.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -387,6 +390,7 @@
     <None Include="Icons\Toolbar\dccChat.ico" />
     <None Include="Icons\Toolbar\dccSend.ico" />
     <None Include="Icons\Dialog\dccChatRequest.ico" />
+    <None Include="Icons\Toolbar\downloads.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

@@ -128,8 +128,7 @@ namespace FusionIRC.Helpers.Connection
             /* Send notify */
             if (client.Parser.AllowsWatch)
             {
-                var nicks = UserManager.GetNotifyList();
-                System.Diagnostics.Debug.Print(string.Format("WATCH +{0}", string.Join(" ", nicks.Select(o => o.Nick).ToArray()).Replace(" ", " +")));
+                var nicks = UserManager.GetNotifyList();                
                 client.Send(string.Format("WATCH +{0}", string.Join(" ", nicks.Select(o => o.Nick).ToArray()).Replace(" ", " +")));
             }
         }

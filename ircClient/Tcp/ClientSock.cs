@@ -407,7 +407,6 @@ namespace ircClient.Tcp
             _byteData.RemoveAt(0);
             if (byt == null)
             {
-                Debug.Print("SOCKET: byt parameter is null");
                 return;
             }
             bytes = new byte[byt.Length];
@@ -610,14 +609,17 @@ namespace ircClient.Tcp
                         Close();
                         _buffer = new byte[BufferSize];
                         return;
-                    }                  
-                    var buffer = _buffer; /* Marshal-by-reference may cause runtime exception when passed by ref/out as in the next line... */
-                    Array.Resize(ref buffer, intCount);
-                    _buffer = buffer; /* Shouldn't have to re-assign it back, but doesn't work without doing so... */
-                    _byteData.Add(_buffer);
+                    }   
+                    /* Doing it the following way seems to be more logical than the way I had it */
+                    var buffer = new byte[intCount];
+                    //var buffer = _buffer; /* Marshal-by-reference may cause runtime exception when passed by ref/out as in the next line... */
+                    //Array.Resize(ref buffer, intCount);
+                    //_buffer = buffer; /* Shouldn't have to re-assign it back, but doesn't work without doing so... */
+                    Array.Copy(_buffer, buffer, intCount);
+                    _byteData.Add(buffer);
                     if (OnDataArrival != null)
                     {
-                        _sync.Execute(() => OnDataArrival(this, _buffer.Length));                        
+                        _sync.Execute(() => OnDataArrival(this, buffer.Length));                        
                     }
                     _buffer = new byte[BufferSize];
                     if (IsSsl)

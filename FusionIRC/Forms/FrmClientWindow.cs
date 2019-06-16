@@ -11,13 +11,10 @@ using System.Windows.Forms;
 using FusionIRC.Controls.ControlBars;
 using FusionIRC.Controls.SwitchView;
 using FusionIRC.Forms.Child;
-using FusionIRC.Forms.DirectClientConnection;
-using FusionIRC.Forms.DirectClientConnection.Helper;
 using FusionIRC.Forms.Misc;
 using FusionIRC.Helpers;
 using FusionIRC.Helpers.Commands;
 using FusionIRC.Properties;
-using ircClient.Tcp;
 using ircCore.Autos;
 using ircCore.Controls;
 using ircCore.Settings;
@@ -641,7 +638,7 @@ namespace FusionIRC.Forms
                 case PopupType.Channel:
                 case PopupType.Nicklist:
                     e.Channel = c.Tag.ToString();
-                    if (c.Nicklist.SelectedNicks.Count > 0)
+                    if (c.Nicklist != null && c.Nicklist.SelectedNicks.Count > 0)
                     {
                         e.Nick = c.Nicklist.SelectedNicks[0];
                         args = c.Nicklist.SelectedNicks.ToArray();
@@ -650,7 +647,8 @@ namespace FusionIRC.Forms
 
                 case PopupType.Private:
                 case PopupType.DccChat:
-                    e.Nick = c.Tag.ToString();
+                    var nick = c.Tag.ToString();
+                    e.Nick = nick[0] == '=' ? nick.Substring(1) : nick;
                     break;
             }
             s.LineParsed += PopupLineParsed;
@@ -661,7 +659,6 @@ namespace FusionIRC.Forms
 
         private static void PopupLineParsed(Script s, ScriptArgs e, string lineData)
         {
-            System.Diagnostics.Debug.Print(lineData);
             CommandProcessor.Parse(e.ClientConnection, (FrmChildWindow) e.ChildWindow, lineData);
         }
 
