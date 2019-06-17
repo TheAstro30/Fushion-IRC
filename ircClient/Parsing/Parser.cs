@@ -5,7 +5,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using ircClient.Parsing.Helpers;
 using ircCore.Utils;
 
@@ -60,7 +59,7 @@ namespace ircClient.Parsing
         public event Action<ClientConnection, string, string> OnTopicSetBy;
         public event Action<ClientConnection, string, string, string> OnTopicChanged;
 
-        public event Action<ClientConnection, string, string, string> OnCtcp;
+        public event Action<ClientConnection, string, string, string, string> OnCtcp;
         public event Action<ClientConnection, string, string, string, string> OnCtcpReply;
         public event Action<ClientConnection> OnWhois;
         public event Action<ClientConnection, string> OnRaw;
@@ -715,31 +714,14 @@ namespace ircClient.Parsing
                 /* You were messaged */
                 if (s[0] == '\x01')
                 {
-                    /* Either a CTCP or ACTION */
+                    /* Either a CTCP, DCC or ACTION */
                     s = RemoveColon(s.Substring(1, s.Length - 2));
-                    switch (s)
-                    {
-                        case "VERSION":
-                            /* We cannot use "GetExecutingAssembly" here to get the version information from the main
-                             * executable as this DLL IS the executing assembly - so we use "GetEntryAssembly" instead,
-                             * which is basically the same as the original assembly that "called" this DLL */
-                            var version = Assembly.GetEntryAssembly().GetName().Version;
-                            _client.Send(
-                                string.Format(
-                                    "NOTICE {0} :{1}VERSION FusionIRC v{2}.{3}.{4} by Jason James Newland{5}", n[0],
-                                    (char) 1, version.Major, version.Minor, version.MinorRevision, (char) 1));
-                            break;
-
-                        case "TIME":
-                            _client.Send(string.Format("NOTICE {0} :{1}TIME {2}{3}", n[0], (char) 1, string.Format("{0:ddd dd MMM yyyy, H:mm:ss tt}", DateTime.Now), (char) 1));
-                            break;
-                    }
                     i = s.IndexOf(' ');
                     if (i == -1)
                     {
                         if (OnCtcp != null)
                         {
-                            OnCtcp(_client, n[0], n.Length > 1 ? n[1] : string.Empty, s);
+                            OnCtcp(_client, n[0], n.Length > 1 ? n[1] : string.Empty, s, string.Empty);
                         }
                         /* Ignore it */
                         return;
@@ -748,11 +730,10 @@ namespace ircClient.Parsing
                     var t = s.Substring(i, s.Length - i).Trim();
                     switch (ctcp)
                     {
-                        case "PING":
-                            _client.Send(string.Format("NOTICE {0} :{1}PING {2}{3}", n[0], (char) 1, t, (char) 1));
+                        case "PING":                            
                             if (OnCtcp != null)
                             {
-                                OnCtcp(_client, n[0], n.Length > 1 ? n[1] : string.Empty, ctcp);
+                                OnCtcp(_client, n[0], n.Length > 1 ? n[1] : string.Empty, ctcp, t);
                             }
                             break;
 

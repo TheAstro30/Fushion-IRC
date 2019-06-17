@@ -6,6 +6,7 @@
 using System;
 using ircCore.Controls.ChildWindows.OutputDisplay;
 using ircCore.Settings.Theming;
+using ircCore.Settings.Theming.Structures;
 
 namespace FusionIRC.Forms.Theming.Helpers
 {

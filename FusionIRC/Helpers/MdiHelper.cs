@@ -25,7 +25,7 @@ namespace FusionIRC.Helpers
         private const int SbBoth = 3;
         private const int WmMdinext = 0x224;
         private const int Wfnccalcsize = 131;
-
+        
         private readonly Form _parentForm;
         private readonly MdiClient _mdiClient;
 

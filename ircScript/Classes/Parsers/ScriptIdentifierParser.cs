@@ -345,6 +345,27 @@ namespace ircScript.Classes.Parsers
 
                 case "LOWER":
                     return argList.Length == 1 ? argList[0].ToLower() : string.Empty;
+
+                case "STRIP":
+                    return argList.Length > 0 ? Functions.StripControlCodes(argList[0], true) : string.Empty;
+
+                case "RAND":
+                    if (argList.Length == 2)
+                    {
+                        int low;
+                        if (!int.TryParse(argList[0], out low))
+                        {
+                            return string.Empty;
+                        }
+                        int hi;
+                        if (!int.TryParse(argList[1], out hi))
+                        {
+                            return string.Empty;
+                        }
+                        var rand = new Random();
+                        return rand.Next(low, hi).ToString();
+                    }
+                    return string.Empty;
             }
             return string.Empty;
         }

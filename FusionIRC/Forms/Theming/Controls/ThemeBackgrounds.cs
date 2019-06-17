@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using FusionIRC.Forms.Theming.Helpers;
 using ircCore.Controls.ChildWindows.OutputDisplay.Helpers;
 using ircCore.Settings.Theming;
+using ircCore.Settings.Theming.Structures;
 
 namespace FusionIRC.Forms.Theming.Controls
 {
@@ -121,7 +122,7 @@ namespace FusionIRC.Forms.Theming.Controls
 
         private void SaveSelectedImageData(ChildWindowType type, BackgroundStrip bs)
         {
-            var bg = new Theme.ThemeBackgroundData {Path = bs.SelectedImage, LayoutStyle = bs.LayoutStyle};
+            var bg = new ThemeBackgroundData {Path = bs.SelectedImage, LayoutStyle = bs.LayoutStyle};
             CurrentTheme.ThemeBackgrounds[type] = bg;
         }
 

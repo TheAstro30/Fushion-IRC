@@ -16,6 +16,7 @@ using ircClient.Tcp;
 using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
+using ircCore.Users;
 using ircCore.Utils;
 
 namespace FusionIRC.Forms.DirectClientConnection.Helper
@@ -38,15 +39,26 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
         /* Server callbacks */
         public static void OnDccChat(ClientConnection client, string nick, string address, string ip, string port)
         {
-            using (var d = new FrmDccConfirm(DccType.DccChat)
-                            {
-                                NickName = String.Format("{0} ({1})", nick, address),
-                            })
+            /* Check the nick isn't ignored first */
+            if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
             {
-                if (d.ShowDialog(WindowManager.MainForm) == DialogResult.Cancel)
-                {
+                return;
+            }
+            /* Auto-accept is the default action and is not checked here */
+            switch (SettingsManager.Settings.Dcc.Requests.ChatRequest)
+            {
+                case DccRequestAction.Ask:
+                    using (var d = new FrmDccConfirm(DccType.DccChat) {NickName = String.Format("{0} ({1})", nick, address)})
+                    {
+                        if (d.ShowDialog(WindowManager.MainForm) == DialogResult.Cancel)
+                        {
+                            return;
+                        }
+                    }
+                    break;
+
+                case DccRequestAction.Ignore:
                     return;
-                }
             }
             /* Port */
             int p;
@@ -71,6 +83,11 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
 
         public static void OnDccSend(ClientConnection client, string nick, string address, string file, string ip, string port, string length)
         {
+            /* Check the nick isn't ignored first */
+            if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
+            {
+                return;
+            }
             /* Check current DCC filter settings to see if this file is acceptable to download */
             var f = CheckFilter(file);
             var ignore = false;
@@ -83,78 +100,96 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
                     ignore = !f;
                     if (f)
                     {
-                        /* This file is allowed - show request dialog */
-                        using (var req = new FrmDccConfirm(DccType.DccFileTransfer) { FileName = file, NickName = string.Format("{0} ({1})", nick, address) })
+                        /* This file is allowed */
+                        uint i;
+                        if (!uint.TryParse(length, out i))
                         {
-                            if (req.ShowDialog(WindowManager.MainForm) == DialogResult.OK)
-                            {
-                                /* Create a new DCC get, add it to list of files */
-                                uint i;
-                                if (!uint.TryParse(length, out i))
+                            return;
+                        }
+                        int p;
+                        if (!int.TryParse(port, out p))
+                        {
+                            return;
+                        }
+                        var resume = false;
+                        var path = Functions.MainDir(@"\downloads");
+                        var fullPath = string.Format(@"{0}\{1}", path, file);
+                        var fs = new FileInfo(fullPath);
+                        /* Auto-accept is the default action and is not checked here */
+                        switch (SettingsManager.Settings.Dcc.Requests.GetRequest)
+                        {
+                            case DccRequestAction.Ask:
+                                using (var req = new FrmDccConfirm(DccType.DccFileTransfer) { FileName = file, NickName = string.Format("{0} ({1})", nick, address) })
                                 {
-                                    return;
-                                }
-                                int p;
-                                if (!int.TryParse(port, out p))
-                                {
-                                    return;
-                                }
-                                /* Check if the file already exists */
-                                var path = Functions.MainDir(@"\downloads");
-                                var fullPath = string.Format(@"{0}\{1}", path, file);
-                                var fs = new FileInfo(fullPath);
-                                var resume = false;
-                                if (File.Exists(fullPath))
-                                {                                    
-                                    var type = fs.Length < i ? DccWriteMode.Resume : DccWriteMode.SaveAs;
-                                    using (var de = new FrmDccExists(type, fullPath))
+                                    if (req.ShowDialog(WindowManager.MainForm) == DialogResult.Cancel)
                                     {
-                                        if (de.ShowDialog(DccManagerWindow) == DialogResult.Cancel)
+                                        return;
+                                    }
+                                    /* Check if the file already exists */
+                                    if (File.Exists(fullPath))
+                                    {
+                                        /* Overwrite option is the default action and not checked here */
+                                        switch (SettingsManager.Settings.Dcc.Requests.GetFileExists)
                                         {
-                                            return;
+                                            case DccFileExistsAction.Ask:
+                                                var type = fs.Length < i ? DccWriteMode.Resume : DccWriteMode.SaveAs;
+                                                using (var de = new FrmDccExists(type, fullPath))
+                                                {
+                                                    if (de.ShowDialog(DccManagerWindow) == DialogResult.Cancel)
+                                                    {
+                                                        return;
+                                                    }
+                                                    file = Path.GetFileName(de.FileName);
+                                                    path = Path.GetDirectoryName(de.FileName);
+                                                    resume = de.WriteMode == DccWriteMode.Resume;
+                                                }
+                                                break;
+
+                                            case DccFileExistsAction.Cancel:
+                                                return;
                                         }
-                                        file = Path.GetFileName(de.FileName);
-                                        path = Path.GetDirectoryName(de.FileName);
-                                        resume = de.WriteMode == DccWriteMode.Resume;
                                     }
                                 }
-                                var dcc = GetTransfer(nick, file);
-                                if (dcc == null)
-                                {
-                                    dcc = new Dcc(DccManagerWindow)
-                                              {
-                                                  Client = client,
-                                                  DccType = DccType.DccFileTransfer,
-                                                  DccFileType = DccFileType.Download,
-                                                  UserName = nick,
-                                                  Address = IpConvert(ip, true),
-                                                  Port = p,
-                                                  DccFolder = path,
-                                                  FileName = file,                                                  
-                                                  FileSize = i
-                                              };
-                                    dcc.OnDccTransferProgress += OnDccTransferProgress;
-                                    AddDccHistory(nick);
-                                    AddPort(p);
-                                    AddTransfer(dcc);
-                                }
-                                dcc.IsResume = resume;
-                                if (resume)
-                                {
-                                    /* We request the sender to resume */                                    
-                                    client.Send(string.Format("PRIVMSG {0} :\u0001DCC RESUME \"{1}\" {2} {3}\u0001",
-                                                              nick, file, port, fs.Length));
-                                }
-                                /* Make sure the current port hasn't changed, sometimes mIRC changes the port when resending */
-                                if (dcc.Port != p)
-                                {
-                                    RemovePort(dcc.Port);
-                                    dcc.Port = p;
-                                    AddPort(p);
-                                }
-                                dcc.BeginConnect();
-                            }
+                                break;
+
+                            case DccRequestAction.Ignore:
+                                return;
+                        }                        
+                        var dcc = GetTransfer(nick, file);
+                        if (dcc == null)
+                        {
+                            dcc = new Dcc(DccManagerWindow)
+                                      {
+                                          Client = client,
+                                          DccType = DccType.DccFileTransfer,
+                                          DccFileType = DccFileType.Download,
+                                          UserName = nick,
+                                          Address = IpConvert(ip, true),
+                                          Port = p,
+                                          DccFolder = path,
+                                          FileName = file,
+                                          FileSize = i
+                                      };
+                            dcc.OnDccTransferProgress += OnDccTransferProgress;
+                            AddDccHistory(nick);
+                            AddPort(p);
+                            AddTransfer(dcc);
                         }
+                        dcc.IsResume = resume;
+                        if (resume)
+                        {
+                            /* We request the sender to resume */
+                            client.Send(string.Format("PRIVMSG {0} :\u0001DCC RESUME \"{1}\" {2} {3}\u0001",
+                                                      nick, file, port, fs.Length));
+                        }
+                        /* Make sure the current port hasn't changed, sometimes mIRC changes the port when resending */
+                        if (dcc.Port != p)
+                        {
+                            RemovePort(dcc.Port);
+                            dcc.Port = p;
+                            AddPort(p);
+                        }
+                        dcc.BeginConnect();
                         return;
                     }
                     break;

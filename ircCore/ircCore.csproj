@@ -129,6 +129,7 @@
     <Compile Include="Settings\SettingsBase\Structures\SettingsDcc.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsEditor.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsFind.cs" />
+    <Compile Include="Settings\SettingsBase\Structures\SettingsFlash.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsIdentd.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsLocalInfo.cs" />
     <Compile Include="Settings\SettingsBase\Structures\SettingsLog.cs" />
@@ -142,6 +143,9 @@
     <Compile Include="Controls\FormEx.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Settings\Theming\Structures\IncomingMessageData.cs" />
+    <Compile Include="Settings\Theming\Structures\ThemeBackgroundData.cs" />
+    <Compile Include="Settings\Theming\Structures\ThemeSoundData.cs" />
     <Compile Include="Users\UserManager.cs" />
     <Compile Include="Users\UserList.cs" />
     <Compile Include="Utils\DirectX\Sound.cs" />

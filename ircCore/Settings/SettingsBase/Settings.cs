@@ -120,6 +120,10 @@ namespace ircCore.Settings.SettingsBase
             /* Show information */
             Client.Show.PingPong = true;
             Client.Show.Motd = true;
+            /* Flash */
+            Client.Flash.Channel = true;
+            Client.Flash.Private = true;
+            Client.Flash.Chat = true;
             /* Logging */
             Client.Logging.LogPath = @"\logs";
             /* Mouse */

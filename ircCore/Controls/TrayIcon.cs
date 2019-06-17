@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using ircCore.Controls.Notification;
 
@@ -17,9 +18,29 @@ namespace ircCore.Controls
     {
         /* Notification icon control/class (inherit on main form)
            By: Jason James Newland
-           ©2012 - KangaSoft Software
+           ©2012/2019 - KangaSoft Software
            All Rights Reserved
          */
+        internal struct FlashWInfo
+        {
+            public UInt32 Size;
+            public IntPtr Hwnd;
+            public FlashWindowExOption Flags;
+            public UInt32 Count;
+            public UInt32 Timeout;
+        }
+
+        [Flags]
+        internal enum FlashWindowExOption : uint
+        {  
+            FlashwStop = 0,
+            FlashwCaption = 1,
+            FlashwTray = 2,
+            FlashwAll = 3,
+            FlashwTimer = 4,
+            FlashwTimerNoFg = 12
+        }
+
         private Image _renderBmp;
 
         private int _positionY;
@@ -28,6 +49,16 @@ namespace ircCore.Controls
         private FormWindowState _lastWindowState = FormWindowState.Normal;
 
         private readonly List<PopupNotifier> _popups = new List<PopupNotifier>();
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool FlashWindowEx(ref FlashWInfo pwfi);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr GetForegroundWindow();
+
+        /* Public properties */
+        public bool Inactive { get; set; }
 
         public NotifyIcon TrayNotifyIcon { get; set; }
 
@@ -43,6 +74,22 @@ namespace ircCore.Controls
                 _trayAlwaysShowIcon = value;
                 TrayNotifyIcon.Visible = _trayAlwaysShowIcon;
             }
+        }
+
+        protected override void OnActivated(EventArgs e)
+        {
+            if (GetForegroundWindow() != Handle || Inactive)
+            {
+                return;
+            }
+            Inactive = false;
+            base.OnActivated(e);
+        }
+
+        protected override void OnDeactivate(EventArgs e)
+        {
+            Inactive = true;
+            base.OnDeactivate(e);
         }
 
         public override Image BackgroundImage
@@ -108,6 +155,24 @@ namespace ircCore.Controls
             base.OnResize(e);
         }
 
+        /* Public methods */
+        public void FlashWindow()
+        {
+            if (!Inactive || !Visible)
+            {
+                return;
+            }
+            var fInfo = new FlashWInfo
+                            {
+                                Hwnd = Handle,
+                                Flags = FlashWindowExOption.FlashwAll | FlashWindowExOption.FlashwTimerNoFg,
+                                Count = UInt32.MaxValue,
+                                Timeout = 0
+                            };
+            fInfo.Size = Convert.ToUInt32(Marshal.SizeOf(fInfo));
+            FlashWindowEx(ref fInfo);
+        }
+
         public void ShowNotificationPopup(string title, string text, int height)
         {
             if (!TrayShowNotifications || !TrayNotifyIcon.Visible)
@@ -156,6 +221,6 @@ namespace ircCore.Controls
             Show();
             WindowState = _lastWindowState;
             Activate();
-        }
+        }   
     }
 }

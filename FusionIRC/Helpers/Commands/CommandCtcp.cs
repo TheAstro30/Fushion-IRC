@@ -5,7 +5,9 @@
  */
 using System;
 using ircClient;
+using ircCore.Settings;
 using ircCore.Settings.Theming;
+using ircCore.Settings.Theming.Structures;
 using ircCore.Utils;
 
 namespace FusionIRC.Helpers.Commands
@@ -35,6 +37,15 @@ namespace FusionIRC.Helpers.Commands
                           };
             var pmd = ThemeManager.ParseMessage(tmd);
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
+            if (SettingsManager.Settings.Client.Show.Ctcps)
+            {
+                var active = WindowManager.GetActiveWindow();
+                if (active != c && active.Client == client)
+                {
+                    /* Active window of this connection */
+                    active.Output.AddLine(pmd.DefaultColor, pmd.Message);
+                }
+            }
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
             client.Send(ct == "PING"

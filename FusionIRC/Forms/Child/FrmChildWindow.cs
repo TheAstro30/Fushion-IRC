@@ -28,6 +28,7 @@ using ircCore.Settings.Channels;
 using ircCore.Settings.Networks;
 using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
+using ircCore.Settings.Theming.Structures;
 using ircCore.Users;
 using ircCore.Utils;
 using ircScript;
@@ -1065,6 +1066,11 @@ namespace FusionIRC.Forms.Child
             Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(this, WindowManager.MainForm, WindowEvent.MessageReceived);
+            /* Flash main window if inactive */
+            if (SettingsManager.Settings.Client.Flash.Chat)
+            {
+                ((TrayIcon)MdiParent).FlashWindow();
+            }
         }
 
         private void OnDccChatAction(Dcc dcc, string text)
@@ -1086,6 +1092,11 @@ namespace FusionIRC.Forms.Child
             Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(this, WindowManager.MainForm, WindowEvent.MessageReceived);
+            /* Flash main window if inactive */
+            if (SettingsManager.Settings.Client.Flash.Chat)
+            {
+                ((TrayIcon)MdiParent).FlashWindow();
+            }
         }
 
         private void TimerFocus(object sender, EventArgs e)

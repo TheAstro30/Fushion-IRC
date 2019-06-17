@@ -41,6 +41,7 @@ namespace FusionIRC.Forms.Settings
         private readonly ClientSystemTray _clientSystemTray;
         private readonly ClientConfirm _clientConfirm;
 
+        private readonly DccRequests _dccRequests;
         private readonly DccOptions _dccOptions;
 
         private readonly MouseDoubleClick _mouseDoubleClick;
@@ -117,6 +118,7 @@ namespace FusionIRC.Forms.Settings
             /* Mouse */
             _mouseDoubleClick = new MouseDoubleClick {Location = new Point(168, 12), Visible = false};
             /* DCC */
+            _dccRequests = new DccRequests { Location = new Point(168, 12), Visible = false };
             _dccOptions = new DccOptions {Location = new Point(168, 12), Visible = false};
 
             Controls.AddRange(new Control[]
@@ -136,6 +138,7 @@ namespace FusionIRC.Forms.Settings
                                       _clientSystemTray,
                                       _clientConfirm,
                                       _mouseDoubleClick,
+                                      _dccRequests,
                                       _dccOptions
                                   });
             /* Connection */
@@ -153,6 +156,7 @@ namespace FusionIRC.Forms.Settings
             /* Mouse */
             _mouseDoubleClick.OnSettingsChanged += OnSettingsChanged;
             /* DCC */
+            _dccRequests.OnSettingsChanged += OnSettingsChanged;
             _dccOptions.OnSettingsChanged += OnSettingsChanged;
 
             BuildTreeMenuNodes();
@@ -292,13 +296,18 @@ namespace FusionIRC.Forms.Settings
             /* DCC... */
             _tvMenu.Nodes.Add("DCC", "DCC").Nodes.AddRange(new[]
                                                                {
+                                                                   new TreeNode("Requests")
+                                                                       {
+                                                                           Tag = _dccRequests,
+                                                                           Name = "DCCREQUESTS"
+                                                                       },
                                                                    new TreeNode("Options")
                                                                        {
                                                                            Tag = _dccOptions,
                                                                            Name = "DCCOPTIONS"
                                                                        }
                                                                });
-            _tvMenu.Nodes[3].Tag = _dccOptions;
+            _tvMenu.Nodes[3].Tag = _dccRequests;
         }
 
         private void OnSettingsChanged(ISettings control)
@@ -408,6 +417,10 @@ namespace FusionIRC.Forms.Settings
 
                 case "MOUSE":
                     tab = "MOUSEDOUBLECLICK";
+                    break;
+
+                case "DCC":
+                    tab = "DCCREQUESTS";
                     break;
             }
             var node = _tvMenu.Nodes.Find(tab, true);

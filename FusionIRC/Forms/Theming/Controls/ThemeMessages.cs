@@ -135,13 +135,13 @@ namespace FusionIRC.Forms.Theming.Controls
             if (c.GetType() == typeof (ListBox))
             {
                 _textSet = true;
-                _txtString.Text = CurrentTheme.Messages[(ThemeMessage) _lstMessages.SelectedIndex].MessageFormat;
+                _txtString.Text = CurrentTheme.Messages[(ThemeMessage) _lstMessages.SelectedIndex].Message;
                 return;
             }
             if (!_textSet)
             {
                 CurrentTheme.TimeStampFormat = _txtTimestamp.Text;
-                CurrentTheme.Messages[(ThemeMessage) _lstMessages.SelectedIndex].MessageFormat = _txtString.Text;
+                CurrentTheme.Messages[(ThemeMessage) _lstMessages.SelectedIndex].Message = _txtString.Text;
                 if (ThemeChanged != null)
                 {
                     ThemeChanged();

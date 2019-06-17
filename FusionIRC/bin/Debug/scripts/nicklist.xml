@@ -6,9 +6,14 @@
   <data>Add to Notify:notify $1</data>
   <data>Remove from Notify:notify -r $1</data>
   <data>-</data>
-  <data>DCC:</data>
+  <data>DCC</data>
   <data>.Send:dcc send $1</data>
   <data>.Chat:dcc chat $1</data>
+  <data>CTCP</data>
+  <data>.Ping:ctcp $1 ping</data>
+  <data>.Version:ctcp $1 version</data>
+  <data>.Time:ctcp $1 time</data>
+  <data>.Finger:ctcp $1 finger</data>
   <data>-</data>
   <data>Ignore:ignore $1</data>
   <data>Unignore:ignore -r $1</data>

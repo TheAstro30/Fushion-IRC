@@ -10,6 +10,25 @@ using System.Xml.Serialization;
 
 namespace ircCore.Settings.SettingsBase.Structures
 {
+    public enum DccRequestAction
+    {
+        Ask = 0,
+        AutoAccept = 1,
+        Ignore = 2
+    }
+
+    public enum DccFileExistsAction
+    {
+        [Description("Ask")]
+        Ask = 0,
+
+        [Description("Overwrite")]
+        Overwrite = 1,
+
+        [Description("Cancel")]
+        Cancel
+    }
+
     public enum DccFilterMethod
     {
         [Description("Disabled")]
@@ -27,7 +46,14 @@ namespace ircCore.Settings.SettingsBase.Structures
     {
         public class SettingsDccRequests
         {
-            
+            [XmlAttribute("getRequest")]
+            public DccRequestAction GetRequest { get; set; }
+
+            [XmlAttribute("getFileExists")]
+            public DccFileExistsAction GetFileExists { get; set; }
+
+            [XmlAttribute("chatRequest")]
+            public DccRequestAction ChatRequest { get; set; }
         }
 
         public class SettingsDccOptions

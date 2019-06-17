@@ -36,6 +36,9 @@ namespace ircCore.Settings.SettingsBase.Structures
         [XmlElement("show")]
         public SettingsShow Show = new SettingsShow();
 
+        [XmlElement("flash")]
+        public SettingsFlash Flash = new SettingsFlash();
+
         [XmlElement("trayIcon")]
         public SettingsTrayIcon TrayIcon = new SettingsTrayIcon();
     }

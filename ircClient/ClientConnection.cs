@@ -57,6 +57,8 @@ namespace ircClient
 
         public InternalAddressList Ial = new InternalAddressList();
 
+        public int Idle { get; set; }
+
         public event Action<ClientConnection> OnClientBeginConnect;
         public event Action<ClientConnection> OnClientConnected;
         public event Action<ClientConnection> OnClientDisconnected;
@@ -200,6 +202,7 @@ namespace ircClient
         public void Send(string data)
         {
             _sock.SendData(string.Format("{0}\r\n", Utf8.ConvertFromUtf8(data, true)));
+            Idle = 0;
         }
 
         /* DNS Methods */
@@ -440,7 +443,8 @@ namespace ircClient
             {
                 return;
             }
-            _pingCheck++;     
+            _pingCheck++;
+            Idle++;
             if (_pingCheck <= 450)
             {
                 return;

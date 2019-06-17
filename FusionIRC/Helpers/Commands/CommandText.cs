@@ -9,6 +9,7 @@ using System.Linq;
 using FusionIRC.Forms.Child;
 using ircClient;
 using ircCore.Settings.Theming;
+using ircCore.Settings.Theming.Structures;
 
 namespace FusionIRC.Helpers.Commands
 {
@@ -106,7 +107,7 @@ namespace FusionIRC.Helpers.Commands
                 return;
             }
             IncomingMessageData tmd;
-            ParsedMessageData pmd;
+            ThemeMessageData pmd;
             var target = args.Substring(0, i).Trim();
             args = args.Substring(i).Trim();
             /* Now we need to find the "target" window, if it exists send text to there, if not we display an "echo" in the acitve window */

@@ -98,10 +98,17 @@ namespace FusionIRC.Forms.DirectClientConnection
             Controls.AddRange(new Control[] {_txtNick, _btnSelect, _lvNicks, _btnClear, _btnCancel});
             
             _lvNicks.SetObjects(SettingsManager.Settings.Dcc.History.Data);
-
+                      
             _txtNick.TextChanged += TextNickTextChanged;
+            _lvNicks.MouseUp += ListMouseUp;
             _lvNicks.DoubleClick += ListDoubleClicked;
             _btnClear.Click += ButtonClickHandler;
+
+            if (_lvNicks.GetItemCount() > 0)
+            {
+                _lvNicks.SelectedIndex = 0;
+            }
+            SetTextBoxNick();
 
             AcceptButton = _btnSelect;
         }
@@ -111,6 +118,7 @@ namespace FusionIRC.Forms.DirectClientConnection
             /* Clear history */
             _lvNicks.ClearObjects();
             SettingsManager.Settings.Dcc.History.Data.Clear();
+            _txtNick.Text = string.Empty;
         }
 
         private void TextNickTextChanged(object sender, EventArgs e)
@@ -118,13 +126,28 @@ namespace FusionIRC.Forms.DirectClientConnection
             _btnSelect.Enabled = !string.IsNullOrEmpty(_txtNick.Text);
         }
 
+        private void ListMouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && _lvNicks.SelectedObject != null)
+            {
+                SetTextBoxNick();
+            }
+        }
+
         private void ListDoubleClicked(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.OK;
+            Close();
+        }
+
+        /* Private helper method */
+        private void SetTextBoxNick()
         {
             if (_lvNicks.SelectedObject == null)
             {
                 return;
             }
-            var d = (SettingsDcc.SettingsDccHistory.SettingsDccHistoryData) _lvNicks.SelectedObject;
+            var d = (SettingsDcc.SettingsDccHistory.SettingsDccHistoryData)_lvNicks.SelectedObject;
             _txtNick.Text = d.ToString();
         }
     }

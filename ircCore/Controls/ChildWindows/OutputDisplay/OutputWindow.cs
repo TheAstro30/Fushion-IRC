@@ -164,13 +164,13 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
             }
         }        
 
-        /* Control overrides */        
+        /* Control overrides */
         protected override void OnResize(EventArgs e)
         {
             if (_isDesignMode)
             {
                 return;
-            }            
+            }
             /* Adjust the vertical scrollbar's large change based on client window size - we also need to re-wrap the line data */
             AdjustWidth(true);
             Invalidate();
@@ -185,7 +185,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 return;
             }
             if (!UserResize && _wrapUpdate.Enabled)
-            {                
+            {
                 /* Because of the way the control wraps/rewraps lines on resize, there is a slight jump if the parent form is maximized -
                  * this gets around that issue (but will flicker if the end user is resizing the form) */
                 return;
@@ -735,14 +735,18 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
         {
             using (var g = CreateGraphics())
             {
-                _averageCharacterWidth = TextMeasurement.MeasureStringWidth(g, _font, "*");
-                IndentWidth = _averageCharacterWidth * 2;
+                _averageCharacterWidth = TextMeasurement.MeasureStringWidth(g, _font, "*");                
             }
+            IndentWidth = _averageCharacterWidth * 2;
             TextHeight = _font.Height * LineSpacing;
-            if (!adjustClientWidth) { return; }
+            if (!adjustClientWidth)
+            {
+                return;
+            }
             var i = ClientRectangle.Width - (_showScrollBar ? _vScroll.Width + _averageCharacterWidth : _averageCharacterWidth) - 2;
             if (i == _windowWidth)
             {
+                /* Nothing has changed */
                 return;
             }
             _windowWidth = i; /* Update average characters that will fit in the client area */

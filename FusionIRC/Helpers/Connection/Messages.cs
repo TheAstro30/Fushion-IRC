@@ -6,8 +6,10 @@
 using System;
 using ircClient;
 using ircCore.Autos;
+using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
+using ircCore.Settings.Theming.Structures;
 using ircCore.Users;
 using ircScript.Classes.Structures;
 
@@ -40,6 +42,11 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
+            /* Flash main window if inactive */
+            if (SettingsManager.Settings.Client.Flash.Channel)
+            {
+                ((TrayIcon) WindowManager.MainForm).FlashWindow();
+            }
             /* Process event script */
             var e = new ScriptArgs
                         {
@@ -59,8 +66,12 @@ namespace FusionIRC.Helpers.Connection
             {
                 return;
             }
-            var c = WindowManager.GetWindow(client, nick) ??
-                    WindowManager.AddWindow(client, ChildWindowType.Private, WindowManager.MainForm, nick, nick, false);
+            var c = WindowManager.GetWindow(client, nick);
+            if (c == null)
+            {
+                c = WindowManager.AddWindow(client, ChildWindowType.Private, WindowManager.MainForm, nick, nick, false);
+                ThemeManager.PlaySound(ThemeSound.PrivateMessage);
+            }
             var tmd = new IncomingMessageData
                           {
                               Message = ThemeMessage.PrivateText,
@@ -73,6 +84,11 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
+            /* Flash main window if inactive */
+            if (SettingsManager.Settings.Client.Flash.Private)
+            {
+                ((TrayIcon)WindowManager.MainForm).FlashWindow();
+            }
             /* Process event script */
             var e = new ScriptArgs
                         {
@@ -110,6 +126,11 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
+            /* Flash main window if inactive */
+            if (SettingsManager.Settings.Client.Flash.Channel)
+            {
+                ((TrayIcon)WindowManager.MainForm).FlashWindow();
+            }
             /* Process event script */
             var e = new ScriptArgs
                         {
@@ -143,6 +164,11 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
+            /* Flash main window if inactive */
+            if (SettingsManager.Settings.Client.Flash.Private)
+            {
+                ((TrayIcon)WindowManager.MainForm).FlashWindow();
+            }
             /* Process event script */
             var e = new ScriptArgs
                         {
@@ -156,8 +182,7 @@ namespace FusionIRC.Helpers.Connection
         }
 
         public static void OnNotice(ClientConnection client, string nick, string address, string target, string text)
-        {
-            /* Check ignored */
+        {            
             if (nick.Equals("nickserv", StringComparison.InvariantCultureIgnoreCase) && text.Contains("nickname is registered") && AutomationsManager.Automations.Identify.Enable)
             {
                 /* ALL takes priority */
@@ -176,6 +201,7 @@ namespace FusionIRC.Helpers.Connection
                     }
                 }
             }
+            /* Check ignored */
             if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
             {
                 return;

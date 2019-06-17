@@ -30,6 +30,8 @@ namespace FusionIRC.Forms.Theming
         private readonly TabPage _tabMessages;
         private readonly TabPage _tabFonts;
         private readonly TabPage _tabBackgrounds;
+        private readonly TabPage _tabSounds;
+
         private readonly Button _btnApply;
         private readonly Button _btnCancel;
 
@@ -37,6 +39,7 @@ namespace FusionIRC.Forms.Theming
         private ThemeMessages _tMessages;
         private ThemeFonts _tFonts;
         private ThemeBackgrounds _tBackgrounds;
+        private ThemeSounds _tSounds;
 
         private Theme _theme;
 
@@ -56,7 +59,8 @@ namespace FusionIRC.Forms.Theming
                                             Resources.themeColor.ToBitmap(),
                                             Resources.themeMessage.ToBitmap(),
                                             Resources.themeFont.ToBitmap(),
-                                            Resources.themePicture.ToBitmap()
+                                            Resources.themePicture.ToBitmap(),
+                                            Resources.themeSound.ToBitmap()
                                         });
 
             _lblTheme = new Label
@@ -148,13 +152,23 @@ namespace FusionIRC.Forms.Theming
                                       ImageIndex = 3
                                   };
 
+            _tabSounds = new TabPage
+                             {
+                                 Location = new Point(4, 24),
+                                 Size = new Size(438, 360),
+                                 TabIndex = 8,
+                                 Text = @"Sounds",
+                                 UseVisualStyleBackColor = true,
+                                 ImageIndex = 4
+                             };
+
             _btnApply = new Button
                             {
                                 DialogResult = DialogResult.OK,
                                 Enabled = false,
                                 Location = new Point(305, 429),
                                 Size = new Size(75, 23),
-                                TabIndex = 8,
+                                TabIndex = 9,
                                 Text = @"Apply",
                                 UseVisualStyleBackColor = true
                             };
@@ -164,12 +178,12 @@ namespace FusionIRC.Forms.Theming
                                  DialogResult = DialogResult.Cancel,
                                  Location = new Point(386, 429),
                                  Size = new Size(75, 23),
-                                 TabIndex = 9,
+                                 TabIndex = 10,
                                  Text = @"Cancel",
                                  UseVisualStyleBackColor = true
                              };
 
-            _tabTheme.Controls.AddRange(new Control[] {_tabColors, _tabMessages, _tabFonts, _tabBackgrounds});
+            _tabTheme.Controls.AddRange(new Control[] {_tabColors, _tabMessages, _tabFonts, _tabBackgrounds, _tabSounds});
 
             Controls.AddRange(new Control[] {_lblTheme, _cmbTheme, _btnNew, _btnDelete, _tabTheme, _btnApply, _btnCancel});
 
@@ -213,10 +227,14 @@ namespace FusionIRC.Forms.Theming
             _tBackgrounds = new ThemeBackgrounds(_theme) {Dock = DockStyle.Fill};
             _tabBackgrounds.Controls.Add(_tBackgrounds);
 
+            _tSounds = new ThemeSounds(_theme) { Dock = DockStyle.Fill };
+            _tabSounds.Controls.Add(_tSounds);
+
             _tColors.ThemeChanged += OnThemeChanged;
             _tMessages.ThemeChanged += OnThemeChanged;
             _tFonts.ThemeChanged += OnThemeChanged;
             _tBackgrounds.ThemeChanged += OnThemeChanged;
+            _tSounds.ThemeChanged += OnThemeChanged;
             base.OnLoad(e);
         }
 
@@ -280,6 +298,7 @@ namespace FusionIRC.Forms.Theming
                     }
                     _tFonts.SaveSettings();
                     _tBackgrounds.SaveSettings();
+                    _tSounds.SaveSettings();
                     ThemeManager.Save(Functions.MainDir(t.Path), _theme);
                     SettingsManager.Settings.Themes.CurrentTheme = _cmbTheme.SelectedIndex;
                     ThemeManager.Load(Functions.MainDir(t.Path));

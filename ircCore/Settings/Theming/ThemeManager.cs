@@ -6,9 +6,15 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
+using System.Media;
 using System.Text;
+using System.Linq;
 using System.Windows.Forms;
+using ircCore.Properties;
+using ircCore.Settings.Theming.Structures;
 using ircCore.Utils;
+using ircCore.Utils.DirectX;
 using ircCore.Utils.Serialization;
 
 namespace ircCore.Settings.Theming
@@ -229,35 +235,6 @@ namespace ircCore.Settings.Theming
         Voice = 4
     }
 
-    public class IncomingMessageData
-    {
-        public ThemeMessage Message { get; set; }
-
-        public DateTime TimeStamp { get; set; }
-
-        public string Nick { get; set; }
-        public string Prefix { get; set; }
-        public string Address { get; set; }
-        public string Target { get; set; }
-        public string Text { get; set; }
-        public string NewNick { get; set; }
-        public string KickedNick { get; set; } 
-
-        /* Server related properties */
-        public string Server { get; set; }
-        public int Port { get; set; }
-
-        /* DNS */
-        public string DnsAddress { get; set; }
-        public string DnsHost { get; set; }
-    }
-
-    public class ParsedMessageData
-    {
-        public int DefaultColor { get; set; }
-        public string Message { get; set; }
-    }
-
     public static class ThemeManager
     {
         /* Basic theme management class - mainly loads and saves the current theme */
@@ -308,12 +285,12 @@ namespace ircCore.Settings.Theming
             return !theme.ThemeFonts.ContainsKey(window) ? new Font("Lucida Console", 10) : theme.ThemeFonts[window];
         }
 
-        public static Theme.ThemeBackgroundData GetBackground(ChildWindowType window)
+        public static ThemeBackgroundData GetBackground(ChildWindowType window)
         {
             return GetBackground(window, CurrentTheme);
         }
 
-        public static Theme.ThemeBackgroundData GetBackground(ChildWindowType window, Theme theme)
+        public static ThemeBackgroundData GetBackground(ChildWindowType window, Theme theme)
         {
             return !theme.ThemeBackgrounds.ContainsKey(window) ? null : theme.ThemeBackgrounds[window];
         }
@@ -326,6 +303,47 @@ namespace ircCore.Settings.Theming
         public static Color GetColor(ThemeColor color, Theme theme)
         {
             return !theme.ThemeColors.ContainsKey(color) ? theme.Colors[0] : theme.Colors[theme.ThemeColors[color]];
+        }
+
+        public static void PlaySound(ThemeSound sound)
+        {
+            PlaySound(sound, CurrentTheme);
+        }
+
+        public static void PlaySound(ThemeSound sound, Theme theme)
+        {
+            var d = theme.ThemeSounds.FirstOrDefault(s => s.ThemeSound == sound);
+            if (d == null || !d.Enabled)
+            {
+                return;
+            }
+            PlaySound(d);                      
+        }
+
+        public static object PlaySound(ThemeSoundData sound)
+        {
+            switch (sound.Type)
+            {
+                case ThemeSoundType.None:
+                    return null;
+
+                case ThemeSoundType.Default:
+                    /* Play internal notification sound */
+                    var s = new SoundPlayer(Resources.notification);
+                    s.Play();
+                    return s;
+
+                case ThemeSoundType.User:
+                    var path = Functions.MainDir(sound.SoundPath);
+                    if (!File.Exists(path))
+                    {
+                        return null;
+                    }
+                    var dx = new Sound(path) {Volume = 100};
+                    dx.PlayAsync();
+                    return dx;
+            }
+            return null;
         }
 
         public static ImageList GetNicklistImages()
@@ -344,14 +362,14 @@ namespace ircCore.Settings.Theming
         }
 
         /* The main theme message parser */
-        public static ParsedMessageData ParseMessage(IncomingMessageData messageData)
+        public static ThemeMessageData ParseMessage(IncomingMessageData messageData)
         {
             return ParseMessage(messageData, CurrentTheme);
         }
 
-        public static ParsedMessageData ParseMessage(IncomingMessageData messageData, Theme theme)
+        public static ThemeMessageData ParseMessage(IncomingMessageData messageData, Theme theme)
         {
-            var pmd = new ParsedMessageData
+            var pmd = new ThemeMessageData
                           {
                               DefaultColor = 1,
                               Message = "[Theme file corrupt/missing data]"
@@ -361,7 +379,7 @@ namespace ircCore.Settings.Theming
                 return pmd;
             }
             /* This code is kind of ugly... */            
-            var sb = new StringBuilder(theme.Messages[messageData.Message].MessageFormat);
+            var sb = new StringBuilder(theme.Messages[messageData.Message].Message);
             sb.Replace("$ts", TimeFunctions.FormatTimeStamp(messageData.TimeStamp, theme.TimeStampFormat));
             sb.Replace("$nick", messageData.Nick);
             sb.Replace("$prefix", messageData.Prefix);

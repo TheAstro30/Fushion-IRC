@@ -31,6 +31,7 @@
             System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("General", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Channels", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Show...", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("Flash main window on...", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Show menubar");
             System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Show toolbar");
             System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Always keep channel windows open");
@@ -41,6 +42,10 @@
             System.Windows.Forms.ListViewItem listViewItem8 = new System.Windows.Forms.ListViewItem("Client ping/pong event in console");
             System.Windows.Forms.ListViewItem listViewItem9 = new System.Windows.Forms.ListViewItem("MOTD on connect");
             System.Windows.Forms.ListViewItem listViewItem10 = new System.Windows.Forms.ListViewItem("Notices in active window");
+            System.Windows.Forms.ListViewItem listViewItem11 = new System.Windows.Forms.ListViewItem("CTCPs in active window");
+            System.Windows.Forms.ListViewItem listViewItem12 = new System.Windows.Forms.ListViewItem("Channel messages");
+            System.Windows.Forms.ListViewItem listViewItem13 = new System.Windows.Forms.ListViewItem("Private messages");
+            System.Windows.Forms.ListViewItem listViewItem14 = new System.Windows.Forms.ListViewItem("DCC chat messages");
             this.lvOptions = new System.Windows.Forms.ListView();
             this.cHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
@@ -57,10 +62,13 @@
             listViewGroup2.Name = "gChannels";
             listViewGroup3.Header = "Show...";
             listViewGroup3.Name = "gShow";
+            listViewGroup4.Header = "Flash main window on...";
+            listViewGroup4.Name = "gFlash";
             this.lvOptions.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
             listViewGroup1,
             listViewGroup2,
-            listViewGroup3});
+            listViewGroup3,
+            listViewGroup4});
             this.lvOptions.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             listViewItem1.Group = listViewGroup1;
             listViewItem1.StateImageIndex = 0;
@@ -82,6 +90,14 @@
             listViewItem9.StateImageIndex = 0;
             listViewItem10.Group = listViewGroup3;
             listViewItem10.StateImageIndex = 0;
+            listViewItem11.Group = listViewGroup3;
+            listViewItem11.StateImageIndex = 0;
+            listViewItem12.Group = listViewGroup4;
+            listViewItem12.StateImageIndex = 0;
+            listViewItem13.Group = listViewGroup4;
+            listViewItem13.StateImageIndex = 0;
+            listViewItem14.Group = listViewGroup4;
+            listViewItem14.StateImageIndex = 0;
             this.lvOptions.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             listViewItem1,
             listViewItem2,
@@ -92,7 +108,11 @@
             listViewItem7,
             listViewItem8,
             listViewItem9,
-            listViewItem10});
+            listViewItem10,
+            listViewItem11,
+            listViewItem12,
+            listViewItem13,
+            listViewItem14});
             this.lvOptions.Location = new System.Drawing.Point(3, 39);
             this.lvOptions.MultiSelect = false;
             this.lvOptions.Name = "lvOptions";

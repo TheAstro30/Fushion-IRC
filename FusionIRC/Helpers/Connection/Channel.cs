@@ -12,6 +12,7 @@ using ircClient.Parsing;
 using ircCore.Settings;
 using ircCore.Settings.Channels;
 using ircCore.Settings.Theming;
+using ircCore.Settings.Theming.Structures;
 using ircCore.Utils;
 
 namespace FusionIRC.Helpers.Connection

@@ -6,6 +6,7 @@
 using System;
 using ircClient;
 using ircCore.Settings.Theming;
+using ircCore.Settings.Theming.Structures;
 using ircCore.Utils;
 
 namespace FusionIRC.Helpers.Connection

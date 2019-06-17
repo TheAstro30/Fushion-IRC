@@ -225,7 +225,7 @@ namespace FusionIRC.Forms
             _timerConnect.Tick += ShowConnectDialog;
             /* UserManager */
             UserManager.NotifyChanged += SendWatchCommand;
-            _initialize = false;               
+            _initialize = false;
         }
 
         /* Overrides */
@@ -268,6 +268,15 @@ namespace FusionIRC.Forms
             base.OnMove(e);
         }
 
+        protected override void OnResizeBegin(EventArgs e)
+        {
+            if (WindowManager.LastActiveChild.WindowType != ChildWindowType.ChanList && SettingsManager.Settings.Windows.ChildrenMaximized)
+            {
+                WindowManager.LastActiveChild.Output.UserResize = true;
+            }
+            base.OnResizeBegin(e);
+        }
+
         protected override void OnResize(EventArgs e)
         {
             if (!_initialize)
@@ -282,6 +291,15 @@ namespace FusionIRC.Forms
             }
             base.OnResize(e);
             Invalidate(true);
+        }
+
+        protected override void OnResizeEnd(EventArgs e)
+        {
+            if (WindowManager.LastActiveChild.WindowType != ChildWindowType.ChanList && SettingsManager.Settings.Windows.ChildrenMaximized)
+            {
+                WindowManager.LastActiveChild.Output.UserResize = false;
+            }
+            base.OnResizeEnd(e);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -469,7 +487,7 @@ namespace FusionIRC.Forms
             }
             var win = (FrmChildWindow)t.Tag;
             win.Restore();
-            _mdi.ActivateChild(win);
+            _mdi.ActivateChild(win);            
             win.MyActivate();
         }
 

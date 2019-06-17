@@ -13,6 +13,7 @@ using ircClient;
 using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
+using ircCore.Settings.Theming.Structures;
 using ircScript.Classes.Structures;
 
 namespace FusionIRC.Helpers.Connection
@@ -60,6 +61,8 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
+            /* Sound */
+            ThemeManager.PlaySound(ThemeSound.Connect);
             /* Process event script */
             var e = new ScriptArgs
                         {
@@ -116,6 +119,8 @@ namespace FusionIRC.Helpers.Connection
             ((FrmClientWindow) WindowManager.MainForm).SwitchView.RemoveNotifyNode(client);
             /* Notification */
             ((TrayIcon) WindowManager.MainForm).ShowNotificationPopup(client.Network, "Disconnect from network", 50);
+            /* Sound */
+            ThemeManager.PlaySound(ThemeSound.Disconnect);
             /* Process event script */
             var e = new ScriptArgs
                         {

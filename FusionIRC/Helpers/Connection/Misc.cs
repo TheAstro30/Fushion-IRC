@@ -14,6 +14,7 @@ using ircCore.Settings;
 using ircCore.Settings.Networks;
 using ircCore.Settings.SettingsBase.Structures;
 using ircCore.Settings.Theming;
+using ircCore.Settings.Theming.Structures;
 using ircCore.Users;
 using ircScript.Classes;
 using ircScript.Classes.Structures;
@@ -195,7 +196,7 @@ namespace FusionIRC.Helpers.Connection
                                                client.Server.Address);
         }
 
-        public static void UpdateChannelsOnDisconnect(ClientConnection client, ParsedMessageData message)
+        public static void UpdateChannelsOnDisconnect(ClientConnection client, ThemeMessageData message)
         {
             /* Here we either close all open windows or just clear the nicklist - dependant on settings */
             foreach (var win in WindowManager.Windows[client].Where(win => !win.DisconnectedShown))

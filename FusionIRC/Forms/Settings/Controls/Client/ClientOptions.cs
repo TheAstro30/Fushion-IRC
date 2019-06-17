@@ -21,6 +21,7 @@ namespace FusionIRC.Forms.Settings.Controls.Client
 
             Header = "Client Options";
 
+            /* Ugly code */
             lvOptions.Items[0].Checked = SettingsManager.Settings.Client.Appearance.ControlBars.Control[0].Visible;
             lvOptions.Items[1].Checked = SettingsManager.Settings.Client.Appearance.ControlBars.Control[1].Visible;
 
@@ -33,6 +34,11 @@ namespace FusionIRC.Forms.Settings.Controls.Client
             lvOptions.Items[7].Checked = SettingsManager.Settings.Client.Show.PingPong;
             lvOptions.Items[8].Checked = SettingsManager.Settings.Client.Show.Motd;
             lvOptions.Items[9].Checked = SettingsManager.Settings.Client.Show.Notices;
+            lvOptions.Items[10].Checked = SettingsManager.Settings.Client.Show.Ctcps;
+
+            lvOptions.Items[11].Checked = SettingsManager.Settings.Client.Flash.Channel;
+            lvOptions.Items[12].Checked = SettingsManager.Settings.Client.Flash.Private;
+            lvOptions.Items[13].Checked = SettingsManager.Settings.Client.Flash.Chat;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -52,6 +58,7 @@ namespace FusionIRC.Forms.Settings.Controls.Client
                
         public void SaveSettings()
         {
+            /* Ugly code... */
             SettingsManager.Settings.Client.Appearance.ControlBars.Control[0].Visible = lvOptions.Items[0].Checked;
             SettingsManager.Settings.Client.Appearance.ControlBars.Control[1].Visible = lvOptions.Items[1].Checked;
 
@@ -64,6 +71,11 @@ namespace FusionIRC.Forms.Settings.Controls.Client
             SettingsManager.Settings.Client.Show.PingPong = lvOptions.Items[7].Checked;
             SettingsManager.Settings.Client.Show.Motd = lvOptions.Items[8].Checked;
             SettingsManager.Settings.Client.Show.Notices = lvOptions.Items[9].Checked;
+            SettingsManager.Settings.Client.Show.Ctcps = lvOptions.Items[10].Checked;
+
+            SettingsManager.Settings.Client.Flash.Channel = lvOptions.Items[11].Checked;
+            SettingsManager.Settings.Client.Flash.Private = lvOptions.Items[12].Checked;
+            SettingsManager.Settings.Client.Flash.Chat = lvOptions.Items[13].Checked;
         }
     }
 }

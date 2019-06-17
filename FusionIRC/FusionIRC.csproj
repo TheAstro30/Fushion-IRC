@@ -105,8 +105,20 @@
     <Compile Include="Forms\Settings\Controls\Dcc\DccOptions.Designer.cs">
       <DependentUpon>DccOptions.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Settings\Controls\Dcc\DccRequests.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\Controls\Dcc\DccRequests.Designer.cs">
+      <DependentUpon>DccRequests.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Settings\Editing\FrmAddExtension.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Theming\Controls\ThemeSounds.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Theming\Controls\ThemeSounds.Designer.cs">
+      <DependentUpon>ThemeSounds.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ChannelPropertyData.cs" />
     <Compile Include="Forms\ChannelProperties\Controls\ChannelPropertyBase.cs">
@@ -336,8 +348,14 @@
     <EmbeddedResource Include="Forms\Settings\Controls\Dcc\DccOptions.resx">
       <DependentUpon>DccOptions.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Settings\Controls\Dcc\DccRequests.resx">
+      <DependentUpon>DccRequests.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Mouse\MouseDoubleClick.resx">
       <DependentUpon>MouseDoubleClick.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Theming\Controls\ThemeSounds.resx">
+      <DependentUpon>ThemeSounds.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -379,6 +397,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Wave\notification.wav" />
     <None Include="Wave\cork.wav" />
     <None Include="Icons\Dialog\notifyGroup.ico" />
     <None Include="Icons\ChildWindows\list.ico" />
@@ -391,6 +410,7 @@
     <None Include="Icons\Toolbar\dccSend.ico" />
     <None Include="Icons\Dialog\dccChatRequest.ico" />
     <None Include="Icons\Toolbar\downloads.ico" />
+    <None Include="Icons\Dialog\themeSound.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

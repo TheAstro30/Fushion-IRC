@@ -8,6 +8,11 @@
   <data>-</data>
   <data>DCC</data>
   <data>.Send:dcc send $nick</data>
+  <data>CTCP</data>
+  <data>.Ping:ctcp $nick ping</data>
+  <data>.Version:ctcp $nick version</data>
+  <data>.Time:ctcp $nick time</data>
+  <data>.Finger:ctcp $nick finger</data>
   <data>-</data>
   <data>Popups</data>
   <data>.Slap:me slaps $nick around a bit with a dirty sock!</data>

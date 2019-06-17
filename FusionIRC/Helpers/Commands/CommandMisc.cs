@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using ircClient;
 using ircCore.Settings.Theming;
+using ircCore.Settings.Theming.Structures;
 using ircCore.Users;
 using ircCore.Utils;
 using ircScript.Classes.ScriptFunctions;

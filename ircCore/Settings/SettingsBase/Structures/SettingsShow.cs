@@ -19,5 +19,8 @@ namespace ircCore.Settings.SettingsBase.Structures
 
         [XmlAttribute("notices")]
         public bool Notices { get; set; }
+
+        [XmlAttribute("ctcps")]
+        public bool Ctcps { get; set; }
     }
 }
