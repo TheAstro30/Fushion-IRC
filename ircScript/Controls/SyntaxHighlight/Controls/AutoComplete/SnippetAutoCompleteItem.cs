@@ -10,6 +10,7 @@
 //
 //  Copyright (C) Pavel Torgashov, 2011-2016.
 using System;
+using ircCore.Utils;
 using ircScript.Controls.SyntaxHighlight.Helpers;
 
 namespace ircScript.Controls.SyntaxHighlight.Controls.AutoComplete
@@ -18,14 +19,14 @@ namespace ircScript.Controls.SyntaxHighlight.Controls.AutoComplete
     {
         public SnippetAutoCompleteItem(string snippet)
         {
-            Text = snippet.Replace("\r", "");
+            Text = snippet.ReplaceEx("\r", string.Empty);
             ToolTipTitle = "Code snippet:";
             ToolTipText = Text;
         }
 
         public override string ToString()
         {
-            return MenuText ?? Text.Replace("\n", " ").Replace("^", "");
+            return MenuText ?? Text.ReplaceEx("\n", " ").ReplaceEx("^", string.Empty);
         }
 
         public override string GetTextForReplace()

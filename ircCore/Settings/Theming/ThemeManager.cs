@@ -312,7 +312,11 @@ namespace ircCore.Settings.Theming
 
         public static void PlaySound(ThemeSound sound, Theme theme)
         {
-            var d = theme.ThemeSounds.FirstOrDefault(s => s.ThemeSound == sound);
+            if (!theme.ThemeSounds.Enable)
+            {
+                return;
+            }
+            var d = theme.ThemeSounds.SoundData.FirstOrDefault(s => s.ThemeSound == sound);
             if (d == null || !d.Enabled)
             {
                 return;

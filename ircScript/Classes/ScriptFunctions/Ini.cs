@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using ircCore.Utils;
 
 namespace ircScript.Classes.ScriptFunctions
 {
@@ -213,7 +214,7 @@ namespace ircScript.Classes.ScriptFunctions
                     }
                     section = new IniSection
                                   {
-                                      Name = s.Replace("[", null).Replace("]", null)
+                                      Name = s.ReplaceEx("[", string.Empty).ReplaceEx("]", string.Empty)
                                   };
                     continue;
                 }

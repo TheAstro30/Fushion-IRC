@@ -3,8 +3,11 @@
  * Copyright (C) 2016 - 2019
  * Provided AS-IS with no warranty expressed or implied
  */
+
+using System;
 using System.Globalization;
 using System.Windows.Forms;
+using ircCore.Utils;
 using ircScript.Forms;
 
 namespace ircScript.Classes.ScriptFunctions
@@ -16,12 +19,12 @@ namespace ircScript.Classes.ScriptFunctions
             /* Looks for filenames with quotation marks */
             if (args.StartsWith(((char)34).ToString(CultureInfo.InvariantCulture)))
             {
-                var index = args.IndexOf(((char)34).ToString(CultureInfo.InvariantCulture), 1, System.StringComparison.Ordinal);
+                var index = args.IndexOf(((char)34).ToString(), 1, StringComparison.Ordinal);
                 return index == -1
                            ? new[] { args }
                            : new[]
                                {
-                                   args.Substring(0, index).Replace(((char)34).ToString(CultureInfo.InvariantCulture), null),
+                                   args.Substring(0, index).ReplaceEx(((char)34).ToString(), string.Empty),
                                    args.Substring(index + 1).TrimStart()
                                };
             }

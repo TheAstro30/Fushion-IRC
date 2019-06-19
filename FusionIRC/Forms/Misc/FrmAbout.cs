@@ -4,9 +4,11 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Media;
 using System.Reflection;
+using System.Text;
 using System.Windows.Forms;
 using FusionIRC.Properties;
 using ircCore.Controls;
@@ -21,12 +23,13 @@ namespace FusionIRC.Forms.Misc
         private readonly Label _lblVersion;
         private readonly Label _lblAuthor;
         private readonly Label _lblCopyright;
+        private readonly TextBox _txtVersions;
         private readonly Label _lblDisclaimer;
         private readonly Button _btnClose;
 
         public FrmAbout()
         {
-            ClientSize = new Size(388, 280);
+            ClientSize = new Size(388, 336);
             Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
             MaximizeBox = false;
@@ -95,11 +98,20 @@ namespace FusionIRC.Forms.Misc
                                     Text = @"Copyright © 2016 - 2019 KangaSoft Software, All Rights Reserved."
                                 };
 
+            _txtVersions = new TextBox
+                               {
+                                   Size = new Size(287, 73),
+                                   Location = new Point(86, 154),
+                                   Multiline = true,
+                                   ScrollBars = ScrollBars.None,
+                                   ReadOnly = true
+                               };
+
             _lblDisclaimer = new Label
                                  {
                                      BackColor = Color.Transparent,
                                      Font = new Font("Segoe UI", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0),
-                                     Location = new Point(88, 176),
+                                     Location = new Point(88, 232),
                                      Size = new Size(288, 59),
                                      Text = @"THIS SOFTWARE IS PROVIDED ""AS IS"" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS."
                                  };
@@ -107,7 +119,7 @@ namespace FusionIRC.Forms.Misc
             _btnClose = new Button
                             {
                                 DialogResult = DialogResult.OK,
-                                Location = new Point(301, 245),
+                                Location = new Point(301, 301),
                                 Size = new Size(75, 23),
                                 TabIndex = 0,
                                 Text = @"Close",
@@ -116,18 +128,36 @@ namespace FusionIRC.Forms.Misc
 
             Controls.AddRange(new Control[]
                                   {
-                                      _pnlIcon, _lblFusion, _lblCodeName, _lblVersion, _lblAuthor, _lblCopyright, _lblDisclaimer,
+                                      _pnlIcon, _lblFusion,
+                                      _lblCodeName, _lblVersion,
+                                      _lblAuthor, _lblCopyright, 
+                                      _txtVersions, _lblDisclaimer,
                                       _btnClose
                                   });
 
             _pnlIcon.Click += PanelClick;
 
-            AcceptButton = _btnClose;            
+            AcceptButton = _btnClose;
+
+            var sb = new StringBuilder();
+            var f = FileVersionInfo.GetVersionInfo("ircCore.dll");
+            sb.AppendLine(string.Format("ircCore.dll v{0}.{1}.{2} build: ({3})", f.FileMajorPart, f.FileMinorPart,
+                                        f.FilePrivatePart, f.FileBuildPart));
+            f = FileVersionInfo.GetVersionInfo("ircClient.dll");
+            sb.AppendLine(string.Format("ircClient.dll v{0}.{1}.{2} build: ({3})", f.FileMajorPart, f.FileMinorPart,
+                                        f.FilePrivatePart, f.FileBuildPart));
+            f = FileVersionInfo.GetVersionInfo("ircScript.dll");
+            sb.AppendLine(string.Format("ircScript.dll v{0}.{1}.{2} build: ({3})", f.FileMajorPart, f.FileMinorPart,
+                                        f.FilePrivatePart, f.FileBuildPart));
+            f = FileVersionInfo.GetVersionInfo("libolv.dll");
+            sb.AppendLine(string.Format("libolv.dll v{0}.{1}.{2} build: ({3})", f.FileMajorPart, f.FileMinorPart,
+                                        f.FilePrivatePart, f.FileBuildPart));
+            _txtVersions.Text = sb.ToString();
         }
 
         private static void PanelClick(object sender, EventArgs e)
         {
-            var player = new SoundPlayer(Properties.Resources.cork);
+            var player = new SoundPlayer(Resources.cork);
             player.Play();
         }
     }

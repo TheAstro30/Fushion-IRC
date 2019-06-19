@@ -7,6 +7,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using FusionIRC.Forms.Users.Editing;
+using FusionIRC.Properties;
 using ircCore.Users;
 using ircCore.Utils;
 using ircScript.Classes.ScriptFunctions;
@@ -105,8 +106,8 @@ namespace FusionIRC.Forms.Users.Controls
             _imageList = new ImageList {ColorDepth = ColorDepth.Depth32Bit, ImageSize = new Size(16, 16)};
             _imageList.Images.AddRange(new Image[]
                                            {
-                                               Properties.Resources.notify.ToBitmap(),
-                                               Properties.Resources.ignored.ToBitmap()
+                                               Resources.notify.ToBitmap(),
+                                               Resources.ignored.ToBitmap()
                                            });
             _list.SmallImageList = _imageList;
 

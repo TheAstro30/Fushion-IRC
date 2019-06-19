@@ -42,14 +42,14 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
             return new Font(font, fs);
         }
 
-        internal static void ParseColorCodes(string text, int index, int length, ref Color foreColor, ref Color backColor, ref int charactersFound)
+        internal static void ParseColorCodes(string text, int index, int length, out Color foreColor, out Color backColor, ref int charactersFound)
         {
-            if (index + 1 > length || text.Substring(index + 1, 1) == " ")
-            {                
-                return;
-            }
             foreColor = Color.Empty;
             backColor = Color.Empty;
+            if (index + 1 > length || text.Substring(index + 1, 1) == " ")
+            {
+                return;
+            }
             /* Look at next byte to make sure it is not a control code */
             switch (text[index + 1])
             {

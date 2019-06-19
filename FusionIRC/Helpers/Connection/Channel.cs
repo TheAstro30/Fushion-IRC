@@ -104,6 +104,8 @@ namespace FusionIRC.Helpers.Connection
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
             /* Update IAL */
             client.Ial.Add(nick, address, channel);
+            /* Play sound */
+            ThemeManager.PlaySound(ThemeSound.UserJoin);
         }
 
         public static void OnJoinSelf(ClientConnection client, string channel)
@@ -165,6 +167,8 @@ namespace FusionIRC.Helpers.Connection
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
             /* Update IAL */
             client.Ial.Remove(nick, channel);
+            /* Play sound */
+            ThemeManager.PlaySound(ThemeSound.UserPart);
         }
 
         public static void OnNames(ClientConnection client, string channel, string names)
@@ -253,6 +257,8 @@ namespace FusionIRC.Helpers.Connection
             }
             /* Update IAL */
             client.Ial.Update(nick, newNick);
+            /* Play sound */
+            ThemeManager.PlaySound(ThemeSound.Nick);
         }
 
         public static void OnQuit(ClientConnection client, string nick, string address, string msg)
@@ -277,6 +283,8 @@ namespace FusionIRC.Helpers.Connection
             }
             /* Update IAL */
             client.Ial.Remove(nick);
+            /* Play sound */
+            ThemeManager.PlaySound(ThemeSound.UserQuit);
         }
 
         public static void OnKickSelf(ClientConnection client, string nick, string channel, string msg)
@@ -315,6 +323,8 @@ namespace FusionIRC.Helpers.Connection
                     WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
                 }
             }
+            /* Play sound */
+            ThemeManager.PlaySound(ThemeSound.SelfKick);
             /* Attempt to rejoin the channel */
             if (SettingsManager.Settings.Client.Channels.ReJoinChannelsOnKick)
             {
@@ -344,6 +354,8 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
+            /* Play sound */
+            ThemeManager.PlaySound(ThemeSound.UserKick);
         }
 
         public static void OnInvite(ClientConnection client, string nick, string address, string channel)
@@ -365,6 +377,13 @@ namespace FusionIRC.Helpers.Connection
             c.Output.AddLine(pmd.DefaultColor, pmd.Message);
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.EventReceived);
+            /* Play sound */
+            ThemeManager.PlaySound(ThemeSound.Invite);
+            /* Auto-join ? */
+            if (SettingsManager.Settings.Client.Channels.JoinChannelsOnInvite)
+            {
+                client.Send(string.Format("JOIN {0}", channel));
+            }
         }
 
         public static void OnModeListData(ClientConnection client, ModeListType type, string data)

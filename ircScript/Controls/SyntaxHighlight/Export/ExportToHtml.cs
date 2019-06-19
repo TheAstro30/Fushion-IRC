@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Collections.Generic;
+using ircCore.Utils;
 using ircScript.Controls.SyntaxHighlight.Helpers.TextRange;
 using ircScript.Controls.SyntaxHighlight.Styles;
 
@@ -187,7 +188,7 @@ namespace ircScript.Controls.SyntaxHighlight.Export
 
         public string GetStyleName(StyleIndex styleIndex)
         {
-            return styleIndex.ToString().Replace(" ", "").Replace(",", "");
+            return styleIndex.ToString().ReplaceEx(" ", string.Empty).ReplaceEx(",", string.Empty);
         }
 
         private void Flush(StringBuilder sb, StringBuilder tempSb, StyleIndex currentStyle)

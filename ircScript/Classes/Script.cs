@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Misc;
 using ircScript.Classes.Parsers;
 using ircScript.Classes.Structures;
 

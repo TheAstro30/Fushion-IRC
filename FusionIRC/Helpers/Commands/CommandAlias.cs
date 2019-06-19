@@ -7,6 +7,7 @@ using System;
 using FusionIRC.Forms.Child;
 using ircClient;
 using ircCore.Settings.Theming;
+using ircCore.Utils;
 using ircScript;
 using ircScript.Classes;
 using ircScript.Classes.Structures;
@@ -56,7 +57,7 @@ namespace FusionIRC.Helpers.Commands
             }
             else
             {
-                command = data.Substring(0, i).Trim().ToUpper().Replace("/", "");
+                command = data.Substring(0, i).Trim().ToUpper().ReplaceEx("/", string.Empty);
                 args = data.Substring(i + 1).Trim();
             }
             CommandProcessor.ParseCommand(e.ClientConnection, (FrmChildWindow)e.ChildWindow, command, args);

@@ -64,7 +64,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay.Helpers
                     case (char)ControlByte.Color:
                         /* When parsing colours, we need to check the character byte isn't on it's own, if it is colour formatting is removed */                        
                         var iTmp = 0;
-                        Functions.ParseColorCodes(text, i, length, ref foreCol, ref backCol, ref iTmp);                      
+                        Functions.ParseColorCodes(text, i, length, out foreCol, out backCol, ref iTmp);                      
                         wld.ControlBytes.Add(CreateNewControlByte(ControlByte.Color, i, foreCol, backCol, currentWidth, text.Substring(i, iTmp + 1)));
                         text = string.Format("{0}{1}", text.Substring(0, i), text.Substring(i + iTmp + 1));
                         length -= iTmp + 1;

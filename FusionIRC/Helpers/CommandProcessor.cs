@@ -6,6 +6,7 @@
 using System.Windows.Forms;
 using FusionIRC.Forms.Child;
 using FusionIRC.Helpers.Commands;
+using FusionIRC.Helpers.Timers;
 using ircClient;
 using ircClient.Parsing.Helpers;
 using ircCore.Utils;
@@ -23,12 +24,12 @@ namespace FusionIRC.Helpers
             var args = string.Empty;
             if (i != -1)
             {
-                com = data.Substring(0, i).Trim().ToUpper().Replace("/", "");
+                com = data.Substring(0, i).Trim().ToUpper().ReplaceEx("/", string.Empty);
                 args = data.Substring(i).Trim();
             }
             else
             {
-                com = data.ToUpper().Replace("/", "");
+                com = data.ToUpper().ReplaceEx("/", string.Empty);
             }
             ParseCommand(client, child, com, args);
         }
@@ -203,6 +204,16 @@ namespace FusionIRC.Helpers
                     
                 case "DCC":
                     CommandDcc.Parse(client, args);
+                    break;
+
+                case "QUOTE":
+                case "RAW":
+                    /* Sends arguments to server unmodified */
+                    CommandMisc.ParseRawQuote(client, child, args);
+                    break;
+
+                case "TIMER":
+                    UserTimerManager.ParseTimer(client, child, args);
                     break;
 
                 //case "SMODE":

@@ -7,6 +7,7 @@ using System;
 using System.Windows.Forms;
 using System.Drawing;
 using FusionIRC.Forms.Users.Controls;
+using FusionIRC.Properties;
 using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Utils;
@@ -57,8 +58,8 @@ namespace FusionIRC.Forms.Users
             _images = new ImageList { ColorDepth = ColorDepth.Depth32Bit, ImageSize = new Size(16, 16) };
             _images.Images.AddRange(new Image[]
                                         {
-                                            Properties.Resources.notifyGroup.ToBitmap(),
-                                            Properties.Resources.ignored.ToBitmap()
+                                            Resources.notifyGroup.ToBitmap(),
+                                            Resources.ignored.ToBitmap()
                                         });
 
             _tabUsers = new TabControl

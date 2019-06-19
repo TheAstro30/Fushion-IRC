@@ -62,9 +62,6 @@
     <Compile Include="Classes\Parsers\ScriptVariableParser.cs" />
     <Compile Include="Classes\Structures\ScriptEventParams.cs" />
     <Compile Include="Classes\Structures\ScriptFileNode.cs" />
-    <Compile Include="Classes\ScriptFunctions\UserTimer.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Classes\Structures\ScriptVariable.cs" />
     <Compile Include="Classes\Structures\ScriptWhile.cs" />
     <Compile Include="Controls\ScriptEditor.cs">

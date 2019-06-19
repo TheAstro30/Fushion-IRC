@@ -24,7 +24,7 @@ namespace ircCore.Controls.ChildWindows.Nicklist
     {
         private readonly List<NickData> _list = new List<NickData>();
         
-        private readonly ObjectListView _nickList;
+        private readonly FastObjectListView _nickList;
         private readonly HeaderFormatStyle _header = new HeaderFormatStyle();
         private readonly OlvColumn _nickColumn;
         private ImageList _images;
@@ -61,7 +61,7 @@ namespace ircCore.Controls.ChildWindows.Nicklist
                               ImageSize = new Size(16, 16)
                           };
 
-            _nickList = new ObjectListView
+            _nickList = new FastObjectListView
                             {
                                 MultiSelect = true,
                                 FullRowSelect = true,
@@ -133,7 +133,7 @@ namespace ircCore.Controls.ChildWindows.Nicklist
                 _header.Normal.BackColor = value;
                 _nickList.BackColor = value;
                 base.BackColor = value;
-                _nickList.RefreshObjects(_list);
+                //_nickList.RefreshObjects(_list);
             }
         }
 
@@ -148,7 +148,8 @@ namespace ircCore.Controls.ChildWindows.Nicklist
                 _header.Normal.ForeColor = value;
                 _nickList.ForeColor = value;
                 base.ForeColor = value;
-                _nickList.RefreshObjects(_list);
+                //_nickList.RefreshObjects(_list);
+                _nickList.RebuildColumns();
             }
         }
 
@@ -290,7 +291,7 @@ namespace ircCore.Controls.ChildWindows.Nicklist
                 var n = _prefixCompare.Match(nick);
                 if (!string.IsNullOrEmpty(n.Value))
                 {                 
-                    nd.Nick = nick.Replace(n.Value, "");
+                    nd.Nick = nick.ReplaceEx(n.Value, string.Empty);
                     nd.AddUserMode(n.Value);                    
                 }
                 else
@@ -396,7 +397,7 @@ namespace ircCore.Controls.ChildWindows.Nicklist
             var n = _prefixCompare.Match(nick);
             if (!string.IsNullOrEmpty(n.Value))
             {
-                nick = nick.Replace(n.Value, "");
+                nick = nick.ReplaceEx(n.Value, string.Empty);
             }
             return _list.FirstOrDefault(o => o.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase)) != null;
         }

@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
+using libolv.Properties;
 using libolv.Utilities;
 
 namespace libolv
@@ -41,8 +42,8 @@ namespace libolv
 
         private bool _contextMenuStaysOpen;
         
-        public static Bitmap SortAscendingImage = Properties.Resources.SortAscending;
-        public static Bitmap SortDescendingImage = Properties.Resources.SortDescending;
+        public static Bitmap SortAscendingImage = Resources.SortAscending;
+        public static Bitmap SortDescendingImage = Resources.SortDescending;
 
         protected virtual bool HandleHeaderRightClick(int columnIndex)
         {

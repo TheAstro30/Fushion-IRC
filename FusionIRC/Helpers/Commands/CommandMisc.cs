@@ -5,6 +5,7 @@
  */
 using System;
 using System.Collections.Generic;
+using FusionIRC.Forms.Child;
 using ircClient;
 using ircCore.Settings.Theming;
 using ircCore.Settings.Theming.Structures;
@@ -108,6 +109,23 @@ namespace FusionIRC.Helpers.Commands
                 }
             }
             AddRemoveNotifyIgnore(client, type, address, remove, flush);
+        }
+
+        public static void ParseRawQuote(ClientConnection client, FrmChildWindow child, string args)
+        {
+            if (!client.IsConnected)
+            {
+                return;
+            }
+            var tmd = new IncomingMessageData
+                          {
+                              Message = ThemeMessage.EchoText,
+                              TimeStamp = DateTime.Now,
+                              Text = string.Format("-> Server: {0}", args)
+                          };
+            var pmd = ThemeManager.ParseMessage(tmd);
+            child.Output.AddLine(pmd.DefaultColor, pmd.Message);            
+            client.Send(args);
         }
 
         /* Private helper functions */

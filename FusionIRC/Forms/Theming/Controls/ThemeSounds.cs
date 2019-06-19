@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Drawing;
 using System.Linq;
 using System.Media;
 using System.Windows.Forms;
@@ -16,11 +17,18 @@ using libolv;
 
 namespace FusionIRC.Forms.Theming.Controls
 {
-    public partial class ThemeSounds : UserControl, IThemeSetting
+    public sealed class ThemeSounds : UserControl, IThemeSetting
     {
+        private readonly CheckBox _chkEnable;
+        private readonly ObjectListView _lvSound;
         private readonly OlvColumn _colEvent;
         private readonly OlvColumn _colFile;
-
+        private readonly Button _btnTest;
+        private readonly Button _btnStop;
+        private readonly Button _btnDefault;
+        private readonly Button _btnSelect;
+        private readonly Button _btnNone;        
+        
         private object _sound;
 
         public Theme CurrentTheme { get; set; }
@@ -29,16 +37,40 @@ namespace FusionIRC.Forms.Theming.Controls
 
         public ThemeSounds(Theme theme)
         {
-            InitializeComponent();
+            BackColor = Color.Transparent;
+            Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            Size = new Size(438, 360);
 
-            CurrentTheme = theme;
+            _chkEnable = new CheckBox
+                             {
+                                 AutoSize = true,
+                                 Location = new Point(3, 3),
+                                 Size = new Size(134, 19),
+                                 TabIndex = 0,
+                                 Text = @"Enable sound events",
+                                 UseVisualStyleBackColor = true
+                             };
+
+            _lvSound = new ObjectListView
+                           {
+                               CheckBoxes = true,
+                               FullRowSelect = true,
+                               HeaderStyle = ColumnHeaderStyle.Nonclickable,
+                               HideSelection = false,
+                               Location = new Point(3, 28),
+                               MultiSelect = false,
+                               Size = new Size(351, 329),
+                               TabIndex = 1,
+                               UseCompatibleStateImageBehavior = false,
+                               View = View.Details
+                           };
 
             _colEvent = new OlvColumn("Event:", "Name")
                             {
                                 CellPadding = null,
                                 IsEditable = false,
                                 Sortable = false,
-                                Width = 120
+                                Width = 200
                             };
 
             _colFile = new OlvColumn("Sound:", "SoundPathString")
@@ -49,37 +81,96 @@ namespace FusionIRC.Forms.Theming.Controls
                                Width = 120,
                                FillsFreeSpace = true
                            };
-            lvSound.AllColumns.AddRange(new[] {_colEvent, _colFile});
-            lvSound.Columns.AddRange(new ColumnHeader[] {_colEvent, _colFile});
-            lvSound.RebuildColumns();
+
+            _lvSound.AllColumns.AddRange(new[] { _colEvent, _colFile });
+            _lvSound.Columns.AddRange(new ColumnHeader[] { _colEvent, _colFile });
+
+            _btnTest = new Button
+                           {
+                               Enabled = false,
+                               Location = new Point(360, 28),
+                               Size = new Size(75, 23),
+                               TabIndex = 2,
+                               Text = @"Test",
+                               UseVisualStyleBackColor = true
+                           };
+
+            _btnStop = new Button
+                           {
+                               Enabled = false,
+                               Location = new Point(360, 57),
+                               Size = new Size(75, 23),
+                               TabIndex = 3,
+                               Text = @"Stop",
+                               UseVisualStyleBackColor = true
+                           };
+
+            _btnDefault = new Button
+                              {
+                                  Enabled = false,
+                                  Location = new Point(360, 276),
+                                  Size = new Size(75, 23),
+                                  TabIndex = 4,
+                                  Text = @"Default",
+                                  UseVisualStyleBackColor = true
+                              };
+
+            _btnSelect = new Button
+                             {
+                                 Enabled = false,
+                                 Location = new Point(360, 305),
+                                 Size = new Size(75, 23),
+                                 TabIndex = 5,
+                                 Text = @"Select",
+                                 UseVisualStyleBackColor = true
+                             };
+
+            _btnNone = new Button
+                           {
+                               Enabled = false,
+                               Location = new Point(360, 334),
+                               Size = new Size(75, 23),
+                               TabIndex = 6,
+                               Text = @"None",
+                               UseVisualStyleBackColor = true
+                           };
+
+            Controls.AddRange(new Control[] {_chkEnable, _lvSound, _btnTest, _btnStop, _btnDefault, _btnSelect, _btnNone});
+            
+            CurrentTheme = theme;
+                        
+            _chkEnable.Checked = theme.ThemeSounds.Enable;
             /* Import sound list */
-            lvSound.SetObjects(theme.ThemeSounds);
+            _lvSound.RebuildColumns();
+            _lvSound.SetObjects(theme.ThemeSounds.SoundData);
             /* No real nice way of doing this ... */
-            foreach (var s in from object s in lvSound.Objects where ((ThemeSoundData)s).Enabled select s)
+            foreach (var s in from object s in _lvSound.Objects where ((ThemeSoundData)s).Enabled select s)
             {
-                lvSound.CheckObject(s);
+                _lvSound.CheckObject(s);
             }
             /* Handlers */
-            lvSound.ItemChecked += ListCheckChanged;            
-            lvSound.SelectedIndexChanged += ListSelectedIndexChanged;
-            btnTest.Click += ButtonClickHandler;
-            btnStop.Click += ButtonClickHandler;
-            btnDefault.Click += ButtonClickHandler;
-            btnSelect.Click += ButtonClickHandler;
-            btnNone.Click += ButtonClickHandler;
+            _chkEnable.CheckedChanged += CheckChanged;
+            _lvSound.ItemChecked += CheckChanged;            
+            _lvSound.SelectedIndexChanged += ListSelectedIndexChanged;
+            _btnTest.Click += ButtonClickHandler;
+            _btnStop.Click += ButtonClickHandler;
+            _btnDefault.Click += ButtonClickHandler;
+            _btnSelect.Click += ButtonClickHandler;
+            _btnNone.Click += ButtonClickHandler;
         }
                 
         public void SaveSettings()
         {
-            /* Again, no real nice way of doing this... */
-            for (var i = 0; i <= lvSound.Items.Count - 1; i++)
+            CurrentTheme.ThemeSounds.Enable = _chkEnable.Checked;
+            /* Again, no real nice way of doing .. */
+            for (var i = 0; i <= _lvSound.Items.Count - 1; i++)
             {
-                CurrentTheme.ThemeSounds[i].Enabled = lvSound.Items[i].Checked;
+                CurrentTheme.ThemeSounds.SoundData[i].Enabled = _lvSound.Items[i].Checked;
             }            
         }
 
         /* Callbacks */
-        private void ListCheckChanged(object sender, EventArgs e)
+        private void CheckChanged(object sender, EventArgs e)
         {
             /* Penis... */
             if (ThemeChanged != null)
@@ -90,12 +181,12 @@ namespace FusionIRC.Forms.Theming.Controls
 
         private void ListSelectedIndexChanged(object sender, EventArgs e)
         {
-            var enable = lvSound.SelectedObject != null;
-            btnTest.Enabled = enable;
-            btnStop.Enabled = enable;
-            btnDefault.Enabled = enable;
-            btnSelect.Enabled = enable;
-            btnNone.Enabled = enable;
+            var enable = _lvSound.SelectedObject != null;
+            _btnTest.Enabled = enable;
+            _btnStop.Enabled = enable;
+            _btnDefault.Enabled = enable;
+            _btnSelect.Enabled = enable;
+            _btnNone.Enabled = enable;
         }
 
         private void ButtonClickHandler(object sender, EventArgs e)
@@ -105,7 +196,7 @@ namespace FusionIRC.Forms.Theming.Controls
             {
                 return;
             }
-            var s = (ThemeSoundData) lvSound.SelectedObject;
+            var s = (ThemeSoundData) _lvSound.SelectedObject;
             switch (btn.Text.ToUpper())
             {
                 case "TEST":
@@ -130,6 +221,7 @@ namespace FusionIRC.Forms.Theming.Controls
                 case "DEFAULT":
                     s.SoundPath = string.Empty;
                     s.Type = ThemeSoundType.Default;
+                    _lvSound.CheckObject(s);
                     break;
 
                 case "SELECT":
@@ -141,15 +233,17 @@ namespace FusionIRC.Forms.Theming.Controls
                         }
                         s.SoundPath = Functions.MainDir(ofd.FileName);
                         s.Type = ThemeSoundType.User;
+                        _lvSound.CheckObject(s);
                     }                    
                     break;
 
                 case "NONE":
                     s.SoundPath = string.Empty;
-                    s.Type = ThemeSoundType.None;                    
+                    s.Type = ThemeSoundType.None;   
+                    _lvSound.UncheckObject(s);
                     break;
             }
-            lvSound.RefreshObject(s);
+            _lvSound.RefreshObject(s);
             if (ThemeChanged != null)
             {
                 ThemeChanged();

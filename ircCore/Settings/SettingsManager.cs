@@ -8,6 +8,8 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Client;
+using ircCore.Settings.SettingsBase.Structures.Misc;
 using ircCore.Utils;
 using ircCore.Utils.Serialization;
 

@@ -9,6 +9,7 @@ using System.Text;
 using System.Windows.Forms;
 using FusionIRC.Forms.Child;
 using FusionIRC.Helpers;
+using FusionIRC.Properties;
 using ircClient;
 using ircCore.Controls;
 using ircCore.Settings.Theming;
@@ -59,7 +60,7 @@ namespace FusionIRC.Forms.Misc
                                BackgroundImageLayout = ImageLayout.Center,
                                Location = new Point(12, 12),
                                Size = new Size(64, 64),
-                               BackgroundImage = Properties.Resources.partChan.ToBitmap()
+                               BackgroundImage = Resources.partChan.ToBitmap()
                            };
 
             _lblInfo = new Label
@@ -85,7 +86,7 @@ namespace FusionIRC.Forms.Misc
                             };
 
             _imageList = new ImageList {ColorDepth = ColorDepth.Depth32Bit, ImageSize = new Size(16, 16)};
-            _imageList.Images.Add(Properties.Resources.channel);
+            _imageList.Images.Add(Resources.channel);
             _chanList.SmallImageList = _imageList;
 
             /* The column gets the Tag property of each channel to get it's "name" */

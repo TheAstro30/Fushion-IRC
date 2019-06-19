@@ -5,6 +5,7 @@
  */
 using System.Drawing;
 using System.Windows.Forms;
+using FusionIRC.Properties;
 using ircCore.Controls;
 
 namespace FusionIRC.Forms.Misc
@@ -35,7 +36,7 @@ namespace FusionIRC.Forms.Misc
                                BackgroundImageLayout = ImageLayout.Center,
                                Location = new Point(12, 12),
                                Size = new Size(64, 64),
-                               BackgroundImage = Properties.Resources.joinChan.ToBitmap()
+                               BackgroundImage = Resources.joinChan.ToBitmap()
                            };
 
             _lblInfo = new Label

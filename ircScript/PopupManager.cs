@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Misc;
 using ircCore.Utils;
 using ircCore.Utils.Serialization;
 using ircScript.Classes;

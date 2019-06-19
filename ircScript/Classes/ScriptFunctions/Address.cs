@@ -5,6 +5,7 @@
  */
 using System.Linq;
 using System.Text.RegularExpressions;
+using ircCore.Utils;
 
 namespace ircScript.Classes.ScriptFunctions
 {
@@ -33,13 +34,13 @@ namespace ircScript.Classes.ScriptFunctions
                         return string.Format("*!{0}@{1}", ident, addr);
 
                     case 1:
-                        return string.Format("*!{0}@{1}", ident.Replace("~", "*"), addr);
+                        return string.Format("*!{0}@{1}", ident.ReplaceEx("~", "*"), addr);
 
                     case 2:
                         return string.Format("*!*@{0}", addr);
 
                     case 3:
-                        return string.Format("*!{0}@{1}", ident.Replace("~", "*"), GetAddressWildCard(addr, 1));
+                        return string.Format("*!{0}@{1}", ident.ReplaceEx("~", "*"), GetAddressWildCard(addr, 1));
 
                     case 4:
                         return string.Format("*!*@{0}", GetAddressWildCard(addr, 1));
@@ -48,13 +49,13 @@ namespace ircScript.Classes.ScriptFunctions
                         return string.Format("{0}!{1}@{2}", nick, ident, addr);
 
                     case 6:
-                        return string.Format("{0}!{1}@{2}", nick, ident.Replace("~", "*"), addr);
+                        return string.Format("{0}!{1}@{2}", nick, ident.ReplaceEx("~", "*"), addr);
 
                     case 7:
                         return string.Format("{0}!*@{1}", nick, addr);
 
                     case 8:
-                        return string.Format("{0}!{1}@{2}", nick, ident.Replace("~", "*"), GetAddressWildCard(addr, 1));
+                        return string.Format("{0}!{1}@{2}", nick, ident.ReplaceEx("~", "*"), GetAddressWildCard(addr, 1));
 
                     case 9:
                         return string.Format("{0}!*@{1}", nick, GetAddressWildCard(addr, 1));

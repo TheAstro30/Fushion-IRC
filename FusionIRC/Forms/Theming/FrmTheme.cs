@@ -13,6 +13,7 @@ using FusionIRC.Properties;
 using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Misc;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
 

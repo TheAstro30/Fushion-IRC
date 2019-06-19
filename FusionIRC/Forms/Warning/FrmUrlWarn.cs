@@ -6,6 +6,7 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using FusionIRC.Properties;
 using ircCore.Controls;
 using ircCore.Settings;
 
@@ -45,7 +46,7 @@ namespace FusionIRC.Forms.Warning
                               BackgroundImageLayout = ImageLayout.Center,
                               Location = new Point(12, 12),                              
                               Size = new Size(48, 48),                              
-                              BackgroundImage = Properties.Resources.warning.ToBitmap()
+                              BackgroundImage = Resources.warning.ToBitmap()
                           };
 
             _lblInfo1 = new Label

@@ -112,7 +112,7 @@ namespace ircCore.Users
         public static void ClearNotify()
         {
             var u = string.Format("-{0}",
-                                  string.Join(" ", _users.Notify.Users.Select(o => o.Nick).ToArray()).Replace(" ",
+                                  string.Join(" ", _users.Notify.Users.Select(o => o.Nick).ToArray()).ReplaceEx(" ",
                                                                                                                 " -"));
             _users.Notify.Users.Clear();
             if (NotifyChanged != null)

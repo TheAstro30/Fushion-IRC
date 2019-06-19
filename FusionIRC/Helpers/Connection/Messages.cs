@@ -238,6 +238,8 @@ namespace FusionIRC.Helpers.Connection
             }
             /* Update treenode color */
             WindowManager.SetWindowEvent(c, WindowManager.MainForm, WindowEvent.MessageReceived);
+            /* Play sound */
+            ThemeManager.PlaySound(ThemeSound.Notice);
             /* Process event script */
             var e = new ScriptArgs
                         {

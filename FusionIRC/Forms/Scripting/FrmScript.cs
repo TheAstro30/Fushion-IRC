@@ -16,6 +16,7 @@ using FusionIRC.Properties;
 using ircCore.Controls.Rendering;
 using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Misc;
 using ircCore.Utils;
 using ircScript;
 using ircScript.Classes.Structures;

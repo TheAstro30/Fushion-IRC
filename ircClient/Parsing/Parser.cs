@@ -229,7 +229,7 @@ namespace ircClient.Parsing
                     ParseProtocols(fourth);
                     if (OnWelcome != null)
                     {
-                        OnWelcome(_client, RemoveColon(fourth.Replace(":are", "are")));
+                        OnWelcome(_client, RemoveColon(fourth.ReplaceEx(":are", "are")));
                     }
                     break;
 
@@ -244,7 +244,7 @@ namespace ircClient.Parsing
                     /* LUsers */
                     if (OnLUsers != null)
                     {
-                        OnLUsers(_client, fourth.Replace(":", ""));
+                        OnLUsers(_client, fourth.ReplaceEx(":", string.Empty));
                     }
                     break;
 
@@ -252,7 +252,7 @@ namespace ircClient.Parsing
                     /* Userinfo */
                     if (OnUserInfo != null)
                     {
-                        OnUserInfo(_client, fourth.Replace(":", "").Trim());
+                        OnUserInfo(_client, fourth.ReplaceEx(":", string.Empty).Trim());
                     }
                     break;
 
@@ -389,7 +389,7 @@ namespace ircClient.Parsing
                 case "379":
                 case "671":
                     /* Whois replies */
-                    Whois.OtherInfo.Add(fourth.Replace(":", ""));
+                    Whois.OtherInfo.Add(fourth.ReplaceEx(":", string.Empty));
                     break;
 
                 case "330":
@@ -432,7 +432,7 @@ namespace ircClient.Parsing
                     i = fourth.IndexOf(' ');
                     if (i > -1)
                     {
-                        Whois.Server = string.Format("{0})", fourth.Substring(i).Trim().Replace(":", "("));
+                        Whois.Server = string.Format("{0})", fourth.Substring(i).Trim().ReplaceEx(":", "("));
                     }
                     break;
 
@@ -449,7 +449,7 @@ namespace ircClient.Parsing
                     i = fourth.IndexOf(' ');
                     if (i > -1)
                     {
-                        Whois.Channels = RemoveColon(fourth.Substring(i).Trim()).Replace(" ", ", ");
+                        Whois.Channels = RemoveColon(fourth.Substring(i).Trim()).ReplaceEx(" ", ", ");
                     }
                     break;
 
@@ -482,7 +482,7 @@ namespace ircClient.Parsing
                     IsAdministrator = true;
                     if (OnRaw != null)
                     {
-                        OnRaw(_client, string.Format("{0}", fourth.Replace(":", "")));
+                        OnRaw(_client, string.Format("{0}", fourth.ReplaceEx(":", string.Empty)));
                     }
                     break;
 
@@ -564,7 +564,7 @@ namespace ircClient.Parsing
                     /* Nickname is already in use - switch alternative and nick in user info */
                     if (OnRaw != null)
                     {
-                        OnRaw(_client, string.Format("{0}", fourth.Replace(":", "")));
+                        OnRaw(_client, string.Format("{0}", fourth.ReplaceEx(":", string.Empty)));
                     }
                     if (_client.IsConnecting && !_client.UserInfo.AlternateUsed)
                     {
@@ -768,7 +768,7 @@ namespace ircClient.Parsing
                                     /* Remote client has accepted a resume request or is requesting a resume request */
                                     if (OnDccAcceptResume != null)
                                     {
-                                        OnDccAcceptResume(_client, com == "ACCEPT", n[0], sp[1].Replace("\"", string.Empty), sp[2], sp[3]);
+                                        OnDccAcceptResume(_client, com == "ACCEPT", n[0], sp[1].ReplaceEx("\"", string.Empty), sp[2], sp[3]);
                                     }
                                     break;
                             }                            
@@ -777,7 +777,7 @@ namespace ircClient.Parsing
                         case "ACTION":
                             if (OnActionSelf != null)
                             {
-                                OnActionSelf(_client, n[0], n.Length > 1 ? n[1] : "", t);
+                                OnActionSelf(_client, n[0], n.Length > 1 ? n[1] : string.Empty, t);
                             }
                             break;
                     }                    
@@ -977,7 +977,7 @@ namespace ircClient.Parsing
                         var prefix = sections[1].Split(')');
                         if (prefix.Length == 2)
                         {                            
-                            UserModes = prefix[0].Replace("(", "");
+                            UserModes = prefix[0].ReplaceEx("(", string.Empty);
                             UserModeCharacters = prefix[1];
                         }
                         break;

@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace ircCore.Settings.SettingsBase.Structures
+namespace ircCore.Settings.SettingsBase.Structures.Misc
 {
     public enum SearchDirection
     {

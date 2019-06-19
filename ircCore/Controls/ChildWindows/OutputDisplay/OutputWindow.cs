@@ -189,7 +189,7 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 /* Because of the way the control wraps/rewraps lines on resize, there is a slight jump if the parent form is maximized -
                  * this gets around that issue (but will flicker if the end user is resizing the form) */
                 return;
-            }
+            }          
             /* Set initial graphics modes - not sure they actually make any difference to the overall speed... */
             e.Graphics.InterpolationMode = InterpolationMode.Low;
             e.Graphics.SmoothingMode = SmoothingMode.HighSpeed;

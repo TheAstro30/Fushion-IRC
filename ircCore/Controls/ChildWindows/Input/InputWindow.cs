@@ -5,6 +5,7 @@
  */
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Media;
 using System.Windows.Forms;
 using System.Collections.Generic;
@@ -151,51 +152,46 @@ namespace ircCore.Controls.ChildWindows.Input
         private void BuildContextMenu()
         {
             _mnuContext.Items.Clear();
-            var m = new ToolStripMenuItem("Undo", null, ContextMenuOnClick)
-                        {
-                            ShortcutKeys = Keys.Control | Keys.Z,
-                            Enabled = _txtOut.CanUndo,
-                            Tag = "UNDO"
-                        };
-            _mnuContext.Items.Add(m);
-            var s = new ToolStripSeparator();
-            _mnuContext.Items.Add(s);
-            m = new ToolStripMenuItem("Cut", null, ContextMenuOnClick)
-                    {
-                        ShortcutKeys = Keys.Control | Keys.X,
-                        Enabled = _txtOut.SelectedText.Length > 0,
-                        Tag = "CUT"
-                    };
-            _mnuContext.Items.Add(m);
-            m = new ToolStripMenuItem("Copy", null, ContextMenuOnClick)
-                    {
-                        ShortcutKeys = Keys.Control | Keys.C,
-                        Enabled = _txtOut.SelectedText.Length > 0,
-                        Tag = "COPY"
-                    };
-            _mnuContext.Items.Add(m);
-            m = new ToolStripMenuItem("Paste", null, ContextMenuOnClick)
-                    {
-                        ShortcutKeys = Keys.Control | Keys.V,
-                        Enabled = Clipboard.GetText().Length > 0,
-                        Tag = "PASTE"
-                    };
-            _mnuContext.Items.Add(m);
-            m = new ToolStripMenuItem("Delete", null, ContextMenuOnClick)
-                    {
-                        Enabled = _txtOut.SelectedText.Length > 0,
-                        Tag = "DELETE"
-                    };
-            _mnuContext.Items.Add(m);
-            s = new ToolStripSeparator();
-            _mnuContext.Items.Add(s);
-            m = new ToolStripMenuItem("Select ALL", null, ContextMenuOnClick)
-                    {
-                        ShortcutKeys = Keys.Control | Keys.A,
-                        Enabled = !string.IsNullOrEmpty(_txtOut.Text),
-                        Tag = "ALL"
-                    };
-            _mnuContext.Items.Add(m);
+            _mnuContext.Items.AddRange(new ToolStripItem[]
+                                           {
+                                               new ToolStripMenuItem("Undo", null, ContextMenuOnClick)
+                                                   {
+                                                       ShortcutKeys = Keys.Control | Keys.Z,
+                                                       Enabled = _txtOut.CanUndo,
+                                                       Tag = "UNDO"
+                                                   },
+                                               new ToolStripSeparator(),
+                                               new ToolStripMenuItem("Cut", null, ContextMenuOnClick)
+                                                   {
+                                                       ShortcutKeys = Keys.Control | Keys.X,
+                                                       Enabled = _txtOut.SelectedText.Length > 0,
+                                                       Tag = "CUT"
+                                                   },
+                                               new ToolStripMenuItem("Copy", null, ContextMenuOnClick)
+                                                   {
+                                                       ShortcutKeys = Keys.Control | Keys.C,
+                                                       Enabled = _txtOut.SelectedText.Length > 0,
+                                                       Tag = "COPY"
+                                                   },
+                                               new ToolStripMenuItem("Paste", null, ContextMenuOnClick)
+                                                   {
+                                                       ShortcutKeys = Keys.Control | Keys.V,
+                                                       Enabled = Clipboard.GetText().Length > 0,
+                                                       Tag = "PASTE"
+                                                   },
+                                               new ToolStripMenuItem("Delete", null, ContextMenuOnClick)
+                                                   {
+                                                       Enabled = _txtOut.SelectedText.Length > 0,
+                                                       Tag = "DELETE"
+                                                   },
+                                               new ToolStripSeparator(),
+                                               new ToolStripMenuItem("Select ALL", null, ContextMenuOnClick)
+                                                   {
+                                                       ShortcutKeys = Keys.Control | Keys.A,
+                                                       Enabled = !string.IsNullOrEmpty(_txtOut.Text),
+                                                       Tag = "ALL"
+                                                   }
+                                           });           
         }
 
         private void ContextMenuOnClick(object sender, EventArgs e)
@@ -243,16 +239,9 @@ namespace ircCore.Controls.ChildWindows.Input
             {
                 case 13:
                     /* Return */
-                    if (_txtOut.Text.Length > 0)
+                    if (!string.IsNullOrEmpty(_txtOut.Text))
                     {
-                        IsInCache(_txtOut.Text);
-                        _history.Add(_txtOut.Text);
-                        /* First in, first out */
-                        if (_history.Count > MaximumHistoryCache)
-                        {
-                            _history.RemoveAt(0);
-                        }
-                        _historyPoint = _history.Count;
+                        AddHistoryCache(_txtOut.Text);
                     }
                     else
                     {
@@ -262,7 +251,13 @@ namespace ircCore.Controls.ChildWindows.Input
 
                 case 38:
                     /* Up arrow */
-                    _historyPoint -= 1;
+                    if (_historyPoint == _history.Count && !string.IsNullOrEmpty(_txtOut.Text))
+                    {
+                        /* We are moving up the list but the text box isn't empty - add contents to list */
+                        AddHistoryCache(_txtOut.Text);
+                        _historyPoint--;
+                    }
+                    _historyPoint--;
                     if (_historyPoint < 0)
                     {
                         SystemSounds.Beep.Play();
@@ -280,11 +275,15 @@ namespace ircCore.Controls.ChildWindows.Input
 
                 case 40:
                     /* Down arrow */
-                    _historyPoint += 1;
+                    _historyPoint++;
                     if (_historyPoint > _history.Count - 1)
                     {
                         SystemSounds.Beep.Play();
-                        _txtOut.Text = null;
+                        if (!string.IsNullOrEmpty(_txtOut.Text))
+                        {
+                            AddHistoryCache(_txtOut.Text);
+                        }
+                        _txtOut.Text = string.Empty;
                         _historyPoint = _history.Count;
                         e.Handled = true;
                         return;
@@ -330,17 +329,29 @@ namespace ircCore.Controls.ChildWindows.Input
             }
         }
 
-        private void IsInCache(string text)
-        {
-            var i = _history.IndexOf(text);
-            if (i > -1) { _history.RemoveAt(i); }
-        }
-
+        /* Private helper methods */
         private int GetTextHeight()
         {
             /* Compensates the control height with the font height */
             var g = CreateGraphics();
             return Convert.ToInt32(g.MeasureString("gW", _txtOut.Font).Height);
+        }
+
+        private void AddHistoryCache(string text)
+        {
+            /* Make sure line isn't already in cache */
+            foreach (var s in _history.Where(s => s.Equals(text, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                _history.Remove(s);
+                break;
+            }
+            _history.Add(_txtOut.Text);
+            /* First in, first out */
+            if (_history.Count > MaximumHistoryCache)
+            {
+                _history.RemoveAt(0);
+            }
+            _historyPoint = _history.Count;
         }
     }
 }

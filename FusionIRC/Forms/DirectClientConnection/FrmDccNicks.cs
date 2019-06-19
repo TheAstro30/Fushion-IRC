@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Dcc;
 using libolv;
 
 namespace FusionIRC.Forms.DirectClientConnection

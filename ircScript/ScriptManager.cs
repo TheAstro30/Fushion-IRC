@@ -7,10 +7,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Misc;
 using ircCore.Utils;
 using ircCore.Utils.Serialization;
 using ircScript.Classes;
+using ircScript.Classes.ScriptFunctions;
 using ircScript.Classes.Structures;
 
 namespace ircScript
@@ -37,7 +38,6 @@ namespace ircScript
         public static ScriptVariables Variables = new ScriptVariables();
 
         /* Load/Save methods */
-
         public static ScriptData LoadScript(string fileName)
         {
             /* NOTE: This method returns NULL if failed - this is by design, always check for NULL at other end */
@@ -161,7 +161,7 @@ namespace ircScript
                                 {                 
                                     continue; /* Ignore this line as it's invalid */
                                 }
-                                name = lineData.Substring(0, i).TrimEnd().Replace("/", "");
+                                name = lineData.Substring(0, i).TrimEnd().ReplaceEx("/", string.Empty);
                                 lineData = lineData.Substring(i + 1);
                             }
                             break;

@@ -8,9 +8,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using ircCore.Settings.SettingsBase.Structures.Misc;
 using ircCore.Utils;
 
-namespace ircCore.Settings.SettingsBase.Structures
+namespace ircCore.Settings.SettingsBase.Structures.Client
 {
     [Serializable]
     public class SettingsClient

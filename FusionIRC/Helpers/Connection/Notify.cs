@@ -5,6 +5,8 @@
  */
 using FusionIRC.Forms;
 using ircClient;
+using ircCore.Settings.Theming;
+using ircCore.Settings.Theming.Structures;
 
 namespace FusionIRC.Helpers.Connection
 {
@@ -14,12 +16,16 @@ namespace FusionIRC.Helpers.Connection
         {
             /* User has come online, add to UI list */
             ((FrmClientWindow) WindowManager.MainForm).SwitchView.AddNotify(client, nick, address);
+            /* Play sound */
+            ThemeManager.PlaySound(ThemeSound.NotifyOnline);
         }
 
         public static void OnWatchOffline(ClientConnection client, string nick)
         {
             /* User buggered off, so we now need to remove them from the notify list */
             ((FrmClientWindow) WindowManager.MainForm).SwitchView.RemoveNotify(client, nick);
+            /* Play sound */
+            ThemeManager.PlaySound(ThemeSound.NotifyOffline);
         }
     }
 }

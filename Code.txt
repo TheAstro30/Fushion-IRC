@@ -1,0 +1,19 @@
+    [Serializable]
+    public struct KeyValuePair<TK, TV> where TK : class
+    {
+        [XmlAttribute("key")]
+        public TK Key { get; set; }
+
+        [XmlAttribute("value")]
+        public TV Value { get; set; }
+
+        public KeyValuePair(TK key, TV value ) : this()
+        {
+            if (key == null)
+            {
+                return;
+            }
+            Key = key;
+            Value = value;
+        }
+    }

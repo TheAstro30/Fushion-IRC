@@ -51,7 +51,7 @@ namespace ircScript.Classes.Parsers
                     if (e == null)
                     {
                         /* Remove the identifers found */
-                        sb.Replace(m[i].Value, "", m[i].Index, m[i].Length);
+                        sb.Replace(m[i].Value, string.Empty, m[i].Index, m[i].Length);
                     }
                     else
                     {
@@ -102,7 +102,7 @@ namespace ircScript.Classes.Parsers
 
                 default:
                     /* Check if it's an alias */                    
-                    var id = value.Replace("$", "");
+                    var id = value.ReplaceEx("$", string.Empty);
                     /* Is it an alias or an internal identifier? (Args aren't required here) */
                     var script = ScriptManager.GetScript(ScriptManager.Aliases, id);
                     return script != null ? script.Parse(e) : ParseInternalIdentifier(e, id.ToUpper(), null);
@@ -181,7 +181,7 @@ namespace ircScript.Classes.Parsers
                             }
                             else
                             {
-                                argList[i] = ParseSingleIdentifier(e, argList[i].Replace("$", ""));
+                                argList[i] = ParseSingleIdentifier(e, argList[i].ReplaceEx("$", string.Empty));
                             }                                                        
                         }
                         argList[i] = argList[i];
@@ -291,7 +291,7 @@ namespace ircScript.Classes.Parsers
                         var md5 = new MD5CryptoServiceProvider();
                         var origBytes = Encoding.Default.GetBytes(argList[0]);
                         var newBytes = md5.ComputeHash(origBytes);
-                        return BitConverter.ToString(newBytes).ToLower().Replace("-", string.Empty);
+                        return BitConverter.ToString(newBytes).ToLower().ReplaceEx("-", string.Empty);
                     }
                     break;       
          
@@ -366,6 +366,15 @@ namespace ircScript.Classes.Parsers
                         return rand.Next(low, hi).ToString();
                     }
                     return string.Empty;
+
+                case "REPLACE":
+                    return argList.Length == 3 ? argList[0].ReplaceEx(argList[1], argList[2], StringComparison.OrdinalIgnoreCase) : string.Empty;
+
+                case "REPLACECS":
+                    return argList.Length == 3 ? argList[0].ReplaceEx(argList[1], argList[2]) : string.Empty;
+
+                case "CONCAT":
+                    return string.Join(string.Empty, argList);
             }
             return string.Empty;
         }

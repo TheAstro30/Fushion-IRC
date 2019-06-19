@@ -6,7 +6,7 @@
 using System;
 using System.Xml.Serialization;
 
-namespace ircCore.Settings.SettingsBase.Structures
+namespace ircCore.Settings.SettingsBase.Structures.Client
 {
     [Serializable]
     public class SettingsTrayIcon

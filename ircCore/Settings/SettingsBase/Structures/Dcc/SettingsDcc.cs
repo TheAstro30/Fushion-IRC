@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
 
-namespace ircCore.Settings.SettingsBase.Structures
+namespace ircCore.Settings.SettingsBase.Structures.Dcc
 {
     public enum DccRequestAction
     {

@@ -25,7 +25,7 @@ namespace ircCore.Utils
 
         public static string WildcardToRegex(string pattern)
         {
-            return "^" + Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + "$";
+            return string.Format("^{0}$", Escape(pattern).ReplaceEx("\\*", ".*").ReplaceEx("\\?", "."));
         }
     }
 }

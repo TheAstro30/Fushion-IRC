@@ -9,6 +9,7 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using FusionIRC.Forms.Settings.Controls.Base;
 using FusionIRC.Forms.Settings.Editing;
+using FusionIRC.Properties;
 using ircCore.Settings.Networks;
 using libolv;
 
@@ -133,8 +134,8 @@ namespace FusionIRC.Forms.Settings.Controls.Connection
 
             /* Images for root or children */
             _colName.ImageGetter = x => x is NetworkData
-                                            ? Properties.Resources.network.ToBitmap()
-                                            : Properties.Resources.server.ToBitmap();
+                                            ? Resources.network.ToBitmap()
+                                            : Resources.server.ToBitmap();
 
             /* Change the color of treelines */
             _lvServers.TreeColumnRenderer.LinePen = new Pen(Color.FromArgb(190, 190, 190), 0.5F)

@@ -20,12 +20,15 @@ using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.Channels;
 using ircCore.Settings.Networks;
-using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Client;
+using ircCore.Settings.SettingsBase.Structures.Connection;
+using ircCore.Settings.SettingsBase.Structures.Misc;
 using ircCore.Settings.Theming;
 using ircCore.Users;
 using ircCore.Utils;
 using ircScript;
 using ircScript.Classes;
+using ircScript.Classes.ScriptFunctions;
 using ircScript.Classes.Structures;
 
 namespace FusionIRC.Forms

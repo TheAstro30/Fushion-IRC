@@ -255,7 +255,7 @@ namespace FusionIRC.Forms.DirectClientConnection
                     var add = SettingsManager.Settings.Connection.LocalInfo.HostInfo.Address;
                     var ip = DccManager.IpConvert(add, false);
                     var fs = new FileInfo(string.Format(@"{0}\{1}", dcc.DccFolder, dcc.FileName));
-                    var file = dcc.FileName.Replace(" ", "_");
+                    var file = dcc.FileName.ReplaceEx(" ", "_");
                     dcc.Client.Send(
                         string.Format(
                             "NOTICE {0} :DCC Send {1} ({2}){3}PRIVMSG {0} :\u0001DCC SEND {1} {4} {5} {6}\u0001",

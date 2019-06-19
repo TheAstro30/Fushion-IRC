@@ -26,7 +26,7 @@ using ircCore.Controls.ChildWindows.OutputDisplay;
 using ircCore.Settings;
 using ircCore.Settings.Channels;
 using ircCore.Settings.Networks;
-using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Client;
 using ircCore.Settings.Theming;
 using ircCore.Settings.Theming.Structures;
 using ircCore.Users;
@@ -653,7 +653,7 @@ namespace FusionIRC.Forms.Child
             }
             else
             {                
-                var nick = _regExNick.Replace(word, "");
+                var nick = _regExNick.Replace(word, string.Empty);
                 if (Nicklist != null && Nicklist.ContainsNick(nick))
                 {
                     /* Open a query window with the nick (default action) */
@@ -683,7 +683,7 @@ namespace FusionIRC.Forms.Child
                 else
                 {
                     /* Check if it's a nick? */
-                    if (Nicklist != null && Nicklist.ContainsNick(_regExNick.Replace(word, "")))
+                    if (Nicklist != null && Nicklist.ContainsNick(_regExNick.Replace(word, string.Empty)))
                     {
                         Output.Cursor = Cursors.Hand;
                         Output.AllowSpecialWordDoubleClick = true;

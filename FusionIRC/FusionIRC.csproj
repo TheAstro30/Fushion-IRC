@@ -117,9 +117,6 @@
     <Compile Include="Forms\Theming\Controls\ThemeSounds.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Forms\Theming\Controls\ThemeSounds.Designer.cs">
-      <DependentUpon>ThemeSounds.cs</DependentUpon>
-    </Compile>
     <Compile Include="Helpers\ChannelPropertyData.cs" />
     <Compile Include="Forms\ChannelProperties\Controls\ChannelPropertyBase.cs">
       <SubType>UserControl</SubType>
@@ -201,9 +198,6 @@
     </Compile>
     <Compile Include="Forms\Settings\Controls\Client\ClientOptions.cs">
       <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Forms\Settings\Controls\Client\ClientOptions.Designer.cs">
-      <DependentUpon>ClientOptions.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\Settings\Controls\Client\ClientSystemTray.cs">
       <SubType>UserControl</SubType>
@@ -314,36 +308,44 @@
     <Compile Include="Forms\DirectClientConnection\Helper\DccManager.cs" />
     <Compile Include="Helpers\MdiHelper.cs" />
     <Compile Include="Helpers\ReconnectOnDisconnect.cs" />
-    <Compile Include="Helpers\UserTimers.cs" />
+    <Compile Include="Helpers\Timers\UserTimer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Helpers\Timers\UserTimerManager.cs" />
     <Compile Include="Helpers\WindowManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\Misc\FrmChannelList.resx">
       <DependentUpon>FrmChannelList.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DirectClientConnection\FrmDccManager.resx">
       <DependentUpon>FrmDccManager.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientCaching.resx">
       <DependentUpon>ClientCaching.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientConfirm.resx">
       <DependentUpon>ClientConfirm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientLogging.resx">
       <DependentUpon>ClientLogging.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientMessages.resx">
       <DependentUpon>ClientMessages.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientOptions.resx">
-      <DependentUpon>ClientOptions.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Client\ClientSystemTray.resx">
       <DependentUpon>ClientSystemTray.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Connection\ConnectionOptions.resx">
       <DependentUpon>ConnectionOptions.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Dcc\DccOptions.resx">
       <DependentUpon>DccOptions.cs</DependentUpon>
@@ -353,9 +355,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Settings\Controls\Mouse\MouseDoubleClick.resx">
       <DependentUpon>MouseDoubleClick.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Theming\Controls\ThemeSounds.resx">
-      <DependentUpon>ThemeSounds.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -397,20 +396,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Wave\notification.wav" />
-    <None Include="Wave\cork.wav" />
-    <None Include="Icons\Dialog\notifyGroup.ico" />
-    <None Include="Icons\ChildWindows\list.ico" />
-    <None Include="Icons\Dialog\autoPerform.ico" />
-    <None Include="Icons\Dialog\aboutDialog.ico" />
-    <None Include="Icons\Dialog\autoConnect.ico" />
-    <None Include="Icons\Toolbar\logs.ico" />
-    <None Include="Icons\Dialog\dccManager.ico" />
-    <None Include="Icons\Toolbar\dccChat.ico" />
-    <None Include="Icons\Toolbar\dccSend.ico" />
-    <None Include="Icons\Dialog\dccChatRequest.ico" />
-    <None Include="Icons\Toolbar\downloads.ico" />
-    <None Include="Icons\Dialog\themeSound.ico" />
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup />

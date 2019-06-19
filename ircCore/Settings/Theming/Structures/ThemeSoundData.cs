@@ -4,6 +4,7 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using ircCore.Utils;
@@ -25,8 +26,50 @@ namespace ircCore.Settings.Theming.Structures
         [Description("Disconnect")]
         Disconnect = 1,
 
+        [Description("User Join")]
+        UserJoin = 2,
+
+        [Description("User Part")]
+        UserPart = 3,
+
+        [Description("User Quit")]
+        UserQuit = 4,
+
+        [Description("User Kick")]
+        UserKick = 5,
+
+        [Description("Kick (Yourself)")]
+        SelfKick = 6,
+
+        [Description("Nick Change")]
+        Nick = 7,
+
         [Description("Private Message")]
-        PrivateMessage = 10
+        PrivateMessage = 8,
+
+        [Description("Notices")]
+        Notice = 9,
+
+        [Description("Invites")]
+        Invite = 10,
+
+        [Description("Notify Online")]
+        NotifyOnline = 11,
+
+        [Description("Notify Offline")]
+        NotifyOffline = 12,
+
+        [Description("DCC Get Request")]
+        DccGet = 13,
+
+        [Description("DCC Chat Request")]
+        DccChat = 14,
+
+        [Description("DCC Transfer Completed")]
+        DccTransferComplete = 15,
+
+        [Description("DCC Transfer Failed")]
+        DccTransferFailed = 16
     }
 
     [Serializable]
@@ -52,9 +95,29 @@ namespace ircCore.Settings.Theming.Structures
                 return Type == ThemeSoundType.Default
                            ? "<Default>"
                            : Type != ThemeSoundType.None
-                                 ? Path.GetFileNameWithoutExtension(SoundPath)
+                                 ? Path.GetFileName(SoundPath)
                                  : string.Empty;
             }
+        }
+    }
+
+    [Serializable]
+    public class ThemeSounds
+    {        
+        public bool Enable { get; set; }
+
+        public List<ThemeSoundData> SoundData = new List<ThemeSoundData>();
+
+        public ThemeSounds()
+        {
+            /* Empty default constructor */
+        }
+
+        public ThemeSounds(ThemeSounds sounds)
+        {
+            /* Copy constructor */
+            Enable = sounds.Enable;
+            SoundData = new List<ThemeSoundData>(sounds.SoundData);
         }
     }
 }

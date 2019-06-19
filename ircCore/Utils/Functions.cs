@@ -88,7 +88,7 @@ namespace ircCore.Utils
 
         public static string CleanFileName(string fileName)
         {
-            return Path.GetInvalidFileNameChars().Aggregate(fileName, (current, c) => current.Replace(c.ToString(), string.Empty));
+            return Path.GetInvalidFileNameChars().Aggregate(fileName, (current, c) => current.ReplaceEx(c.ToString(), string.Empty));
         }
 
         public static string GetFirstWord(string input)
@@ -101,15 +101,15 @@ namespace ircCore.Utils
         {
             var folder = AppDomain.CurrentDomain.BaseDirectory;
             var progFolder = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            var compare = folder.Replace(progFolder, null);
+            var compare = folder.ReplaceEx(progFolder, null);
             if (folder.Substring(0, folder.Length - compare.Length) == progFolder)
             {
                 /* If this is in progfiles, according to MicroSoft we can't access this folder,
                    so we have to use AppData instead */
                 _mainFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\FusionIRC";
                 /* Copy any files from application directory that need to be user read/writable */
-                CopyDirectory(folder + @"\data", _mainFolder + @"\data");
-                CopyDirectory(folder + @"\themes", _mainFolder + @"\themes");
+                CopyDirectory(string.Format(@"{0}\data", folder), string.Format(@"{0}\data", _mainFolder));
+                CopyDirectory(string.Format(@"{0}\themes", folder), string.Format(@"{0}\themes", _mainFolder));
             }
             else
             {
@@ -120,26 +120,11 @@ namespace ircCore.Utils
         public static void CheckFolders()
         {
             /* Check folders exist */
-            if (!Directory.Exists(_mainFolder))
-            {
-                Directory.CreateDirectory(_mainFolder);
-            }
-            if (!Directory.Exists(_mainFolder + @"\data"))
-            {
-                Directory.CreateDirectory(_mainFolder + @"\data");
-            }
-            if (!Directory.Exists(_mainFolder + @"\themes"))
-            {
-                Directory.CreateDirectory(_mainFolder + @"\themes");
-            }
-            if (!Directory.Exists(_mainFolder + @"\scripts"))
-            {
-                Directory.CreateDirectory(_mainFolder + @"\scripts");
-            }
-            if (!Directory.Exists(_mainFolder + @"\downloads"))
-            {
-                Directory.CreateDirectory(_mainFolder + @"\downloads");
-            }
+            CreateDirectory(_mainFolder);
+            CreateDirectory(string.Format(@"{0}\data", _mainFolder));
+            CreateDirectory(string.Format(@"{0}\themes", _mainFolder));
+            CreateDirectory(string.Format(@"{0}\scripts", _mainFolder));
+            CreateDirectory(string.Format(@"{0}\downloads", _mainFolder));
         }
 
         public static string MainDir(string path)
@@ -160,9 +145,9 @@ namespace ircCore.Utils
                 if (path.ToLower().Contains(sFolder.ToLower()))
                 {
                     /* Remove app path */
-                    return @"\" + path.Replace(sFolder, null);
+                    return string.Format(@"\{0}", path.ReplaceEx(sFolder, string.Empty));
                 }
-                return path.Substring(0, 1) == @"\" ? (sFolder + path).Replace(@"\\", @"\") : path.Replace(@"\\", @"\");
+                return path.Substring(0, 1) == @"\" ? (sFolder + path).ReplaceEx(@"\\", @"\") : path.ReplaceEx(@"\\", @"\");
             }
             /* Failed */
             return allowEmptyPath ? sFolder : string.Empty;
@@ -222,7 +207,7 @@ namespace ircCore.Utils
 
         public static string StripControlCodes(string text, bool strip)
         {
-            return strip ? string.IsNullOrEmpty(text) ? string.Empty : RegExAllCodes.Replace(text, "") : text;
+            return strip ? string.IsNullOrEmpty(text) ? string.Empty : RegExAllCodes.Replace(text, string.Empty) : text;
         }
 
         public static string TruncateString(string text, int length)
@@ -285,6 +270,14 @@ namespace ircCore.Utils
         }
 
         /* Private methods */
+        private static void CreateDirectory(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+        }
+
         private static void CopyDirectory(string srcFolder, string destFolder)
         {
             if (!Directory.Exists(srcFolder)) { return; }

@@ -11,6 +11,7 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using ircCore.Controls.Notification;
+using ircCore.Properties;
 
 namespace ircCore.Controls
 {
@@ -184,7 +185,7 @@ namespace ircCore.Controls
                             TitleFont = new Font("Segeo UI Semibold", 10),
                             ContentFont = new Font("Segeo UI", 9),
                             Size = new Size(230, height),
-                            Image = Properties.Resources.fusion.ToBitmap(),
+                            Image = Resources.fusion.ToBitmap(),
                             TitleText = title,
                             ContentText = text,
                             AnimationDuration = 350,

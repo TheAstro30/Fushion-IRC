@@ -40,6 +40,7 @@ using ircScript.Controls.SyntaxHighlight.Helpers.TypeDescriptors;
 using ircScript.Controls.SyntaxHighlight.Highlight;
 using ircScript.Controls.SyntaxHighlight.Styles;
 using ircScript.Controls.SyntaxHighlight.TextBoxEventArgs;
+using ircCore.Utils;
 using Char = ircScript.Controls.SyntaxHighlight.Helpers.Char;
 using Timer = System.Windows.Forms.Timer;
 
@@ -4985,8 +4986,8 @@ namespace ircScript.Controls.SyntaxHighlight
                 return;
             }
             /* select folded block */
-            int iStart = (marker as FoldedAreaMarker).Line;
-            int iEnd = FindEndOfFoldingBlock(iStart);
+            var iStart = (marker as FoldedAreaMarker).Line;
+            var iEnd = FindEndOfFoldingBlock(iStart);
             if (iEnd < 0)
             {
                 return;
@@ -5115,7 +5116,7 @@ namespace ircScript.Controls.SyntaxHighlight
 
         protected virtual string PrepareHtmlText(string s)
         {
-            return s.Replace("<", "&lt;").Replace(">", "&gt;").Replace("&", "&amp;");
+            return s.ReplaceEx("<", "&lt;").ReplaceEx(">", "&gt;").ReplaceEx("&", "&amp;");
         }
 
         public void Print(PrintDialogSettings settings)
@@ -6338,15 +6339,19 @@ namespace ircScript.Controls.SyntaxHighlight
             Selection.BeginUpdate();
             try
             {
-                int iLine = Selection.Start.Line;
-                int spaces = this[iLine].StartSpacesCount;
+                var iLine = Selection.Start.Line;
+                var spaces = this[iLine].StartSpacesCount;
                 if (Selection.Start.Char <= spaces)
+                {
                     Selection.GoHome(shift);
+                }
                 else
                 {
                     Selection.GoHome(shift);
-                    for (int i = 0; i < spaces; i++)
+                    for (var i = 0; i < spaces; i++)
+                    {
                         Selection.GoRight(shift);
+                    }
                 }
             }
             finally
@@ -6388,12 +6393,9 @@ namespace ircScript.Controls.SyntaxHighlight
             Selection.End = old.End;
         }
 
-        /// <summary>
-        /// Convert selected text to sentence case
-        /// </summary>
         public virtual void SentenceCase()
         {
-            Range old = Selection.Clone();
+            var old = Selection.Clone();
             var lowerCase = SelectedText.ToLower();
             var r = new Regex(@"(^\S)|[\.\?!:]\s+(\S)", RegexOptions.ExplicitCapture);
             SelectedText = r.Replace(lowerCase, s => s.Value.ToUpper());
@@ -6401,33 +6403,35 @@ namespace ircScript.Controls.SyntaxHighlight
             Selection.End = old.End;
         }
 
-        /// <summary>
-        /// Insert/remove comment prefix into selected lines
-        /// </summary>
         public void CommentSelected()
         {
             CommentSelected(CommentPrefix);
         }
 
-        /// <summary>
-        /// Insert/remove comment prefix into selected lines
-        /// </summary>
         public virtual void CommentSelected(string commentPrefix)
         {
             if (string.IsNullOrEmpty(commentPrefix))
+            {
                 return;
+            }
             Selection.Normalize();
-            bool isCommented = _lines[Selection.Start.Line].Text.TrimStart().StartsWith(commentPrefix);
+            var isCommented = _lines[Selection.Start.Line].Text.TrimStart().StartsWith(commentPrefix);
             if (isCommented)
+            {
                 RemoveLinePrefix(commentPrefix);
+            }
             else
+            {
                 InsertLinePrefix(commentPrefix);
+            }
         }
 
         public void OnKeyPressing(KeyPressEventArgs args)
         {
             if (KeyPressing != null)
+            {
                 KeyPressing(this, args);
+            }
         }
 
         private bool OnKeyPressing(char c)

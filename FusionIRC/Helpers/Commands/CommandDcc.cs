@@ -11,6 +11,7 @@ using ircClient;
 using ircClient.Tcp;
 using ircCore.Settings;
 using ircCore.Settings.Theming;
+using ircCore.Utils;
 
 namespace FusionIRC.Helpers.Commands
 {
@@ -76,7 +77,7 @@ namespace FusionIRC.Helpers.Commands
                         }
                         dcc.BeginConnect();
                         /* Send notification to user */
-                        var fl = dcc.FileName.Replace(" ", "_");
+                        var fl = dcc.FileName.ReplaceEx(" ", "_");
                         client.Send(
                             string.Format(
                                 "NOTICE {0} :DCC Send {1} ({2}){3}PRIVMSG {0} :\u0001DCC SEND {1} {4} {5} {6}\u0001",

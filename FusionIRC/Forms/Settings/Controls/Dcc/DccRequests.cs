@@ -7,6 +7,7 @@ using System;
 using FusionIRC.Forms.Settings.Controls.Base;
 using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Dcc;
 using ircCore.Utils;
 
 namespace FusionIRC.Forms.Settings.Controls.Dcc

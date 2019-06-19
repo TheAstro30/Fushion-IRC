@@ -5,8 +5,10 @@
  */
 using System;
 using System.Windows.Forms;
+using FusionIRC.Forms.Child;
+using ircClient;
 
-namespace ircScript.Classes.ScriptFunctions
+namespace FusionIRC.Helpers.Timers
 {
     public class UserTimer : Timer
     {
@@ -16,6 +18,8 @@ namespace ircScript.Classes.ScriptFunctions
         private int _interval;
 
         /* Public properties */
+        public bool IsSilent { get; set; }
+
         public string Name { get; set; }
         
         public new int Interval
@@ -38,6 +42,12 @@ namespace ircScript.Classes.ScriptFunctions
         }
         
         public bool IsContinuous { get; set; }
+
+        public string Command { get; set; }
+
+        public ClientConnection Client { get; set; }
+
+        public FrmChildWindow Child { get; set; }
 
         /* Events raised */
         public event Action<UserTimer> OnTimer;

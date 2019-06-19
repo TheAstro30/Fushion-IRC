@@ -20,7 +20,7 @@ namespace ircScript.Controls
     {
         private readonly Regex _commentPrefix = new Regex(@"//.*$", RegexOptions.Multiline | RegexOptions.Compiled);
 
-        private readonly Regex _keywordPrefix = new Regex(@"\b(alias|if|elseif|else|while|on|return|break|halt|isnull|isnum)\b",
+        private readonly Regex _keywordPrefix = new Regex(@"\b(alias|if|elseif|else|while|on|return|break|halt|isnull|isnum|isin)\b",
                                                           RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private readonly Regex _identifierPrefix =
@@ -28,7 +28,7 @@ namespace ircScript.Controls
                 @"\$input|\$\+|\$me|\$chan|\$nick|\$active|\$gettok|\$rand" +
                 @"\$addtok|\$deltok|\$cid|\$asctime|\$ctime|\$duration|" +
                 @"\$calc|\$iif|\$encode|\$decode|\$appdir|\$chr|\$asc|\$readini|" +
-                @"\$read|\$server|\$network|\$address|\$comchan|\$strip" +
+                @"\$read|\$server|\$network|\$address|\$comchan|\$strip|" +
                 @"\$len|\$left|\$mid|\$right|\$upper|\$lower");
 
         private readonly Regex _commandPrefix = new Regex(@"\b(set|var|inc|dec|unset|echo|writeini|write)\b",

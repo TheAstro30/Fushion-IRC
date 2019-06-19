@@ -6,9 +6,8 @@
 using System;
 using System.Drawing;
 using System.Xml.Serialization;
-using ircCore.Utils;
 
-namespace ircCore.Settings.SettingsBase.Structures
+namespace ircCore.Settings.SettingsBase.Structures.Misc
 {
     [Serializable]
     public class SettingsEditor

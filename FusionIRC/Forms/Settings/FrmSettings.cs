@@ -17,6 +17,7 @@ using FusionIRC.Helpers;
 using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Client;
 using ircCore.Settings.Theming;
 using ircCore.Utils;
 
@@ -247,7 +248,7 @@ namespace FusionIRC.Forms.Settings
                                                                                         Name = "CONNECTIONLOCALINFO"
                                                                                     }
                                                                             });
-            _tvMenu.Nodes[0].Tag = _connectionServers;
+            _tvMenu.Nodes[0].Tag = _connectionServers;            
             /* Client options... */
             _tvMenu.Nodes.Add("CLIENT", "Client").Nodes.AddRange(new[]
                                                                      {
@@ -308,6 +309,7 @@ namespace FusionIRC.Forms.Settings
                                                                        }
                                                                });
             _tvMenu.Nodes[3].Tag = _dccRequests;
+            _tvMenu.ExpandAll();
         }
 
         private void OnSettingsChanged(ISettings control)
@@ -330,13 +332,14 @@ namespace FusionIRC.Forms.Settings
             }
             _btnApply.Enabled = false;
             SettingsManager.Save();
-            /* Update logging */
-            if (_loggingChanged)
-            {
-                var type = SettingsManager.Settings.Client.Logging.KeepLogsType;
-                var close = false;
-                foreach (var w in WindowManager.Windows.SelectMany(c => c.Value))
+            /* Update child windows */
+            var type = SettingsManager.Settings.Client.Logging.KeepLogsType;
+            var close = false;
+            foreach (var w in WindowManager.Windows.SelectMany(c => c.Value))
+            {                
+                if (_loggingChanged)
                 {
+                    /* Update logging */
                     switch (w.WindowType)
                     {
                         case ChildWindowType.Channel:
@@ -364,21 +367,24 @@ namespace FusionIRC.Forms.Settings
                         {
                             w.Logger.CloseLog(); /* Must call this first when changing any setting */
                             /* Forgot to add this!! */
-                            w.Logger.FilePath = w.Logger.FilePath = string.Format("{0}.log", Functions.GetLogFileName(w.Client.Network, w.Tag.ToString(), true));
+                            w.Logger.FilePath =
+                                w.Logger.FilePath =
+                                string.Format("{0}.log",
+                                              Functions.GetLogFileName(w.Client.Network, w.Tag.ToString(), true));
                             w.Logger.CreateLog();
                         }
                     }
-                    /* Line spacing */
-                    w.Output.LinePaddingPixels = SettingsManager.Settings.Client.Messages.LinePadding;
-                    w.Output.LineSpacingStyle = SettingsManager.Settings.Client.Messages.LineSpacing;
-                    w.Output.AdjustWidth(false);
-                    /* Input box */
-                    w.Input.ConfirmPaste = SettingsManager.Settings.Client.Confirmation.ConfirmPaste;
-                    w.Input.ConfirmPasteLines = SettingsManager.Settings.Client.Confirmation.PasteLines;
                 }
+                /* Line spacing */
+                w.Output.LinePaddingPixels = SettingsManager.Settings.Client.Messages.LinePadding;
+                w.Output.LineSpacingStyle = SettingsManager.Settings.Client.Messages.LineSpacing;
+                w.Output.AdjustWidth(false);
+                /* Input box */
+                w.Input.ConfirmPaste = SettingsManager.Settings.Client.Confirmation.ConfirmPaste;
+                w.Input.ConfirmPasteLines = SettingsManager.Settings.Client.Confirmation.PasteLines;
             }
             /* Update tray icon */
-            var owner = (TrayIcon)WindowManager.MainForm;
+            var owner = (TrayIcon) WindowManager.MainForm;
             if (owner != null)
             {
                 owner.TrayHideOnMinimize = SettingsManager.Settings.Client.TrayIcon.HideMinimized;
@@ -390,10 +396,11 @@ namespace FusionIRC.Forms.Settings
                 owner.TrayNotifyIcon.Visible = owner.TrayAlwaysShowIcon;
                 owner.TrayShowNotifications = SettingsManager.Settings.Client.TrayIcon.ShowNotifications;
                 /* Control bars */
-                ((FrmClientWindow)owner).MenuBar.Visible = SettingsManager.Settings.Client.Appearance.ControlBars.Control[0].Visible;
-                ((FrmClientWindow)owner).ToolBar.Visible = SettingsManager.Settings.Client.Appearance.ControlBars.Control[1].Visible;
+                ((FrmClientWindow) owner).MenuBar.Visible =
+                    SettingsManager.Settings.Client.Appearance.ControlBars.Control[0].Visible;
+                ((FrmClientWindow) owner).ToolBar.Visible =
+                    SettingsManager.Settings.Client.Appearance.ControlBars.Control[1].Visible;
             }
-            
         }
 
         /* Select last known node */

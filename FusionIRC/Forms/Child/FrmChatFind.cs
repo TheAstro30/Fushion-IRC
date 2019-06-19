@@ -13,6 +13,8 @@ using System.Windows.Forms;
 using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Misc;
+using ircCore.Utils;
 
 namespace FusionIRC.Forms.Child
 {
@@ -284,8 +286,8 @@ namespace FusionIRC.Forms.Child
                 }
             }
             var regXMatch = !matchCase
-                                ? new Regex(Regex.Escape(matchString.Replace("*", null)), RegexOptions.IgnoreCase)
-                                : new Regex(Regex.Escape(matchString.Replace("*", null)));
+                                ? new Regex(Regex.Escape(matchString.ReplaceEx("*", string.Empty)), RegexOptions.IgnoreCase)
+                                : new Regex(Regex.Escape(matchString.ReplaceEx("*", string.Empty)));
             int x;
             int y;
             var pointer = 0;            

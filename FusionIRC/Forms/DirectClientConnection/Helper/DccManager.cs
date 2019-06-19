@@ -15,7 +15,9 @@ using ircClient;
 using ircClient.Tcp;
 using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Dcc;
 using ircCore.Settings.Theming;
+using ircCore.Settings.Theming.Structures;
 using ircCore.Users;
 using ircCore.Utils;
 
@@ -43,11 +45,13 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
             if (UserManager.IsIgnored(string.Format("{0}!{1}", nick, address)))
             {
                 return;
-            }
+            }            
             /* Auto-accept is the default action and is not checked here */
             switch (SettingsManager.Settings.Dcc.Requests.ChatRequest)
             {
                 case DccRequestAction.Ask:
+                    /* Play sound */
+                    ThemeManager.PlaySound(ThemeSound.DccChat);
                     using (var d = new FrmDccConfirm(DccType.DccChat) {NickName = String.Format("{0} ({1})", nick, address)})
                     {
                         if (d.ShowDialog(WindowManager.MainForm) == DialogResult.Cancel)
@@ -59,7 +63,7 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
 
                 case DccRequestAction.Ignore:
                     return;
-            }
+            }            
             /* Port */
             int p;
             if (!Int32.TryParse(port, out p))
@@ -119,6 +123,8 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
                         switch (SettingsManager.Settings.Dcc.Requests.GetRequest)
                         {
                             case DccRequestAction.Ask:
+                                /* Play sound */
+                                ThemeManager.PlaySound(ThemeSound.DccGet);
                                 using (var req = new FrmDccConfirm(DccType.DccFileTransfer) { FileName = file, NickName = string.Format("{0} ({1})", nick, address) })
                                 {
                                     if (req.ShowDialog(WindowManager.MainForm) == DialogResult.Cancel)
@@ -219,7 +225,7 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
             /* Get resume */
             uint i;
             int p;
-            var dcc = GetTransfer(nick, get ? file : file.Replace("_", " "));
+            var dcc = GetTransfer(nick, get ? file : file.ReplaceEx("_", " "));
             if (dcc == null || !uint.TryParse(position, out i) || !int.TryParse(port, out p))
             {
                 return;
@@ -240,6 +246,18 @@ namespace FusionIRC.Forms.DirectClientConnection.Helper
         public static void OnDccTransferProgress(Dcc dcc)
         {
             DccManagerWindow.UpdateTransferData();
+            switch (dcc.Status)
+            {
+                case DccFileStatus.Completed:
+                    /* Play sound */
+                    ThemeManager.PlaySound(ThemeSound.DccTransferComplete);
+                    break;
+
+                case DccFileStatus.Failed:
+                    /* Play sound */
+                    ThemeManager.PlaySound(ThemeSound.DccTransferFailed);
+                    break;
+            }
         }
 
         /* Public methods */

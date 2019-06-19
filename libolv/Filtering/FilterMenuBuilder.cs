@@ -24,6 +24,7 @@ using System.Windows.Forms;
 using System.Collections;
 using System.Drawing;
 using libolv.Implementation;
+using libolv.Properties;
 using libolv.SubControls;
 
 namespace libolv.Filtering
@@ -35,8 +36,8 @@ namespace libolv.Filtering
         public static string FilteringLabel = "Filtering";
         public static string SelectAllLabel = "Select All";
 
-        public static Bitmap ClearFilteringImage = Properties.Resources.ClearFiltering;
-        public static Bitmap FilteringImage = Properties.Resources.Filtering;
+        public static Bitmap ClearFilteringImage = Resources.ClearFiltering;
+        public static Bitmap FilteringImage = Resources.Filtering;
 
         private bool _treatNullAsDataValue = true;
         private int _maxObjectsToConsider = 10000;

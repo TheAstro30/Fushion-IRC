@@ -7,7 +7,7 @@ using System;
 using System.Xml.Serialization;
 using ircCore.Controls.ChildWindows.OutputDisplay.Helpers;
 
-namespace ircCore.Settings.SettingsBase.Structures
+namespace ircCore.Settings.SettingsBase.Structures.Client
 {
     [Serializable]
     public class SettingsMessages

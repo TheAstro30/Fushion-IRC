@@ -13,9 +13,11 @@ using ircCore.Controls;
 using ircCore.Settings;
 using ircCore.Settings.Networks;
 using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Connection;
 using ircCore.Settings.Theming;
 using ircCore.Settings.Theming.Structures;
 using ircCore.Users;
+using ircCore.Utils;
 using ircScript.Classes;
 using ircScript.Classes.Structures;
 
@@ -130,7 +132,7 @@ namespace FusionIRC.Helpers.Connection
             if (client.Parser.AllowsWatch)
             {
                 var nicks = UserManager.GetNotifyList();                
-                client.Send(string.Format("WATCH +{0}", string.Join(" ", nicks.Select(o => o.Nick).ToArray()).Replace(" ", " +")));
+                client.Send(string.Format("WATCH +{0}", string.Join(" ", nicks.Select(o => o.Nick).ToArray()).ReplaceEx(" ", " +")));
             }
         }
 

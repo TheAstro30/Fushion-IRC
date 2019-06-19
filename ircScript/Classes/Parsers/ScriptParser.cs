@@ -5,6 +5,7 @@
  */
 using System.Text;
 using System.Text.RegularExpressions;
+using ircCore.Utils;
 using ircScript.Classes.Structures;
 
 namespace ircScript.Classes.Parsers
@@ -46,25 +47,29 @@ namespace ircScript.Classes.Parsers
                     if (multi)
                     {
                         /* Attempt to get the numeric value of $[N]- */                        
-                        if (!int.TryParse(m[i].Value.Replace("$", "").Replace("-", ""), out index))
+                        if (!int.TryParse(m[i].Value.ReplaceEx("$", string.Empty).ReplaceEx("-", string.Empty), out index))
                         {
                             index = 0;
                         }
                         sb.Replace(m[i].Value,
                                    args != null && args.Length > 0 && args.Length - (index - 1) > 0
-                                       ? string.Join(" ", args, index - 1, args.Length - (index - 1))
-                                       : "");
+                                       ? string.Join(" ", args, index - 1, args.Length - (index - 1)).Replace(
+                                           (char) 44, (char) 7)
+                                       : string.Empty);
                     }
                     else
                     {
                         /* Single tokens $[N] */
-                        if (!int.TryParse(m[i].Value.Replace("$", ""), out index))
+                        if (!int.TryParse(m[i].Value.ReplaceEx("$", string.Empty), out index))
                         {
                             index = 0;
                         }
-                        sb.Replace(m[i].Value, args != null && index - 1 < args.Length ? args[index - 1] : "");                        
+                        sb.Replace(m[i].Value,
+                                   args != null && index - 1 < args.Length
+                                       ? args[index - 1].Replace((char) 44, (char) 7)
+                                       : string.Empty);
                     }
-                }                
+                }     
                 return sb.ToString();
             }
             /* Short, but, again, sweet :P */

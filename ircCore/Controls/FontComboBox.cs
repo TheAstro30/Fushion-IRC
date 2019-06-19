@@ -6,6 +6,7 @@
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using ircCore.Properties;
 
 namespace ircCore.Controls
 {
@@ -26,7 +27,7 @@ namespace ircCore.Controls
             }
         }
 
-        private readonly Image _ttImg = Properties.Resources.ttfIcon;
+        private readonly Image _ttImg = Resources.ttfIcon;
 
         public FontComboBox()
         {

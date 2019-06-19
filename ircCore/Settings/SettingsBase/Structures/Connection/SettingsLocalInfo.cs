@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.Xml.Serialization;
 using ircCore.Utils;
 
-namespace ircCore.Settings.SettingsBase.Structures
+namespace ircCore.Settings.SettingsBase.Structures.Connection
 {
     public enum LocalInfoLookupMethod
     {

@@ -6,7 +6,7 @@
 using System;
 using System.Xml.Serialization;
 
-namespace ircCore.Settings.SettingsBase.Structures
+namespace ircCore.Settings.SettingsBase.Structures.Mouse
 {
     [Serializable]
     public class SettingsMouse

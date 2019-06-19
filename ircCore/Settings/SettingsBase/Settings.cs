@@ -4,11 +4,17 @@
  * Provided AS-IS with no warranty expressed or implied
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using ircCore.Controls.ChildWindows.OutputDisplay.Helpers;
 using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Client;
+using ircCore.Settings.SettingsBase.Structures.Connection;
+using ircCore.Settings.SettingsBase.Structures.Dcc;
+using ircCore.Settings.SettingsBase.Structures.Misc;
+using ircCore.Settings.SettingsBase.Structures.Mouse;
 
 namespace ircCore.Settings.SettingsBase
 {
@@ -169,7 +175,7 @@ namespace ircCore.Settings.SettingsBase
             Client.Channels.ChannelList.Minimum = 3;
             Client.Channels.ChannelList.Minimum = 1000;
             /* Create a blank theme */
-            Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = @"\themes\default.thm"});            
+            Themes.Theme.Add(new SettingsTheme.ThemeListData {Name = "Default", Path = @"\themes\default.thm"});                        
         }
     }
 }

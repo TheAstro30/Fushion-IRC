@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using ircCore.Properties;
 using ircCore.Settings.Theming.Structures;
 
 namespace ircCore.Settings.Theming
@@ -36,7 +37,7 @@ namespace ircCore.Settings.Theming
 
         public Dictionary<ThemeNicklistImage, Bitmap> NicklistImages = new Dictionary<ThemeNicklistImage, Bitmap>();
 
-        public List<ThemeSoundData> ThemeSounds = new List<ThemeSoundData>(); 
+        public ThemeSounds ThemeSounds = new ThemeSounds(); 
         
         /* Constructor */
         public Theme()
@@ -123,13 +124,14 @@ namespace ircCore.Settings.Theming
             Messages.Add(ThemeMessage.DccChatDisconnectedText, new ThemeMessageData { DefaultColor = 4, Message = "$ts * DCC session closed." });
             Messages.Add(ThemeMessage.DccChatConnectionErrorText, new ThemeMessageData { DefaultColor = 4, Message = "$ts * DCC connection error ($text)" });
             /* Image list... */
-            NicklistImages.Add(ThemeNicklistImage.Owner, Properties.Resources.owner.ToBitmap());
-            NicklistImages.Add(ThemeNicklistImage.Protected, Properties.Resources.prot.ToBitmap());
-            NicklistImages.Add(ThemeNicklistImage.Operator, Properties.Resources.op.ToBitmap());
-            NicklistImages.Add(ThemeNicklistImage.HalfOperator, Properties.Resources.halfop.ToBitmap());
-            NicklistImages.Add(ThemeNicklistImage.Voice, Properties.Resources.voice.ToBitmap());
+            NicklistImages.Add(ThemeNicklistImage.Owner, Resources.owner.ToBitmap());
+            NicklistImages.Add(ThemeNicklistImage.Protected, Resources.prot.ToBitmap());
+            NicklistImages.Add(ThemeNicklistImage.Operator, Resources.op.ToBitmap());
+            NicklistImages.Add(ThemeNicklistImage.HalfOperator, Resources.halfop.ToBitmap());
+            NicklistImages.Add(ThemeNicklistImage.Voice, Resources.voice.ToBitmap());
             /* Theme sounds */
-            ThemeSounds.AddRange(new[]
+            ThemeSounds.Enable = true;
+            ThemeSounds.SoundData.AddRange(new[]
                                      {
                                          new ThemeSoundData
                                              {
@@ -145,9 +147,93 @@ namespace ircCore.Settings.Theming
                                              },
                                          new ThemeSoundData
                                              {
+                                                 ThemeSound = ThemeSound.UserJoin,
+                                                 Type = ThemeSoundType.None,
+                                                 Enabled = false
+                                             },
+                                         new ThemeSoundData
+                                             {
+                                                 ThemeSound = ThemeSound.UserPart,
+                                                 Type = ThemeSoundType.None,
+                                                 Enabled = false
+                                             },
+                                         new ThemeSoundData
+                                             {
+                                                 ThemeSound = ThemeSound.UserQuit,
+                                                 Type = ThemeSoundType.None,
+                                                 Enabled = false
+                                             },
+                                         new ThemeSoundData
+                                             {
+                                                 ThemeSound = ThemeSound.UserKick,
+                                                 Type = ThemeSoundType.None,
+                                                 Enabled = false
+                                             },
+                                         new ThemeSoundData
+                                             {
+                                                 ThemeSound = ThemeSound.SelfKick,
+                                                 Type = ThemeSoundType.None,
+                                                 Enabled = false
+                                             },
+                                         new ThemeSoundData
+                                             {
+                                                 ThemeSound = ThemeSound.Nick,
+                                                 Type = ThemeSoundType.None,
+                                                 Enabled = false
+                                             },
+                                         new ThemeSoundData
+                                             {
                                                  ThemeSound = ThemeSound.PrivateMessage,
                                                  Type = ThemeSoundType.Default,
                                                  Enabled = true
+                                             },
+                                         new ThemeSoundData
+                                             {
+                                                 ThemeSound = ThemeSound.Notice,
+                                                 Type = ThemeSoundType.None,
+                                                 Enabled = false
+                                             },
+                                         new ThemeSoundData
+                                             {
+                                                 ThemeSound = ThemeSound.Invite,
+                                                 Type = ThemeSoundType.None,
+                                                 Enabled = false
+                                             },
+                                         new ThemeSoundData
+                                             {
+                                                 ThemeSound = ThemeSound.NotifyOnline,
+                                                 Type = ThemeSoundType.None,
+                                                 Enabled = false
+                                             },
+                                         new ThemeSoundData
+                                             {
+                                                 ThemeSound = ThemeSound.NotifyOffline,
+                                                 Type = ThemeSoundType.None,
+                                                 Enabled = false
+                                             },
+                                         new ThemeSoundData
+                                             {
+                                                 ThemeSound = ThemeSound.DccGet,
+                                                 Type = ThemeSoundType.None,
+                                                 Enabled = false
+                                             },
+                                         new ThemeSoundData
+                                             {
+                                                 ThemeSound = ThemeSound.DccChat,
+                                                 Type = ThemeSoundType.None,
+                                                 Enabled = false
+                                             },
+                                         new ThemeSoundData
+                                             {
+                                                 ThemeSound = ThemeSound.DccTransferComplete,
+                                                 Type = ThemeSoundType.None,
+                                                 Enabled = false
+                                             },
+                                         new ThemeSoundData
+                                             {
+                                                 ThemeSound = ThemeSound.DccTransferFailed,
+                                                 Type = ThemeSoundType.None,
+                                                 Enabled = false
                                              }
                                      });      
             /* Set this flag to true to ensure it will be saved if it doesn't exist (ie: load fails) */
@@ -168,7 +254,7 @@ namespace ircCore.Settings.Theming
             ThemeBackgrounds = new Dictionary<ChildWindowType, ThemeBackgroundData>(theme.ThemeBackgrounds);
             Messages = new Dictionary<ThemeMessage, ThemeMessageData>(theme.Messages);
             NicklistImages = new Dictionary<ThemeNicklistImage, Bitmap>(theme.NicklistImages);
-            ThemeSounds = new List<ThemeSoundData>(theme.ThemeSounds);
+            ThemeSounds = new ThemeSounds(theme.ThemeSounds);
         }
     }
 }

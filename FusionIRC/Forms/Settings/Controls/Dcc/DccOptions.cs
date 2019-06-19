@@ -10,6 +10,7 @@ using FusionIRC.Forms.Settings.Controls.Base;
 using FusionIRC.Forms.Settings.Editing;
 using ircCore.Settings;
 using ircCore.Settings.SettingsBase.Structures;
+using ircCore.Settings.SettingsBase.Structures.Dcc;
 using ircCore.Utils;
 using libolv;
 
