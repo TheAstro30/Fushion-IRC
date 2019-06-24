@@ -29,9 +29,10 @@ namespace ircScript.Controls
                 @"\$addtok|\$deltok|\$cid|\$asctime|\$ctime|\$duration|" +
                 @"\$calc|\$iif|\$encode|\$decode|\$appdir|\$chr|\$asc|\$readini|" +
                 @"\$read|\$server|\$network|\$address|\$comchan|\$strip|" +
-                @"\$len|\$left|\$mid|\$right|\$upper|\$lower");
+                @"\$len|\$left|\$mid|\$right|\$upper|\$lower",
+                RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        private readonly Regex _commandPrefix = new Regex(@"\b(set|var|inc|dec|unset|echo|writeini|write)\b",
+        private readonly Regex _commandPrefix = new Regex(@"\b(set|var|inc|dec|unset|echo|writeini|write|timer)\b",
                                                           RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private readonly Regex _ircCommandPrefix =
@@ -131,6 +132,22 @@ namespace ircScript.Controls
             ShowScrollBars = true;
             AutoIndent = false;
             TabLength = 2;
+            AutoCompleteBracketsList = new[]
+                                           {
+                                               '(',
+                                               ')',
+                                               '{',
+                                               '}',
+                                               '[',
+                                               ']'                                               
+                                           };
+            AutoCompleteBrackets = true;
+            AutoIndentCharsPatterns =
+                "^\\s*[\\w\\.]+(\\s\\w+)?\\s*(?<range>=)\\s*(?<range>[^;]+);\r\n^\\s*(case|default)\\s*[^:]*(" +
+                "?<range>:)\\s*(?<range>[^;]+);";
+            AutoIndentChars = true;
+            AutoIndent = true;
+
             base.TextChanged += OnTextChanged;
             TextChangedDelayed += OnTextChangedDelayed;
             _unlockMouse = new Timer {Interval = 1};
@@ -249,6 +266,7 @@ namespace ircScript.Controls
             ClearStyles();
             Range.SetStyle(_keywordsStyle, _keywordPrefix);
             Range.SetStyle(_comment, _commentPrefix);
+            Range.SetStyle(_comment, @"(/\*.*?\*/)|(/\*.*)", RegexOptions.Singleline);
             Range.SetStyle(_commandStyle, _commandPrefix);
             Range.SetStyle(_identifierStyle, _identifierPrefix);
             Range.SetStyle(_miscStyle, _ircCommandPrefix);

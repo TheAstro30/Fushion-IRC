@@ -47,7 +47,7 @@ namespace ircScript.Classes.Parsers
                 }
             }
             /* Now we parse the line and replace %<var> with the actual values including $id(<n>) identifiers */
-            return _id.Parse(e, ReplaceVariables(line)).Replace((char) 7, (char) 44);
+            return _id.Parse(e, ReplaceVariables(line)).Replace((char)7, (char)44);
         }
 
         private bool GetVariableAssignment(string line, ref string command, ref string name, ref string value)

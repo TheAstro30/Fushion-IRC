@@ -100,6 +100,9 @@ namespace ircScript.Classes.Parsers
                 case "$PI":
                     return Math.PI.ToString();
 
+                case "$NULL":
+                    return ((char) 0).ToString();
+
                 default:
                     /* Check if it's an alias */                    
                     var id = value.ReplaceEx("$", string.Empty);

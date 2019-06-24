@@ -335,6 +335,7 @@ namespace FusionIRC.Helpers
             client.OnClientBeginQuit += Channel.OnBeginQuit;
             client.Parser.OnWatchOnline += Notify.OnWatchOnline;
             client.Parser.OnWatchOffline += Notify.OnWatchOffline;
+            client.Parser.OnIson += Notify.OnIson;
             client.Parser.OnBeginChannelList += Channel.OnBeginChannelList;
             client.Parser.OnChannelListData += Channel.OnChannelListData;
             client.Parser.OnEndChannelList += Channel.OnEndChannelList;
@@ -398,6 +399,7 @@ namespace FusionIRC.Helpers
             client.OnClientBeginQuit -= Channel.OnBeginQuit;
             client.Parser.OnWatchOnline -= Notify.OnWatchOnline;
             client.Parser.OnWatchOffline -= Notify.OnWatchOffline;
+            client.Parser.OnIson -= Notify.OnIson;
             client.Parser.OnBeginChannelList -= Channel.OnBeginChannelList;
             client.Parser.OnChannelListData -= Channel.OnChannelListData;
             client.Parser.OnEndChannelList -= Channel.OnEndChannelList;

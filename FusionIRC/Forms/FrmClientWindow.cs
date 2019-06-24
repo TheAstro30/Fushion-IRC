@@ -12,6 +12,7 @@ using FusionIRC.Controls.ControlBars;
 using FusionIRC.Controls.SwitchView;
 using FusionIRC.Forms.Child;
 using FusionIRC.Forms.Misc;
+using FusionIRC.Forms.Scripting;
 using FusionIRC.Helpers;
 using FusionIRC.Helpers.Commands;
 using FusionIRC.Properties;
@@ -28,7 +29,6 @@ using ircCore.Users;
 using ircCore.Utils;
 using ircScript;
 using ircScript.Classes;
-using ircScript.Classes.ScriptFunctions;
 using ircScript.Classes.Structures;
 
 namespace FusionIRC.Forms
@@ -327,6 +327,19 @@ namespace FusionIRC.Forms
                 /* Abort closing */
                 e.Cancel = true;
                 return;
+            }
+            /* Script editor */
+            var edit = WindowManager.FindClientWindow(@"FusionIRC - Script Editor");
+            if (edit != null)
+            {
+                /* Forces the OnFormClose event to fire allowing saving of files */
+                edit.BringToFront();
+            }
+            foreach (var f in Application.OpenForms.OfType<FrmScript>())
+            {
+                /* This forces the editor's OnFormClosing event to fire as it's shown with no owner */
+                f.Close();
+                break;
             }
             /* Save child forms window state */            
             if (MdiChildren.Where(w => w is FrmChildWindow).Any(w => w.WindowState == FormWindowState.Maximized))

@@ -27,5 +27,11 @@ namespace FusionIRC.Helpers.Connection
             /* Play sound */
             ThemeManager.PlaySound(ThemeSound.NotifyOffline);
         }
+
+        public static void OnIson(ClientConnection client, string nick)
+        {
+            /* Used for servers that don't support the /WATCH command */
+            System.Diagnostics.Debug.Print("SERVER ISON -> " + nick);
+        }
     }
 }

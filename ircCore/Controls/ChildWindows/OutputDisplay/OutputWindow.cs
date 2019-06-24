@@ -749,6 +749,8 @@ namespace ircCore.Controls.ChildWindows.OutputDisplay
                 /* Nothing has changed */
                 return;
             }
+
+            
             _windowWidth = i; /* Update average characters that will fit in the client area */
             _wrapUpdate.Enabled = true;
         }

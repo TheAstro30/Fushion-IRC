@@ -276,7 +276,8 @@ namespace ircScript.Classes.Parsers
                     }
                 }
                 /* Still here? */
-                return conditionTrue ? string.IsNullOrEmpty(args[0]) : !string.IsNullOrEmpty(args[0]);
+                //return conditionTrue ? string.IsNullOrEmpty(args[0]) : !string.IsNullOrEmpty(args[0]);
+                return false;
             }
             /* Second param is not null ... check firstarg is a variable... */                        
             if (args[0] == null || args[0].Length == 0)
@@ -309,7 +310,7 @@ namespace ircScript.Classes.Parsers
                 {
                     sTmpArgs[i] = sTmpArgs[i].Substring(0, sTmpArgs[i].Length - 1);
                 }
-                var conditionTrue = ParseConditional(sTmpArgs[i]);     //note: hi           
+                var conditionTrue = ParseConditional(sTmpArgs[i]);          
                 if (andOr != " || " && !conditionTrue)
                 {
                     return false;
@@ -334,7 +335,7 @@ namespace ircScript.Classes.Parsers
             if (secondArg == null)
             {
                 secondArg = (char)0;
-            }            
+            }      
             switch (operAnd)
             {
                 case 0:
@@ -348,7 +349,7 @@ namespace ircScript.Classes.Parsers
                 case 2:
                     /* > */
                     if (Functions.IsNumeric(firstArg.ToString()) && Functions.IsNumeric(secondArg.ToString()))
-                    {
+                    {                        
                         return Convert.ToInt32(firstArg) > Convert.ToInt32(secondArg);
                     }
                     break;

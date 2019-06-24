@@ -356,7 +356,7 @@ namespace FusionIRC.Forms.Scripting
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
-        {
+        {            
             /* Check if any files need saving */
             if (_files.SelectMany(file => file.Data).Any(s => s.ContentsChanged))
             {

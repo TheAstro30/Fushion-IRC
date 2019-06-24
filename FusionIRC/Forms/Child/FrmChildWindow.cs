@@ -407,7 +407,6 @@ namespace FusionIRC.Forms.Child
                     }
                     break;
             }
-            /* Update window position in settings ... */
             switch (e.CloseReason)
             {
                 case CloseReason.ApplicationExitCall:

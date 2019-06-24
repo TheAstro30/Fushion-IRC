@@ -5,6 +5,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ircClient.Parsing.Helpers;
 using ircCore.Utils;
 
@@ -78,6 +79,7 @@ namespace ircClient.Parsing
 
         public event Action<ClientConnection, string, string> OnWatchOnline;
         public event Action<ClientConnection, string> OnWatchOffline;
+        public event Action<ClientConnection, string> OnIson;
 
         public event Action<ClientConnection> OnBeginChannelList;
         public event Action<ClientConnection, string, int, string> OnChannelListData;
@@ -553,6 +555,11 @@ namespace ircClient.Parsing
 
                 case "303":
                     /* ISON */
+                    var ison = RemoveColon(fourth).Split(' ');
+                    foreach (var nick in ison.Where(nick => OnIson != null))
+                    {
+                        OnIson(_client, nick);
+                    }
                     break;
 
                 case "353":
